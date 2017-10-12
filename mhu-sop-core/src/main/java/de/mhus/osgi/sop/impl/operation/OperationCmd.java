@@ -19,6 +19,7 @@ import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.jms.JmsConnection;
 import de.mhus.lib.karaf.jms.JmsUtil;
 import de.mhus.osgi.sop.api.Sop;
+import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
 import de.mhus.osgi.sop.api.operation.JmsOperationApi;
@@ -47,13 +48,15 @@ public class OperationCmd implements Action {
 	public Object execute() throws Exception {
 
 		JmsConnection con = Sop.getDefaultJmsConnection();
-		if (conName != null)
-			con = JmsUtil.getConnection(conName);
+		if (conName == null)
+			conName = MApi.lookup(JmsApi.class).getDefaultConnectionName();
+			
+		con = JmsUtil.getConnection(conName);
 		
 		AaaContext acc = MApi.lookup(AccessApi.class).getCurrentOrGuest();
+		JmsOperationApi jms = MApi.lookup(JmsOperationApi.class);
 		
 		LocalOperationApi api = MApi.lookup(LocalOperationApi.class);
-		JmsOperationApi jms = MApi.lookup(JmsOperationApi.class);
 		
 		if (cmd.equals("list")) {
 			if (MString.isEmpty(path) && MString.isEmpty(queueName)) {

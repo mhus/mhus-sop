@@ -54,7 +54,7 @@
     </dependency>
     <dependency>
     	<groupId>de.mhus.osgi</groupId>
-    	<artifactId>mhu-osgi-sop-api</artifactId>
+    	<artifactId>mhu-sop-api</artifactId>
     	<version>${project.version}</version>
     </dependency>
     <dependency>

@@ -1,4 +1,4 @@
-package de.mhus.osgi.sop.impl.rest;
+package de.mhus.osgi.sop.rest;
 
 import java.util.Arrays;
 import java.util.Map.Entry;

@@ -42,6 +42,7 @@ import de.mhus.lib.karaf.jms.JmsUtil;
 import de.mhus.osgi.sop.api.Sop;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
+import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.operation.JmsOperationApi;
 import de.mhus.osgi.sop.api.operation.LocalOperationApi;
 import de.mhus.osgi.sop.api.operation.OperationRegister;
@@ -315,7 +316,7 @@ public class JmsOperationApiImpl extends MLog implements JmsOperationApi {
 		try {
 			MapMessage msg = registerClient.createMapMessage();
 			msg.setStringProperty("type", "operations");
-			msg.setStringProperty("connection", Jms2LocalOperationExecuteChannel.connectionName.value());
+			msg.setStringProperty("connection", MApi.lookup(JmsApi.class).getDefaultConnectionName());
 			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.queueName.value());
 			
 			int cnt = 0;
@@ -334,7 +335,7 @@ public class JmsOperationApiImpl extends MLog implements JmsOperationApi {
 		try {
 			MapMessage msg = registerClient.createMapMessage();
 			msg.setStringProperty("type", "request");
-			msg.setStringProperty("connection", Jms2LocalOperationExecuteChannel.connectionName.value());
+			msg.setStringProperty("connection", MApi.lookup(JmsApi.class).getDefaultConnectionName());
 			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.queueName.value());
 			registerClient.sendJms(msg);
 		} catch (Throwable t) {

@@ -1,4 +1,4 @@
-package de.mhus.osgi.sop.impl.rest;
+package de.mhus.osgi.sop.rest;
 
 import java.io.IOException;
 import java.io.PrintWriter;

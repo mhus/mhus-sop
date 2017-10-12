@@ -21,7 +21,7 @@ public abstract class AbstractNode<T> implements RestNodeService {
 		String id = parts.get(0);
 		parts.remove(0);
 		
-		T obj = getObjectForId(id);
+		T obj = getObjectForId(callContext, id);
 
 		if (obj == null) return null;
 		
@@ -57,7 +57,7 @@ public abstract class AbstractNode<T> implements RestNodeService {
 		return (String) callContext.get(clazz.getCanonicalName() + ID);
 	}
 	
-	protected abstract T getObjectForId(String id) throws Exception;
+	protected abstract T getObjectForId(CallContext context, String id) throws Exception;
 
 	protected abstract ActionDescriptor getCreateBpmOperation();
 

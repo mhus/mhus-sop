@@ -19,6 +19,7 @@ import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.karaf.jms.JmsDataChannel;
 import de.mhus.lib.karaf.jms.JmsManagerService;
 import de.mhus.osgi.sop.api.jms.AbstractJmsOperationExecuteChannel;
+import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.jms.TicketAccessInterceptor;
 import de.mhus.osgi.sop.api.operation.LocalOperationApi;
 
@@ -26,7 +27,6 @@ import de.mhus.osgi.sop.api.operation.LocalOperationApi;
 public class Jms2LocalOperationExecuteChannel extends AbstractJmsOperationExecuteChannel {
 
 	public static CfgString queueName = new CfgString(Jms2LocalOperationExecuteChannel.class, "queue", "sop.operation." + MApi.lookup(ServerIdent.class));
-	public static CfgString connectionName = new CfgString(Jms2LocalOperationExecuteChannel.class, "connection", "sop");
 	static Jms2LocalOperationExecuteChannel instance;
 	
 	@Override
@@ -64,7 +64,7 @@ public class Jms2LocalOperationExecuteChannel extends AbstractJmsOperationExecut
 
 	@Override
 	protected String getJmsConnectionName() {
-		return connectionName.value(); 
+		return MApi.lookup(JmsApi.class).getDefaultConnectionName();
 	}
 
 	@Override
