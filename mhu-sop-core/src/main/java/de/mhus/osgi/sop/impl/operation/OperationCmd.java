@@ -13,9 +13,11 @@ import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
+import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.lib.core.strategy.Operation;
 import de.mhus.lib.core.strategy.OperationDescription;
 import de.mhus.lib.core.strategy.OperationResult;
+import de.mhus.lib.core.util.VersionRange;
 import de.mhus.lib.jms.JmsConnection;
 import de.mhus.lib.karaf.jms.JmsUtil;
 import de.mhus.osgi.sop.api.Sop;
@@ -24,6 +26,7 @@ import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
 import de.mhus.osgi.sop.api.operation.JmsOperationApi;
 import de.mhus.osgi.sop.api.operation.LocalOperationApi;
+import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 
 @Command(scope = "sop", name = "operation", description = "Operation commands")
 @Service
@@ -44,6 +47,9 @@ public class OperationCmd implements Action {
 	@Option(name="-q", aliases="--queue", description="JMS Connection Queue OperationChannel",required=false)
 	String queueName = null;
 	
+	@Option(name="-v", aliases="--version", description="Version Range [1.2.3,2.0.0)",required=false)
+	String version = null;
+	
 	@Override
 	public Object execute() throws Exception {
 
@@ -60,12 +66,15 @@ public class OperationCmd implements Action {
 		
 		if (cmd.equals("list")) {
 			if (MString.isEmpty(path) && MString.isEmpty(queueName)) {
-				for (String path : api.getOperations()) {
-					System.out.println(path);
+				ConsoleTable out = new ConsoleTable();
+				out.setHeaderValues("path","version");
+				for (OperationDescriptor desc : api.getLocalOperations()) {
+					out.addRowValues(desc.getPath(),desc.getVersion());
 				}
+				out.print(System.out);
 			} else {
 				if (MString.isSet(path)) queueName = path;
-				List<String> list = jms.doGetOperationList(con, queueName, acc);
+				List<String> list = jms.getOperationList(con, queueName, acc);
 				if (list != null) {
 					for (String item : list)
 						System.out.println(item);
@@ -86,7 +95,7 @@ public class OperationCmd implements Action {
 		if (cmd.equals("info")) {
 			
 			if (MString.isEmpty(queueName)) {
-				Operation oper = api.getOperation(path).getOperation();
+				Operation oper = api.getOperation(path, version == null ? null : new VersionRange(version)).getOperation();
 				if (oper == null) {
 					System.out.println("Operation not found");
 				} else {
@@ -115,7 +124,7 @@ public class OperationCmd implements Action {
 		} else
 		if (cmd.equals("execute")) {
 			MProperties properties = MProperties.explodeToMProperties(parameters);
-			OperationResult res = api.doExecute(path, properties);
+			OperationResult res = api.doExecute(path, version == null ? null : new VersionRange(version), properties);
 			System.out.println("Result: "+res);
 			System.out.println("RC: " + res.getReturnCode());
 			System.out.println("Object: " + res.getResult());

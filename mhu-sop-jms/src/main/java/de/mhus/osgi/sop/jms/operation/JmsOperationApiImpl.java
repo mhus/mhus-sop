@@ -45,14 +45,16 @@ import de.mhus.osgi.sop.api.aaa.AccessApi;
 import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.operation.JmsOperationApi;
 import de.mhus.osgi.sop.api.operation.LocalOperationApi;
-import de.mhus.osgi.sop.api.operation.OperationRegister;
+import de.mhus.osgi.sop.api.operation.OperationAddress;
+import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 
 @Component(immediate=true)
 public class JmsOperationApiImpl extends MLog implements JmsOperationApi {
 
+	protected static final String PROVIDER_NAME = "jms";
 	private ClientJms registerClient;
 	private ServerJms registerServer;
-	private HashMap<String, OperationRegister> register = new HashMap<>();
+	private HashMap<String, OperationAddress> register = new HashMap<>();
 	private TimerIfc timer;
 	protected long lastRegistryRequest;
 
@@ -85,9 +87,9 @@ public class JmsOperationApiImpl extends MLog implements JmsOperationApi {
 								String version = m.getString("version" + cnt);
 								cnt++;
 								String ident = connection + "," + queue + "," + path + "," + version;
-								OperationRegister r = register.get(ident);
+								OperationAddress r = register.get(ident);
 								if (r == null) {
-									r = new OperationRegister(connection, queue, path, version);
+									r = new OperationAddress(PROVIDER_NAME, connection, queue, path, version);
 									register.put(ident, r);
 								}
 								r.setLastUpdated();
@@ -281,7 +283,7 @@ public class JmsOperationApiImpl extends MLog implements JmsOperationApi {
 	}
 
 	@Override
-	public List<String>	doGetOperationList(JmsConnection con, String queueName, AaaContext user) throws Exception {
+	public List<String>	getOperationList(JmsConnection con, String queueName, AaaContext user) throws Exception {
 		IProperties pa = new MProperties();
 		OperationResult ret = doExecuteOperation(con, queueName, "_list", pa, user, OPT_NEED_ANSWER);
 		if (ret.isSuccessful()) {
@@ -321,8 +323,11 @@ public class JmsOperationApiImpl extends MLog implements JmsOperationApi {
 			
 			int cnt = 0;
 			
-			for ( String o : MApi.lookup(LocalOperationApi.class).getOperations())
-				msg.setString("operation" + (cnt++), o);
+			for ( OperationDescriptor desc : MApi.lookup(LocalOperationApi.class).getLocalOperations()) {
+				msg.setString("operation" + cnt, desc.getPath());
+				msg.setString("version" + cnt, desc.getVersionString());
+				cnt++;
+			}
 			
 			registerClient.sendJms(msg);
 		} catch (Throwable t) {
@@ -344,16 +349,16 @@ public class JmsOperationApiImpl extends MLog implements JmsOperationApi {
 	}
 
 	@Override
-	public List<OperationRegister> getRegisteredOperations() {
+	public List<OperationAddress> getRegisteredOperations() {
 		synchronized (register) {
-			return new LinkedList<OperationRegister>( register.values() );
+			return new LinkedList<OperationAddress>( register.values() );
 		}
 	}
 
 	@Override
-	public OperationRegister getRegisteredOperation(String path, VersionRange version) {
+	public OperationAddress getRegisteredOperation(String path, VersionRange version) {
 		synchronized (register) {
-			for (OperationRegister r : register.values())
+			for (OperationAddress r : register.values())
 				if (r.getPath().equals(path) && version == null || version.includes(r.getVersion()))
 					return r;
 		}

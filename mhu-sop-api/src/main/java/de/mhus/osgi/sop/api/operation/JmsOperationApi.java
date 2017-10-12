@@ -17,7 +17,7 @@ public interface JmsOperationApi extends SApi {
 	
 	// Remote Operations API
 	
-	List<String> doGetOperationList(JmsConnection con, String queueName,
+	List<String> getOperationList(JmsConnection con, String queueName,
 			AaaContext user) throws Exception;
 	
 	OperationResult doExecuteOperation(JmsConnection con, String queueName,
@@ -33,8 +33,8 @@ public interface JmsOperationApi extends SApi {
 	
 	void requestOperationRegistry();
 	
-	List<OperationRegister> getRegisteredOperations();
+	List<OperationAddress> getRegisteredOperations();
 	
-	OperationRegister getRegisteredOperation(String path, VersionRange version);
+	OperationAddress getRegisteredOperation(String path, VersionRange version);
 	
 }

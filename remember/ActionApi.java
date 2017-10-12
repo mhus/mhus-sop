@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.List;
 
 import de.mhus.lib.core.IProperties;
+import de.mhus.lib.core.util.VersionRange;
+import de.mhus.lib.errors.NotFoundException;
 import de.mhus.osgi.sop.api.SApi;
 
 public interface ActionApi extends SApi {
@@ -14,8 +16,9 @@ public interface ActionApi extends SApi {
 	 * 
 	 * @param name
 	 * @return the action or null if not exists
+	 * @throws NotFoundException 
 	 */
-	ActionDescriptor getAction(String name);
+	ActionDescriptor getAction(String name, VersionRange version) throws NotFoundException;
 	
 	/**
 	 * Returns all actions.

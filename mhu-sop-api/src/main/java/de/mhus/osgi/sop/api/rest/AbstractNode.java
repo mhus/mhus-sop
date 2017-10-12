@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.transaction.NotSupportedException;
 
-import de.mhus.osgi.sop.api.action.ActionDescriptor;
+import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 
 public abstract class AbstractNode<T> implements RestNodeService {
 
@@ -59,11 +59,11 @@ public abstract class AbstractNode<T> implements RestNodeService {
 	
 	protected abstract T getObjectForId(CallContext context, String id) throws Exception;
 
-	protected abstract ActionDescriptor getCreateBpmOperation();
+	protected abstract OperationDescriptor getCreateAction();
 
-	protected abstract ActionDescriptor getUpdateBpmOperation();
+	protected abstract OperationDescriptor getUpdateAction();
 	
-	protected abstract ActionDescriptor getDeleteBpmOperation();
+	protected abstract OperationDescriptor getDeleteAction();
 
 	@Override
 	public RestResult doAction(CallContext callContext) throws Exception {
@@ -80,7 +80,7 @@ public abstract class AbstractNode<T> implements RestNodeService {
 //		JsonResult result = new JsonResult();
 //		doCreate(result, callContext);
 //		return result;
-		ActionDescriptor oper = getCreateBpmOperation();
+		OperationDescriptor oper = getCreateAction();
 		if (oper == null)
 			throw new NotSupportedException();
 		return RestUtil.doExecuteBpm( oper, callContext, getNodeId());
@@ -91,7 +91,7 @@ public abstract class AbstractNode<T> implements RestNodeService {
 //		JsonResult result = new JsonResult();
 //		doUpdate(result, callContext);
 //		return result;
-		ActionDescriptor oper = getUpdateBpmOperation();
+		OperationDescriptor oper = getUpdateAction();
 		if (oper == null)
 			throw new NotSupportedException();
 		return RestUtil.doExecuteBpm( oper, callContext, getNodeId());
@@ -103,7 +103,7 @@ public abstract class AbstractNode<T> implements RestNodeService {
 //		JsonResult result = new JsonResult();
 //		doDelete(result, callContext);
 //		return result;
-		ActionDescriptor oper = getDeleteBpmOperation();
+		OperationDescriptor oper = getDeleteAction();
 		if (oper == null)
 			throw new NotSupportedException();
 		return RestUtil.doExecuteBpm( oper, callContext, getNodeId());

@@ -14,6 +14,8 @@ import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MString;
+import de.mhus.lib.core.util.VersionRange;
+import de.mhus.lib.errors.NotFoundException;
 import de.mhus.lib.karaf.MServiceMap;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
@@ -47,21 +49,21 @@ public class ActionApiImpl extends MLog implements ActionApi {
     }
 	
 	@Override
-	public ActionDescriptor getAction(String name) {
+	public ActionDescriptor getAction(String name, VersionRange version) throws NotFoundException {
 		if (name == null) return null;
 		if (MString.isIndex(name, ':')) {
 			String providerName = MString.beforeIndex(name, ':');
 			name = MString.afterIndex(name, ':');
 			ActionProvider p = getProvider(providerName);
 			if (p == null) return null;
-			ActionDescriptor a = p.getAction(name);
+			ActionDescriptor a = p.getAction(name, version);
 			if (a == null) return null;
 			if (!hasAccess(a)) return null;
 			return a;
 		}
 		
 		for (ActionProvider p : getProviders()) {
-			ActionDescriptor a = p.getAction(name);
+			ActionDescriptor a = p.getAction(name, version);
 			if (a != null) return a;
 		}
 		return null;

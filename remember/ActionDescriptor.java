@@ -11,13 +11,14 @@ import de.mhus.lib.core.util.MNls;
 import de.mhus.lib.core.util.MNlsProvider;
 import de.mhus.lib.core.util.Nls;
 import de.mhus.lib.core.util.ParameterDefinitions;
+import de.mhus.lib.core.util.Version;
 
 public class ActionDescriptor implements MNlsProvider, Nls, Named, Versioned {
 	
 	private Action action;
 	private Collection<String> tags;
 	private String path;
-	private String version;
+	private Version version;
 	private String source;
 	private ParameterDefinitions definitions;
 	private DefRoot form;
@@ -30,7 +31,7 @@ public class ActionDescriptor implements MNlsProvider, Nls, Named, Versioned {
 			Collection<String> tags, 
 			String source, 
 			String path,
-			String version,
+			Version version,
 			ParameterDefinitions definitions, 
 			DefRoot form, 
 			MNlsProvider nlsProvider, 
@@ -85,8 +86,15 @@ public class ActionDescriptor implements MNlsProvider, Nls, Named, Versioned {
 		return path;
 	}
 	
+	public String getPath() {
+		return path;
+	}
+	
 	@Override
-	public String getVersion() {
+	public String getVersionString() {
+		return version.toString();
+	}
+	public Version getVersion() {
 		return version;
 	}
 	

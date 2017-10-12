@@ -10,20 +10,31 @@ import de.mhus.lib.core.util.Version;
  * @author mikehummel
  *
  */
-public class OperationRegister {
+public class OperationAddress {
 	
+	private String provider;
 	private String connection;
 	private String queue;
 	private String path;
 	private Version version;
 	private long lastUpdated;
 	
-	public OperationRegister(String connection, String queue, String path, String version) {
+	public OperationAddress(String provider, String connection, String queue, String path, String version) {
 		super();
+		this.provider = provider;
 		this.connection = connection;
 		this.queue = queue;
 		this.path = path;
 		this.version = new Version(version);
+	}
+	
+	public OperationAddress(String provider, String connection, String queue, String path, Version version) {
+		super();
+		this.provider = provider;
+		this.connection = connection;
+		this.queue = queue;
+		this.path = path;
+		this.version = version;
 	}
 	
 	public String getConnection() {
@@ -39,9 +50,13 @@ public class OperationRegister {
 		return version;
 	}
 	
+	public String getProvider() {
+		return provider;
+	}
+	
 	@Override
 	public String toString() {
-		return "jms://" + (connection == null || connection.length() == 0 ? "" : connection + ":") + queue + "/" + path + (version == null? "" : "/" + version);
+		return provider + "://" + (connection == null || connection.length() == 0 ? "" : connection + ":") + queue + "/" + path + (version == null? "" : "/" + version);
 	}
 
 	public long getLastUpdated() {

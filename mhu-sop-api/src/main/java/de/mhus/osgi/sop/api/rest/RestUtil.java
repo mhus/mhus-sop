@@ -13,9 +13,8 @@ import de.mhus.lib.core.logging.Log;
 import de.mhus.lib.core.pojo.PojoAttribute;
 import de.mhus.lib.core.pojo.PojoModel;
 import de.mhus.lib.errors.MException;
-import de.mhus.osgi.sop.api.action.ActionApi;
-import de.mhus.osgi.sop.api.action.ActionDescriptor;
 import de.mhus.osgi.sop.api.adb.AdbApi;
+import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 
 public class RestUtil {
 	
@@ -69,15 +68,16 @@ public class RestUtil {
 		return callContext.getParameter(getObjectIdParameterName(clazz));
 	}
 
-	public static RestResult doExecuteBpm(ActionDescriptor oper, CallContext callContext, String source) throws MException {
+	public static RestResult doExecuteBpm(OperationDescriptor oper, CallContext callContext, String source) throws MException {
 		return doExecuteRestAction(callContext, oper, source );
 	}
 	
-	public static RestResult doExecuteBpm(String name, CallContext callContext, String source) throws MException {
-		return doExecuteRestAction(callContext, MApi.lookup(ActionApi.class).getAction(name), source );
+	private static RestResult doExecuteRestAction(CallContext callContext, OperationDescriptor descriptor, String source) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
-	private static RestResult doExecuteRestAction(CallContext callContext, ActionDescriptor descriptor, String source) {
+	public static RestResult doExecuteBpm(String string, CallContext callContext, String nodeId) {
 		// TODO Auto-generated method stub
 		return null;
 	}

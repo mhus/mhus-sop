@@ -10,6 +10,7 @@ import de.mhus.lib.core.strategy.NotSuccessful;
 import de.mhus.lib.core.strategy.Operation;
 import de.mhus.lib.core.strategy.OperationDescription;
 import de.mhus.lib.core.strategy.OperationResult;
+import de.mhus.lib.core.util.VersionRange;
 
 /**
  * Abstract operation execution but this one can handle a list of operations.
@@ -24,8 +25,8 @@ public abstract class AbstractOperationListChannel extends AbstractJmsOperationE
 	private HashMap<String, Operation> operations = new HashMap<String, Operation>();
 	
 	@Override
-	protected OperationResult doExecute(String path, IProperties properties) {
-		Operation oper = getOperation(path);
+	protected OperationResult doExecute(String path, VersionRange version, IProperties properties) {
+		Operation oper = getOperation(path, version);
 		if (oper == null) return new NotSuccessful(path,"not found",OperationResult.NOT_FOUND);
 		DefaultTaskContext context = new DefaultTaskContext(getClass());
 		context.setParameters(properties);
@@ -37,8 +38,9 @@ public abstract class AbstractOperationListChannel extends AbstractJmsOperationE
 		}
 	}
 
-	protected Operation getOperation(String path) {
+	protected Operation getOperation(String path, VersionRange version) {
 		synchronized (operations) {
+			// TODO check version range
 			return operations.get(path);
 		}
 	}
@@ -52,8 +54,8 @@ public abstract class AbstractOperationListChannel extends AbstractJmsOperationE
 	}
 
 	@Override
-	protected OperationDescription getOperationDescription(String path) {
-		Operation oper = getOperation(path);
+	protected OperationDescription getOperationDescription(String path, VersionRange version) {
+		Operation oper = getOperation(path, version);
 		if (oper == null) return null;
 		return oper.getDescription();
 	}

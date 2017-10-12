@@ -5,12 +5,14 @@ import java.util.List;
 import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 import de.mhus.lib.core.MCollection;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.lib.core.strategy.OperationResult;
+import de.mhus.lib.core.util.VersionRange;
 import de.mhus.osgi.sop.api.action.ActionDescriptor;
 
 @Command(scope = "sop", name = "action", description = "Action commands")
@@ -26,6 +28,9 @@ public class ActionCmd implements Action {
 	@Argument(index=2, name="parameters", required=false, description="More Parameters", multiValued=true)
     String[] parameters;
 	
+	@Option(name="-v", aliases="--version", description="Version Range [1.2.3,2.0.0)",required=false)
+	String version = null;
+
 	@Override
 	public Object execute() throws Exception {
 
@@ -52,7 +57,7 @@ public class ActionCmd implements Action {
 			}
 		} else
 		if (cmd.equals("execute")) {
-			ActionDescriptor a = ActionApiImpl.instance.getAction(path);
+			ActionDescriptor a = ActionApiImpl.instance.getAction(path, version == null ? null : new VersionRange(version));
 			if (a == null) {
 				System.out.println("Action not found");
 				return null;
@@ -65,7 +70,7 @@ public class ActionCmd implements Action {
 			
 		} else
 		if (cmd.equals("info")) {
-			ActionDescriptor a = ActionApiImpl.instance.getAction(path);
+			ActionDescriptor a = ActionApiImpl.instance.getAction(path, version == null ? null : new VersionRange(version));
 			if (a == null) {
 				System.out.println("Action not found");
 				return null;

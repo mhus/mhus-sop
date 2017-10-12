@@ -20,6 +20,7 @@ import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.core.strategy.Successful;
 import de.mhus.lib.core.util.ParameterDefinition;
 import de.mhus.lib.core.util.ParameterDefinitions;
+import de.mhus.lib.core.util.Version;
 import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.action.Action;
 import de.mhus.osgi.sop.api.action.ActionDescriptor;
@@ -62,7 +63,7 @@ public abstract class BpmActionProvider extends MLog implements ActionProvider {
 						new BpmAction(def), 
 						tags, getName(), 
 						def.getProcess(), 
-						Versioned.DEFAULT_VERSION,
+						new Version(null),
 						pDefs, 
 						null, 
 						def, 

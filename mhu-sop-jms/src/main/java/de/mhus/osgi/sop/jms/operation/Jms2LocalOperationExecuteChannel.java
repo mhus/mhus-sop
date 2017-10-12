@@ -16,12 +16,15 @@ import de.mhus.lib.core.service.ServerIdent;
 import de.mhus.lib.core.strategy.Operation;
 import de.mhus.lib.core.strategy.OperationDescription;
 import de.mhus.lib.core.strategy.OperationResult;
+import de.mhus.lib.core.util.VersionRange;
+import de.mhus.lib.errors.NotFoundException;
 import de.mhus.lib.karaf.jms.JmsDataChannel;
 import de.mhus.lib.karaf.jms.JmsManagerService;
 import de.mhus.osgi.sop.api.jms.AbstractJmsOperationExecuteChannel;
 import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.jms.TicketAccessInterceptor;
 import de.mhus.osgi.sop.api.operation.LocalOperationApi;
+import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 
 @Component(provide=JmsDataChannel.class,immediate=true)
 public class Jms2LocalOperationExecuteChannel extends AbstractJmsOperationExecuteChannel {
@@ -68,12 +71,12 @@ public class Jms2LocalOperationExecuteChannel extends AbstractJmsOperationExecut
 	}
 
 	@Override
-	protected OperationResult doExecute(String path, IProperties properties) {
+	protected OperationResult doExecute(String path, VersionRange version, IProperties properties) throws NotFoundException {
 
 		log().d("execute operation",path,properties);
 		
 		LocalOperationApi admin = MApi.lookup(LocalOperationApi.class);
-		OperationResult res = admin.doExecute(path, properties);
+		OperationResult res = admin.doExecute(path, version, properties);
 		
 		log().d("operation result",path,res, res == null ? "" : res.getResult());
 		return res;
@@ -83,13 +86,13 @@ public class Jms2LocalOperationExecuteChannel extends AbstractJmsOperationExecut
 	protected List<String> getPublicOperations() {
 		LocalOperationApi admin = MApi.lookup(LocalOperationApi.class);
 		LinkedList<String> out = new LinkedList<String>();
-		for (String path : admin.getOperations()) {
+		for (OperationDescriptor desc : admin.getLocalOperations()) {
 			try {
-				Operation oper = admin.getOperation(path).getOperation();
+				Operation oper = desc.getOperation();
 				if (oper.hasAccess())
-					out.add(path);
+					out.add(desc.getPath() + ":" + desc.getVersionString());
 			} catch (Throwable t) {
-				log().d(path,t);
+				log().d(desc,t);
 			}
 		}
 			
@@ -97,9 +100,9 @@ public class Jms2LocalOperationExecuteChannel extends AbstractJmsOperationExecut
 	}
 
 	@Override
-	protected OperationDescription getOperationDescription(String path) {
+	protected OperationDescription getOperationDescription(String path, VersionRange version) throws NotFoundException {
 		LocalOperationApi admin = MApi.lookup(LocalOperationApi.class);
-		Operation oper = admin.getOperation(path).getOperation();
+		Operation oper = admin.getOperation(path, version).getOperation();
 		if (!oper.hasAccess()) return null;
 		return oper.getDescription();
 	}

@@ -2,6 +2,7 @@ package de.mhus.osgi.sop.impl.operation;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -14,24 +15,30 @@ import aQute.bnd.annotation.component.Component;
 import aQute.bnd.annotation.component.Deactivate;
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MLog;
+import de.mhus.lib.core.MString;
 import de.mhus.lib.core.strategy.DefaultTaskContext;
 import de.mhus.lib.core.strategy.NotSuccessful;
 import de.mhus.lib.core.strategy.Operation;
 import de.mhus.lib.core.strategy.OperationDescription;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.core.util.VectorMap;
+import de.mhus.lib.core.util.Version;
+import de.mhus.lib.core.util.VersionRange;
+import de.mhus.lib.errors.NotFoundException;
 import de.mhus.osgi.sop.api.operation.LocalOperationApi;
+import de.mhus.osgi.sop.api.operation.OperationAddress;
+import de.mhus.osgi.sop.api.operation.OperationApi;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 import de.mhus.osgi.sop.api.operation.OperationException;
 import de.mhus.osgi.sop.api.operation.OperationsProvider;
 
-@Component(immediate=true,provide={LocalOperationApi.class, OperationsProvider.class})
-public class LocalOperationApiImpl extends MLog implements LocalOperationApi, OperationsProvider {
+@Component(immediate=true,provide={LocalOperationApi.class, OperationsProvider.class, OperationApi.class},properties="provider=local")
+public class LocalOperationApiImpl extends MLog implements LocalOperationApi, OperationsProvider, OperationApi {
 
+	private static final String PROVIDER_NAME = "local";
 	private BundleContext context;
 	private ServiceTracker<Operation,Operation> nodeTracker;
 	private HashMap<String, OperationDescriptor> register = new HashMap<>();
-	private VectorMap<String, String, OperationDescriptor> groups = new VectorMap<>();
 	public static LocalOperationApiImpl instance;
 
 	@Activate
@@ -61,9 +68,8 @@ public class LocalOperationApiImpl extends MLog implements LocalOperationApi, Op
 					log().i("register",desc);
 					synchronized (register) {
 						OperationDescriptor descriptor = createDescriptor(reference, service);
-						if (register.put(desc.getPath(), descriptor ) != null)
+						if (register.put(desc.getPath() + ":" + desc.getVersion(), descriptor ) != null)
 							log().w("Operation already defined",desc.getPath());
-						groups.put(desc.getGroup(), desc.getId(), descriptor);
 					}
 				} else {
 					log().i("no description found, not registered",reference.getProperty("objectClass"));
@@ -108,8 +114,7 @@ public class LocalOperationApiImpl extends MLog implements LocalOperationApi, Op
 					log().i("modified",desc);
 					synchronized (register) {
 						OperationDescriptor descriptor = createDescriptor(reference, service);
-						register.put(desc.getPath(), descriptor);
-						groups.put(desc.getGroup(), desc.getId(), descriptor);
+						register.put(desc.getPath() + ":" + desc.getVersion(), descriptor);
 					}
 				}
 			}
@@ -126,8 +131,7 @@ public class LocalOperationApiImpl extends MLog implements LocalOperationApi, Op
 				if (desc != null && desc.getPath() != null) {
 					log().i("unregister",desc);
 					synchronized (register) {
-						register.remove(desc.getPath());
-						groups.removeValue(desc.getGroup(), desc.getId());
+						register.remove(desc.getPath() + ":" + desc.getVersion());
 					}
 				}
 			}			
@@ -136,51 +140,26 @@ public class LocalOperationApiImpl extends MLog implements LocalOperationApi, Op
 	}
 
 	@Override
-	public String[] getGroups() {
+	public OperationDescriptor[] getLocalOperations() {
 		synchronized (register) {
-			return groups.keySet().toArray(new String[0]);
+			return register.values().toArray(new OperationDescriptor[register.size()]);
 		}
 	}
 
 	@Override
-	public String[] getOperations() {
+	public OperationDescriptor getOperation(String path, VersionRange version) throws NotFoundException {
 		synchronized (register) {
-			return register.keySet().toArray(new String[0]);
+			for (OperationDescriptor desc : register.values())
+				if (path.equals(desc.getPath()) && (version == null || version.includes(desc.getVersion())))
+					return desc;
 		}
+		throw new NotFoundException();
 	}
 
 	@Override
-	public String[] getOperationForGroup(String group) {
-		synchronized (register) {
-			return groups.get(group).keySet().toArray(new String[0]);
-		}
-	}
-
-	@Override
-	public OperationDescriptor getOperation(String path) {
-		synchronized (register) {
-			return register.get(path);
-		}
-	}
-
-	@Override
-	public OperationResult doExecute(String path, IProperties properties) {
+	public OperationResult doExecute(String path, VersionRange version, IProperties properties) throws NotFoundException {
 		
-//		int p = path.indexOf('/');
-//		if (p >= 0) {
-//			String queue = path.substring(0,p);
-//			path = path.substring(p+1);
-//			AccessApi access = Sop.getApi(AccessApi.class);
-//			try {
-//				OperationResult answer = doExecuteOperation(Sop.getDefaultJmsConnection(), queue, path, properties, access.getCurrentOrGuest(), true);
-//				return answer;
-//			} catch (Exception e) {
-//				log().w(path,e);
-//				return null;
-//			}
-//		}
-		
-		OperationDescriptor operation = getOperation(path);
+		OperationDescriptor operation = getOperation(path, version);
 		if (operation == null) return new NotSuccessful(path, "operation not found", OperationResult.NOT_FOUND);
 		
 		DefaultTaskContext taskContext = new DefaultTaskContext(getClass());
@@ -194,6 +173,30 @@ public class LocalOperationApiImpl extends MLog implements LocalOperationApi, Op
 			log().w(path,properties,e);
 			return new NotSuccessful(path,e.toString(), OperationResult.INTERNAL_ERROR);
 		}
+	}
+
+	@Override
+	public void collectOperations(List<OperationAddress> list, String filter, VersionRange version) {
+		synchronized (register) {
+			for (String key : register.keySet())
+				if (MString.compareFsLikePattern(key, filter)) {
+					OperationDescriptor oper = register.get(key);
+					list.add(new OperationAddress(PROVIDER_NAME, "", "", key, oper.getVersion()));
+				}
+		}
+	}
+
+	@Override
+	public Operation getOperation(OperationAddress address) throws NotFoundException {
+		if (address == null) return null;
+		if (address.getProvider() == null || address.getProvider().equals(PROVIDER_NAME))
+			return getOperation(address.getPath(), address.getVersion().toRange()).getOperation();
+		return null;
+	}
+
+	@Override
+	public List<OperationAddress> getOperations(String filter, VersionRange version) {
+		return null;
 	}
 
 //	public OperationResult doExecuteOperation(JmsConnection con, String queueName, String operationName, IProperties parameters, AaaContext user, boolean needAnswer ) throws Exception {

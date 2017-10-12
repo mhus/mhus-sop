@@ -25,6 +25,8 @@ import de.mhus.lib.core.strategy.NotSuccessful;
 import de.mhus.lib.core.strategy.OperationDescription;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.core.strategy.Successful;
+import de.mhus.lib.core.util.VersionRange;
+import de.mhus.lib.errors.NotFoundException;
 import de.mhus.lib.jms.MJms;
 import de.mhus.lib.jms.ServerJms;
 import de.mhus.lib.karaf.jms.JmsDataChannelImpl;
@@ -65,6 +67,7 @@ public abstract class AbstractJmsOperationExecuteChannel extends JmsDataChannelI
 		
 		String path = msg.getStringProperty(Sop.PARAM_OPERATION_PATH);
 		if (path == null) return null;
+		String version = msg.getStringProperty(Sop.PARAM_OPERATION_VERSION);
 		IProperties properties = null;
 		if (msg instanceof MapMessage) {
 			properties = MJms.getMapProperties((MapMessage)msg);
@@ -95,21 +98,24 @@ public abstract class AbstractJmsOperationExecuteChannel extends JmsDataChannelI
 			if (id == null) 
 				res = new NotSuccessful(Sop.OPERATION_INFO, "not found", OperationResult.NOT_FOUND);
 			else {
-				OperationDescription des = getOperationDescription(id);
-				if (des == null)
-					res = new NotSuccessful(Sop.OPERATION_INFO, "not found", OperationResult.NOT_FOUND);
-				else {
+				try {
+					OperationDescription des = getOperationDescription(id, version == null ? null : new VersionRange(version));
 					res = new Successful(Sop.OPERATION_INFO, "list",OperationResult.OK,
 							"group",des.getGroup(),
 							"id",des.getId(),
 							"form",des.getForm().toString(),
 							"title",des.getCaption()
 							);
+				} catch (NotFoundException nfe) {
+					res = new NotSuccessful(Sop.OPERATION_INFO, "not found", OperationResult.NOT_FOUND);
 				}
 			}
 		} else
-			res = doExecute(path, properties);
-		
+			try {
+				res = doExecute(path, version == null ? null : new VersionRange(version), properties);
+			} catch (NotFoundException nfe) {
+				res = new NotSuccessful(path, "not found", OperationResult.NOT_FOUND);
+			}
 		Message ret = null;
 		boolean consumed = false;
 		if (res != null && res.getResult() != null && res.getResult() instanceof Map) {
@@ -238,8 +244,9 @@ public abstract class AbstractJmsOperationExecuteChannel extends JmsDataChannelI
 	 * @param path The name of the command
 	 * @param properties properties given.
 	 * @return
+	 * @throws NotFoundException 
 	 */
-	protected abstract OperationResult doExecute(String path, IProperties properties);
+	protected abstract OperationResult doExecute(String path, VersionRange version, IProperties properties) throws NotFoundException;
 
 	/**
 	 * Return a list of current possible and public operations. The list can be called
@@ -260,7 +267,8 @@ public abstract class AbstractJmsOperationExecuteChannel extends JmsDataChannelI
 	 * 
 	 * @param path The path to the operation
 	 * @return The description or null.
+	 * @throws NotFoundException 
 	 */
-	protected abstract OperationDescription getOperationDescription(String path);
+	protected abstract OperationDescription getOperationDescription(String path, VersionRange version) throws NotFoundException;
 	
 }

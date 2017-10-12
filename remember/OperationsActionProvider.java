@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import aQute.bnd.annotation.component.Component;
+import de.mhus.lib.core.util.VersionRange;
+import de.mhus.lib.errors.NotFoundException;
 import de.mhus.osgi.sop.api.action.ActionDescriptor;
 import de.mhus.osgi.sop.api.action.ActionProvider;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
@@ -25,16 +27,15 @@ public class OperationsActionProvider implements ActionProvider {
 	@Override
 	public Collection<ActionDescriptor> getActions() {
 		LinkedList<ActionDescriptor> out = new LinkedList<>();
-		for (String name : LocalOperationApiImpl.instance.getOperations()) {
-			OperationDescriptor oper = LocalOperationApiImpl.instance.getOperation(name);
-			out.add(oper);
+		for ( OperationDescriptor desc : LocalOperationApiImpl.instance.getOperations(null, null)) {
+			out.add(desc);
 		}
 		return out;
 	}
 
 	@Override
-	public ActionDescriptor getAction(String name) {
-		return LocalOperationApiImpl.instance.getOperation(name);
+	public ActionDescriptor getAction(String name, VersionRange version) throws NotFoundException {
+		return LocalOperationApiImpl.instance.getOperation(name, version);
 	}
 
 }

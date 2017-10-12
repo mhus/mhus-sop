@@ -8,7 +8,7 @@ import org.codehaus.jackson.node.ObjectNode;
 import aQute.bnd.annotation.component.Component;
 import de.mhus.lib.core.pojo.MPojo;
 import de.mhus.lib.errors.MException;
-import de.mhus.osgi.sop.api.action.ActionDescriptor;
+import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 import de.mhus.osgi.sop.api.rest.AbstractObjectListNode;
 import de.mhus.osgi.sop.api.rest.CallContext;
 import de.mhus.osgi.sop.api.rest.JsonResult;
@@ -59,17 +59,17 @@ public class PublicRestNode extends AbstractObjectListNode<Object> {
 	}
 
 	@Override
-	protected ActionDescriptor getCreateBpmOperation() {
+	protected OperationDescriptor getCreateAction() {
 		return null;
 	}
 
 	@Override
-	protected ActionDescriptor getUpdateBpmOperation() {
+	protected OperationDescriptor getUpdateAction() {
 		return null;
 	}
 
 	@Override
-	protected ActionDescriptor getDeleteBpmOperation() {
+	protected OperationDescriptor getDeleteAction() {
 		return null;
 	}
 
