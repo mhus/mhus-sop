@@ -2,47 +2,71 @@ package de.mhus.osgi.sop.api.operation;
 
 import java.util.Date;
 
+import de.mhus.lib.basics.Named;
+import de.mhus.lib.basics.Versioned;
+import de.mhus.lib.core.strategy.OperationDescription;
 import de.mhus.lib.core.util.Version;
 
 /**
- * The class represent an address to an operation via jms like a uri
+ * The class represents an address to an operation
+ * jms://de.xyz.Operation:1.2.3/remote/sop
+ * provider: jms
+ * group: de.xyz
+ * name: Operation
+ * version: 1.2.3
+ * path: de.xyz.Operation
+ * queue: remote
+ * connection: sop
  * 
  * @author mikehummel
  *
  */
-public class OperationAddress {
+public class OperationAddress implements Named, Versioned {
 	
 	private String provider;
-	private String connection;
-	private String queue;
 	private String path;
 	private Version version;
-	private long lastUpdated;
+	private String address;
+	private String[] parts;
+	private int grpIndex;
 	
-	public OperationAddress(String provider, String connection, String queue, String path, String version) {
+	public OperationAddress(String address) {
 		super();
-		this.provider = provider;
-		this.connection = connection;
-		this.queue = queue;
-		this.path = path;
-		this.version = new Version(version);
+		this.address = address;
+		// parse address
+		int p = address.indexOf("://");
+		if ( p >= 0 ) {
+			provider = address.substring(0, p);
+			address = address.substring(p+3);
+		} else {
+			provider = OperationApi.DEFAULT_PROVIDER_NAME;
+		}
+		p = address.indexOf('/');
+		if (p >= 0) {
+			path = address.substring(0, p);
+			address = address.substring(p+1);
+		} else {
+			path = address;
+			address = "";
+		}
+		
+		p = path.indexOf(':');
+		if (p >=0) {
+			version = new Version(path.substring(p+1));
+			path = path.substring(0, p);
+		} else
+			version = new Version(null);
+		
+		grpIndex = path.lastIndexOf('.');
+		
+		if (address.length() > 0) {
+			parts = address.split("/");
+		} else {
+			parts = new String[0];
+		}
+		
 	}
 	
-	public OperationAddress(String provider, String connection, String queue, String path, Version version) {
-		super();
-		this.provider = provider;
-		this.connection = connection;
-		this.queue = queue;
-		this.path = path;
-		this.version = version;
-	}
-	
-	public String getConnection() {
-		return connection;
-	}
-	public String getQueue() {
-		return queue;
-	}
 	public String getPath() {
 		return path;
 	}
@@ -56,14 +80,44 @@ public class OperationAddress {
 	
 	@Override
 	public String toString() {
-		return provider + "://" + (connection == null || connection.length() == 0 ? "" : connection + ":") + queue + "/" + path + (version == null? "" : "/" + version);
+		return address;
+	}
+	
+	public String getPart(int index) {
+		return parts[index];
+	}
+	
+	public int partSize() {
+		return parts.length;
 	}
 
-	public long getLastUpdated() {
-		return lastUpdated;
+	public String getGroup() {
+		if (grpIndex >= 0)
+			return path.substring(0, grpIndex);
+		return "";
+	}
+	
+	@Override
+	public String getName() {
+		if (grpIndex >= 0)
+			return path.substring(grpIndex+1);
+		return path;
 	}
 
-	public void setLastUpdated() {
-		this.lastUpdated = System.currentTimeMillis();
+	@Override
+	public String getVersionString() {
+		return version.toString();
 	}
+
+	public static OperationAddress create(String providerName, OperationDescription desc, String ... parts ) {
+		StringBuilder b = new StringBuilder().append(providerName).append("://").append(desc.getPath());
+		String v = desc.getVersionString();
+		if (v != null) b.append(':').append(v);
+		if (parts != null) {
+			for (String part : parts)
+				b.append("/").append(part);
+		}
+		return new OperationAddress(b.toString());
+	}
+	
 }

@@ -2,6 +2,7 @@ package de.mhus.osgi.sop.impl.operation;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Argument;
@@ -24,8 +25,7 @@ import de.mhus.osgi.sop.api.Sop;
 import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
-import de.mhus.osgi.sop.api.operation.JmsOperationApi;
-import de.mhus.osgi.sop.api.operation.LocalOperationApi;
+import de.mhus.osgi.sop.api.operation.OperationApi;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 
 @Command(scope = "sop", name = "operation", description = "Operation commands")
@@ -59,80 +59,29 @@ public class OperationCmd implements Action {
 			
 		con = JmsUtil.getConnection(conName);
 		
-		AaaContext acc = MApi.lookup(AccessApi.class).getCurrentOrGuest();
-		JmsOperationApi jms = MApi.lookup(JmsOperationApi.class);
+//		AaaContext acc = MApi.lookup(AccessApi.class).getCurrentOrGuest();
 		
-		LocalOperationApi api = MApi.lookup(LocalOperationApi.class);
+		OperationApi api = MApi.lookup(OperationApi.class);
 		
 		if (cmd.equals("list")) {
-			if (MString.isEmpty(path) && MString.isEmpty(queueName)) {
-				ConsoleTable out = new ConsoleTable();
-				out.setHeaderValues("path","version");
-				for (OperationDescriptor desc : api.getLocalOperations()) {
-					out.addRowValues(desc.getPath(),desc.getVersion());
-				}
-				out.print(System.out);
-			} else {
-				if (MString.isSet(path)) queueName = path;
-				List<String> list = jms.getOperationList(con, queueName, acc);
-				if (list != null) {
-					for (String item : list)
-						System.out.println(item);
-					System.out.println("OK");
-				} else {
-					System.out.println("ERROR");
-				}
+			ConsoleTable out = new ConsoleTable();
+			out.setHeaderValues("address","title","tags");
+			for (OperationDescriptor desc : api.findOperations(path,version == null ? null : new VersionRange(version),null)) {
+				out.addRowValues(desc.getAddress(),desc.getTitle(),desc.getTags());
 			}
+			out.print(System.out);
 		} else
-//		if (cmd.equals("action")) {
-//			ConsoleTable table = new ConsoleTable();
-//			table.setHeaderValues("Name","Register name", "Service Class");
-//			for (OperationBpmDefinition def : api.getActionDefinitions()) {
-//				table.addRowValues(def.getName(), def.getRegisterName(), def.getServiceClass());
-//			}
-//			table.print(System.out);
-//		}
 		if (cmd.equals("info")) {
-			
-			if (MString.isEmpty(queueName)) {
-				Operation oper = api.getOperation(path, version == null ? null : new VersionRange(version)).getOperation();
-				if (oper == null) {
-					System.out.println("Operation not found");
-				} else {
-					OperationDescription des = oper.getDescription();
-					System.out.println("Description  : " + des);
-					System.out.println("Form         : " + des.getForm());
-//				System.out.println("BpmDefinition: " + oper.get);
-				}
-			} else {
-				IProperties pa = new MProperties();
-				pa.setString("id", path);
-				OperationResult ret = jms.doExecuteOperation(con, queueName, "_get", pa, acc, JmsOperationApi.OPT_NEED_ANSWER);
-				if (ret.isSuccessful()) {
-					Object res = ret.getResult();
-					if (res != null && res instanceof Map<?,?>) {
-						Map<?, ?> map = (Map<?,?>)res;
-						System.out.println("Description  : " + map.get("group") + "," + map.get("id"));
-						System.out.println("Form         : " + map.get("form") );
-					} else {
-						System.out.println("Result not a map");
-					}
-				} else {
-					System.out.println("ERROR " + ret.getMsg());
-				}
-			}
+			OperationDescriptor des = api.findOperation(path, version == null ? null : new VersionRange(version),null);
+			System.out.println("Title  : " + des.getTitle());
+			System.out.println("Form   : " + des.getForm());
 		} else
 		if (cmd.equals("execute")) {
 			MProperties properties = MProperties.explodeToMProperties(parameters);
-			OperationResult res = api.doExecute(path, version == null ? null : new VersionRange(version), properties);
+			OperationResult res = api.doExecute(path, version == null ? null : new VersionRange(version), null, properties);
 			System.out.println("Result: "+res);
 			System.out.println("RC: " + res.getReturnCode());
 			System.out.println("Object: " + res.getResult());
-		} else
-		if (cmd.equals("search")) {
-			for (String name : jms.lookupOperationQueues())
-				System.out.println("Queue: " + name);
-			System.out.println("OK");
 		} else {
 			System.out.println("Command not found");
 		}

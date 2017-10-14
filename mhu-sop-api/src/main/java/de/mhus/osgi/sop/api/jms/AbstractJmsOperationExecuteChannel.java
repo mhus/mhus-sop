@@ -31,6 +31,7 @@ import de.mhus.lib.jms.MJms;
 import de.mhus.lib.jms.ServerJms;
 import de.mhus.lib.karaf.jms.JmsDataChannelImpl;
 import de.mhus.osgi.sop.api.Sop;
+import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 
 /**
  * The class implement the protocol to provide a 'operation' connection via JMS. It's the
@@ -99,12 +100,12 @@ public abstract class AbstractJmsOperationExecuteChannel extends JmsDataChannelI
 				res = new NotSuccessful(Sop.OPERATION_INFO, "not found", OperationResult.NOT_FOUND);
 			else {
 				try {
-					OperationDescription des = getOperationDescription(id, version == null ? null : new VersionRange(version));
+					OperationDescriptor des = getOperationDescription(id, version == null ? null : new VersionRange(version));
 					res = new Successful(Sop.OPERATION_INFO, "list",OperationResult.OK,
-							"group",des.getGroup(),
-							"id",des.getId(),
-							"form",des.getForm().toString(),
-							"title",des.getCaption()
+							"group",des.getAddress().getGroup(),
+							"id",des.getAddress().getName(),
+							"form",des.getForm() == null ? "" : des.getForm().toString(),
+							"title",des.getTitle()
 							);
 				} catch (NotFoundException nfe) {
 					res = new NotSuccessful(Sop.OPERATION_INFO, "not found", OperationResult.NOT_FOUND);
@@ -269,6 +270,6 @@ public abstract class AbstractJmsOperationExecuteChannel extends JmsDataChannelI
 	 * @return The description or null.
 	 * @throws NotFoundException 
 	 */
-	protected abstract OperationDescription getOperationDescription(String path, VersionRange version) throws NotFoundException;
+	protected abstract OperationDescriptor getOperationDescription(String path, VersionRange version) throws NotFoundException;
 	
 }

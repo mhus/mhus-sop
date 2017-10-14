@@ -1,8 +1,10 @@
 package de.mhus.osgi.sop.impl.operation;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -25,20 +27,20 @@ import de.mhus.lib.core.util.VectorMap;
 import de.mhus.lib.core.util.Version;
 import de.mhus.lib.core.util.VersionRange;
 import de.mhus.lib.errors.NotFoundException;
-import de.mhus.osgi.sop.api.operation.LocalOperationApi;
 import de.mhus.osgi.sop.api.operation.OperationAddress;
 import de.mhus.osgi.sop.api.operation.OperationApi;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 import de.mhus.osgi.sop.api.operation.OperationException;
 import de.mhus.osgi.sop.api.operation.OperationsProvider;
 
-@Component(immediate=true,provide={LocalOperationApi.class, OperationsProvider.class, OperationApi.class},properties="provider=local")
-public class LocalOperationApiImpl extends MLog implements LocalOperationApi, OperationsProvider, OperationApi {
+@Component(immediate=true,provide=OperationsProvider.class,properties="provider=local")
+public class LocalOperationApiImpl extends MLog implements OperationsProvider {
 
-	private static final String PROVIDER_NAME = "local";
+	static final String PROVIDER_NAME = "local";
+
 	private BundleContext context;
 	private ServiceTracker<Operation,Operation> nodeTracker;
-	private HashMap<String, OperationDescriptor> register = new HashMap<>();
+	private HashMap<String, LocalOperationDescriptor> register = new HashMap<>();
 	public static LocalOperationApiImpl instance;
 
 	@Activate
@@ -67,8 +69,8 @@ public class LocalOperationApiImpl extends MLog implements LocalOperationApi, Op
 				if (desc != null && desc.getPath() != null) {
 					log().i("register",desc);
 					synchronized (register) {
-						OperationDescriptor descriptor = createDescriptor(reference, service);
-						if (register.put(desc.getPath() + ":" + desc.getVersion(), descriptor ) != null)
+						LocalOperationDescriptor descriptor = createDescriptor(reference, service);
+						if (register.put(desc.getPath() + ":" + desc.getVersionString(), descriptor ) != null)
 							log().w("Operation already defined",desc.getPath());
 					}
 				} else {
@@ -78,8 +80,7 @@ public class LocalOperationApiImpl extends MLog implements LocalOperationApi, Op
 			return service;
 		}
 
-		private OperationDescriptor createDescriptor(ServiceReference<Operation> reference, Operation service) {
-			String source = "operation";
+		private LocalOperationDescriptor createDescriptor(ServiceReference<Operation> reference, Operation service) {
 			LinkedList<String> tags = new LinkedList<>();
 			Object tagsStr = reference.getProperty("tags");
 			if (tagsStr instanceof String[]) {
@@ -92,15 +93,8 @@ public class LocalOperationApiImpl extends MLog implements LocalOperationApi, Op
 			}
 			service.getDescription().getForm();
 			OperationDescription desc = service.getDescription();
-			return new OperationDescriptor(
-					service, 
-					tags, 
-					source, 
-					desc != null ? desc.getParameterDefinitions() : null,
-					desc != null ? desc.getForm() : null,
-					service,
-					desc != null ? desc.getTitle() : source
-					);
+			
+			return new LocalOperationDescriptor(OperationAddress.create(PROVIDER_NAME,desc), desc,tags, service);
 		}
 
 		@Override
@@ -113,8 +107,8 @@ public class LocalOperationApiImpl extends MLog implements LocalOperationApi, Op
 				if (desc != null && desc.getPath() != null) {
 					log().i("modified",desc);
 					synchronized (register) {
-						OperationDescriptor descriptor = createDescriptor(reference, service);
-						register.put(desc.getPath() + ":" + desc.getVersion(), descriptor);
+						LocalOperationDescriptor descriptor = createDescriptor(reference, service);
+						register.put(desc.getPath() + ":" + desc.getVersionString(), descriptor);
 					}
 				}
 			}
@@ -131,7 +125,7 @@ public class LocalOperationApiImpl extends MLog implements LocalOperationApi, Op
 				if (desc != null && desc.getPath() != null) {
 					log().i("unregister",desc);
 					synchronized (register) {
-						register.remove(desc.getPath() + ":" + desc.getVersion());
+						register.remove(desc.getPath() + ":" + desc.getVersionString());
 					}
 				}
 			}			
@@ -140,198 +134,76 @@ public class LocalOperationApiImpl extends MLog implements LocalOperationApi, Op
 	}
 
 	@Override
-	public OperationDescriptor[] getLocalOperations() {
+	public void collectOperations(List<OperationDescriptor> list, String filter, VersionRange version, Collection<String> providedTags) {
 		synchronized (register) {
-			return register.values().toArray(new OperationDescriptor[register.size()]);
+			for (OperationDescriptor desc : register.values()) {
+				if (MString.compareFsLikePattern(desc.getPath(), filter) && 
+					version.includes(desc.getVersion()) && 
+					(providedTags == null || desc.compareTags(providedTags)) )
+						list.add(desc);
+			}
 		}
 	}
 
 	@Override
-	public OperationDescriptor getOperation(String path, VersionRange version) throws NotFoundException {
+	public OperationResult doExecute(String filter, VersionRange version, Collection<String> providedTags, IProperties properties, String ... executeOptions)
+			throws NotFoundException {
+		OperationDescriptor d = null;
 		synchronized (register) {
-			for (OperationDescriptor desc : register.values())
-				if (path.equals(desc.getPath()) && (version == null || version.includes(desc.getVersion())))
-					return desc;
+			for (OperationDescriptor desc : register.values()) {
+				if (MString.compareFsLikePattern(desc.getPath(), filter) && 
+					version.includes(desc.getVersion()) && 
+					(providedTags == null || desc.compareTags(providedTags)) ) {
+						d = desc;
+						break;
+				}
+			}
 		}
-		throw new NotFoundException();
+		if (d == null) throw new NotFoundException("operation not found",filter,version,providedTags);
+		return doExecute(d, properties);
 	}
 
 	@Override
-	public OperationResult doExecute(String path, VersionRange version, IProperties properties) throws NotFoundException {
-		
-		OperationDescriptor operation = getOperation(path, version);
-		if (operation == null) return new NotSuccessful(path, "operation not found", OperationResult.NOT_FOUND);
+	public OperationResult doExecute(OperationDescriptor desc, IProperties properties, String ... executeOptions) throws NotFoundException {
+		Operation operation = null;
+		if (desc instanceof LocalOperationDescriptor) {
+			operation = ((LocalOperationDescriptor)desc).operation;
+		}
+		if (operation == null) {
+			if (!PROVIDER_NAME.equals(desc.getProvider()))
+				throw new NotFoundException("description is from another provider",desc);
+			synchronized (register) {
+				LocalOperationDescriptor local = register.get(desc.getPath() + ":" + desc.getVersionString());
+				if (local != null)
+					operation = local.operation;
+			}
+		}
+		if (operation == null)
+			throw new NotFoundException("operation not found", desc);
 		
 		DefaultTaskContext taskContext = new DefaultTaskContext(getClass());
 		taskContext.setParameters(properties);
 		try {
-			return operation.getOperation().doExecute(taskContext);
+			return operation.doExecute(taskContext);
 		} catch (OperationException e) {
-			log().w(path,properties,e);
-			return new NotSuccessful(path,e.getMessage(), e.getReturnCode());
+			log().w(desc,properties,e);
+			return new NotSuccessful(operation,e.getMessage(), e.getCaption(), e.getReturnCode());
 		} catch (Exception e) {
-			log().w(path,properties,e);
-			return new NotSuccessful(path,e.toString(), OperationResult.INTERNAL_ERROR);
+			log().w(desc,properties,e);
+			return new NotSuccessful(operation,e.toString(), OperationResult.INTERNAL_ERROR);
 		}
 	}
 
-	@Override
-	public void collectOperations(List<OperationAddress> list, String filter, VersionRange version) {
-		synchronized (register) {
-			for (String key : register.keySet())
-				if (MString.compareFsLikePattern(key, filter)) {
-					OperationDescriptor oper = register.get(key);
-					list.add(new OperationAddress(PROVIDER_NAME, "", "", key, oper.getVersion()));
-				}
+	private class LocalOperationDescriptor extends OperationDescriptor {
+
+		private Operation operation;
+
+		public LocalOperationDescriptor(OperationAddress address, OperationDescription description,
+				Collection<String> tags, Operation operation) {
+			super(address, description, tags);
+			this.operation = operation;
 		}
-	}
-
-	@Override
-	public Operation getOperation(OperationAddress address) throws NotFoundException {
-		if (address == null) return null;
-		if (address.getProvider() == null || address.getProvider().equals(PROVIDER_NAME))
-			return getOperation(address.getPath(), address.getVersion().toRange()).getOperation();
-		return null;
-	}
-
-	@Override
-	public List<OperationAddress> getOperations(String filter, VersionRange version) {
-		return null;
-	}
-
-//	public OperationResult doExecuteOperation(JmsConnection con, String queueName, String operationName, IProperties parameters, AaaContext user, boolean needAnswer ) throws Exception {
-//		AccessApi api = Sop.getApi(AccessApi.class);
-//		String ticket = api.createTrustTicket(user);
-//		return doExecuteOperation(con, queueName, operationName, parameters, ticket, MTimeInterval.MINUTE_IN_MILLISECOUNDS / 2, needAnswer);
-//	}
-//	
-//	public OperationResult doExecuteOperation(JmsConnection con, String queueName, String operationName, IProperties parameters, String ticket, long timeout, boolean needAnswer ) throws Exception {
-//
-//		if (con == null) throw new JMSException("connection is null");
-//		ClientJms client = new ClientJms(con.createQueue(queueName));
-//				
-//		boolean needObject = false;
-//		for (Entry<String, Object> item : parameters) {
-//			Object value = item.getValue();
-//			if (! (value == null || value.getClass().isPrimitive() || value instanceof String ) ) {
-//				needObject = true;
-//				break;
-//			}
-//		}
-//		
-//		Message msg = null;
-//		if (needObject) {
-//			msg = con.createObjectMessage((MProperties)parameters);
-//		} else {
-//			msg = con.createMapMessage();
-//			for (Entry<String, Object> item : parameters) {
-//				//String name = item.getKey();
-//				//if (!name.startsWith("_"))
-//				((MapMessage)msg).setObject(item.getKey(), item.getValue()); //TODO different types, currently it's only String ?!
-//			}
-//			((MapMessage)msg).getMapNames();
-//		}
-//		
-//		msg.setStringProperty(Sop.PARAM_OPERATION_PATH, operationName);
-//
-//
-//		msg.setStringProperty(Sop.PARAM_AAA_TICKET, ticket );
-//		client.setTimeout(timeout);
-//    	// Send Request
-//    	
-//    	log().d(operationName,"sending Message", queueName, msg, needAnswer);
-//    	
-//    	if (!needAnswer) {
-//    		client.sendJmsOneWay(msg);
-//    		return null;
-//    	}
-//    	
-//    	Message answer = client.sendJms(msg);
-//
-//    	// Process Answer
-//    	
-//    	OperationResult out = new OperationResult();
-//    	out.setOperationPath(operationName);
-//		if (answer == null) {
-//			log().d(queueName,operationName,"answer is null");
-//			out.setSuccessful(false);
-//			out.setMsg("answer is null");
-//			out.setReturnCode(OperationResult.INTERNAL_ERROR);
-//		} else {
-//			boolean successful = answer.getBooleanProperty(Sop.PARAM_SUCCESSFUL);
-//			out.setSuccessful(successful);
-//			
-//			if (!successful)
-//				out.setMsg(answer.getStringProperty(Sop.PARAM_MSG));
-//			out.setReturnCode(answer.getLongProperty(Sop.PARAM_RC));
-//			
-//			if (successful) {
-//				
-//				if (answer instanceof MapMessage) {
-//					MapMessage mapMsg = (MapMessage)answer;
-//					out.setResult(MJms.getMapProperties(mapMsg));
-//				} else
-//				if (answer instanceof TextMessage) {
-//					out.setMsg(((TextMessage)answer).getText());
-//					out.setResult(out.getMsg());
-//				} else
-//				if (answer instanceof BytesMessage) {
-//					long len = ((BytesMessage)answer).getBodyLength();
-//					if (len > Sop.MAX_MSG_BYTES) {
-//						out.setMsg("answer bytes too long " + len);
-//						out.setSuccessful(false);
-//						out.setReturnCode(OperationResult.INTERNAL_ERROR);
-//					} else {
-//						byte[] bytes = new byte[(int) len];
-//						((BytesMessage)answer).readBytes(bytes);
-//						out.setResult(bytes);
-//					}
-//				} else
-//				if (answer instanceof ObjectMessage) {
-//					Serializable obj = ((ObjectMessage)answer).getObject();
-//					if (obj == null) {
-//						out.setResult(null);
-//					} else {
-//						out.setResult(obj);
-//					}
-//				}
-//			}	
-//		}
-//		
-//		
-//		client.close();
-//		
-//		return out;
-//	}
 		
-//	public List<String>	doGetOperationList(JmsConnection con, String queueName, AaaContext user) throws Exception {
-//		IProperties pa = new MProperties();
-//		OperationResult ret = doExecuteOperation(con, queueName, "_list", pa, user, true);
-//		if (ret.isSuccessful()) {
-//			Object res = ret.getResult();
-//			if (res != null && res instanceof MProperties) {
-//				String[] list = String.valueOf( ((MProperties)res).getString("list","") ).split(",");
-//				LinkedList<String> out = new LinkedList<String>();
-//				for (String item : list) out.add(item);
-//				return out;
-//			}
-//		}
-//		return null;
-//	}
-	
-	// Deprecated
-//	public List<String> lookupOperationQueues() throws Exception {
-//		JmsConnection con = JmsUtil.getConnection(OperationBroadcast.connectionName.value());
-//		ClientJms client = new ClientJms(con.createTopic(OperationBroadcast.queueName.value()));
-//		client.open();
-//		TextMessage msg = client.getSession().createTextMessage();
-//		LinkedList<String> out = new LinkedList<String>();
-//		for (Message ret : client.sendJmsBroadcast(msg)) {
-//			String q = ret.getStringProperty("queue");
-//			if (q != null)
-//				out.add(q);
-//		}
-//		return out;
-//	}
+	}
 	
 }

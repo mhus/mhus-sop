@@ -23,7 +23,7 @@ import de.mhus.lib.karaf.jms.JmsManagerService;
 import de.mhus.osgi.sop.api.jms.AbstractJmsOperationExecuteChannel;
 import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.jms.TicketAccessInterceptor;
-import de.mhus.osgi.sop.api.operation.LocalOperationApi;
+import de.mhus.osgi.sop.api.operation.OperationApi;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 
 @Component(provide=JmsDataChannel.class,immediate=true)
@@ -75,8 +75,8 @@ public class Jms2LocalOperationExecuteChannel extends AbstractJmsOperationExecut
 
 		log().d("execute operation",path,properties);
 		
-		LocalOperationApi admin = MApi.lookup(LocalOperationApi.class);
-		OperationResult res = admin.doExecute(path, version, properties);
+		OperationApi admin = MApi.lookup(OperationApi.class);
+		OperationResult res = admin.doExecute(path, version, null, properties);
 		
 		log().d("operation result",path,res, res == null ? "" : res.getResult());
 		return res;
@@ -84,15 +84,15 @@ public class Jms2LocalOperationExecuteChannel extends AbstractJmsOperationExecut
 
 	@Override
 	protected List<String> getPublicOperations() {
-		LocalOperationApi admin = MApi.lookup(LocalOperationApi.class);
 		LinkedList<String> out = new LinkedList<String>();
-		for (OperationDescriptor desc : admin.getLocalOperations()) {
-			try {
-				Operation oper = desc.getOperation();
-				if (oper.hasAccess())
+		OperationApi admin = MApi.lookup(OperationApi.class);
+		for (OperationDescriptor desc :  admin.findOperations("*", null, null)) {
+			if (!JmsOperationApiImpl.PROVIDER_NAME.equals(desc.getProvider())) {
+				try {
 					out.add(desc.getPath() + ":" + desc.getVersionString());
-			} catch (Throwable t) {
-				log().d(desc,t);
+				} catch (Throwable t) {
+					log().d(desc,t);
+				}
 			}
 		}
 			
@@ -100,11 +100,11 @@ public class Jms2LocalOperationExecuteChannel extends AbstractJmsOperationExecut
 	}
 
 	@Override
-	protected OperationDescription getOperationDescription(String path, VersionRange version) throws NotFoundException {
-		LocalOperationApi admin = MApi.lookup(LocalOperationApi.class);
-		Operation oper = admin.getOperation(path, version).getOperation();
-		if (!oper.hasAccess()) return null;
-		return oper.getDescription();
+	protected OperationDescriptor getOperationDescription(String path, VersionRange version) throws NotFoundException {
+		OperationApi admin = MApi.lookup(OperationApi.class);
+		OperationDescriptor desc = admin.findOperation(path, version, null);
+		if (desc == null) return null;
+		return desc;
 	}
 
 }

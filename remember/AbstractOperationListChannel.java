@@ -11,6 +11,7 @@ import de.mhus.lib.core.strategy.Operation;
 import de.mhus.lib.core.strategy.OperationDescription;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.core.util.VersionRange;
+import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 
 /**
  * Abstract operation execution but this one can handle a list of operations.
@@ -54,7 +55,7 @@ public abstract class AbstractOperationListChannel extends AbstractJmsOperationE
 	}
 
 	@Override
-	protected OperationDescription getOperationDescription(String path, VersionRange version) {
+	protected OperationDescriptor getOperationDescription(String path, VersionRange version) {
 		Operation oper = getOperation(path, version);
 		if (oper == null) return null;
 		return oper.getDescription();

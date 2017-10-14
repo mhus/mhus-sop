@@ -9,6 +9,7 @@ import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.definition.DefRoot;
 import de.mhus.lib.core.strategy.DefaultTaskContext;
 import de.mhus.lib.core.strategy.Operation;
+import de.mhus.lib.core.strategy.OperationDescription;
 import de.mhus.lib.core.util.MNls;
 import de.mhus.lib.core.util.MNlsProvider;
 import de.mhus.lib.core.util.Nls;
@@ -18,42 +19,27 @@ import de.mhus.lib.core.util.Version;
 public class OperationDescriptor implements MNlsProvider, Nls, Named, Versioned {
 
 	private Collection<String> tags;
-	private String path;
-	private Version version;
-	private String source;
-	private ParameterDefinitions definitions;
-	private DefRoot form;
-	private MNls nls;
-	private MNlsProvider nlsProvider;
-	private String title;
-	private Operation operation;
+	private OperationAddress address;
+	private OperationDescription description;
 
 	public OperationDescriptor(
-			Operation operation, 
-			Collection<String> tags, 
-			String source, 
-			ParameterDefinitions pDef, 
-			DefRoot form, 
-			MNlsProvider nls, 
-			String title
+			String address,
+			OperationDescription description,
+			Collection<String> tags
 		) {
-		this.operation = operation;
-		this.tags = tags;
-		this.source = source;
-		this.path = operation.getDescription().getPath();
-		this.version = operation.getDescription().getVersion();
-		this.definitions = operation.getDescription().getParameterDefinitions();
-		this.form = form;
-		this.nlsProvider = operation;
-		this.title = title;
+		this(new OperationAddress(address), description, tags);
 		
 	}
 	
-	public Operation getOperation() {
-		return operation;
+	public OperationDescriptor(OperationAddress address, OperationDescription description,
+			Collection<String> tags) {
+		this.address = address;
+		this.description = description;
+		this.tags = tags;
 	}
-	
-	public boolean canExecute(Collection<String> providedTags, IProperties properties) {
+
+	public boolean compareTags(Collection<String> providedTags) {
+		if (providedTags == null) return false;
 		// negative check
 		for (String t : tags) {
 			if (t.startsWith("*")) {
@@ -74,43 +60,20 @@ public class OperationDescriptor implements MNlsProvider, Nls, Named, Versioned 
 			if (!tags.contains(t)) 
 				return false;
 		}
-		DefaultTaskContext context = new DefaultTaskContext(operation.getClass());
-		context.setParameters(properties);
-		return operation.canExecute(context);
+		return true;
 	}
-
+	
 	public Collection<String> getTags() {
 		return tags;
 	}
-
-	@Override
-	public String getName() {
-		return path;
-	}
-	
-	public String getPath() {
-		return path;
-	}
-	
-	@Override
-	public String getVersionString() {
-		return version.toString();
-	}
-	public Version getVersion() {
-		return version;
-	}
-	
-	public String getSource() {
-		return source;
-	}
-
+		
 	/**
 	 * Every action should have a parameter definition. If
 	 * parameter definitions are not supported, the method will return null;
 	 * @return
 	 */
 	public ParameterDefinitions getParameterDefinitions() {
-		return definitions;
+		return description.getParameterDefinitions();
 	}
 	
 	/**
@@ -119,33 +82,56 @@ public class OperationDescriptor implements MNlsProvider, Nls, Named, Versioned 
 	 * @return
 	 */
 	public DefRoot getForm() {
-		return form;
+		return description.getForm();
 	}
 
 	@Override
 	public String nls(String text) {
-		return MNls.find(this, text);
+		return description.nls(text);
 	}
 
 	@Override
 	public MNls getNls() {
-		if (nls == null)
-			nls = nlsProvider.getNls();
-		return nls;
+		return description.getNls();
 	}
 
 	public String getCaption() {
-		return nls("caption=" + getTitle());
+		return description.getCaption();
 	}
 
 	public String getTitle() {
-		return title;
+		return description.getTitle();
+	}
+	
+	@Override
+	public String getName() {
+		return address.getName();
+	}
+	
+	public String getPath() {
+		return address.getPath();
+	}
+	
+	public Version getVersion() {
+		return address.getVersion();
+	}
+	
+	public OperationAddress getAddress() {
+		return address;
 	}
 	
 	@Override
 	public String toString() {
-		return MSystem.toString(this, path, version, tags);
+		return MSystem.toString(this, address, tags);
 	}
 
+	@Override
+	public String getVersionString() {
+		return address.getVersionString();
+	}
 
+	public String getProvider() {
+		return address.getProvider();
+	}
+	
 }
