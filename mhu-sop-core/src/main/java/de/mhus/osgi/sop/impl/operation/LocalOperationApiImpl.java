@@ -31,6 +31,7 @@ import de.mhus.osgi.sop.api.operation.OperationAddress;
 import de.mhus.osgi.sop.api.operation.OperationApi;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 import de.mhus.osgi.sop.api.operation.OperationException;
+import de.mhus.osgi.sop.api.operation.OperationUtil;
 import de.mhus.osgi.sop.api.operation.OperationsProvider;
 
 @Component(immediate=true,provide=OperationsProvider.class,properties="provider=local")
@@ -137,10 +138,8 @@ public class LocalOperationApiImpl extends MLog implements OperationsProvider {
 	public void collectOperations(List<OperationDescriptor> list, String filter, VersionRange version, Collection<String> providedTags) {
 		synchronized (register) {
 			for (OperationDescriptor desc : register.values()) {
-				if (MString.compareFsLikePattern(desc.getPath(), filter) && 
-					version.includes(desc.getVersion()) && 
-					(providedTags == null || desc.compareTags(providedTags)) )
-						list.add(desc);
+				if (OperationUtil.matches(desc, filter, version, providedTags))
+					list.add(desc);
 			}
 		}
 	}
@@ -151,9 +150,7 @@ public class LocalOperationApiImpl extends MLog implements OperationsProvider {
 		OperationDescriptor d = null;
 		synchronized (register) {
 			for (OperationDescriptor desc : register.values()) {
-				if (MString.compareFsLikePattern(desc.getPath(), filter) && 
-					version.includes(desc.getVersion()) && 
-					(providedTags == null || desc.compareTags(providedTags)) ) {
+				if (OperationUtil.matches(desc, filter, version, providedTags)) {
 						d = desc;
 						break;
 				}

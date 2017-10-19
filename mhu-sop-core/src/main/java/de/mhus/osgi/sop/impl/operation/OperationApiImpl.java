@@ -118,6 +118,23 @@ public class OperationApiImpl extends MLog implements OperationApi {
 	}
 	
 	@Override
+	public List<OperationDescriptor> findOperations(OperationAddress addr, Collection<String> providedTags) {
+		OperationsProvider provider = getProvider(addr.getProvider());
+		LinkedList<OperationDescriptor> list = new LinkedList<>();
+		provider.collectOperations(list, addr.getPath(), addr.getVersion().toRange(), providedTags);
+		return list;
+	}
+
+	@Override
+	public OperationDescriptor findOperation(OperationAddress addr, Collection<String> providedTags) throws NotFoundException {
+		OperationsProvider provider = getProvider(addr.getProvider());
+		LinkedList<OperationDescriptor> list = new LinkedList<>();
+		provider.collectOperations(list, addr.getPath(), addr.getVersion().toRange(), providedTags);
+		if (list.size() == 0) throw new NotFoundException("operation not found",addr,providedTags);
+		return list.getFirst();
+	}
+	
+	@Override
 	public List<OperationDescriptor> findOperations(String filter, VersionRange version,
 			Collection<String> providedTags) {
 		LinkedList<OperationDescriptor> list = new LinkedList<>();

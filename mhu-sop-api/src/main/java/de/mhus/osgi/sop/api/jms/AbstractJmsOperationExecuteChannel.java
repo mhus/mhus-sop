@@ -52,7 +52,7 @@ public abstract class AbstractJmsOperationExecuteChannel extends JmsDataChannelI
 		setConnectionName(getJmsConnectionName());
 		setName(getServiceName());
 		reset();
-//		server.setInterceptorIn(new TicketAccessInterceptor());
+		getServer().setInterceptorIn(new TicketAccessInterceptor());
 	}	
 	
 	public void doDeactivate(ComponentContext ctx) {
@@ -64,6 +64,7 @@ public abstract class AbstractJmsOperationExecuteChannel extends JmsDataChannelI
 		return (ServerJms) getChannel();
 	};
 	
+	@Override
 	protected Message received(Message msg) throws JMSException {
 		
 		String path = msg.getStringProperty(Sop.PARAM_OPERATION_PATH);

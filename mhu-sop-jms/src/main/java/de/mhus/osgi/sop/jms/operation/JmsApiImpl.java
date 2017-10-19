@@ -11,6 +11,7 @@ import javax.jms.Message;
 import org.osgi.service.component.ComponentContext;
 
 import aQute.bnd.annotation.component.Activate;
+import aQute.bnd.annotation.component.Component;
 import aQute.bnd.annotation.component.Deactivate;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCollection;
@@ -23,24 +24,25 @@ import de.mhus.lib.core.base.service.TimerIfc;
 import de.mhus.lib.core.cfg.CfgString;
 import de.mhus.lib.core.strategy.OperationDescription;
 import de.mhus.lib.jms.ClientJms;
+import de.mhus.lib.jms.JmsConnection;
 import de.mhus.lib.jms.JmsDestination;
 import de.mhus.lib.jms.ServerJms;
+import de.mhus.lib.karaf.jms.JmsUtil;
 import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.operation.OperationAddress;
 import de.mhus.osgi.sop.api.operation.OperationApi;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 
+@Component
 public class JmsApiImpl extends MLog implements JmsApi {
 
 	public static CfgString connectionName = new CfgString(JmsApi.class, "connection", "sop");
 	protected static JmsApiImpl instance;
 
 	private ClientJms registerClient;
-	private ServerJms registerServer;
 	HashMap<String, JmsOperationDescriptor> register = new HashMap<>();
 	private TimerIfc timer;
-	protected long lastRegistryRequest;
-
+	long lastRegistryRequest;
 
 	@Override
 	public String getDefaultConnectionName() {
@@ -50,6 +52,7 @@ public class JmsApiImpl extends MLog implements JmsApi {
 	@Override
 	public void sendLocalOperations() {
 		try {
+			checkClient();
 			MapMessage msg = registerClient.createMapMessage();
 			msg.setStringProperty("type", "operations");
 			msg.setStringProperty("connection", MApi.lookup(JmsApi.class).getDefaultConnectionName());
@@ -58,7 +61,7 @@ public class JmsApiImpl extends MLog implements JmsApi {
 			int cnt = 0;
 			
 			for ( OperationDescriptor desc : MApi.lookup(OperationApi.class).findOperations("*", null, null)) {
-				if (!JmsOperationApiImpl.PROVIDER_NAME.equals(desc.getProvider())) {
+				if (!JmsOperationProvider.PROVIDER_NAME.equals(desc.getProvider())) {
 					msg.setString("operation" + cnt, desc.getPath());
 					msg.setString("version" + cnt, desc.getVersionString());
 					msg.setString("tags" + cnt, MString.join(desc.getTags().iterator(), ",") );
@@ -77,6 +80,7 @@ public class JmsApiImpl extends MLog implements JmsApi {
 	@Override
 	public void requestOperationRegistry() {
 		try {
+			checkClient();
 			MapMessage msg = registerClient.createMapMessage();
 			msg.setStringProperty("type", "request");
 			msg.setStringProperty("connection", MApi.lookup(JmsApi.class).getDefaultConnectionName());
@@ -87,64 +91,18 @@ public class JmsApiImpl extends MLog implements JmsApi {
 		}
 	}
 
+	private void checkClient() {
+		if (registerClient.getJmsDestination().getConnection() == null) {
+			JmsConnection con = JmsUtil.getConnection( getDefaultConnectionName() );
+			if (con != null)
+				registerClient.getJmsDestination().setConnection(con);
+		}
+	}
+
 	@Activate
 	public void doActivate(ComponentContext ctx) {
 		instance = this;
 		registerClient = new ClientJms(new JmsDestination(JmsApi.REGISTRY_TOPIC, true));
-		registerServer = new ServerJms(new JmsDestination(JmsApi.REGISTRY_TOPIC, true)) {
-			
-			@Override
-			public void receivedOneWay(Message msg) throws JMSException {
-				if (msg instanceof MapMessage && 
-					!Jms2LocalOperationExecuteChannel.queueName.value().equals(msg.getStringProperty("queue")) // do not process my own messages
-				   ) {
-					
-					MapMessage m = (MapMessage)msg;
-					String type = m.getStringProperty("type");
-					if ("request".equals(type) ) {
-						lastRegistryRequest = System.currentTimeMillis();
-						sendLocalOperations();
-					}
-					if ("operations".equals("type")) {
-						String queue = m.getStringProperty("queue");
-						String connection = getDefaultConnectionName(); //TODO
-						int cnt = 0;
-						String path = null;
-						synchronized (register) {
-							long now = System.currentTimeMillis();
-							do {
-								path = m.getString("operation" + cnt);
-								String version = m.getString("version" + cnt);
-								String tags = m.getString("tags" + cnt);
-								String form = m.getString("form" + cnt);
-								cnt++;
-								String ident = connection + "," + queue + "," + path + "," + version;
-								JmsOperationDescriptor desc = register.get(ident);
-								if (desc == null) {
-									OperationAddress a = new OperationAddress(JmsOperationApiImpl.PROVIDER_NAME + "://" + path + ":" + version + "/" + queue + "/" + connection);
-									OperationDescription d = new OperationDescription(a.getGroup(),a.getName(),a.getVersion(),null,null);
-									// TODO transform string to form
-									// d.setForm(form);
-									desc = new JmsOperationDescriptor(a,d,tags == null ? null : MCollection.toList(tags.split(",")));
-									register.put(ident, desc);
-								}
-								desc.setLastUpdated();
-							} while (path != null);
-							// remove stare
-							register.entrySet().removeIf(
-									entry -> entry.getValue().getAddress().getPart(0).equals(queue) && 
-											 entry.getValue().getLastUpdated() < now
-									);
-						}
-					}
-				}
-			}
-			
-			@Override
-			public Message received(Message msg) throws JMSException {
-				return null;
-			}
-		};
 		
 		timer = MApi.lookup(TimerFactory.class).getTimer();
 		timer.schedule(new TimerTask() {
@@ -167,9 +125,6 @@ public class JmsApiImpl extends MLog implements JmsApi {
 		if (registerClient != null)
 			registerClient.close();
 		registerClient = null;
-		if (registerServer != null)
-			registerServer.close();
-		registerServer = null;
 		register.clear();
 		
 	}
@@ -188,7 +143,7 @@ public class JmsApiImpl extends MLog implements JmsApi {
 		}
 	}
 
-	public class JmsOperationDescriptor extends OperationDescriptor {
+	public static class JmsOperationDescriptor extends OperationDescriptor {
 
 		private long lastUpdated;
 

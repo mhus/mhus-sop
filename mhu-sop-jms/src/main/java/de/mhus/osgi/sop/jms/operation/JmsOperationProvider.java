@@ -55,11 +55,13 @@ import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.operation.OperationAddress;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 import de.mhus.osgi.sop.api.operation.OperationException;
+import de.mhus.osgi.sop.api.operation.OperationUtil;
 import de.mhus.osgi.sop.api.operation.OperationsProvider;
+import de.mhus.osgi.sop.api.util.ObjectUtil;
 import de.mhus.osgi.sop.jms.operation.JmsApiImpl.JmsOperationDescriptor;
 
 @Component(immediate=true,properties="provider=jms")
-public class JmsOperationApiImpl extends MLog implements OperationsProvider {
+public class JmsOperationProvider extends MLog implements OperationsProvider {
 
 	protected static final String PROVIDER_NAME = "jms";
 
@@ -81,10 +83,8 @@ public class JmsOperationApiImpl extends MLog implements OperationsProvider {
 		synchronized (JmsApiImpl.instance.register) {
 			HashMap<String, JmsOperationDescriptor> register = JmsApiImpl.instance.register;
 			for (JmsOperationDescriptor desc : register.values())
-				if (MString.compareFsLikePattern(desc.getPath(), filter) && 
-						version.includes(desc.getVersion()) && 
-						(providedTags == null || desc.compareTags(providedTags)) )
-							list.add(desc);
+				if (OperationUtil.matches(desc, filter, version, providedTags))
+					list.add(desc);
 		}
 	}
 
@@ -96,9 +96,7 @@ public class JmsOperationApiImpl extends MLog implements OperationsProvider {
 		synchronized (JmsApiImpl.instance.register) {
 			HashMap<String, JmsOperationDescriptor> register = JmsApiImpl.instance.register;
 			for (OperationDescriptor desc : register.values()) {
-				if (MString.compareFsLikePattern(desc.getPath(), filter) && 
-					version.includes(desc.getVersion()) && 
-					(providedTags == null || desc.compareTags(providedTags)) ) {
+				if (OperationUtil.matches(desc, filter, version, providedTags) ) {
 						d = desc;
 						break;
 				}

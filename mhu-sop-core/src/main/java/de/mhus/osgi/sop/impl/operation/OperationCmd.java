@@ -25,6 +25,7 @@ import de.mhus.osgi.sop.api.Sop;
 import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
+import de.mhus.osgi.sop.api.operation.OperationAddress;
 import de.mhus.osgi.sop.api.operation.OperationApi;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 
@@ -50,16 +51,14 @@ public class OperationCmd implements Action {
 	@Option(name="-v", aliases="--version", description="Version Range [1.2.3,2.0.0)",required=false)
 	String version = null;
 	
+	@Option(name="-o", aliases="--options", description="Execute Options separated by pipe",required=false)
+	String options = null;
+	
 	@Override
 	public Object execute() throws Exception {
 
-		JmsConnection con = Sop.getDefaultJmsConnection();
 		if (conName == null)
 			conName = MApi.lookup(JmsApi.class).getDefaultConnectionName();
-			
-		con = JmsUtil.getConnection(conName);
-		
-//		AaaContext acc = MApi.lookup(AccessApi.class).getCurrentOrGuest();
 		
 		OperationApi api = MApi.lookup(OperationApi.class);
 		
@@ -77,11 +76,30 @@ public class OperationCmd implements Action {
 			System.out.println("Form   : " + des.getForm());
 		} else
 		if (cmd.equals("execute")) {
+			String[] executeOptions = null;
+			if (options != null) executeOptions = options.split("\\|");
+			
 			MProperties properties = MProperties.explodeToMProperties(parameters);
-			OperationResult res = api.doExecute(path, version == null ? null : new VersionRange(version), null, properties);
+			OperationResult res = null;
+			if (path.indexOf("://") >= 0) {
+				OperationAddress addr = new OperationAddress(path);
+				OperationDescriptor desc = api.findOperation(addr, null);
+				res = api.doExecute(desc, properties, executeOptions);
+			} else
+				res = api.doExecute(path, version == null ? null : new VersionRange(version), null, properties, executeOptions);
 			System.out.println("Result: "+res);
-			System.out.println("RC: " + res.getReturnCode());
-			System.out.println("Object: " + res.getResult());
+			if (res != null) {
+				System.out.println("RC: " + res.getReturnCode());
+				System.out.println("Object: " + res.getResult());
+			}
+		} else
+		if (cmd.equals("request")) {
+			MApi.lookup(JmsApi.class).requestOperationRegistry();
+			System.out.println("ok");
+		} else
+		if (cmd.equals("send")) {
+			MApi.lookup(JmsApi.class).sendLocalOperations();
+			System.out.println("ok");
 		} else {
 			System.out.println("Command not found");
 		}

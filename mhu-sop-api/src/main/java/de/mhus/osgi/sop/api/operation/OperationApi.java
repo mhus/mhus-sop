@@ -16,6 +16,8 @@ public interface OperationApi extends SApi {
 
 	List<OperationDescriptor> findOperations(String filter, VersionRange version, Collection<String> providedTags);
 	OperationDescriptor findOperation(String filter, VersionRange version, Collection<String> providedTags) throws NotFoundException;
+	List<OperationDescriptor> findOperations(OperationAddress addr, Collection<String> providedTags);
+	OperationDescriptor findOperation(OperationAddress addr, Collection<String> providedTags) throws NotFoundException;
 	
 	OperationResult doExecute(String filter, VersionRange version, Collection<String> providedTags, IProperties properties, String ... executeOptions) throws NotFoundException;
 	OperationResult doExecute(OperationDescriptor desc, IProperties properties, String ... executeOptions) throws NotFoundException;

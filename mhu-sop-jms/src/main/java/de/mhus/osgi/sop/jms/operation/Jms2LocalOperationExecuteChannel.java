@@ -31,6 +31,7 @@ public class Jms2LocalOperationExecuteChannel extends AbstractJmsOperationExecut
 
 	public static CfgString queueName = new CfgString(Jms2LocalOperationExecuteChannel.class, "queue", "sop.operation." + MApi.lookup(ServerIdent.class));
 	static Jms2LocalOperationExecuteChannel instance;
+	private JmsApi jmsApi;
 	
 	@Override
 	@Activate
@@ -65,9 +66,15 @@ public class Jms2LocalOperationExecuteChannel extends AbstractJmsOperationExecut
 		return  queueName.value();
 	}
 
+	@Reference
+	public void setJmsApi(JmsApi api) {
+		this.jmsApi = api;
+	}
+	
 	@Override
 	protected String getJmsConnectionName() {
-		return MApi.lookup(JmsApi.class).getDefaultConnectionName();
+		return jmsApi.getDefaultConnectionName();
+		//return "sop";
 	}
 
 	@Override
@@ -87,7 +94,7 @@ public class Jms2LocalOperationExecuteChannel extends AbstractJmsOperationExecut
 		LinkedList<String> out = new LinkedList<String>();
 		OperationApi admin = MApi.lookup(OperationApi.class);
 		for (OperationDescriptor desc :  admin.findOperations("*", null, null)) {
-			if (!JmsOperationApiImpl.PROVIDER_NAME.equals(desc.getProvider())) {
+			if (!JmsOperationProvider.PROVIDER_NAME.equals(desc.getProvider())) {
 				try {
 					out.add(desc.getPath() + ":" + desc.getVersionString());
 				} catch (Throwable t) {
