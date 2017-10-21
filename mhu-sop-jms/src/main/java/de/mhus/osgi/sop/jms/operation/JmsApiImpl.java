@@ -41,7 +41,6 @@ public class JmsApiImpl extends MLog implements JmsApi {
 
 	private ClientJms registerClient;
 	HashMap<String, JmsOperationDescriptor> register = new HashMap<>();
-	private TimerIfc timer;
 	long lastRegistryRequest;
 
 	@Override
@@ -104,43 +103,17 @@ public class JmsApiImpl extends MLog implements JmsApi {
 		instance = this;
 		registerClient = new ClientJms(new JmsDestination(JmsApi.REGISTRY_TOPIC, true));
 		
-		timer = MApi.lookup(TimerFactory.class).getTimer();
-		timer.schedule(new TimerTask() {
-
-			@Override
-			public void run() {
-				doCheckRegistry();
-			}
-			
-		}, MTimeInterval.MINUTE_IN_MILLISECOUNDS);
 	}
 
 	@Deactivate
 	public void doDeactivate(ComponentContext ctx) {
 		instance = null;
-		if (timer != null)
-			timer.cancel();
-		timer = null;
 		
 		if (registerClient != null)
 			registerClient.close();
 		registerClient = null;
 		register.clear();
 		
-	}
-
-	protected void doCheckRegistry() {
-		if (MTimeInterval.isTimeOut(lastRegistryRequest,MTimeInterval.MINUTE_IN_MILLISECOUNDS * 3)) {
-			long now = System.currentTimeMillis();
-			requestOperationRegistry();
-			sendLocalOperations();
-			MThread.sleep(30000);
-			
-			// remove staled - if not updated in the last 30 seconds
-			synchronized (register) {
-				register.entrySet().removeIf(e -> e.getValue().getLastUpdated() < now);
-			}
-		}
 	}
 
 	public static class JmsOperationDescriptor extends OperationDescriptor {

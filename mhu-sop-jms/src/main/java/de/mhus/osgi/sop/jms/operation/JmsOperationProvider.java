@@ -254,39 +254,6 @@ public class JmsOperationProvider extends MLog implements OperationsProvider {
 			if (opt.equals(o)) return true;
 		return false;
 	}
-//
-//	@Override
-//	public List<String>	getOperationList(JmsConnection con, String queueName, AaaContext user) throws Exception {
-//		IProperties pa = new MProperties();
-//		OperationResult ret = doExecuteOperation(con, queueName, "_list", pa, user, OPT_NEED_ANSWER);
-//		if (ret.isSuccessful()) {
-//			Object res = ret.getResult();
-//			if (res != null && res instanceof MProperties) {
-//				String[] list = String.valueOf( ((MProperties)res).getString("list","") ).split(",");
-//				LinkedList<String> out = new LinkedList<String>();
-//				for (String item : list) out.add(item);
-//				return out;
-//			}
-//		}
-//		return null;
-//	}
-//	
-//	@Override
-//	public List<String> lookupOperationQueues() throws Exception {
-//		JmsConnection con = JmsUtil.getConnection(OperationBroadcast.connectionName.value());
-//		ClientJms client = new ClientJms(con.createTopic(OperationBroadcast.queueName.value()));
-//		client.open();
-//		TextMessage msg = client.getSession().createTextMessage();
-//		LinkedList<String> out = new LinkedList<String>();
-//		for (Message ret : client.sendJmsBroadcast(msg)) {
-//			String q = ret.getStringProperty("queue");
-//			if (q != null)
-//				out.add(q);
-//		}
-//		return out;
-//	}
-//
-
 
 	@Override
 	public OperationDescriptor getOperation(OperationAddress addr) throws NotFoundException {
@@ -302,21 +269,21 @@ public class JmsOperationProvider extends MLog implements OperationsProvider {
 		}
 	}
 
-//	@Override
-//	public List<OperationAddress> getRegisteredOperations() {
-//		synchronized (register) {
-//			return new LinkedList<OperationAddress>( register.values() );
-//		}
-//	}
-//
-//	@Override
-//	public OperationAddress getRegisteredOperation(String path, VersionRange version) {
-//		synchronized (register) {
-//			for (OperationAddress r : register.values())
-//				if (r.getPath().equals(path) && version == null || version.includes(r.getVersion()))
-//					return r;
-//		}
-//		return null;
-//	}
+
+	@Override
+	public void synchronize() {
+		// TODO time configurable
+		if (MTimeInterval.isTimeOut(JmsApiImpl.instance.lastRegistryRequest,MTimeInterval.MINUTE_IN_MILLISECOUNDS * 3)) {
+			long now = System.currentTimeMillis();
+			JmsApiImpl.instance.requestOperationRegistry();
+			MThread.sleep(30000);
+			
+			// remove staled - if not updated in the last 30 seconds
+			synchronized (JmsApiImpl.instance.register) {
+				JmsApiImpl.instance.register.entrySet().removeIf(e -> e.getValue().getLastUpdated() < now);
+			}
+		}
+
+	}
 		
 }

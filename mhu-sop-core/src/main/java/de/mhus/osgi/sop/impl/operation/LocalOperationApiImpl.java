@@ -211,5 +211,10 @@ public class LocalOperationApiImpl extends MLog implements OperationsProvider {
 			return ret;
 		}
 	}
+
+	@Override
+	public void synchronize() {
+		// already up to date
+	}
 	
 }

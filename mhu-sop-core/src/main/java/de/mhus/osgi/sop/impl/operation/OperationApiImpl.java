@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TimerTask;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -16,7 +17,12 @@ import aQute.bnd.annotation.component.Activate;
 import aQute.bnd.annotation.component.Component;
 import aQute.bnd.annotation.component.Deactivate;
 import de.mhus.lib.core.IProperties;
+import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MLog;
+import de.mhus.lib.core.MThread;
+import de.mhus.lib.core.MTimeInterval;
+import de.mhus.lib.core.base.service.TimerFactory;
+import de.mhus.lib.core.base.service.TimerIfc;
 import de.mhus.lib.core.strategy.Operation;
 import de.mhus.lib.core.strategy.OperationDescription;
 import de.mhus.lib.core.strategy.OperationResult;
@@ -34,6 +40,7 @@ public class OperationApiImpl extends MLog implements OperationApi {
 	private HashMap<String, OperationsProvider> register = new HashMap<>();
 	private BundleContext context;
 	public static OperationApiImpl instance;
+	private TimerIfc timer;
 
 	@Activate
 	public void doActivate(ComponentContext ctx) {
@@ -41,10 +48,26 @@ public class OperationApiImpl extends MLog implements OperationApi {
 		nodeTracker = new ServiceTracker<>(context, OperationsProvider.class, new MyServiceTrackerCustomizer() );
 		nodeTracker.open();
 		instance = this;
+		
+		timer = MApi.lookup(TimerFactory.class).getTimer();
+		timer.schedule(new TimerTask() {
+
+			@Override
+			public void run() {
+				synchronize();
+			}
+			
+		}, MTimeInterval.MINUTE_IN_MILLISECOUNDS); // TODO configurable and disable
+
 	}
 
 	@Deactivate
 	public void doDeactivate(ComponentContext ctx) {
+		
+		if (timer != null)
+			timer.cancel();
+		timer = null;
+
 		instance  = null;
 		context = null;
 	}
@@ -168,6 +191,17 @@ public class OperationApiImpl extends MLog implements OperationApi {
 		OperationsProvider provider = getProvider(desc.getProvider());
 		if (provider == null) throw new NotFoundException("provider for operation not found",desc, executeOptions);
 		return provider.doExecute(desc, properties);
+	}
+
+	@Override
+	public void synchronize() {
+		for (OperationsProvider provider : getProviders()) {
+			try {
+				provider.synchronize();
+			} catch (Throwable e) {
+				log().d(provider,e);
+			}
+		}
 	}
 
 }
