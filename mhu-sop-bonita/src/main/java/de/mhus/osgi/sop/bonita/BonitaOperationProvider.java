@@ -111,5 +111,17 @@ public class BonitaOperationProvider extends MLog implements OperationsProvider 
 		
 	}
 
+	@Override
+	public OperationDescriptor getOperation(OperationAddress addr) throws NotFoundException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void synchronize() {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }
