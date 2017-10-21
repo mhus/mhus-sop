@@ -11,6 +11,7 @@ import de.mhus.lib.errors.NotFoundException;
 public interface OperationsProvider {
 
 	void collectOperations(List<OperationDescriptor> list, String filter, VersionRange version, Collection<String> providedTags);
+	OperationDescriptor getOperation(OperationAddress addr) throws NotFoundException;
 	
 	OperationResult doExecute(String filter, VersionRange version, Collection<String> providedTags, IProperties properties, String ... executeOptions) throws NotFoundException;
 	OperationResult doExecute(OperationDescriptor desc, IProperties properties, String ... executeOptions) throws NotFoundException;

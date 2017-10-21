@@ -202,5 +202,14 @@ public class LocalOperationApiImpl extends MLog implements OperationsProvider {
 		}
 		
 	}
+
+	@Override
+	public OperationDescriptor getOperation(OperationAddress addr) throws NotFoundException {
+		synchronized (register) {
+			LocalOperationDescriptor ret = register.get(addr.getPath() + ":" + addr.getVersionString());
+			if (ret == null) throw new NotFoundException("operation not found", addr);
+			return ret;
+		}
+	}
 	
 }

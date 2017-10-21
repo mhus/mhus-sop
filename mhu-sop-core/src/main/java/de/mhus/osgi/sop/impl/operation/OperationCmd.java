@@ -83,7 +83,7 @@ public class OperationCmd implements Action {
 			OperationResult res = null;
 			if (path.indexOf("://") >= 0) {
 				OperationAddress addr = new OperationAddress(path);
-				OperationDescriptor desc = api.findOperation(addr, null);
+				OperationDescriptor desc = api.getOperation(addr);
 				res = api.doExecute(desc, properties, executeOptions);
 			} else
 				res = api.doExecute(path, version == null ? null : new VersionRange(version), null, properties, executeOptions);

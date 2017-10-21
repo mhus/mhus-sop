@@ -287,6 +287,21 @@ public class JmsOperationProvider extends MLog implements OperationsProvider {
 //	}
 //
 
+
+	@Override
+	public OperationDescriptor getOperation(OperationAddress addr) throws NotFoundException {
+		String connection = JmsApiImpl.instance.getDefaultConnectionName(); //TODO
+		String queue = addr.getPart(0);
+		String path = addr.getPath();
+		String version = addr.getVersionString();
+		String ident = connection + "," + queue + "," + path + "," + version;
+		synchronized (JmsApiImpl.instance.register) {
+			JmsOperationDescriptor res = JmsApiImpl.instance.register.get(ident);
+			if (res == null) throw new NotFoundException("operation not found",addr);
+			return res;
+		}
+	}
+
 //	@Override
 //	public List<OperationAddress> getRegisteredOperations() {
 //		synchronized (register) {
