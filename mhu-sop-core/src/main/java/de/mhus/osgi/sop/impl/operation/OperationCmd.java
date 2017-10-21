@@ -100,6 +100,10 @@ public class OperationCmd implements Action {
 		if (cmd.equals("send")) {
 			MApi.lookup(JmsApi.class).sendLocalOperations();
 			System.out.println("ok");
+		} else
+		if (cmd.equals("sync")) {
+			api.synchronize();
+			System.out.println("ok");
 		} else {
 			System.out.println("Command not found");
 		}

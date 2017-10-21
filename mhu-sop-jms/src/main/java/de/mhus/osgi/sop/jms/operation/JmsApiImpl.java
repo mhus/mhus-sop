@@ -84,7 +84,7 @@ public class JmsApiImpl extends MLog implements JmsApi {
 			msg.setStringProperty("type", "request");
 			msg.setStringProperty("connection", MApi.lookup(JmsApi.class).getDefaultConnectionName());
 			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.queueName.value());
-			registerClient.sendJms(msg);
+			registerClient.sendJmsOneWay(msg);
 		} catch (Throwable t) {
 			log().w(t);
 		}

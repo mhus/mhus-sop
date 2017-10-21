@@ -58,31 +58,32 @@ public class JmsRegisterServer extends AbstractJmsDataChannel {
 						JmsApiImpl.instance.lastRegistryRequest = System.currentTimeMillis();
 						jmsApi.sendLocalOperations();
 					}
-					if ("operations".equals("type")) {
+					if ("operations".equals(type)) {
 						String queue = m.getStringProperty("queue");
 						String connection = jmsApi.getDefaultConnectionName(); //TODO
 						int cnt = 0;
 						String path = null;
 						synchronized (JmsApiImpl.instance.register) {
 							long now = System.currentTimeMillis();
-							do {
+							while (m.getString("operation" + cnt) != null) {
 								path = m.getString("operation" + cnt);
 								String version = m.getString("version" + cnt);
 								String tags = m.getString("tags" + cnt);
+								String title = m.getString("title" + cnt);
 								String form = m.getString("form" + cnt);
 								cnt++;
 								String ident = connection + "," + queue + "," + path + "," + version;
 								JmsOperationDescriptor desc = JmsApiImpl.instance.register.get(ident);
 								if (desc == null) {
 									OperationAddress a = new OperationAddress(JmsOperationProvider.PROVIDER_NAME + "://" + path + ":" + version + "/" + queue + "/" + connection);
-									OperationDescription d = new OperationDescription(a.getGroup(),a.getName(),a.getVersion(),null,null);
+									OperationDescription d = new OperationDescription(a.getGroup(),a.getName(),a.getVersion(),null,title);
 									// TODO transform string to form
 									// d.setForm(form);
 									desc = new JmsOperationDescriptor(a,d,tags == null ? null : MCollection.toList(tags.split(",")));
 									JmsApiImpl.instance.register.put(ident, desc);
 								}
 								desc.setLastUpdated();
-							} while (path != null);
+							}
 							// remove stare
 							JmsApiImpl.instance.register.entrySet().removeIf(
 									entry -> entry.getValue().getAddress().getPart(0).equals(queue) && 
@@ -95,6 +96,7 @@ public class JmsRegisterServer extends AbstractJmsDataChannel {
 			
 			@Override
 			public Message received(Message msg) throws JMSException {
+				receivedOneWay(msg);
 				return null;
 			}
 		};
