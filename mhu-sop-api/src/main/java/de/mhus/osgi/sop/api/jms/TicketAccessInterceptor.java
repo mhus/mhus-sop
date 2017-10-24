@@ -26,10 +26,17 @@ public class TicketAccessInterceptor extends MLog implements JmsInterceptor {
 			throw new MRuntimeException(e);
 		}
 		try {
-			if (ticket == null) throw new AccessDeniedException("call service without ticket");
 			AccessApi api = MApi.lookup(AccessApi.class);
-			if (api == null && RELAXED.value()) return;
-			api.process(ticket);
+			if (api == null) {
+				if (RELAXED.value()) 
+					return;
+				else
+					throw new AccessDeniedException("access api not found");
+			}
+			if (ticket == null)
+				api.process(api.getGuestAccount(),null,false);
+			else
+				api.process(ticket);
 		} catch (Throwable t) {
 			log().i("Incoming Access Denied",message);
 			throw t;
@@ -38,14 +45,20 @@ public class TicketAccessInterceptor extends MLog implements JmsInterceptor {
 
 	@Override
 	public void end(Message message) {
+		
+		AccessApi api = MApi.lookup(AccessApi.class);
+		if (api == null) return;
+
 		String ticket;
 		try {
 			ticket = message.getStringProperty(TICKET_KEY.value());
 		} catch (JMSException e) {
 			throw new MRuntimeException(e);
 		}
-		if (ticket == null) throw new AccessDeniedException("call service without ticket");
-		MApi.lookup(AccessApi.class).release(ticket);
+		if (ticket == null)
+			MApi.lookup(AccessApi.class).release(api.getGuestContext());
+		else
+			MApi.lookup(AccessApi.class).release(ticket);
 	}
 
 	@Override

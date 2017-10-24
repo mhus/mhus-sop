@@ -27,6 +27,8 @@ public class Sop {
 	public static final String PARAM_RC = "rc";
 
 	public static final String PARAM_OPERATION_VERSION = "version";
+
+	public static final String PARAM_ERROR = "_error";
 	
 /* use MApi.lookup() instead
 

@@ -16,11 +16,12 @@ import de.mhus.lib.jms.JmsChannel;
 import de.mhus.lib.jms.JmsDestination;
 import de.mhus.lib.jms.ServerJms;
 import de.mhus.lib.karaf.jms.AbstractJmsDataChannel;
+import de.mhus.lib.karaf.jms.JmsDataChannel;
 import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.operation.OperationAddress;
 import de.mhus.osgi.sop.jms.operation.JmsApiImpl.JmsOperationDescriptor;
 
-@Component
+@Component(immediate=true,provide=JmsDataChannel.class)
 public class JmsRegisterServer extends AbstractJmsDataChannel {
 
 	private JmsApi jmsApi;

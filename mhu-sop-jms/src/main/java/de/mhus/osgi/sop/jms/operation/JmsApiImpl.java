@@ -33,7 +33,7 @@ import de.mhus.osgi.sop.api.operation.OperationAddress;
 import de.mhus.osgi.sop.api.operation.OperationApi;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 
-@Component
+@Component(immediate=true)
 public class JmsApiImpl extends MLog implements JmsApi {
 
 	public static CfgString connectionName = new CfgString(JmsApi.class, "connection", "sop");

@@ -41,6 +41,7 @@ import de.mhus.lib.core.strategy.Operation;
 import de.mhus.lib.core.strategy.OperationDescription;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.core.util.VersionRange;
+import de.mhus.lib.errors.MException;
 import de.mhus.lib.errors.NotFoundException;
 import de.mhus.lib.jms.ClientJms;
 import de.mhus.lib.jms.JmsConnection;
@@ -116,30 +117,31 @@ public class JmsOperationProvider extends MLog implements OperationsProvider {
 
 		String conName = desc.getAddress().partSize() > 1 ? desc.getAddress().getPart(1) : JmsApiImpl.instance.getDefaultConnectionName();
 		String queueName = desc.getAddress().getPart(0);
-		String path = desc.getPath() + ":" + desc.getVersionString();
+		String path = desc.getPath();
+		String version = desc.getVersionString();
 		
 		JmsConnection con = JmsUtil.getConnection(conName);
 		
 		AccessApi api = MApi.lookup(AccessApi.class);
 		
 		String ticket = api == null ? null : api.createTrustTicket(api.getCurrent()); // TODO Configurable via execute options
-		long timeout = MTimeInterval.MINUTE_IN_MILLISECOUNDS; // TODO Configurable via execute options
+		long timeout = OperationUtil.getOption(executeOptions, JmsApi.OPT_TIMEOUT, MTimeInterval.MINUTE_IN_MILLISECOUNDS); // TODO Configurable via execute options
 		
 		try {
-			return doExecuteOperation(con, queueName, path, properties, ticket, timeout, executeOptions);
+			return doExecuteOperation(con, queueName, path, version, properties, ticket, timeout, executeOptions);
 		} catch (Exception e) {
 			return new NotSuccessful(path, e.getMessage(), OperationResult.INTERNAL_ERROR);
 		}
 		
 	}
 
-	public OperationResult doExecuteOperation(JmsConnection con, String queueName, String operationName, IProperties parameters, String ticket, long timeout, String ... options  ) throws Exception {
+	public OperationResult doExecuteOperation(JmsConnection con, String queueName, String operationName, String version, IProperties parameters, String ticket, long timeout, String ... options  ) throws Exception {
 
 		if (con == null) throw new JMSException("connection is null");
 		ClientJms client = new ClientJms(con.createQueue(queueName));
 		
 		boolean needObject = false;
-		if (!isOption(options, JmsApi.OPT_FORCE_MAP_MESSAGE)) {
+		if (!OperationUtil.isOption(options, JmsApi.OPT_FORCE_MAP_MESSAGE)) {
 			for (Entry<String, Object> item : parameters) {
 				Object value = item.getValue();
 				if (! (
@@ -177,6 +179,7 @@ public class JmsOperationProvider extends MLog implements OperationsProvider {
 		}
 		
 		msg.setStringProperty(Sop.PARAM_OPERATION_PATH, operationName);
+		msg.setStringProperty(Sop.PARAM_OPERATION_VERSION, version);
 
 
 		msg.setStringProperty(Sop.PARAM_AAA_TICKET, ticket );
@@ -185,7 +188,7 @@ public class JmsOperationProvider extends MLog implements OperationsProvider {
     	
     	log().d(operationName,"sending Message", queueName, msg, options);
     	
-    	if (!isOption(options,JmsApi.OPT_NEED_ANSWER)) {
+    	if (OperationUtil.isOption(options,JmsApi.OPT_ONE_WAY)) {
     		client.sendJmsOneWay(msg);
     		return null;
     	}
@@ -202,6 +205,13 @@ public class JmsOperationProvider extends MLog implements OperationsProvider {
 			out.setMsg("answer is null");
 			out.setReturnCode(OperationResult.INTERNAL_ERROR);
 		} else {
+			// remote error handling
+			String errorMsg = answer.getStringProperty(Sop.PARAM_ERROR);
+			if (errorMsg != null) {
+				throw new MException("Remote error",errorMsg);
+			}
+			
+			// check if technical successful
 			boolean successful = answer.getBooleanProperty(Sop.PARAM_SUCCESSFUL);
 			out.setSuccessful(successful);
 			
@@ -209,7 +219,7 @@ public class JmsOperationProvider extends MLog implements OperationsProvider {
 				out.setMsg(answer.getStringProperty(Sop.PARAM_MSG));
 			out.setReturnCode(answer.getLongProperty(Sop.PARAM_RC));
 			
-			if (successful) {
+			// if (successful) { // also errors can have a result object
 				
 				if (answer instanceof MapMessage) {
 					MapMessage mapMsg = (MapMessage)answer;
@@ -239,20 +249,13 @@ public class JmsOperationProvider extends MLog implements OperationsProvider {
 						out.setResult(obj);
 					}
 				}
-			}	
+			// }	
 		}
 		
 		
 		client.close();
 		
 		return out;
-	}
-		
-	private boolean isOption(String[] options, String opt) {
-		if (options == null || opt == null) return false;
-		for (String o : options)
-			if (opt.equals(o)) return true;
-		return false;
 	}
 
 	@Override
