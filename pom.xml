@@ -47,11 +47,12 @@
     </developer>
   </developers>
     <properties>
-		<mhulib.version>3.3.1-SNAPSHOT</mhulib.version>
-		<ports.version>3.3.1-SNAPSHOT</ports.version>
+		<mhulib.version>3.3.2-SNAPSHOT</mhulib.version>
+		<ports.version>3.3.2-SNAPSHOT</ports.version>
         <scr.packages>*</scr.packages>
         <felix.scr.version>1.6.0</felix.scr.version>
-        <karaf.version>4.0.4</karaf.version>
+        <karaf.version>4.0.10</karaf.version>
+        <karaf.tool.version>4.0.10</karaf.tool.version>
         <bndlib.version>1.50.0</bndlib.version>
         <felix.metatype.version>1.0.10</felix.metatype.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -81,8 +82,11 @@
     <plugins>
     
             <plugin>
-                <groupId>org.apache.karaf.tooling</groupId>
+                <groupId>de.mhus.ports.karaf.tooling</groupId>
                 <artifactId>karaf-services-maven-plugin</artifactId>
+                <configuration>
+                	<artifactInclude>.*mhu.*</artifactInclude>
+                </configuration>
             </plugin>
     
 		<plugin>
@@ -118,7 +122,7 @@
     	<pluginManagement>
 			<plugins>
                 <plugin>
-                    <groupId>org.apache.karaf.tooling</groupId>
+                    <groupId>de.mhus.ports.karaf.tooling</groupId>
                     <artifactId>karaf-services-maven-plugin</artifactId>
                     <version>${karaf.version}</version>
                     <executions>
@@ -128,6 +132,9 @@
                             <goals>
                                 <goal>service-metadata-generate</goal>
                             </goals>
+			                <configuration>
+			                	<artifactInclude>.*mhu.*</artifactInclude>
+			                </configuration>
                         </execution>
                     </executions>
                 </plugin>
