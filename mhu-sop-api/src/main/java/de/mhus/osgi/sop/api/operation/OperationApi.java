@@ -22,5 +22,6 @@ public interface OperationApi extends SApi {
 	OperationResult doExecute(OperationDescriptor desc, IProperties properties, String ... executeOptions) throws NotFoundException;
 
 	void synchronize();
+	String[] getProviderNames();
 	
 }

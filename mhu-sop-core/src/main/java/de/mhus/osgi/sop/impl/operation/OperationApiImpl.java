@@ -16,11 +16,13 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import aQute.bnd.annotation.component.Activate;
 import aQute.bnd.annotation.component.Component;
 import aQute.bnd.annotation.component.Deactivate;
+import aQute.bnd.annotation.component.Reference;
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MThread;
 import de.mhus.lib.core.MTimeInterval;
+import de.mhus.lib.core.MTimerTask;
 import de.mhus.lib.core.base.service.TimerFactory;
 import de.mhus.lib.core.base.service.TimerIfc;
 import de.mhus.lib.core.strategy.Operation;
@@ -41,6 +43,7 @@ public class OperationApiImpl extends MLog implements OperationApi {
 	private BundleContext context;
 	public static OperationApiImpl instance;
 	private TimerIfc timer;
+	private MTimerTask timerTask;
 
 	@Activate
 	public void doActivate(ComponentContext ctx) {
@@ -48,28 +51,29 @@ public class OperationApiImpl extends MLog implements OperationApi {
 		nodeTracker = new ServiceTracker<>(context, OperationsProvider.class, new MyServiceTrackerCustomizer() );
 		nodeTracker.open();
 		instance = this;
-		
-		timer = MApi.lookup(TimerFactory.class).getTimer();
-		timer.schedule(new TimerTask() {
-
-			@Override
-			public void run() {
-				synchronize();
-			}
-			
-		}, MTimeInterval.MINUTE_IN_MILLISECOUNDS); // TODO configurable and disable
-
 	}
 
 	@Deactivate
 	public void doDeactivate(ComponentContext ctx) {
-		
 		if (timer != null)
 			timer.cancel();
-		timer = null;
-
+		
 		instance  = null;
 		context = null;
+	}
+
+	@Reference(service=TimerFactory.class)
+	public void setTimerFactory(TimerFactory factory) {
+		log().i("create timer");
+		timer = factory.getTimer();
+		timerTask = new MTimerTask() {
+			
+			@Override
+			public void doit() throws Exception {
+				synchronize();
+			}
+		};
+		timer.schedule(timerTask, 30000, MTimeInterval.MINUTE_IN_MILLISECOUNDS );
 	}
 
 	private class MyServiceTrackerCustomizer implements ServiceTrackerCustomizer<OperationsProvider,OperationsProvider> {
@@ -128,12 +132,13 @@ public class OperationApiImpl extends MLog implements OperationApi {
 		}
 	}
 	
+	@Override
 	public String[] getProviderNames() {
 		synchronized (register) {
 			return register.keySet().toArray(new String[register.size()]);
 		}
 	}
-	
+
 	public OperationsProvider[] getProviders() {
 		synchronized (register) {
 			return register.values().toArray(new OperationsProvider[register.size()]);

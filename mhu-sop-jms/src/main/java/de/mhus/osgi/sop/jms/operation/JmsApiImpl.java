@@ -9,6 +9,7 @@ import javax.jms.MapMessage;
 import javax.jms.Message;
 
 import org.osgi.service.component.ComponentContext;
+import org.w3c.dom.Document;
 
 import aQute.bnd.annotation.component.Activate;
 import aQute.bnd.annotation.component.Component;
@@ -17,12 +18,17 @@ import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCollection;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MString;
+import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.MThread;
 import de.mhus.lib.core.MTimeInterval;
+import de.mhus.lib.core.MXml;
 import de.mhus.lib.core.base.service.TimerFactory;
 import de.mhus.lib.core.base.service.TimerIfc;
 import de.mhus.lib.core.cfg.CfgString;
+import de.mhus.lib.core.definition.DefRoot;
+import de.mhus.lib.core.service.ServerIdent;
 import de.mhus.lib.core.strategy.OperationDescription;
+import de.mhus.lib.form.ModelUtil;
 import de.mhus.lib.jms.ClientJms;
 import de.mhus.lib.jms.JmsConnection;
 import de.mhus.lib.jms.JmsDestination;
@@ -63,9 +69,16 @@ public class JmsApiImpl extends MLog implements JmsApi {
 				if (!JmsOperationProvider.PROVIDER_NAME.equals(desc.getProvider())) {
 					msg.setString("operation" + cnt, desc.getPath());
 					msg.setString("version" + cnt, desc.getVersionString());
-					msg.setString("tags" + cnt, MString.join(desc.getTags().iterator(), ",") );
+					String tags = MString.join(desc.getTags().iterator(), ",");
+					if (tags.length() > 0) tags = tags + ",";
+					tags = tags + "remote:jms,host:" + MSystem.getHostname() + ",ident:" + MApi.lookup(ServerIdent.class).toString();
+					msg.setString("tags" + cnt, tags );
 					msg.setString("title" + cnt, desc.getTitle());
-					// TODO msg.setString("form" + cnt, desc.getForm());
+					DefRoot form = desc.getForm();
+					if (form != null) {
+						Document doc = ModelUtil.toXml(form);
+						msg.setString("form" + cnt, MXml.toString(doc.getDocumentElement(), false));
+					}
 					cnt++;
 				}
 			}

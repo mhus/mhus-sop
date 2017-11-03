@@ -14,11 +14,13 @@ import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
+import de.mhus.lib.core.MXml;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.lib.core.strategy.Operation;
 import de.mhus.lib.core.strategy.OperationDescription;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.core.util.VersionRange;
+import de.mhus.lib.form.ModelUtil;
 import de.mhus.lib.jms.JmsConnection;
 import de.mhus.lib.karaf.jms.JmsUtil;
 import de.mhus.osgi.sop.api.Sop;
@@ -28,6 +30,7 @@ import de.mhus.osgi.sop.api.aaa.AccessApi;
 import de.mhus.osgi.sop.api.operation.OperationAddress;
 import de.mhus.osgi.sop.api.operation.OperationApi;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
+import de.mhus.osgi.sop.api.operation.OperationsProvider;
 
 @Command(scope = "sop", name = "operation", description = "Operation commands")
 @Service
@@ -71,9 +74,18 @@ public class OperationCmd implements Action {
 			out.print(System.out);
 		} else
 		if (cmd.equals("info")) {
-			OperationDescriptor des = api.findOperation(path, version == null ? null : new VersionRange(version),null);
-			System.out.println("Title  : " + des.getTitle());
-			System.out.println("Form   : " + des.getForm());
+			OperationDescriptor desc = null;
+			if (path.indexOf("://") >= 0) {
+				OperationAddress addr = new OperationAddress(path);
+				desc = api.getOperation(addr);
+			} else
+				desc = api.findOperation(path, version == null ? null : new VersionRange(version),null);
+			System.out.println("Title  : " + desc.getTitle());
+			String xml = null;
+			try {
+				xml = MXml.toString(ModelUtil.toXml(desc.getForm()), true);
+			} catch (Throwable t) {}
+			System.out.println("Form   : " + xml);
 		} else
 		if (cmd.equals("execute")) {
 			String[] executeOptions = null;
@@ -104,6 +116,11 @@ public class OperationCmd implements Action {
 		if (cmd.equals("sync")) {
 			api.synchronize();
 			System.out.println("ok");
+		} else
+		if (cmd.equals("providers")) {
+			for ( String p : api.getProviderNames()) {
+				System.out.println(p);
+			}
 		} else {
 			System.out.println("Command not found");
 		}
