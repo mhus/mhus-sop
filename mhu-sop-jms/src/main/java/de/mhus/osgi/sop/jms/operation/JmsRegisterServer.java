@@ -26,18 +26,6 @@ public class JmsRegisterServer extends AbstractJmsDataChannel {
 
 	private JmsApi jmsApi;
 
-	@Override
-	@Activate
-	public void doActivate(ComponentContext ctx) {
-		super.doActivate(ctx);
-	}
-
-	@Override
-	@Deactivate
-	public void doDeactivate(ComponentContext ctx) {
-		super.doDeactivate(ctx);
-	}
-
 	@Reference
 	public void setJmsApi(JmsApi api) {
 		this.jmsApi = api;
@@ -104,8 +92,9 @@ public class JmsRegisterServer extends AbstractJmsDataChannel {
 	}
 
 	@Override
-	protected String getJmsConnectionName() {
-		return jmsApi.getDefaultConnectionName();
+	public String getConnectionName() {
+		connectionName = jmsApi.getDefaultConnectionName();
+		return connectionName;
 	}
 
 }

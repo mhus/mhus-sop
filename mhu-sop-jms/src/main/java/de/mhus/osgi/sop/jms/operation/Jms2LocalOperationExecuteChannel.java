@@ -3,6 +3,8 @@ package de.mhus.osgi.sop.jms.operation;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.jms.JMSException;
+
 import org.osgi.service.component.ComponentContext;
 
 import aQute.bnd.annotation.component.Activate;
@@ -18,6 +20,8 @@ import de.mhus.lib.core.strategy.OperationDescription;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.core.util.VersionRange;
 import de.mhus.lib.errors.NotFoundException;
+import de.mhus.lib.jms.JmsChannel;
+import de.mhus.lib.jms.ServerJms;
 import de.mhus.lib.karaf.jms.JmsDataChannel;
 import de.mhus.lib.karaf.jms.JmsManagerService;
 import de.mhus.osgi.sop.api.jms.AbstractJmsOperationExecuteChannel;
@@ -33,34 +37,24 @@ public class Jms2LocalOperationExecuteChannel extends AbstractJmsOperationExecut
 	static Jms2LocalOperationExecuteChannel instance;
 	private JmsApi jmsApi;
 	
-	@Override
 	@Activate
 	public void doActivate(ComponentContext ctx) {
-		super.doActivate(ctx);
-		if (MApi.getCfg(Jms2LocalOperationExecuteChannel.class).getBoolean("accessControl", true))
-			getServer().setInterceptorIn(new TicketAccessInterceptor());
 		instance = this;
 	}	
 	
-	@Override
 	@Deactivate
 	public void doDeactivate(ComponentContext ctx) {
 		instance = null;
-		super.doDeactivate(ctx);
+	}
+
+	@Override
+	protected JmsChannel createChannel() throws JMSException {
+		JmsChannel out = super.createChannel();
+		if (out != null && MApi.getCfg(Jms2LocalOperationExecuteChannel.class).getBoolean("accessControl", true))
+			((ServerJms)out).setInterceptorIn(new TicketAccessInterceptor());
+		return out;
 	}
 	
-	@Override
-	@Reference
-	public void setJmsManagerService(JmsManagerService manager) {
-		super.setJmsManagerService(manager);
-	}
-
-	@Override
-	protected void doAfterReset() {
-		if (getServer() != null && getServer().getInterceptorIn() == null)
-			getServer().setInterceptorIn(new TicketAccessInterceptor()); // for authentication
-	}
-
 	@Override
 	protected String getQueueName() {
 		return  queueName.value();
@@ -112,6 +106,12 @@ public class Jms2LocalOperationExecuteChannel extends AbstractJmsOperationExecut
 		OperationDescriptor desc = admin.findOperation(path, version, null);
 		if (desc == null) return null;
 		return desc;
+	}
+
+	@Override
+	public String getConnectionName() {
+		connectionName = jmsApi.getDefaultConnectionName();
+		return connectionName;
 	}
 
 }

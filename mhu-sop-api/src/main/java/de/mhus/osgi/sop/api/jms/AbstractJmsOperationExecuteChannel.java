@@ -14,6 +14,7 @@ import javax.jms.ObjectMessage;
 import org.osgi.service.component.ComponentContext;
 
 import de.mhus.lib.core.IProperties;
+import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
 import de.mhus.lib.core.pojo.DefaultFilter;
@@ -27,9 +28,11 @@ import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.core.strategy.Successful;
 import de.mhus.lib.core.util.VersionRange;
 import de.mhus.lib.errors.NotFoundException;
+import de.mhus.lib.jms.JmsChannel;
+import de.mhus.lib.jms.JmsDestination;
 import de.mhus.lib.jms.MJms;
 import de.mhus.lib.jms.ServerJms;
-import de.mhus.lib.karaf.jms.JmsDataChannelImpl;
+import de.mhus.lib.karaf.jms.AbstractJmsDataChannel;
 import de.mhus.osgi.sop.api.Sop;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 
@@ -41,30 +44,31 @@ import de.mhus.osgi.sop.api.operation.OperationDescriptor;
  * @author mikehummel
  *
  */
-public abstract class AbstractJmsOperationExecuteChannel extends JmsDataChannelImpl {
-
-
-	public void doActivate(ComponentContext ctx) {
-		
-		setDestination(getQueueName());
-		setDestinationTopic(false);
-		setChannel(null);
-		setConnectionName(getJmsConnectionName());
-		setName(getServiceName());
-		reset();
-		getServer().setInterceptorIn(new TicketAccessInterceptor());
-	}	
-	
-	public void doDeactivate(ComponentContext ctx) {
-		if (getServer() != null) getServer().close();
-		setChannel(null);
-	}
+public abstract class AbstractJmsOperationExecuteChannel extends AbstractJmsDataChannel {
 
 	protected ServerJms getServer() {
 		return (ServerJms) getChannel();
 	};
 	
 	@Override
+	protected JmsChannel createChannel() throws JMSException {
+		name = getServiceName();
+		ServerJms out = new ServerJms(new JmsDestination(getQueueName(), false)) {
+			
+			@Override
+			public void receivedOneWay(Message msg) throws JMSException {
+				AbstractJmsOperationExecuteChannel.this.received(msg);
+			}
+			
+			@Override
+			public Message received(Message msg) throws JMSException {
+				return AbstractJmsOperationExecuteChannel.this.received(msg);
+			}
+		};
+		
+		return out;
+	}
+
 	protected Message received(Message msg) throws JMSException {
 		
 		String path = msg.getStringProperty(Sop.PARAM_OPERATION_PATH);
