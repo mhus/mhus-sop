@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 
+import aQute.bnd.annotation.component.Component;
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.logging.LevelMapper;
@@ -36,7 +38,7 @@ import de.mhus.osgi.sop.api.rest.RestResult;
 import de.mhus.osgi.sop.api.util.SopFileLogger;
 import de.mhus.osgi.sop.api.util.TicketUtil;
 
-//@Component(immediate=true,name="RestServlet",provide=Servlet.class,properties="alias=/rest/*")
+@Component(immediate=true,name="RestServlet",provide=Servlet.class,properties="alias=/rest/*")
 public class RestServlet extends HttpServlet {
 
 	static Log trace = new SopFileLogger("rest", "rest_trace");

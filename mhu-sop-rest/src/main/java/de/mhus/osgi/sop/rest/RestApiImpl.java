@@ -13,7 +13,11 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import aQute.bnd.annotation.component.Activate;
 import aQute.bnd.annotation.component.Component;
 import aQute.bnd.annotation.component.Deactivate;
+import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MLog;
+import de.mhus.lib.core.cfg.CfgBoolean;
+import de.mhus.lib.errors.AccessDeniedException;
+import de.mhus.osgi.sop.api.aaa.AccessApi;
 import de.mhus.osgi.sop.api.rest.CallContext;
 import de.mhus.osgi.sop.api.rest.Node;
 import de.mhus.osgi.sop.api.rest.RestApi;
@@ -25,6 +29,8 @@ public class RestApiImpl extends MLog implements RestApi {
 	private BundleContext context;
 	private ServiceTracker<RestNodeService,RestNodeService> nodeTracker;
 	private HashMap<String, RestNodeService> register = new HashMap<>();
+
+	public static final CfgBoolean RELAXED = new CfgBoolean(RestApi.class, "aaaRelaxed", true);
 
 	@Activate
 	public void doActivate(ComponentContext ctx) {
@@ -95,6 +101,19 @@ public class RestApiImpl extends MLog implements RestApi {
 		if (lastNodeId == null) lastNodeId = RestNodeService.ROOT_ID;
 		RestNodeService next = register.get(lastNodeId + "-" + name); 
 		if (next == null) return null;
+		
+		AccessApi aaa = MApi.lookup(AccessApi.class);
+		if (aaa != null) {
+			try {
+				if (!aaa.hasResourceAccess(aaa.getCurrenAccount(), "rest.node", name, "execute"))
+					throw new AccessDeniedException("access denied");
+			} catch (Throwable t) {
+				throw new AccessDeniedException("internal error", t);
+			}
+		} else
+		if (!RELAXED.value())
+			throw new AccessDeniedException("Access api not found");
+		
 		return next.lookup(parts, context);
 	}
 	
