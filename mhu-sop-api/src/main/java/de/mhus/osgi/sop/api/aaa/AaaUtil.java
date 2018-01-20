@@ -10,6 +10,11 @@ public class AaaUtil {
 	
 	private static Log log = Log.getLog(AaaUtil.class);
 	
+	public static boolean hasAccess(AaaContext context, List<String> acl) {
+		if (context.isAdminMode()) return true;
+		return hasAccess(context.getAccount(), acl);
+	}
+	
 	public static boolean hasAccess(Rightful accessControl, List<String> acl) {
 		if (accessControl == null || acl == null )
 			return false;
