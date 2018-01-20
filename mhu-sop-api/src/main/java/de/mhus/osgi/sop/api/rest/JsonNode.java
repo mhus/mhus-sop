@@ -45,13 +45,13 @@ public abstract class JsonNode<T> extends AbstractNode<T>{
 		return result;
 	}
 	
-	public void doUpdate(JsonResult result, CallContext callContext) throws Exception {
+	protected void doUpdate(JsonResult result, CallContext callContext) throws Exception {
 		throw new NotSupportedException();
 	}
-	public void doCreate(JsonResult result, CallContext callContext) throws Exception {
+	protected void doCreate(JsonResult result, CallContext callContext) throws Exception {
 		throw new NotSupportedException();
 	}
-	public void doDelete(JsonResult result, CallContext callContext) throws Exception {
+	protected void doDelete(JsonResult result, CallContext callContext) throws Exception {
 		throw new NotSupportedException();
 	}
 	
@@ -66,5 +66,29 @@ public abstract class JsonNode<T> extends AbstractNode<T>{
 		
 	}
  */		
+
+	/**
+	 * Overwrite the method if you need the feature. Instead use doCreate
+	 */
+	@Override
+	protected OperationDescriptor getCreateAction() {
+		return null;
+	}
+
+	/**
+	 * Overwrite the method if you need the feature. Instead use doUpdate
+	 */
+	@Override
+	protected OperationDescriptor getUpdateAction() {
+		return null;
+	}
+	
+	/**
+	 * Overwrite the method if you need the feature. Instead use doDelete
+	 */
+	@Override
+	protected OperationDescriptor getDeleteAction() {
+		return null;
+	}
 
 }
