@@ -11,12 +11,13 @@ import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.security.Account;
 import de.mhus.lib.core.security.AccountSource;
+import de.mhus.osgi.sop.api.util.SopUtil;
 
 public class AccountFromFile extends MLog implements AccountSource {
 
 	@Override
 	public Account findAccount(String account) {
-		File file = new File( "aaa/account/" + MFile.normalize(account.trim()).toLowerCase() + ".xml" );
+		File file = SopUtil.getFile( "aaa/account/" + MFile.normalize(account.trim()).toLowerCase() + ".xml" );
 		if (!file.exists() || !file.isFile()) {
 			log().i("file not found", file);
 			return null;

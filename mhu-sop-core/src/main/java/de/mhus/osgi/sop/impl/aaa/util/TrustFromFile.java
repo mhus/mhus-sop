@@ -12,12 +12,13 @@ import de.mhus.lib.core.MLog;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.Trust;
 import de.mhus.osgi.sop.api.aaa.TrustSource;
+import de.mhus.osgi.sop.api.util.SopUtil;
 
 public class TrustFromFile extends MLog implements TrustSource {
 
 	@Override
 	public Trust findTrust(String trust) {
-		File file = new File( "aaa/trust/" + MFile.normalize(trust.trim()).toLowerCase() + ".xml" );
+		File file = SopUtil.getFile( "aaa/trust/" + MFile.normalize(trust.trim()).toLowerCase() + ".xml" );
 		if (!file.exists() || !file.isFile()) return null;
 		
 		try {
