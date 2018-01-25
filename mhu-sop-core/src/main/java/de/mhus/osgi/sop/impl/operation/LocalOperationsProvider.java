@@ -422,6 +422,14 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
 			this.operation = operation;
 		}
 		
+		@Override
+		@SuppressWarnings("unchecked")
+		public <T> T adaptTo(Class<T> ifc) {
+			if (ifc == Operation.class) return (T) operation;
+			return super.adaptTo(ifc);
+		}
+
+		
 	}
 
 	@Override

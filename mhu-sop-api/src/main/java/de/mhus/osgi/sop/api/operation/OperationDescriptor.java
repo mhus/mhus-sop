@@ -337,4 +337,11 @@ public class OperationDescriptor implements MNlsProvider, Nls, Named, Versioned 
 		return address.getProvider();
 	}
 	
+	@SuppressWarnings("unchecked")
+	public <T> T adaptTo(Class<T> ifc) {
+		if (ifc == OperationAddress.class) return (T) address;
+		if (ifc == OperationDescription.class) return (T) description;
+		return null;
+	}
+	
 }
