@@ -212,12 +212,14 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 import aQute.bnd.annotation.component.Activate;
+import aQute.bnd.annotation.component.Component;
 import aQute.bnd.annotation.component.Deactivate;
 import de.mhus.lib.adb.DbCollection;
 import de.mhus.lib.adb.DbManager;
@@ -241,21 +243,22 @@ import de.mhus.osgi.sop.api.model.ActionTask;
 import de.mhus.osgi.sop.api.model.ObjectParameter;
 import de.mhus.osgi.sop.impl.AaaContextImpl;
 
+//@Component(immediate=true) done by blueprint
 public class AdbApiImpl extends MLog implements AdbApi {
 
 	private HashMap<String, DbSchemaService> controllers = new HashMap<String, DbSchemaService>();
 	private ServiceTracker<DbSchemaService,DbSchemaService> accessTracker;
 	private BundleContext context;
 
-	@Activate
-	public void doActivate(ComponentContext ctx) {
-		context = ctx.getBundleContext();
+//	@Activate
+	public void doActivate() {
+		context = FrameworkUtil.getBundle(AdbApiImpl.class).getBundleContext();
 		accessTracker = new ServiceTracker<>(context, DbSchemaService.class, new MyAccessTrackerCustomizer() );
 		accessTracker.open();
 	}
 	
-	@Deactivate
-	public void doDeactivate(ComponentContext ctx) {
+//	@Deactivate
+	public void doDeactivate() {
 		accessTracker.close();
 		accessTracker = null;
 		context = null;
@@ -500,7 +503,7 @@ public class AdbApiImpl extends MLog implements AdbApi {
 	protected DbSchemaService getController(String type) throws MException {
 		if (type == null) throw new MException("type is null");
 		DbSchemaService ret = controllers.get(type);
-		if (ret == null) throw new MException("Access Controler not found",type);
+		if (ret == null) throw new MException("Access Controller not found",type);
 		return ret;
 	}
 
