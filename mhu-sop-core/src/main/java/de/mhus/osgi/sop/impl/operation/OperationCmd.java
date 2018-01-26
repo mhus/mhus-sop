@@ -324,6 +324,10 @@ public class OperationCmd implements Action {
 			for ( String p : api.getProviderNames()) {
 				System.out.println(p);
 			}
+		} else
+		if (cmd.equals("reset")) {
+			api.reset();
+			System.out.println("OK");
 		} else {
 			System.out.println("Command not found");
 		}

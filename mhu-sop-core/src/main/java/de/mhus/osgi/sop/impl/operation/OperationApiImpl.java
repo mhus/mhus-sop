@@ -252,7 +252,7 @@ public class OperationApiImpl extends MLog implements OperationApi {
 	public void doActivate(ComponentContext ctx) {
 		context = ctx.getBundleContext();
 		nodeTracker = new ServiceTracker<>(context, OperationsProvider.class, new MyServiceTrackerCustomizer() );
-		nodeTracker.open();
+		nodeTracker.open(true);
 		instance = this;
 	}
 
@@ -410,6 +410,12 @@ public class OperationApiImpl extends MLog implements OperationApi {
 				log().d(provider,e);
 			}
 		}
+	}
+
+	@Override
+	public void reset() {
+		nodeTracker.close();
+		nodeTracker.open(true);
 	}
 
 }

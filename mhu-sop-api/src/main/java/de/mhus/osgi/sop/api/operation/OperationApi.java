@@ -226,5 +226,6 @@ public interface OperationApi extends SApi {
 
 	void synchronize();
 	String[] getProviderNames();
-	
+
+	void reset();
 }
