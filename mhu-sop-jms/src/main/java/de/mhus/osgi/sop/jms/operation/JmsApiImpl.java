@@ -277,6 +277,9 @@ public class JmsApiImpl extends MLog implements JmsApi {
 					tags = tags + "remote:jms,host:" + MSystem.getHostname() + ",ident:" + MApi.lookup(ServerIdent.class).toString();
 					msg.setString("tags" + cnt, tags );
 					msg.setString("title" + cnt, desc.getTitle());
+					for (String key : desc.getParameterKeys()) {
+						msg.setString("param" + cnt + "." + key, desc.getParameter(key) );
+					}
 					DefRoot form = desc.getForm();
 					if (form != null) {
 						Document doc = ModelUtil.toXml(form);

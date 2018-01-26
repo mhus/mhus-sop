@@ -204,6 +204,7 @@
 package de.mhus.osgi.sop.api.operation;
 
 import java.util.Collection;
+import java.util.HashMap;
 
 import de.mhus.lib.basics.Named;
 import de.mhus.lib.basics.Versioned;
@@ -239,6 +240,14 @@ public class OperationDescriptor implements MNlsProvider, Nls, Named, Versioned 
 		this.address = address;
 		this.description = description;
 		this.tags = tags;
+		
+		// tags from description
+		Object tagsStr = description.getParameters() == null ? null : description.getParameters().get(OperationDescription.TAGS);
+		if (tagsStr != null)
+			for (String item : String.valueOf(tagsStr).split(","))
+				tags.add(item);
+		
+		
 	}
 
 	public boolean compareTags(Collection<String> providedTags) {
@@ -344,4 +353,16 @@ public class OperationDescriptor implements MNlsProvider, Nls, Named, Versioned 
 		return null;
 	}
 	
+	public String[] getParameterKeys() {
+		HashMap<String, String> p = description.getParameters();
+		if (p == null) return new String[0];
+		return p.keySet().toArray(new String[p.size()]);
+	}
+	
+	public String getParameter(String key) {
+		HashMap<String, String> p = description.getParameters();
+		if (p == null) return null;
+		return p.get(key);
+	}
+		
 }

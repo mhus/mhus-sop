@@ -264,6 +264,13 @@ import de.mhus.osgi.sop.api.operation.OperationsProvider;
 import de.mhus.osgi.sop.api.util.ObjectUtil;
 import de.mhus.osgi.sop.jms.operation.JmsApiImpl.JmsOperationDescriptor;
 
+/**
+ * The class provides the remote Operations into the osgi engine.
+ * 
+ * @author mikehummel
+ *
+ */
+
 @Component(immediate=true,properties="provider=jms")
 public class JmsOperationProvider extends MLog implements OperationsProvider {
 

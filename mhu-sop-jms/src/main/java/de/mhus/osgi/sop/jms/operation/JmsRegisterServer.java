@@ -203,6 +203,9 @@
  */
 package de.mhus.osgi.sop.jms.operation;
 
+import java.util.Enumeration;
+import java.util.HashMap;
+
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
 import javax.jms.Message;
@@ -230,6 +233,13 @@ import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.operation.OperationAddress;
 import de.mhus.osgi.sop.jms.operation.JmsApiImpl.JmsOperationDescriptor;
 
+/**
+ * The class subscribes and watches for incoming operation registry information.
+ * They will be send by JmsApiImpl.sendLocalOperations
+ * 
+ * @author mikehummel
+ *
+ */
 @Component(immediate=true,provide=JmsDataChannel.class)
 public class JmsRegisterServer extends AbstractJmsDataChannel {
 
@@ -278,6 +288,16 @@ public class JmsRegisterServer extends AbstractJmsDataChannel {
 										model = ModelUtil.toModel(doc.getDocumentElement());
 									} catch (Throwable t) {}
 								}
+								HashMap<String, String> parameters = null;
+								for (Enumeration<String> enu = m.getMapNames(); enu.hasMoreElements();) {
+									String key = enu.nextElement();
+									String start = "param" + cnt + ".";
+									if (key.startsWith(start)) {
+										if (parameters == null)
+											parameters = new HashMap<>();
+										parameters.put(key.substring(start.length()), m.getString(key) );
+									}
+								}
 								cnt++;
 								String ident = connection + "," + queue + "," + path + "," + version;
 								JmsOperationDescriptor desc = JmsApiImpl.instance.register.get(ident);
@@ -285,6 +305,7 @@ public class JmsRegisterServer extends AbstractJmsDataChannel {
 									OperationAddress a = new OperationAddress(JmsOperationProvider.PROVIDER_NAME + "://" + path + ":" + version + "/" + queue + "/" + connection);
 									OperationDescription d = new OperationDescription(a.getGroup(),a.getName(),a.getVersion(),null,title);
 									d.setForm(model);
+									d.setParameters(parameters);
 									desc = new JmsOperationDescriptor(a,d,tags == null ? null : MCollection.toList(tags.split(",")));
 									JmsApiImpl.instance.register.put(ident, desc);
 								}

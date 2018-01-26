@@ -288,7 +288,7 @@ public class OperationApiImpl extends MLog implements OperationApi {
 			OperationsProvider service = context.getService(reference);
 			if (service != null) {
 				String name = String.valueOf(reference.getProperty("provider"));
-				log().d("register",name);
+				log().i("register",name);
 				synchronized (register) {
 					OperationsProvider o = register.put(name, service);
 					if (o != null)
