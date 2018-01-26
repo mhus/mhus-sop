@@ -257,7 +257,7 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
 	public void doActivate(ComponentContext ctx) {
 		context = ctx.getBundleContext();
 		nodeTracker = new ServiceTracker<>(context, Operation.class, new MyServiceTrackerCustomizer() );
-		nodeTracker.open();
+		nodeTracker.open(true);
 		instance = this;
 	}
 
