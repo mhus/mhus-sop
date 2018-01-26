@@ -203,11 +203,19 @@
  */
 package de.mhus.osgi.sop.api.operation;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Collection;
 
+import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCast;
+import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
+import de.mhus.lib.core.strategy.OperationResult;
+import de.mhus.lib.core.strategy.OperationToIfcProxy;
 import de.mhus.lib.core.util.VersionRange;
+import de.mhus.lib.errors.MException;
 
 public class OperationUtil {
 
@@ -250,4 +258,53 @@ public class OperationUtil {
 		return def;
 	}
 
+	@SuppressWarnings("unchecked")
+	public static <T> T createOpertionProxy(Class<T> ifc, OperationDescriptor desc) throws MException {
+		if (!desc.getTitle().equals(ifc.getName()))
+			throw new MException("Interface and operation do not match", ifc.getName(), desc.getName() );
+		
+		return (T)Proxy.newProxyInstance(ifc.getClassLoader(), new Class[] {ifc}, new OperationInvocationHandler(ifc,desc));
+		
+	}
+	
+	private static class OperationInvocationHandler implements InvocationHandler {
+
+		private Class<?> ifc;
+		private OperationDescriptor desc;
+
+		public OperationInvocationHandler(Class<?> ifc, OperationDescriptor desc) {
+			this.ifc = ifc;
+			this.desc = desc;
+		}
+
+		@Override
+		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+			
+			OperationApi api = MApi.lookup(OperationApi.class);
+
+			MProperties properties = new MProperties();
+			properties.setString(OperationToIfcProxy.METHOD, method.getName());
+			int pcount = method.getParameterCount();
+			for (int i = 0; i < pcount; i++) {
+				if (args[i] != null) {
+					properties.put(OperationToIfcProxy.PARAMETER + i, MCast.serializeToString(args[i]));
+//					properties.put(OperationToIfcProxy.TYPE + i, method.getParameters()[i].getType().getCanonicalName() );
+					properties.put(OperationToIfcProxy.TYPE + i, OperationToIfcProxy.SERIALISED );
+					properties.put(OperationToIfcProxy.PARAMETERTYPE + i, args[i].getClass().getCanonicalName() );
+				}
+			}
+			
+			OperationResult res = api.doExecute(desc, properties);
+			
+			if (res == null)
+				throw new NullPointerException();
+			
+			if (!res.isSuccessful())
+				throw new MException(res.getMsg());
+			
+			return res.getResult();
+		}
+		
+	}
+	
 }
