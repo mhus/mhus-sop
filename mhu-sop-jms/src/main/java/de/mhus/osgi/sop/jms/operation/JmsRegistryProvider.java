@@ -21,7 +21,7 @@ public class JmsRegistryProvider extends MLog implements RegistryProvider {
 
 	@Override
 	public void publishAll() {
-		JmsApiImpl.instance.sendLocalOperations();
+		JmsApiImpl.instance.sendLocalRegistry();
 	}
 
 	@Override

@@ -334,7 +334,9 @@ public class JmsRegisterServer extends AbstractJmsDataChannel {
 						while (m.getString("path" + cnt) != null) {
 							String path = m.getString("path" + cnt);
 							String value = m.getString("value" + cnt);
-							api.setLocalParameter(new RegistryValue(value, ident, updated, path));
+							long timeout = m.getLong("timeout" + cnt);
+							boolean readOnly = m.getBoolean("readOnly" + cnt);
+							api.setLocalParameter(new RegistryValue(value, ident, updated, path, timeout, readOnly));
 							cnt++;
 						}
 						if ("full".equals(scope)) {

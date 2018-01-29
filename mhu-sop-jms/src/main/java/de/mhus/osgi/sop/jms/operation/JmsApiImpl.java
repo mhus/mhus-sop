@@ -369,6 +369,8 @@ public class JmsApiImpl extends MLog implements JmsApi {
 			
 			msg.setString("path0", entry.getPath());
 			msg.setString("value0", entry.getValue());
+			msg.setLong("timeout0", entry.getTimeout());
+			msg.setBoolean("readOnly0", entry.isReadOnly());
 			
 			registerClient.sendJms(msg);
 		} catch (Throwable t) {
@@ -407,11 +409,17 @@ public class JmsApiImpl extends MLog implements JmsApi {
 			msg.setStringProperty("scope", "full");
 
 			RegistryManager api = MApi.lookup(RegistryManager.class);
+			if (api == null) {
+				log().d("sendLocalRegistry: API not found");
+				return;
+			}
 			int cnt = 0;
 			for (RegistryValue entry : api.getAll()) {
 				if (entry.getSource().equals(ident)) {
 					msg.setString("path" + cnt, entry.getPath());
 					msg.setString("value" + cnt, entry.getValue());
+					msg.setLong("timeout" + cnt, entry.getTimeout());
+					msg.setBoolean("readOnly" + cnt, entry.isReadOnly());
 					cnt++;
 				}
 			}

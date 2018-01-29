@@ -1,11 +1,13 @@
 package de.mhus.osgi.sop.impl.registry;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -14,14 +16,23 @@ import org.osgi.service.component.ComponentContext;
 import aQute.bnd.annotation.component.Activate;
 import aQute.bnd.annotation.component.Component;
 import aQute.bnd.annotation.component.Deactivate;
+import aQute.bnd.annotation.component.Reference;
 import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MLog;
+import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MSystem;
+import de.mhus.lib.core.MThread;
+import de.mhus.lib.core.MTimeInterval;
+import de.mhus.lib.core.MTimerTask;
+import de.mhus.lib.core.base.service.TimerFactory;
+import de.mhus.lib.core.base.service.TimerIfc;
 import de.mhus.lib.core.cfg.CfgProvider;
 import de.mhus.lib.core.config.IConfig;
 import de.mhus.lib.core.directory.ResourceNode;
 import de.mhus.lib.core.directory.WritableResourceNode;
 import de.mhus.lib.core.service.ServerIdent;
+import de.mhus.lib.errors.AccessDeniedException;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.errors.UsageException;
 import de.mhus.lib.karaf.MOsgi;
@@ -30,20 +41,57 @@ import de.mhus.osgi.sop.api.registry.RegistryManager;
 import de.mhus.osgi.sop.api.registry.RegistryProvider;
 import de.mhus.osgi.sop.api.registry.RegistryValue;
 
-@Component(provide={RegistryApi.class,RegistryManager.class})
+@Component(provide={RegistryApi.class,RegistryManager.class},immediate=true)
 public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManager, CfgProvider {
 
 	private IConfig configProxy = new MyConfig();
 	private HashMap<String, RegistryValue> registry = new HashMap<>();
+	private TimerIfc timer;
+	private MTimerTask timerTask;
 
 	@Activate
 	public void doActivate(ComponentContext ctx) {
 		MApi.get().getCfgManager().registerCfgProvider(RegistryApi.class.getCanonicalName(), this);
+		load(false);
+		MThread.asynchron(new Runnable() {
+			
+			@Override
+			public void run() {
+				MThread.sleep(10000);
+				publishAll();
+			}
+		});
 	}
 	
 	@Deactivate
 	public void doDeactivate(ComponentContext ctx) {
+		if (timer != null)
+			timer.cancel();
 
+	}
+
+	@Reference(service=TimerFactory.class)
+	public void setTimerFactory(TimerFactory factory) {
+//		log().i("create timer");
+		timer = factory.getTimer();
+		timerTask = new MTimerTask() {
+			
+			@Override
+			public void doit() throws Exception {
+				checkUpdate();
+			}
+		};
+		timer.schedule(timerTask, 30000, MTimeInterval.MINUTE_IN_MILLISECOUNDS );
+	}
+
+	protected void checkUpdate() {
+		final long now = System.currentTimeMillis();
+		synchronized (registry) {
+			registry.entrySet().removeIf(entry -> {
+				return  entry.getValue().getTimeout() > 0 && 
+						now - entry.getValue().getUpdated() > entry.getValue().getTimeout();
+			});
+		}
 	}
 
 	@Override
@@ -57,9 +105,9 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	@Override
 	public Set<String> getNodeChildren(String path) {
 		path = validateNodePath(path);
-		TreeSet<String> out = new java.util.TreeSet<>();
-		String pathx = path + "/";
-		int posx = pathx.length()+1;
+		final TreeSet<String> out = new java.util.TreeSet<>();
+		final String pathx = path + "/";
+		final int posx = pathx.length()+1;
 		synchronized (registry) {
 			registry.forEach((k,v) -> { 
 				if (k.startsWith(pathx)) {
@@ -79,9 +127,9 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	@Override
 	public Set<String> getParameterNames(String path) {
 		path = validateNodePath(path);
-		TreeSet<String> out = new java.util.TreeSet<>();
-		String pathx = path + "@";
-		int posx = pathx.length()+1;
+		final TreeSet<String> out = new java.util.TreeSet<>();
+		final String pathx = path + "@";
+		final int posx = pathx.length()+1;
 		synchronized (registry) {
 			registry.forEach((k,v) -> { 
 				if (k.startsWith(pathx)) {
@@ -95,8 +143,8 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	@Override
 	public Set<RegistryValue> getParameters(String path) {
 		path = validateNodePath(path);
-		TreeSet<RegistryValue> out = new java.util.TreeSet<>();
-		String pathx = path + "@";
+		final TreeSet<RegistryValue> out = new java.util.TreeSet<>();
+		final String pathx = path + "@";
 		synchronized (registry) {
 			registry.forEach((k,v) -> { 
 				if (k.startsWith(pathx)) {
@@ -108,7 +156,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	}
 
 	@Override
-	public boolean setParameter(String path, String value) {
+	public boolean setParameter(String path, String value, long timeout, boolean readOnly) {
 		path = validateParameterPath(path);
 		if (value == null) throw new NullPointerException("null value not allowed");
 		RegistryValue current = getNodeParameter(path);
@@ -116,8 +164,10 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 		
 		if (current != null) {
 			if (MSystem.equals(current.getValue(), value)) return false;
+			if (current.isReadOnly() && !current.getSource().equals(source))
+				throw new AccessDeniedException("The entry is read only");
 		}
-		RegistryValue entry = new RegistryValue(value, source, System.currentTimeMillis(), path);
+		RegistryValue entry = new RegistryValue(value, source, System.currentTimeMillis(), path, timeout, readOnly);
 		synchronized (registry) {
 			registry.put(path, entry);
 		}
@@ -142,6 +192,11 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 		path = validateParameterPath(path);
 		RegistryValue current = getNodeParameter(path);
 		if (current == null) return false;
+		
+		String source = MApi.lookup(ServerIdent.class).toString();
+		if (current.isReadOnly() && !current.getSource().equals(source))
+			throw new AccessDeniedException("The entry is readOnly");
+
 		synchronized (registry) {
 			registry.remove(path);
 		}
@@ -478,4 +533,39 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 		}
 		
 	}
+
+	@Override
+	public void save() throws IOException {
+		MProperties p = new MProperties();
+		String ident = MApi.lookup(ServerIdent.class).toString();
+		for (RegistryValue entry : getAll())
+			if (entry.getSource().equals(ident)) {
+				p.setString(entry.getPath(), entry.isReadOnly() + ":" + entry.getTimeout() + ":" + entry.getValue());
+			}
+		p.save(getFile());
+	}
+
+	@Override
+	public void load() {
+		load(true);
+	}
+	
+	public void load(boolean push) {
+		File file = getFile();
+		if (!file.exists()) return;
+		MProperties prop = MProperties.load(file);
+		String ident = MApi.lookup(ServerIdent.class).toString();
+		long updated = System.currentTimeMillis();
+		for (Entry<String, Object> entry : prop.entrySet()) {
+			String[] split = entry.getValue().toString().split(":", 3);
+			setLocalParameter(new RegistryValue(split[2], ident, updated, entry.getKey(), MCast.tolong(split[1],0), MCast.toboolean(split[0], true)));
+		}
+		if (push)
+			publishAll();
+	}
+	
+	private File getFile() {
+		return new File("etc/" + RegistryApi.class.getCanonicalName() + ".properties");
+	}
+
 }

@@ -1,5 +1,6 @@
 package de.mhus.osgi.sop.api.registry;
 
+import java.io.IOException;
 import java.util.Set;
 
 public interface RegistryApi {
@@ -32,8 +33,11 @@ public interface RegistryApi {
 	 * Set and publish a value for the given parameter.
 	 * @param path Node path and parameter name e.g. '/node1/node2@parameter'
 	 * @param value New value
+	 * @param timeout Timeout in milliseconds after receive or 0
+	 * @param readOnly Readonly can only be updated by the source
+	 * @return 
 	 */
-	boolean setParameter(String path, String value);
+	boolean setParameter(String path, String value, long timeout, boolean readOnly);
 
 	/**
 	 * Remove a node or parameter. And publish the information.
@@ -47,5 +51,9 @@ public interface RegistryApi {
 	void publishAll();
 
 	void requestAll();
+
+	void save() throws IOException;
+
+	void load();
 	
 }
