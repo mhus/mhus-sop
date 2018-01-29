@@ -1,0 +1,51 @@
+package de.mhus.osgi.sop.api.registry;
+
+import java.util.Set;
+
+public interface RegistryApi {
+
+	/**
+	 * Return the value information of a node parameter.
+	 * 
+	 * @param path Node path and parameter name e.g. '/node1/node2@parameter'
+	 * @return The value or null if not found
+	 */
+	RegistryValue getNodeParameter(String path);
+	
+	/**
+	 * Returns a list of children nodes.
+	 * 
+	 * @param path Path to the node where to request the children.
+	 * @return List of node names or an empty list.
+	 */
+	Set<String> getNodeChildren(String path);
+	
+	/**
+	 * Returns a list of parameters of the given node.
+	 * 
+	 * @param path Path to the node where to request the parameters.
+	 * @return List of parameter names.
+	 */
+	Set<String> getParameterNames(String path);
+
+	/**
+	 * Set and publish a value for the given parameter.
+	 * @param path Node path and parameter name e.g. '/node1/node2@parameter'
+	 * @param value New value
+	 */
+	boolean setParameter(String path, String value);
+
+	/**
+	 * Remove a node or parameter. And publish the information.
+	 * 
+	 * @param path
+	 */
+	boolean removeParameter(String path);
+
+	Set<RegistryValue> getParameters(String path);
+
+	void publishAll();
+
+	void requestAll();
+	
+}

@@ -241,6 +241,8 @@ import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.operation.OperationAddress;
 import de.mhus.osgi.sop.api.operation.OperationApi;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
+import de.mhus.osgi.sop.api.registry.RegistryManager;
+import de.mhus.osgi.sop.api.registry.RegistryValue;
 
 @Component(immediate=true)
 public class JmsApiImpl extends MLog implements JmsApi {
@@ -352,6 +354,84 @@ public class JmsApiImpl extends MLog implements JmsApi {
 			lastUpdated = System.currentTimeMillis();
 		}
 		
+	}
+
+	public void registryPublish(RegistryValue entry) {
+		try {
+			checkClient();
+
+			MapMessage msg = registerClient.createMapMessage();
+			msg.setStringProperty("type", "registrypublish");
+			msg.setStringProperty("connection", MApi.lookup(JmsApi.class).getDefaultConnectionName());
+			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.queueName.value());
+			msg.setStringProperty("ident", MApi.lookup(ServerIdent.class).toString());
+			msg.setStringProperty("scope", "single");
+			
+			msg.setString("path0", entry.getPath());
+			msg.setString("value0", entry.getValue());
+			
+			registerClient.sendJms(msg);
+		} catch (Throwable t) {
+			log().w(t);
+		}
+	}
+
+	public void registryRemove(String path) {
+		try {
+			checkClient();
+
+			MapMessage msg = registerClient.createMapMessage();
+			msg.setStringProperty("type", "registryremove");
+			msg.setStringProperty("connection", MApi.lookup(JmsApi.class).getDefaultConnectionName());
+			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.queueName.value());
+			msg.setStringProperty("ident", MApi.lookup(ServerIdent.class).toString());
+			
+			msg.setString("path0", path);
+			
+			registerClient.sendJms(msg);
+		} catch (Throwable t) {
+			log().w(t);
+		}
+	}
+
+	public void sendLocalRegistry() {
+		try {
+			checkClient();
+
+			String ident = MApi.lookup(ServerIdent.class).toString();
+			MapMessage msg = registerClient.createMapMessage();
+			msg.setStringProperty("type", "registrypublish");
+			msg.setStringProperty("connection", MApi.lookup(JmsApi.class).getDefaultConnectionName());
+			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.queueName.value());
+			msg.setStringProperty("ident", ident);
+			msg.setStringProperty("scope", "full");
+
+			RegistryManager api = MApi.lookup(RegistryManager.class);
+			int cnt = 0;
+			for (RegistryValue entry : api.getAll()) {
+				if (entry.getSource().equals(ident)) {
+					msg.setString("path" + cnt, entry.getPath());
+					msg.setString("value" + cnt, entry.getValue());
+					cnt++;
+				}
+			}
+			registerClient.sendJms(msg);
+		} catch (Throwable t) {
+			log().w(t);
+		}
+	}
+
+	public void requestRegistry() {
+		try {
+			checkClient();
+			MapMessage msg = registerClient.createMapMessage();
+			msg.setStringProperty("type", "registryrequest");
+			msg.setStringProperty("connection", MApi.lookup(JmsApi.class).getDefaultConnectionName());
+			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.queueName.value());
+			registerClient.sendJmsOneWay(msg);
+		} catch (Throwable t) {
+			log().w(t);
+		}
 	}
 
 }

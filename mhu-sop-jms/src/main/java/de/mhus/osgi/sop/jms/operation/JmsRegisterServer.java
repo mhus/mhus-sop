@@ -217,6 +217,7 @@ import aQute.bnd.annotation.component.Activate;
 import aQute.bnd.annotation.component.Component;
 import aQute.bnd.annotation.component.Deactivate;
 import aQute.bnd.annotation.component.Reference;
+import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCollection;
 import de.mhus.lib.core.MXml;
 import de.mhus.lib.core.definition.DefRoot;
@@ -231,6 +232,8 @@ import de.mhus.lib.karaf.jms.AbstractJmsDataChannel;
 import de.mhus.lib.karaf.jms.JmsDataChannel;
 import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.operation.OperationAddress;
+import de.mhus.osgi.sop.api.registry.RegistryManager;
+import de.mhus.osgi.sop.api.registry.RegistryValue;
 import de.mhus.osgi.sop.jms.operation.JmsApiImpl.JmsOperationDescriptor;
 
 /**
@@ -248,6 +251,7 @@ public class JmsRegisterServer extends AbstractJmsDataChannel {
 	@Reference
 	public void setJmsApi(JmsApi api) {
 		this.jmsApi = api;
+		JmsApiImpl.instance.requestRegistry();
 	}
 
 	@Override
@@ -261,7 +265,10 @@ public class JmsRegisterServer extends AbstractJmsDataChannel {
 				String type = m.getStringProperty("type");
 				if ("request".equals(type) ) {
 					JmsApiImpl.instance.lastRegistryRequest = System.currentTimeMillis();
-					jmsApi.sendLocalOperations();
+					JmsApiImpl.instance.sendLocalOperations();
+				} else
+				if ("registryrequest".equals(type)) {
+					JmsApiImpl.instance.sendLocalRegistry();
 				}
 
 				if (msg instanceof MapMessage && 
@@ -317,7 +324,39 @@ public class JmsRegisterServer extends AbstractJmsDataChannel {
 											 entry.getValue().getLastUpdated() < now
 									);
 						}
-					}
+					} else
+					if ("registrypublish".equals(type)) {
+						RegistryManager api = MApi.lookup(RegistryManager.class);
+						int cnt = 0;
+						String ident = m.getStringProperty("ident");
+						String scope = m.getStringProperty("scope");
+						long updated = System.currentTimeMillis();
+						while (m.getString("path" + cnt) != null) {
+							String path = m.getString("path" + cnt);
+							String value = m.getString("value" + cnt);
+							api.setLocalParameter(new RegistryValue(value, ident, updated, path));
+							cnt++;
+						}
+						if ("full".equals(scope)) {
+							for (RegistryValue value : api.getAll()) {
+								if (value.getSource().equals(ident) && value.getUpdated() < updated)
+									api.removeLocalParameter(value.getPath(), ident);
+							}
+						}
+					} else
+					if ("registryremove".equals(type)) {
+						RegistryManager api = MApi.lookup(RegistryManager.class);
+						int cnt = 0;
+						String ident = m.getStringProperty("ident");
+						while (m.getString("path" + cnt) != null) {
+							String path = m.getString("path" + cnt);
+							api.removeLocalParameter(path, ident);
+							cnt++;
+						}
+					} else
+						log().d("unknown type",type);
+						
+
 				}
 			}
 			
