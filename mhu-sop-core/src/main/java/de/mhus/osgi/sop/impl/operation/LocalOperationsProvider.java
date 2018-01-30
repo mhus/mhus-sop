@@ -208,6 +208,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -291,20 +292,32 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
 		}
 
 		private LocalOperationDescriptor createDescriptor(ServiceReference<Operation> reference, Operation service) {
-			LinkedList<String> tags = new LinkedList<>();
+			TreeSet<String> tags = new TreeSet<>();
 			Object tagsStr = reference.getProperty("tags");
 			if (tagsStr instanceof String[]) {
 				for (String item : (String[])tagsStr)
 					tags.add(item);
 			} else
 			if (tagsStr instanceof String) {
-				for (String item : ((String)tagsStr).split(","))
+				for (String item : ((String)tagsStr).split(";"))
 					tags.add(item);
 			}
 			service.getDescription().getForm();
 			OperationDescription desc = service.getDescription();
 			
-			return new LocalOperationDescriptor(OperationAddress.create(PROVIDER_NAME,desc), desc,tags, service);
+			Object tagsStr2 = desc.getParameters() == null ? null : desc.getParameters().get(OperationDescription.TAGS);
+			if (tagsStr2 != null)
+				for (String item : String.valueOf(tagsStr2).split(";"))
+					tags.add(item);
+			
+			String acl = OperationUtil.getOption(tags, OperationDescriptor.TAG_DEFAULT_ACL, "");
+			try {
+				AccessApi aaa = MApi.lookup(AccessApi.class);
+				acl = aaa.getResourceAccessAcl(aaa.getCurrenAccount(), "local.operation", desc.getPath(), "execute", acl);
+			} catch (Throwable t) {
+				log().i(t);
+			}
+			return new LocalOperationDescriptor(OperationAddress.create(PROVIDER_NAME,desc), desc,tags, acl, service);
 		}
 
 		@Override
@@ -390,7 +403,8 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
 		AccessApi aaa = MApi.lookup(AccessApi.class);
 		if (aaa != null) {
 			try {
-				if (!aaa.hasResourceAccess(aaa.getCurrenAccount(), "local.operation", desc.getPath(), "execute"))
+				String acl = OperationUtil.getOption(desc.getTags(), OperationDescriptor.TAG_DEFAULT_ACL, "");
+				if (!aaa.hasResourceAccess(aaa.getCurrenAccount(), "local.operation", desc.getPath(), "execute", acl))
 					throw new AccessDeniedException("access denied");
 			} catch (Throwable t) {
 				throw new AccessDeniedException("internal error", t);
@@ -417,8 +431,8 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
 		private Operation operation;
 
 		public LocalOperationDescriptor(OperationAddress address, OperationDescription description,
-				Collection<String> tags, Operation operation) {
-			super(address, description, tags);
+				Collection<String> tags, String acl, Operation operation) {
+			super(address, description, tags, acl);
 			this.operation = operation;
 		}
 		

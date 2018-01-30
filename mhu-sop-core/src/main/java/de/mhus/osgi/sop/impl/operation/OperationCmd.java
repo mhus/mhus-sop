@@ -270,9 +270,9 @@ public class OperationCmd implements Action {
 		
 		if (cmd.equals("list")) {
 			ConsoleTable out = new ConsoleTable();
-			out.setHeaderValues("address","title","tags");
+			out.setHeaderValues("address","title","tags","acl");
 			for (OperationDescriptor desc : api.findOperations(path,version == null ? null : new VersionRange(version),null)) {
-				out.addRowValues(desc.getAddress(),desc.getTitle(),desc.getTags());
+				out.addRowValues(desc.getAddress(),desc.getTitle(),desc.getTags(), desc.getAcl());
 			}
 			out.print(System.out);
 		} else

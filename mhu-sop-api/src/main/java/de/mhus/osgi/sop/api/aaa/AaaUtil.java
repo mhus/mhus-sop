@@ -273,6 +273,7 @@ public class AaaUtil {
 	}
 
 	public static boolean hasAccess(Account account, String acl) {
+		if (acl == null) return false;
 		String[] parts = acl.split(",");
 		return hasAccess(account, parts);
 	}

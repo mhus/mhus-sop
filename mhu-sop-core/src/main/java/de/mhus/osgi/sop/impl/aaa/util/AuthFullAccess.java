@@ -213,4 +213,9 @@ public class AuthFullAccess implements AuthorizationSource {
 		return true;
 	}
 
+	@Override
+	public String getResourceAccessAcl(Account account, String aclName) {
+		return "*";
+	}
+
 }

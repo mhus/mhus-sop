@@ -232,4 +232,15 @@ public class AuthFromFile extends MLog implements AuthorizationSource {
 		}
 	}
 
+	@Override
+	public String getResourceAccessAcl(Account account, String aclName) {
+		File file = SopUtil.getFile( "aaa/groupmapping/" + MFile.normalize(aclName.trim()).toLowerCase() + ".txt" );
+		if (!file.exists()) {
+			log().w("file not found",file);
+			return null;
+		}
+		String acl = MFile.readFile(file);
+		return acl;
+	}
+
 }

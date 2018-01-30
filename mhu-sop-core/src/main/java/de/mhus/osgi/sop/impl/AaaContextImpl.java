@@ -231,7 +231,7 @@ public class AaaContextImpl implements AaaContext {
 		this.trust = trust;
 		if (admin) {
 			AccessApi aa = MApi.lookup(AccessApi.class);
-			if (aa.hasGroupAccess(account, Account.MAP_ADMIN, null))
+			if (aa.hasGroupAccess(account, Account.MAP_ADMIN, null, null))
 				adminMode = true;
 		}
 	}

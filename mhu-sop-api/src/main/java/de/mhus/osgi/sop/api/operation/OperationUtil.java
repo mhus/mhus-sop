@@ -238,7 +238,7 @@ public class OperationUtil {
 		if (options == null || opt == null) return def;
 		opt = opt + "=";
 		for (String o : options)
-			if (o != null && o.startsWith(opt)) return MCast.toint(o.substring(o.length()), def);
+			if (o != null && o.startsWith(opt)) return MCast.toint(o.substring(opt.length()), def);
 		return def;
 	}
 
@@ -246,7 +246,7 @@ public class OperationUtil {
 		if (options == null || opt == null) return def;
 		opt = opt + "=";
 		for (String o : options)
-			if (o != null && o.startsWith(opt)) return MCast.tolong(o.substring(o.length()), def);
+			if (o != null && o.startsWith(opt)) return MCast.tolong(o.substring(opt.length()), def);
 		return def;
 	}
 
@@ -254,10 +254,18 @@ public class OperationUtil {
 		if (options == null || opt == null) return def;
 		opt = opt + "=";
 		for (String o : options)
-			if (o != null && o.startsWith(opt)) return o.substring(o.length());
+			if (o != null && o.startsWith(opt)) return o.substring(opt.length());
 		return def;
 	}
 
+	public static String getOption(Collection<String> options, String opt, String def) {
+		if (options == null || opt == null) return def;
+		opt = opt + "=";
+		for (String o : options)
+			if (o != null && o.startsWith(opt)) return o.substring(opt.length());
+		return def;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public static <T> T createOpertionProxy(Class<T> ifc, OperationDescriptor desc) throws MException {
 		if (!desc.getTitle().equals(ifc.getName()))

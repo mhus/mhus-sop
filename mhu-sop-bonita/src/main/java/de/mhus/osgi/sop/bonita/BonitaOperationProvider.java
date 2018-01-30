@@ -307,8 +307,8 @@ public class BonitaOperationProvider extends MLog implements OperationsProvider 
 		private Operation operation;
 
 		public BonitaOperationDescriptor(OperationAddress address, OperationDescription description,
-				Collection<String> tags, Operation operation) {
-			super(address, description, tags);
+				Collection<String> tags, String acl, Operation operation) {
+			super(address, description, tags, acl);
 			this.operation = operation;
 		}
 		

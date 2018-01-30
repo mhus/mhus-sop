@@ -300,9 +300,9 @@ public class AccessCmd implements Action {
 		if (cmd.equals("access")) {
 			Account ac = api.getAccount(parameters[0]);
 			if (parameters.length > 2)
-				return api.hasGroupAccess(ac, parameters[1], parameters[2]);
+				return api.hasGroupAccess(ac, parameters[1], parameters[2], null);
 			else
-				return api.hasGroupAccess(ac, parameters[1], null);
+				return api.hasGroupAccess(ac, parameters[1], null, null);
 		} else
 		if (cmd.equals("info")) {
 			Account ac = api.getAccount(parameters[0]);

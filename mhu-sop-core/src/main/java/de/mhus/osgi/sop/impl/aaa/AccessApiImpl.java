@@ -219,6 +219,7 @@ import de.mhus.lib.core.security.AuthorizationSource;
 import de.mhus.lib.errors.AccessDeniedException;
 import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
+import de.mhus.osgi.sop.api.aaa.AaaUtil;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
 import de.mhus.osgi.sop.api.aaa.AccountGuest;
 import de.mhus.osgi.sop.api.aaa.Trust;
@@ -544,28 +545,50 @@ public class AccessApiImpl extends MLog implements AccessApi {
 	}
 
 	@Override
-	public boolean hasGroupAccess(Account account, String acl, String action) {
-		if (account == null || authorizationSource == null || acl == null ) return false;
+	public boolean hasGroupAccess(Account account, String aclName, String action, String def) {
+		if (account == null || authorizationSource == null || aclName == null ) return false;
 		
-		Boolean res = authorizationSource.hasResourceAccess(account,acl + (action == null ? "" : "_" + action));
+		Boolean res = authorizationSource.hasResourceAccess(account,aclName + (action == null ? "" : "_" + action));
 		if (res != null) return res;
 		
 		// action mapping
 		if (action == null) return false;
 		if (action.equals(Account.ACT_READ)) {
-			res = authorizationSource.hasResourceAccess(account,acl + "_" + Account.ACT_MODIFY);
+			res = authorizationSource.hasResourceAccess(account,aclName + "_" + Account.ACT_MODIFY);
 			if (res != null) return res;
 		}
-		
-		return false;
+		return AaaUtil.hasAccess(account, def);
 	}
 	
 	@Override
-	public boolean hasResourceAccess(Account account, String resourceName, String id, String action) {
+	public boolean hasResourceAccess(Account account, String resourceName, String id, String action, String def) {
 		// TODO Maybe another way ...
-		return hasGroupAccess(account, "res_" + resourceName + "_" + id, action);
+		return hasGroupAccess(account, "res_" + resourceName + "_" + id, action, def);
 	}
 
+	@Override
+	public String getGroupAccessAcl(Account account, String aclName, String action, String def) {
+		if (account == null || authorizationSource == null || aclName == null ) return "";
+		
+		String acl = authorizationSource.getResourceAccessAcl(account,aclName + (action == null ? "" : "_" + action));
+		if (acl != null) return acl;
+		
+		// action mapping
+		if (action == null) return "";
+		if (action.equals(Account.ACT_READ)) {
+			acl = authorizationSource.getResourceAccessAcl(account,aclName + "_" + Account.ACT_MODIFY);
+			if (acl != null) return acl;
+		}
+		
+		return def;
+	}
+
+	@Override
+	public String getResourceAccessAcl(Account account, String resourceName, String id, String action, String def) {
+		// TODO Maybe another way ...
+		return getGroupAccessAcl(account, "res_" + resourceName + "_" + id, action, def);
+	}
+	
 	@Override
 	public String createUserTicket(String username, String password) {
 		return TicketUtil.ACCOUNT + TicketUtil.SEP + username.replace(TicketUtil.SEP_CHAR, '_') + TicketUtil.SEP + password.replace(TicketUtil.SEP_CHAR, '_') ;
@@ -590,8 +613,8 @@ public class AccessApiImpl extends MLog implements AccessApi {
 	}
 
 	@Override
-	public boolean hasGroupAccess(Account account, Class<?> who, String acl, String action) {
-		return hasGroupAccess(account, who.getCanonicalName() + "_" + acl, action);
+	public boolean hasGroupAccess(Account account, Class<?> who, String acl, String action, String def) {
+		return hasGroupAccess(account, who.getCanonicalName() + "_" + acl, action, def);
 	}
 	
 }

@@ -222,29 +222,39 @@ import de.mhus.lib.core.util.Version;
 
 public class OperationDescriptor implements MNlsProvider, Nls, Named, Versioned {
 
+	public static final String TAG_DEFAULT_ACL = "acl";
+	public static final String TAG_METRIC = "metric";
+	public static final String TAG_PRIORITY = "pri";
+	public static final String TAG_REMOTE = "remote";
+	public static final String TAG_HOST = "host";
+	public static final String TAG_IDENT = "ident";
+
 	private Collection<String> tags;
 	private OperationAddress address;
 	private OperationDescription description;
+	private String acl;
 
 	public OperationDescriptor(
 			String address,
 			OperationDescription description,
-			Collection<String> tags
+			Collection<String> tags,
+			String acl
 		) {
-		this(new OperationAddress(address), description, tags);
+		this(new OperationAddress(address), description, tags, acl);
 		
 	}
 	
 	public OperationDescriptor(OperationAddress address, OperationDescription description,
-			Collection<String> tags) {
+			Collection<String> tags, String acl) {
 		this.address = address;
 		this.description = description;
 		this.tags = tags;
+		this.acl = acl;
 		
 		// tags from description
 		Object tagsStr = description.getParameters() == null ? null : description.getParameters().get(OperationDescription.TAGS);
 		if (tagsStr != null)
-			for (String item : String.valueOf(tagsStr).split(","))
+			for (String item : String.valueOf(tagsStr).split(";"))
 				tags.add(item);
 		
 		
@@ -363,6 +373,10 @@ public class OperationDescriptor implements MNlsProvider, Nls, Named, Versioned 
 		HashMap<String, String> p = description.getParameters();
 		if (p == null) return null;
 		return p.get(key);
+	}
+	
+	public String getAcl() {
+		return acl;
 	}
 		
 }

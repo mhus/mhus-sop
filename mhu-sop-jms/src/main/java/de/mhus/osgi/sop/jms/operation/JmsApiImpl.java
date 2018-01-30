@@ -274,10 +274,11 @@ public class JmsApiImpl extends MLog implements JmsApi {
 				if (!JmsOperationProvider.PROVIDER_NAME.equals(desc.getProvider())) {
 					msg.setString("operation" + cnt, desc.getPath());
 					msg.setString("version" + cnt, desc.getVersionString());
-					String tags = MString.join(desc.getTags().iterator(), ",");
-					if (tags.length() > 0) tags = tags + ",";
-					tags = tags + "remote:jms,host:" + MSystem.getHostname() + ",ident:" + MApi.lookup(ServerIdent.class).toString();
+					String tags = MString.join(desc.getTags().iterator(), ";");
+					if (tags.length() > 0) tags = tags + ";";
+					tags = tags + OperationDescriptor.TAG_REMOTE + "=jms;"+OperationDescriptor.TAG_HOST+"=" + MSystem.getHostname() + ";"+OperationDescriptor.TAG_IDENT+"=" + MApi.lookup(ServerIdent.class).toString();
 					msg.setString("tags" + cnt, tags );
+					msg.setString("acl" + cnt, desc.getAcl() );
 					msg.setString("title" + cnt, desc.getTitle());
 					for (String key : desc.getParameterKeys()) {
 						msg.setString("param" + cnt + "." + key, desc.getParameter(key) );
@@ -342,8 +343,8 @@ public class JmsApiImpl extends MLog implements JmsApi {
 		private long lastUpdated;
 
 		public JmsOperationDescriptor(OperationAddress address, OperationDescription description,
-				Collection<String> tags) {
-			super(address, description, tags);
+				Collection<String> tags, String acl) {
+			super(address, description, tags, acl);
 		}
 
 		public long getLastUpdated() {

@@ -288,6 +288,7 @@ public class JmsRegisterServer extends AbstractJmsDataChannel {
 								String tags = m.getString("tags" + cnt);
 								String title = m.getString("title" + cnt);
 								String form = m.getString("form" + cnt);
+								String acl = m.getString("acl" + cnt);
 								DefRoot model = null;
 								if (form != null) {
 									try {
@@ -313,7 +314,7 @@ public class JmsRegisterServer extends AbstractJmsDataChannel {
 									OperationDescription d = new OperationDescription(a.getGroup(),a.getName(),a.getVersion(),null,title);
 									d.setForm(model);
 									d.setParameters(parameters);
-									desc = new JmsOperationDescriptor(a,d,tags == null ? null : MCollection.toList(tags.split(",")));
+									desc = new JmsOperationDescriptor(a,d,tags == null ? null : MCollection.toSet(tags.split(";")), acl );
 									JmsApiImpl.instance.register.put(ident, desc);
 								}
 								desc.setLastUpdated();
