@@ -255,6 +255,16 @@ public class OperationApiImpl extends MLog implements OperationApi {
 		nodeTracker = new ServiceTracker<>(context, OperationsProvider.class, new MyServiceTrackerCustomizer() );
 		nodeTracker.open(true);
 		instance = this;
+		
+		MThread.asynchron(new Runnable() {
+			
+			@Override
+			public void run() {
+				MThread.sleep(10000);
+				synchronize();
+			}
+		});
+
 	}
 
 	@Deactivate
