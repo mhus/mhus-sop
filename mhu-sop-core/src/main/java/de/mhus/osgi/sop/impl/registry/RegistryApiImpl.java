@@ -178,12 +178,14 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 				log().d(provider,t);
 			}
 		}
-		try {
-			MApi.getCfgUpdater().doUpdate(RegistryApi.class.getCanonicalName(), path);
-		} catch (Throwable t) {
-			log().d(t);
-		}
 		
+		if (!path.startsWith(RegistryApi.PATH_SYSTEM)) {
+			try {
+				MApi.getCfgUpdater().doUpdate(RegistryApi.class.getCanonicalName(), path);
+			} catch (Throwable t) {
+				log().d(t);
+			}
+		}
 		return true;
 	}
 
@@ -207,13 +209,13 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 				log().d(provider,t);
 			}
 		}
-		
-		try {
-			MApi.getCfgUpdater().doUpdate(RegistryApi.class.getCanonicalName(), path);
-		} catch (Throwable t) {
-			log().d(t);
+		if (!path.startsWith(RegistryApi.PATH_SYSTEM)) {
+			try {
+				MApi.getCfgUpdater().doUpdate(RegistryApi.class.getCanonicalName(), path);
+			} catch (Throwable t) {
+				log().d(t);
+			}
 		}
-
 		return true;
 	}
 
@@ -223,13 +225,13 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 		synchronized (registry) {
 			registry.put(value.getPath(), value);
 		}
-		
-		try {
-			MApi.getCfgUpdater().doUpdate(RegistryApi.class.getCanonicalName(), value.getPath());
-		} catch (Throwable t) {
-			log().d(t);
+		if (!value.getPath().startsWith(RegistryApi.PATH_SYSTEM)) {
+			try {
+				MApi.getCfgUpdater().doUpdate(RegistryApi.class.getCanonicalName(), value.getPath());
+			} catch (Throwable t) {
+				log().d(t);
+			}
 		}
-
 	}
 
 	@Override
@@ -242,13 +244,13 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 			}
 			registry.remove(path);
 		}
-		
-		try {
-			MApi.getCfgUpdater().doUpdate(RegistryApi.class.getCanonicalName(), path);
-		} catch (Throwable t) {
-			log().d(t);
+		if (!path.startsWith(RegistryApi.PATH_SYSTEM)) {
+			try {
+				MApi.getCfgUpdater().doUpdate(RegistryApi.class.getCanonicalName(), path);
+			} catch (Throwable t) {
+				log().d(t);
+			}
 		}
-
 	}
 
 	@Override

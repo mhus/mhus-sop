@@ -5,6 +5,8 @@ import java.util.Set;
 
 public interface RegistryApi {
 
+	public static final String PATH_SYSTEM = "/system/"; // this path will not fire events to the cfg system
+	
 	/**
 	 * Return the value information of a node parameter.
 	 * 

@@ -11,6 +11,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MDate;
+import de.mhus.lib.core.MString;
 import de.mhus.lib.core.MTimeInterval;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.osgi.sop.api.jms.JmsApi;
@@ -72,10 +73,21 @@ public class RegistryCmd implements Action {
 			System.out.println("Timeout: " + entry.getTimeout() + " " + (entry.getTimeout() > 0 ? MTimeInterval.getIntervalAsString( entry.getTimeout() - ( System.currentTimeMillis() - entry.getUpdated() ) ) : ""));
 		} else
 		if (cmd.equals("set") || cmd.equals("add")) {
-			if (api.setParameter(path, parameters[0], timeout, !writable))
-				System.out.println("SET");
-			else
-				System.out.println("NOT CHANGED");
+			if (MString.isIndex(path, '@')) {
+				if (api.setParameter(path, parameters[0], timeout, !writable))
+					System.out.println("SET");
+				else
+					System.out.println("NOT CHANGED");
+			} else {
+				for (int i = 0; i < parameters.length; i++) {
+					String k = MString.beforeIndex(parameters[i], '=');
+					String v = MString.afterIndex(parameters[i], '=');
+					if (api.setParameter(path + "@" + k, v, timeout, !writable))
+						System.out.println(k + " SET");
+					else
+						System.out.println(k + " NOT CHANGED");
+				}
+			}
 		} else
 		if (cmd.equals("remove")) {
 			if (api.removeParameter(path))
