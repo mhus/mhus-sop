@@ -241,6 +241,7 @@ import de.mhus.lib.core.MTimeInterval;
 import de.mhus.lib.core.base.service.TimerFactory;
 import de.mhus.lib.core.base.service.TimerIfc;
 import de.mhus.lib.core.definition.DefRoot;
+import de.mhus.lib.core.lang.TempFile;
 import de.mhus.lib.core.strategy.DefaultTaskContext;
 import de.mhus.lib.core.strategy.NotSuccessful;
 import de.mhus.lib.core.strategy.Operation;
@@ -444,15 +445,8 @@ public class JmsOperationProvider extends MLog implements OperationsProvider {
 				} else
 				if (answer instanceof BytesMessage) {
 					
-					File tmpFile = File.createTempFile(MSystem.getPid() + "_jms_msg", ".bin");
-					tmpFile = new File(tmpFile.getAbsolutePath()) {
-						private static final long serialVersionUID = 1L;
-
-						@Override
-						protected void finalize() throws Throwable {
-							delete(); // delete the tmp file if reference is lost
-						}
-					};
+					File tmpFile = TempFile.createTempFile(MSystem.getPid() + "_jms_msg", ".bin");
+					
 					FileOutputStream os = new FileOutputStream(tmpFile);
 					BytesMessage m = (BytesMessage)answer;
 					long length = m.getBodyLength();
