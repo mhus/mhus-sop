@@ -34,7 +34,7 @@ public class OperationsSelector {
 		return this;
 	}
 	public OperationsSelector setTags(String ... providedTags) {
-		this.providedTags = MCollection.toSet(providedTags);
+		this.providedTags = MCollection.toTreeSet(providedTags);
 		return this;
 	}
 	public OperationsSelector setTags(Collection<String> providedTags) {

@@ -314,7 +314,7 @@ public class JmsRegisterServer extends AbstractJmsDataChannel {
 									OperationDescription d = new OperationDescription(a.getGroup(),a.getName(),a.getVersion(),null,title);
 									d.setForm(model);
 									d.setParameters(parameters);
-									desc = new JmsOperationDescriptor(a,d,tags == null ? null : MCollection.toSet(tags.split(";")), acl );
+									desc = new JmsOperationDescriptor(a,d,tags == null ? null : MCollection.toTreeSet(tags.split(";")), acl );
 									JmsApiImpl.instance.register.put(ident, desc);
 								}
 								desc.setLastUpdated();

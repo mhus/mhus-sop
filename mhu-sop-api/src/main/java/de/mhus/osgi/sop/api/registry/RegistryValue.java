@@ -1,6 +1,6 @@
 package de.mhus.osgi.sop.api.registry;
 
-public class RegistryValue {
+public class RegistryValue implements Comparable<RegistryValue>{
 
 	private String value;
 	private String source;
@@ -40,6 +40,11 @@ public class RegistryValue {
 
 	public boolean isReadOnly() {
 		return readOnly;
+	}
+
+	@Override
+	public int compareTo(RegistryValue o) {
+		return path.compareTo(o.path);
 	}
 	
 }
