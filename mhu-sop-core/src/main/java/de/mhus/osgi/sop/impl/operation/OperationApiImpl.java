@@ -236,6 +236,7 @@ import de.mhus.lib.errors.NotFoundException;
 import de.mhus.osgi.sop.api.operation.OperationAddress;
 import de.mhus.osgi.sop.api.operation.OperationApi;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
+import de.mhus.osgi.sop.api.operation.OperationUtil;
 import de.mhus.osgi.sop.api.operation.OperationsProvider;
 
 @Component(immediate=true,provide=OperationApi.class)
@@ -385,12 +386,21 @@ public class OperationApiImpl extends MLog implements OperationApi {
 	@Override
 	public OperationResult doExecute(String filter, VersionRange version, Collection<String> providedTags,
 			IProperties properties, String... executeOptions) throws NotFoundException {
-		for (OperationsProvider provider : getProviders()) {
-			try {
+		
+		boolean locaOnly = OperationUtil.isOption(executeOptions, LOCAL_ONLY);
+		if (locaOnly) {
+			synchronized (register) {
+				OperationsProvider provider = register.get(OperationApi.DEFAULT_PROVIDER_NAME);
 				return provider.doExecute(filter, version, providedTags, properties, executeOptions);
-			} catch (NotFoundException nfe) {}
+			}
+		} else {
+			for (OperationsProvider provider : getProviders()) {
+				try {
+					return provider.doExecute(filter, version, providedTags, properties, executeOptions);
+				} catch (NotFoundException nfe) {}
+			}
 		}
-
+		
 		throw new NotFoundException("operation not found",filter,version,providedTags, executeOptions);
 	}
 

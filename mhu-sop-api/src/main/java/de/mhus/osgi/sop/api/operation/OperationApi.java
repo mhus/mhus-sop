@@ -216,6 +216,7 @@ import de.mhus.osgi.sop.api.SApi;
 public interface OperationApi extends SApi {
 
 	static final String DEFAULT_PROVIDER_NAME = "local";
+	static final String LOCAL_ONLY = "localOnly";
 
 	List<OperationDescriptor> findOperations(String filter, VersionRange version, Collection<String> providedTags);
 	OperationDescriptor findOperation(String filter, VersionRange version, Collection<String> providedTags) throws NotFoundException;

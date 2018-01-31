@@ -203,12 +203,16 @@
  */
 package de.mhus.osgi.sop.api.jms;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.jms.BytesMessage;
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
 import javax.jms.Message;
@@ -220,6 +224,8 @@ import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
+import de.mhus.lib.core.MSystem;
+import de.mhus.lib.core.MThread;
 import de.mhus.lib.core.pojo.DefaultFilter;
 import de.mhus.lib.core.pojo.PojoAttribute;
 import de.mhus.lib.core.pojo.PojoModel;
@@ -345,6 +351,25 @@ public abstract class AbstractJmsOperationExecuteChannel extends AbstractJmsData
 		
 		if (consumed) {
 			// already done
+		} else
+		if (res != null && res.getResult() != null && res.getResult() instanceof File) {
+			ret = getServer().createBytesMessage();
+			try {
+				File f = (File)res.getResult();
+				FileInputStream is = new FileInputStream(f);
+				byte[] buffer = new byte[1024 * 10];
+				while (true) {
+					int size = is.read(buffer);
+					if (size == -1) break;
+					if (size == 0)
+						MThread.sleep(200);
+					else {
+						((BytesMessage)ret).writeBytes(buffer, 0, size);
+					}
+				}
+			} catch (IOException e) {
+				throw new JMSException(e.toString());
+			}
 		} else
 		if (res != null && res.getResult() != null && res.getResult() instanceof Serializable ) {
 			ret = getServer().createObjectMessage();

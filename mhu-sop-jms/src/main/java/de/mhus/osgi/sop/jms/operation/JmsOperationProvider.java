@@ -203,6 +203,8 @@
  */
 package de.mhus.osgi.sop.jms.operation;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
@@ -233,6 +235,7 @@ import de.mhus.lib.core.MDate;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
+import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.MThread;
 import de.mhus.lib.core.MTimeInterval;
 import de.mhus.lib.core.base.service.TimerFactory;
@@ -440,16 +443,32 @@ public class JmsOperationProvider extends MLog implements OperationsProvider {
 					out.setResult(out.getMsg());
 				} else
 				if (answer instanceof BytesMessage) {
-					long len = ((BytesMessage)answer).getBodyLength();
-					if (len > Sop.MAX_MSG_BYTES) {
-						out.setMsg("answer bytes too long " + len);
-						out.setSuccessful(false);
-						out.setReturnCode(OperationResult.INTERNAL_ERROR);
-					} else {
-						byte[] bytes = new byte[(int) len];
-						((BytesMessage)answer).readBytes(bytes);
-						out.setResult(bytes);
+					
+					File tmpFile = File.createTempFile(MSystem.getPid() + "_jms_msg", ".bin");
+					tmpFile = new File(tmpFile.getAbsolutePath()) {
+						private static final long serialVersionUID = 1L;
+
+						@Override
+						protected void finalize() throws Throwable {
+							delete(); // delete the tmp file if reference is lost
+						}
+					};
+					FileOutputStream os = new FileOutputStream(tmpFile);
+					BytesMessage m = (BytesMessage)answer;
+					long length = m.getBodyLength();
+					byte[] buffer = new byte[1024 * 10];
+					long done = 0;
+					while (done < length) {
+						int size = m.readBytes(buffer);
+						if (size > 0) {
+							os.write(buffer, 0, size);
+						}
+						done+=size;
 					}
+					os.close();
+
+					out.setResult(tmpFile);
+
 				} else
 				if (answer instanceof ObjectMessage) {
 					Serializable obj = ((ObjectMessage)answer).getObject();

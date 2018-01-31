@@ -203,6 +203,8 @@
  */
 package de.mhus.osgi.sop.impl.operation;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -215,6 +217,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
 import de.mhus.lib.core.MXml;
@@ -259,6 +262,9 @@ public class OperationCmd implements Action {
 	
 	@Option(name="-o", aliases="--options", description="Execute Options separated by pipe",required=false)
 	String options = null;
+
+	@Option(name="-p", aliases="--print", description="Print File Content",required=false)
+	boolean print = false;
 	
 	@Override
 	public Object execute() throws Exception {
@@ -304,8 +310,16 @@ public class OperationCmd implements Action {
 				res = api.doExecute(path, version == null ? null : new VersionRange(version), null, properties, executeOptions);
 			System.out.println("Result: "+res);
 			if (res != null) {
-				System.out.println("RC: " + res.getReturnCode());
-				System.out.println("Object: " + res.getResult());
+				System.out.println("MSG: " + res.getMsg());
+				System.out.println("RC : " + res.getReturnCode());
+				System.out.println("RES: " + res.getResult());
+				if (print && res.getResult() instanceof File) {
+					System.out.println("--- Start File Content ---");
+					FileInputStream is = new FileInputStream((File)res.getResult());
+					MFile.copyFile(is, System.out);
+					System.out.println("\n--- End File Content ---");
+					is.close();
+				}
 			}
 		} else
 		if (cmd.equals("request")) {

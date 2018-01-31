@@ -221,7 +221,7 @@ public class Sop {
 
 	public static final String PARAM_AAA_TICKET = "_aaa_ticket";
 
-	public static final long MAX_MSG_BYTES = 1024 * 1024 * 100; // 100 MB
+	// public static final long MAX_MSG_BYTES = 1024 * 1024 * 100; // 100 MB
 
 	public static final String PARAM_SUCCESSFUL = "successful";
 

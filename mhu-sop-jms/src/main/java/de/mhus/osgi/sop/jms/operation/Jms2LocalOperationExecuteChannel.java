@@ -230,6 +230,7 @@ import de.mhus.lib.karaf.jms.JmsManagerService;
 import de.mhus.osgi.sop.api.jms.AbstractJmsOperationExecuteChannel;
 import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.jms.TicketAccessInterceptor;
+import de.mhus.osgi.sop.api.operation.OperationAddress;
 import de.mhus.osgi.sop.api.operation.OperationApi;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 
@@ -279,8 +280,8 @@ public class Jms2LocalOperationExecuteChannel extends AbstractJmsOperationExecut
 
 		log().d("execute operation",path,properties);
 		
-		OperationApi admin = MApi.lookup(OperationApi.class);
-		OperationResult res = admin.doExecute(path, version, null, properties);
+		OperationApi api = MApi.lookup(OperationApi.class);
+		OperationResult res = api.doExecute(path, version, null, properties, OperationApi.LOCAL_ONLY );
 		
 		log().d("operation result",path,res, res == null ? "" : res.getResult());
 		return res;
