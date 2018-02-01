@@ -163,8 +163,9 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 		String source = MApi.lookup(ServerIdent.class).toString();
 		
 		if (current != null) {
-			if (	MSystem.equals(current.getValue(), value) 
-					&& current.getTimeout() == timeout 
+			if (	current.getTimeout() == 0
+					&& timeout == 0
+					&& MSystem.equals(current.getValue(), value) 
 					&& current.isReadOnly() == readOnly 
 					&& current.isPersistent() == persistent
 				) return false;
