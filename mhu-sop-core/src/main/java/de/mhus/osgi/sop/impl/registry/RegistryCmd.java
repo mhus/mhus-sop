@@ -41,6 +41,9 @@ public class RegistryCmd implements Action {
 	@Option(name="-p", aliases="--persistent", description="Set value persistent (locally)",required=false)
 	boolean persistent = false;
 	
+	@Option(name="-f", aliases="--full", description="Full output of content",required=false)
+	boolean fullOutput = false;
+	
 	@Override
 	public Object execute() throws Exception {
 		RegistryApi api = MApi.lookup(RegistryApi.class);
@@ -48,18 +51,21 @@ public class RegistryCmd implements Action {
 			
 			if (path != null && !path.endsWith("*")) {
 				ConsoleTable out = new ConsoleTable();
+				if (!fullOutput)
+					out.setMaxColSize(40);
 				out.setHeaderValues("Path","Value","Source","Updated", "TTL", "RO","Persistent");
 				for (String child : api.getNodeChildren(path))
-					out.addRowValues(child,"[node]","","", "","", "");
+					out.addRowValues("/" + child,"[node]","","", "","", "");
 				for (RegistryValue value : api.getParameters(path) ) 
-					out.addRowValues(value.getPath(), value.getValue(),value.getSource(),new Date(value.getUpdated()), value.getTimeout() > 0 ? MTimeInterval.getIntervalAsString( value.getTimeout() - ( System.currentTimeMillis() - value.getUpdated() ) ) : "", value.isReadOnly(), value.isPersistent() );
+					out.addRowValues("@" + MString.afterIndex(value.getPath(), '@'), value.getValue(),value.getSource(),new Date(value.getUpdated()), value.getTimeout() > 0 ? MTimeInterval.getIntervalAsString( value.getTimeout() - ( System.currentTimeMillis() - value.getUpdated() ) ) : "", value.isReadOnly(), value.isPersistent() );
 				out.print(System.out);
 			} else {
 				RegistryManager manager = MApi.lookup(RegistryManager.class);
 				LinkedList<RegistryValue> list = new LinkedList<>(manager.getAll());
 				list.sort((a,b) -> { return a.getPath().compareTo(b.getPath());});
 				ConsoleTable out = new ConsoleTable();
-				out.setMaxColSize(40);
+				if (!fullOutput)
+					out.setMaxColSize(40);
 				out.setHeaderValues("Path","Value","Source","Updated", "TTL", "RO","Persistent");
 				for (RegistryValue value : list ) {
 					if (path == null && !value.getPath().startsWith(RegistryApi.PATH_SYSTEM) || MString.compareFsLikePattern(value.getPath(), path))

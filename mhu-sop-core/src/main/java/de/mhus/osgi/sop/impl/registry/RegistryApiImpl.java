@@ -106,7 +106,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	public Set<String> getNodeChildren(String path) {
 		path = validateNodePath(path);
 		final TreeSet<String> out = new java.util.TreeSet<>();
-		final String pathx = path + "/";
+		final String pathx = path.equals("/") ? path : path + "/";
 		final int posx = pathx.length()+1;
 		synchronized (registry) {
 			registry.forEach((k,v) -> { 
@@ -115,9 +115,9 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 					if (p > 0) k = k.substring(0, p);
 					p = k.indexOf('/', posx);
 					if (p > 0)
-						out.add(k.substring(p));
+						out.add(k.substring(posx-1,p));
 					else
-						out.add(k);
+						out.add(k.substring(posx-1));
 				}
 			});
 		}
