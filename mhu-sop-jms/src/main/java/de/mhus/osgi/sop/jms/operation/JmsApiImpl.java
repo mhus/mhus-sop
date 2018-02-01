@@ -373,6 +373,7 @@ public class JmsApiImpl extends MLog implements JmsApi {
 			msg.setString("value0", entry.getValue());
 			msg.setLong("timeout0", entry.getTimeout());
 			msg.setBoolean("readOnly0", entry.isReadOnly());
+			msg.setBoolean("persistent0", entry.isPersistent());
 			
 			registerClient.sendJms(msg);
 		} catch (Throwable t) {
@@ -422,6 +423,7 @@ public class JmsApiImpl extends MLog implements JmsApi {
 					msg.setString("value" + cnt, entry.getValue());
 					msg.setLong("timeout" + cnt, entry.getTimeout());
 					msg.setBoolean("readOnly" + cnt, entry.isReadOnly());
+					msg.setBoolean("persistent" + cnt, entry.isPersistent());
 					cnt++;
 				}
 			}

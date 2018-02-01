@@ -156,21 +156,34 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	}
 
 	@Override
-	public boolean setParameter(String path, String value, long timeout, boolean readOnly) {
+	public boolean setParameter(String path, String value, long timeout, boolean readOnly, boolean persistent) {
 		path = validateParameterPath(path);
 		if (value == null) throw new NullPointerException("null value not allowed");
 		RegistryValue current = getNodeParameter(path);
 		String source = MApi.lookup(ServerIdent.class).toString();
 		
 		if (current != null) {
-			if (MSystem.equals(current.getValue(), value)) return false;
+			if (	MSystem.equals(current.getValue(), value) 
+					&& current.getTimeout() == timeout 
+					&& current.isReadOnly() == readOnly 
+					&& current.isPersistent() == persistent
+				) return false;
 			if (current.isReadOnly() && !current.getSource().equals(source))
 				throw new AccessDeniedException("The entry is read only");
 		}
-		RegistryValue entry = new RegistryValue(value, source, System.currentTimeMillis(), path, timeout, readOnly);
+		// Put into registry
+		RegistryValue entry = new RegistryValue(value, source, System.currentTimeMillis(), path, timeout, readOnly, persistent);
 		synchronized (registry) {
 			registry.put(path, entry);
 		}
+		// save to file if/was persistent
+		if (entry.isPersistent() || current != null && current.isPersistent())
+			try {
+				save();
+			} catch (IOException e) {
+				log().d(e);
+			}
+		// publish to other nodes
 		if (!path.startsWith(RegistryApi.PATH_LOCAL)) {
 			for (RegistryProvider provider : MOsgi.getServices(RegistryProvider.class, null)) {
 				try {
@@ -180,7 +193,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 				}
 			}
 		}
-		
+		// fire Cfg events
 		if (!path.startsWith(RegistryApi.PATH_SYSTEM)) {
 			try {
 				MApi.getCfgUpdater().doUpdate(RegistryApi.class.getCanonicalName(), path);
@@ -201,9 +214,19 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 		if (current.isReadOnly() && !current.getSource().equals(source))
 			throw new AccessDeniedException("The entry is readOnly");
 
+		// update memory registry
+		RegistryValue entry = null;
 		synchronized (registry) {
-			registry.remove(path);
+			entry = registry.remove(path);
 		}
+		// save to disk if was persistent
+		if (entry != null && entry.isPersistent())
+			try {
+				save();
+			} catch (IOException e) {
+				log().d(e);
+			}
+		// publish to other nodes
 		for (RegistryProvider provider : MOsgi.getServices(RegistryProvider.class, null)) {
 			try {
 				provider.remove(path);
@@ -211,6 +234,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 				log().d(provider,t);
 			}
 		}
+		// send Cfg events
 		if (!path.startsWith(RegistryApi.PATH_SYSTEM)) {
 			try {
 				MApi.getCfgUpdater().doUpdate(RegistryApi.class.getCanonicalName(), path);
@@ -551,7 +575,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 		MProperties p = new MProperties();
 		String ident = MApi.lookup(ServerIdent.class).toString();
 		for (RegistryValue entry : getAll())
-			if (entry.getSource().equals(ident)) {
+			if (entry.getSource().equals(ident) && entry.isPersistent()) {
 				p.setString(entry.getPath(), entry.isReadOnly() + ":" + entry.getTimeout() + ":" + entry.getValue());
 			}
 		p.save(getFile());
@@ -570,7 +594,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 		long updated = System.currentTimeMillis();
 		for (Entry<String, Object> entry : prop.entrySet()) {
 			String[] split = entry.getValue().toString().split(":", 3);
-			setLocalParameter(new RegistryValue(split[2], ident, updated, entry.getKey(), MCast.tolong(split[1],0), MCast.toboolean(split[0], true)));
+			setLocalParameter(new RegistryValue(split[2], ident, updated, entry.getKey(), MCast.tolong(split[1],0), MCast.toboolean(split[0], true), true));
 		}
 		if (push)
 			publishAll();

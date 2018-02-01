@@ -8,14 +8,16 @@ public class RegistryValue implements Comparable<RegistryValue>{
 	private String path;
 	private long timeout;
 	private boolean readOnly;
+	private boolean persistent;
 	
-	public RegistryValue(String value, String source, long updated, String path, long timeout, boolean readOnly) {
+	public RegistryValue(String value, String source, long updated, String path, long timeout, boolean readOnly, boolean persistent) {
 		this.value = value;
 		this.source = source;
 		this.updated = updated;
 		this.path = path;
 		this.timeout = timeout;
 		this.readOnly = readOnly;
+		this.persistent = persistent;
 	}
 
 	public String getValue() {
@@ -40,6 +42,10 @@ public class RegistryValue implements Comparable<RegistryValue>{
 
 	public boolean isReadOnly() {
 		return readOnly;
+	}
+	
+	public boolean isPersistent() {
+		return persistent;
 	}
 
 	@Override

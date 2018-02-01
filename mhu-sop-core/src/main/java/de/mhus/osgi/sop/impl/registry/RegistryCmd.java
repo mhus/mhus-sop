@@ -38,43 +38,49 @@ public class RegistryCmd implements Action {
 	@Option(name="-w", aliases="--writeable", description="Set writable by others",required=false)
 	boolean writable = false;
 
+	@Option(name="-p", aliases="--persistent", description="Set value persistent (locally)",required=false)
+	boolean persistent = false;
 	
 	@Override
 	public Object execute() throws Exception {
 		RegistryApi api = MApi.lookup(RegistryApi.class);
 		if (cmd.equals("list")) {
 			
-			if (path != null) {
+			if (path != null && !path.endsWith("*")) {
 				ConsoleTable out = new ConsoleTable();
-				out.setHeaderValues("Path","Value","Source","Updated", "Timeout", "RO");
+				out.setHeaderValues("Path","Value","Source","Updated", "TTL", "RO","Persistent");
 				for (String child : api.getNodeChildren(path))
-					out.addRowValues(child,"[node]","","", "","");
+					out.addRowValues(child,"[node]","","", "","", "");
 				for (RegistryValue value : api.getParameters(path) ) 
-					out.addRowValues(value.getPath(), value.getValue(),value.getSource(),new Date(value.getUpdated()), value.getTimeout(), value.isReadOnly() );
+					out.addRowValues(value.getPath(), value.getValue(),value.getSource(),new Date(value.getUpdated()), value.getTimeout() > 0 ? MTimeInterval.getIntervalAsString( value.getTimeout() - ( System.currentTimeMillis() - value.getUpdated() ) ) : "", value.isReadOnly(), value.isPersistent() );
 				out.print(System.out);
 			} else {
 				RegistryManager manager = MApi.lookup(RegistryManager.class);
 				LinkedList<RegistryValue> list = new LinkedList<>(manager.getAll());
 				list.sort((a,b) -> { return a.getPath().compareTo(b.getPath());});
 				ConsoleTable out = new ConsoleTable();
-				out.setHeaderValues("Path","Value","Source","Updated", "Timeout", "RO");
+				out.setMaxColSize(40);
+				out.setHeaderValues("Path","Value","Source","Updated", "TTL", "RO","Persistent");
 				for (RegistryValue value : list ) {
-					out.addRowValues(value.getPath(), value.getValue(),value.getSource(),new Date(value.getUpdated()), value.getTimeout(), value.isReadOnly());
+					if (path == null && !value.getPath().startsWith(RegistryApi.PATH_SYSTEM) || MString.compareFsLikePattern(value.getPath(), path))
+						out.addRowValues(value.getPath(), value.getValue(),value.getSource(),new Date(value.getUpdated()), value.getTimeout() > 0 ? MTimeInterval.getIntervalAsString( value.getTimeout() - ( System.currentTimeMillis() - value.getUpdated() ) ) : "", value.isReadOnly(), value.isPersistent() );
 				}
 				out.print(System.out);
 			}
 		} else
 		if (cmd.equals("get")) {
 			RegistryValue entry = api.getNodeParameter(path);
-			System.out.println("Path   : " + entry.getPath());
-			System.out.println("Value  : " + entry.getValue());
-			System.out.println("Source : " + entry.getSource());
-			System.out.println("Updated: " + MDate.toIsoDateTime(entry.getUpdated()) + " Age: " + MTimeInterval.getIntervalAsString( System.currentTimeMillis() - entry.getUpdated() ));
-			System.out.println("Timeout: " + entry.getTimeout() + " " + (entry.getTimeout() > 0 ? MTimeInterval.getIntervalAsString( entry.getTimeout() - ( System.currentTimeMillis() - entry.getUpdated() ) ) : ""));
+			System.out.println("Path      : " + entry.getPath());
+			System.out.println("Source    : " + entry.getSource());
+			System.out.println("Persistent: " + entry.isPersistent());
+			System.out.println("Readonly  : " + entry.isReadOnly());
+			System.out.println("Updated   : " + MDate.toIsoDateTime(entry.getUpdated()) + " Age: " + MTimeInterval.getIntervalAsString( System.currentTimeMillis() - entry.getUpdated() ));
+			System.out.println("Timeout   : " + entry.getTimeout() + " " + (entry.getTimeout() > 0 ? MTimeInterval.getIntervalAsString( entry.getTimeout() - ( System.currentTimeMillis() - entry.getUpdated() ) ) : ""));
+			System.out.println("Value     : " + entry.getValue());
 		} else
 		if (cmd.equals("set") || cmd.equals("add")) {
 			if (MString.isIndex(path, '@')) {
-				if (api.setParameter(path, parameters[0], timeout, !writable))
+				if (api.setParameter(path, parameters[0], timeout, !writable, persistent))
 					System.out.println("SET");
 				else
 					System.out.println("NOT CHANGED");
@@ -82,7 +88,7 @@ public class RegistryCmd implements Action {
 				for (int i = 0; i < parameters.length; i++) {
 					String k = MString.beforeIndex(parameters[i], '=');
 					String v = MString.afterIndex(parameters[i], '=');
-					if (api.setParameter(path + "@" + k, v, timeout, !writable))
+					if (api.setParameter(path + "@" + k, v, timeout, !writable, persistent))
 						System.out.println(k + " SET");
 					else
 						System.out.println(k + " NOT CHANGED");

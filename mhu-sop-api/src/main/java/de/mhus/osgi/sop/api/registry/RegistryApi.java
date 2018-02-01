@@ -38,10 +38,15 @@ public interface RegistryApi {
 	 * @param value New value
 	 * @param timeout Timeout in milliseconds after receive or 0
 	 * @param readOnly Readonly can only be updated by the source
-	 * @return 
+	 * @param persistent Set the possibility that the value will be stored (currently only local)
+	 * @return true if the value was really changed or false if the value was the same as before
 	 */
-	boolean setParameter(String path, String value, long timeout, boolean readOnly);
+	boolean setParameter(String path, String value, long timeout, boolean readOnly, boolean persistent);
 
+	default boolean setParameter(String path, String value) {
+		return setParameter(path, value, 0, true, false);
+	}
+	
 	/**
 	 * Remove a node or parameter. And publish the information.
 	 * 
