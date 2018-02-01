@@ -171,11 +171,13 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 		synchronized (registry) {
 			registry.put(path, entry);
 		}
-		for (RegistryProvider provider : MOsgi.getServices(RegistryProvider.class, null)) {
-			try {
-				provider.publish(entry);
-			} catch (Throwable t) {
-				log().d(provider,t);
+		if (!path.startsWith(RegistryApi.PATH_LOCAL)) {
+			for (RegistryProvider provider : MOsgi.getServices(RegistryProvider.class, null)) {
+				try {
+					provider.publish(entry);
+				} catch (Throwable t) {
+					log().d(provider,t);
+				}
 			}
 		}
 		
@@ -222,7 +224,12 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	@Override
 	public void setLocalParameter(RegistryValue value) {
 		if (value == null || value.getPath() == null || value.getValue() == null) throw new NullPointerException();
+		if (value.getPath().startsWith(RegistryApi.PATH_LOCAL)) return;
+		
 		synchronized (registry) {
+			RegistryValue cur = registry.get(value.getPath());
+			if (cur != null && cur.isReadOnly() && !cur.getSource().equals(value.getSource()))
+				return;
 			registry.put(value.getPath(), value);
 		}
 		if (!value.getPath().startsWith(RegistryApi.PATH_SYSTEM)) {
@@ -236,11 +243,14 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 
 	@Override
 	public void removeLocalParameter(String path, String source) {
+		if (path == null) return;
+		if (path.startsWith(RegistryApi.PATH_LOCAL)) return;
+			
 		synchronized (registry) {
+			RegistryValue cur = registry.get(path);
 			if (source != null) {
-				RegistryValue value = registry.get(path);
-				if (value == null) return;
-				if (!source.equals(value.getSource())) return;
+				if (cur != null && cur.isReadOnly() && !cur.getSource().equals(source))
+					return;
 			}
 			registry.remove(path);
 		}

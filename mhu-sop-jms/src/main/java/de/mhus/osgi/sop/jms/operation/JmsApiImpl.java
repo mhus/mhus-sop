@@ -241,6 +241,7 @@ import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.operation.OperationAddress;
 import de.mhus.osgi.sop.api.operation.OperationApi;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
+import de.mhus.osgi.sop.api.registry.RegistryApi;
 import de.mhus.osgi.sop.api.registry.RegistryManager;
 import de.mhus.osgi.sop.api.registry.RegistryValue;
 
@@ -416,7 +417,7 @@ public class JmsApiImpl extends MLog implements JmsApi {
 			}
 			int cnt = 0;
 			for (RegistryValue entry : api.getAll()) {
-				if (entry.getSource().equals(ident)) {
+				if (entry.getSource().equals(ident) && !entry.getPath().startsWith(RegistryApi.PATH_LOCAL)) {
 					msg.setString("path" + cnt, entry.getPath());
 					msg.setString("value" + cnt, entry.getValue());
 					msg.setLong("timeout" + cnt, entry.getTimeout());
