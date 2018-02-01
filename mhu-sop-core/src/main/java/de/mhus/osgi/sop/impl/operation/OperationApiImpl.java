@@ -228,6 +228,7 @@ import de.mhus.lib.core.MTimeInterval;
 import de.mhus.lib.core.MTimerTask;
 import de.mhus.lib.core.base.service.TimerFactory;
 import de.mhus.lib.core.base.service.TimerIfc;
+import de.mhus.lib.core.cfg.CfgLong;
 import de.mhus.lib.core.strategy.Operation;
 import de.mhus.lib.core.strategy.OperationDescription;
 import de.mhus.lib.core.strategy.OperationResult;
@@ -248,6 +249,7 @@ public class OperationApiImpl extends MLog implements OperationApi {
 	public static OperationApiImpl instance;
 	private TimerIfc timer;
 	private MTimerTask timerTask;
+	private CfgLong CFG_OPERATION_SYNC = new CfgLong(OperationApi.class, "syncInterval", 300000);
 
 	@Activate
 	public void doActivate(ComponentContext ctx) {
@@ -287,7 +289,7 @@ public class OperationApiImpl extends MLog implements OperationApi {
 				synchronize();
 			}
 		};
-		timer.schedule(timerTask, 30000, MTimeInterval.MINUTE_IN_MILLISECOUNDS );
+		timer.schedule(timerTask, CFG_OPERATION_SYNC.value(), MTimeInterval.MINUTE_IN_MILLISECOUNDS );
 	}
 
 	private class MyServiceTrackerCustomizer implements ServiceTrackerCustomizer<OperationsProvider,OperationsProvider> {
