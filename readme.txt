@@ -216,3 +216,10 @@ bundle:persistentwatch add mhu-sop-api
 bundle:persistentwatch add mhu-sop-core
 bundle:persistentwatch add mhu-sop-jms
 bundle:persistentwatch add mhu-sop-rest
+
+
+Test unique master handling:
+
+registry set /system/master/test@seed 1
+
+

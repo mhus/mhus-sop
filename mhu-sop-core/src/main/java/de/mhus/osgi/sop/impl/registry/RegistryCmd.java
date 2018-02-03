@@ -17,6 +17,7 @@ import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.registry.RegistryApi;
 import de.mhus.osgi.sop.api.registry.RegistryManager;
+import de.mhus.osgi.sop.api.registry.RegistryPathControl;
 import de.mhus.osgi.sop.api.registry.RegistryValue;
 
 @Command(scope = "sop", name = "registry", description = "Registry commands")
@@ -86,9 +87,9 @@ public class RegistryCmd implements Action {
 			System.out.println("Updated   : " + MDate.toIsoDateTime(entry.getUpdated()) + " Age: " + MTimeInterval.getIntervalAsString( System.currentTimeMillis() - entry.getUpdated() ));
 			System.out.println("Timeout   : " + entry.getTimeout() + " " + (entry.getTimeout() > 0 ? MTimeInterval.getIntervalAsString( entry.getTimeout() - ( System.currentTimeMillis() - entry.getUpdated() ) ) : ""));
 			System.out.println("Value     : " + entry.getValue());
-			
 			RegistryValue c = entry.getRemoteValue();
 			if (c != null) {
+				System.out.println();
 				System.out.println("Remote Path      : " + c.getPath());
 				System.out.println("Remote Source    : " + c.getSource());
 				System.out.println("Remote Persistent: " + c.isPersistent());
@@ -96,6 +97,13 @@ public class RegistryCmd implements Action {
 				System.out.println("Remote Updated   : " + MDate.toIsoDateTime(c.getUpdated()) + " Age: " + MTimeInterval.getIntervalAsString( System.currentTimeMillis() - c.getUpdated() ));
 				System.out.println("Remote Timeout   : " + c.getTimeout() + " " + (c.getTimeout() > 0 ? MTimeInterval.getIntervalAsString( c.getTimeout() - ( System.currentTimeMillis() - c.getUpdated() ) ) : ""));
 				System.out.println("Remote Value     : " + c.getValue());
+			}
+			
+			RegistryManager manager = MApi.lookup(RegistryManager.class);
+			RegistryPathControl controller = manager.getPathController(path);
+			if (controller != null) {
+				System.out.println();
+				System.out.println("Path Controller: " + controller);
 			}
 		} else
 		if (cmd.equals("set") || cmd.equals("add")) {

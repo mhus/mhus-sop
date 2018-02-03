@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 
 import aQute.bnd.annotation.component.Activate;
@@ -37,10 +38,13 @@ import de.mhus.lib.core.directory.WritableResourceNode;
 import de.mhus.lib.core.service.ServerIdent;
 import de.mhus.lib.errors.AccessDeniedException;
 import de.mhus.lib.errors.MException;
+import de.mhus.lib.errors.NotSupportedException;
 import de.mhus.lib.errors.UsageException;
 import de.mhus.lib.karaf.MOsgi;
+import de.mhus.lib.karaf.MServiceTracker;
 import de.mhus.osgi.sop.api.registry.RegistryApi;
 import de.mhus.osgi.sop.api.registry.RegistryManager;
+import de.mhus.osgi.sop.api.registry.RegistryPathControl;
 import de.mhus.osgi.sop.api.registry.RegistryProvider;
 import de.mhus.osgi.sop.api.registry.RegistryValue;
 
@@ -53,11 +57,38 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	private MTimerTask timerTask;
 	private CfgLong CFG_UPDATE_INTERVAL = new CfgLong(RegistryApiImpl.class, "updateInterval", 60000);
 	private String ident;
+	private HashMap<String, RegistryPathControl> pathControllers = new HashMap<>();
+	private MServiceTracker<RegistryPathControl> pathControllerTracker = new MServiceTracker<RegistryPathControl>(RegistryPathControl.class) {
+		
+		@Override
+		protected void removeService(ServiceReference<RegistryPathControl> reference, RegistryPathControl service) {
+			String path = (String) reference.getProperty("path");
+			if (path == null) return;
+			synchronized (pathControllers) {
+				pathControllers.remove(path);
+			}
+		}
+		
+		@Override
+		protected void addService(ServiceReference<RegistryPathControl> reference, RegistryPathControl service) {
+			String path = (String) reference.getProperty("path");
+			if (path == null) {
+				log().w("Found PathControl without path",reference,service);
+				return;
+			}
+			path = validateNodePath(path);
+			if (!path.endsWith("/")) path = path +"/";
+			synchronized (pathControllers) {
+				pathControllers.put(path, service);
+			}
+		}
+	};
 
 	@Activate
 	public void doActivate(ComponentContext ctx) {
 		MApi.get().getCfgManager().registerCfgProvider(RegistryApi.class.getCanonicalName(), this);
 		ident = MApi.lookup(ServerIdent.class).toString();
+		pathControllerTracker.start();
 		load(false);
 		MThread.asynchron(new Runnable() {
 			
@@ -73,7 +104,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	public void doDeactivate(ComponentContext ctx) {
 		if (timer != null)
 			timer.cancel();
-
+		pathControllerTracker.stop();
 	}
 
 	@Reference(service=TimerFactory.class)
@@ -222,6 +253,15 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 			}
 		}
 		
+		// let the controller check the action
+		if (!path.startsWith(PATH_WORKER) && !entry.isLocal()) {
+			RegistryPathControl controller = getPathController(path);
+			if (controller != null) {
+				entry = controller.checkSetParameter(this, entry);
+				if (entry == null) return false;
+				if (!path.equals(entry.getPath())) throw new NotSupportedException("Controller can't change the path of the entry",path);
+			}
+		}
 
 		// Put into registry
 		synchronized (registry) {
@@ -254,6 +294,16 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 			}
 		}
 		return true;
+	}
+
+	@Override
+	public RegistryPathControl getPathController(String path) {
+		synchronized (pathControllers) {
+			for (String p : pathControllers.keySet())
+				if (path.startsWith(p))
+					return pathControllers.get(p);
+		}
+		return null;
 	}
 
 	@Override
@@ -293,6 +343,14 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 		if (current.isReadOnly() && !current.getSource().equals(ident))
 			throw new AccessDeniedException("The entry is readOnly");
 	
+		// let the controller check the action
+		if (!path.startsWith(PATH_WORKER) && !current.isLocal()) {
+			RegistryPathControl controller = getPathController(path);
+			if (controller != null) {
+				if (!controller.checkRemoveParameter(this, current)) return false;
+			}
+		}
+
 		// update memory registry
 		RegistryValue entry = null;
 		synchronized (registry) {
@@ -329,6 +387,15 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 		if (value == null || value.getPath() == null || value.getValue() == null) throw new NullPointerException();
 		if (value.getPath().startsWith(RegistryApi.PATH_LOCAL) || value.isLocal()) return;
 		
+		// let the controller check the action
+		if (!value.getPath().startsWith(PATH_WORKER) && !value.isLocal()) {
+			RegistryPathControl controller = getPathController(value.getPath());
+			if (controller != null) {
+				value = controller.checkSetLocalParameter(this, value);
+				if (value == null) return;
+			}
+		}
+
 		synchronized (registry) {
 			RegistryValue cur = registry.get(value.getPath());
 			if (cur != null ) {
@@ -358,10 +425,23 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	public void removeLocalParameter(String path, String source, boolean intern) {
 		if (path == null) return;
 		if (intern && path.startsWith(RegistryApi.PATH_LOCAL)) return;
-			
+
+		RegistryValue cur = null;
 		synchronized (registry) {
-			RegistryValue cur = registry.get(path);
-			if (cur == null) return; // path not exists
+			cur = registry.get(path);
+		}
+		if (cur == null) return; // path not exists
+		
+		// let the controller check the action
+		if (!path.startsWith(PATH_WORKER) && !cur.isLocal()) {
+			RegistryPathControl controller = getPathController(path);
+			if (controller != null) {
+				if (!controller.checkRemoveLocalParameter(this, cur))
+					return;
+			}
+		}
+
+		synchronized (registry) {
 			if (cur.isLocal()) {
 				RegistryValue c = cur.getRemoteValue();
 				if (c != null && !intern && c.isReadOnly() && !c.getSource().equals(source))
@@ -468,6 +548,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 
 		private static final long serialVersionUID = 1L;
 
+		@Override
 		public IConfig getNodeByPath(String path) {
 			return new MySubConfig(path);
 		}
@@ -572,6 +653,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 			this.path = path;
 		}
 
+		@Override
 		public IConfig getNodeByPath(String path) {
 			return new MySubConfig(this.path + path);
 		}
