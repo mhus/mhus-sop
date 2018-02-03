@@ -7,6 +7,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -95,11 +96,34 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 		setParameter(PATH_WORKER + ident + "@pid", MSystem.getHostname() + ":" + MSystem.getPid(), CFG_UPDATE_INTERVAL.value() * 2, true, false, false);
 		
 		final long now = System.currentTimeMillis();
+		LinkedList<RegistryValue> values = null;
 		synchronized (registry) {
-			registry.entrySet().removeIf(entry -> {
-				return  entry.getValue().getTimeout() > 0 && 
-						now - entry.getValue().getUpdated() > entry.getValue().getTimeout();
-			});
+			values = new LinkedList<>(registry.values());
+		}
+		
+		// remove all out timed entries
+		HashSet<String> lostWorkers = new HashSet<>();
+		for (RegistryValue value : values) {
+			boolean remove =  !value.isLocal() && value.getTimeout() > 0 && now - value.getUpdated() > value.getTimeout();
+			if (remove) {
+				String path = value.getPath();
+				if (path.startsWith(PATH_WORKER) && path.endsWith("@pid") && path.indexOf('/', PATH_WORKER.length()+1) < 0)
+					lostWorkers.add(path.substring(PATH_WORKER.length(), path.length()-4 ));
+				removeLocalParameter(path, value.getSource(), true);
+			}
+		}
+		if (lostWorkers.size() > 0) {
+			for (RegistryValue value : values) {
+				if (value.isLocal()) {
+					RegistryValue remote = value.getRemoteValue();
+					if (remote != null && lostWorkers.contains(remote.getSource()) ) {
+						removeLocalParameter(value.getPath(), remote.getSource(), true);
+					}
+				} else
+				if (lostWorkers.contains(value.getSource())) {
+					removeLocalParameter(value.getPath(), value.getSource(), true);
+				}
+			}
 		}
 	}
 
@@ -328,13 +352,25 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 
 	@Override
 	public void removeLocalParameter(String path, String source) {
+		removeLocalParameter(path, source, false);
+	}
+	
+	public void removeLocalParameter(String path, String source, boolean intern) {
 		if (path == null) return;
-		if (path.startsWith(RegistryApi.PATH_LOCAL)) return;
+		if (intern && path.startsWith(RegistryApi.PATH_LOCAL)) return;
 			
 		synchronized (registry) {
 			RegistryValue cur = registry.get(path);
+			if (cur == null) return; // path not exists
+			if (cur.isLocal()) {
+				RegistryValue c = cur.getRemoteValue();
+				if (c != null && !intern && c.isReadOnly() && !c.getSource().equals(source))
+					return;
+				cur.setRemoteValue(null);
+				return;
+			}
 			if (source != null) {
-				if (cur != null && cur.isReadOnly() && !cur.getSource().equals(source))
+				if (cur != null && !intern && cur.isReadOnly() && !cur.getSource().equals(source))
 					return;
 			}
 			registry.remove(path);

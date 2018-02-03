@@ -71,7 +71,7 @@ public class RegistryCmd implements Action {
 					out.setMaxColSize(40);
 				out.setHeaderValues("Path","Value","Source","Updated", "TTL", "RO","Persistent");
 				for (RegistryValue value : list ) {
-					if (path == null && !value.getPath().startsWith(RegistryApi.PATH_SYSTEM) || MString.compareFsLikePattern(value.getPath(), path))
+					if (path == null && !value.getPath().startsWith(RegistryApi.PATH_SYSTEM) && !value.getPath().startsWith(RegistryApi.PATH_WORKER) || MString.compareFsLikePattern(value.getPath(), path))
 						out.addRowValues(value.getPath(), value.getValue(),value.getSource(),new Date(value.getUpdated()), value.getTimeout() > 0 ? MTimeInterval.getIntervalAsString( value.getTimeout() - ( System.currentTimeMillis() - value.getUpdated() ) ) : "", value.isReadOnly(), value.isPersistent() );
 				}
 				out.print(System.out);
