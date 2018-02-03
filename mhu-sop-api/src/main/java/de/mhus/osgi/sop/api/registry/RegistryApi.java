@@ -7,7 +7,10 @@ public interface RegistryApi {
 
 	public static final String PATH_SYSTEM = "/system/"; // this path will not fire events to the cfg system
 	public static final String PATH_LOCAL = "/local/"; // this path will not be published
-	
+	public static final String PATH_WORKER = "/worker/"; 
+
+	public static final String SOURCE_LOCAL = "@local@";
+
 	/**
 	 * Return the value information of a node parameter.
 	 * 
@@ -39,12 +42,13 @@ public interface RegistryApi {
 	 * @param timeout Timeout in milliseconds after receive or 0
 	 * @param readOnly Readonly can only be updated by the source
 	 * @param persistent Set the possibility that the value will be stored (currently only local)
+	 * @param local Overwrite other  remote values
 	 * @return true if the value was really changed or false if the value was the same as before
 	 */
-	boolean setParameter(String path, String value, long timeout, boolean readOnly, boolean persistent);
+	boolean setParameter(String path, String value, long timeout, boolean readOnly, boolean persistent, boolean local);
 
 	default boolean setParameter(String path, String value) {
-		return setParameter(path, value, 0, true, false);
+		return setParameter(path, value, 0, true, false, false);
 	}
 	
 	/**

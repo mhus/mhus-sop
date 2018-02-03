@@ -7,6 +7,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
@@ -27,6 +28,7 @@ import de.mhus.lib.core.MTimeInterval;
 import de.mhus.lib.core.MTimerTask;
 import de.mhus.lib.core.base.service.TimerFactory;
 import de.mhus.lib.core.base.service.TimerIfc;
+import de.mhus.lib.core.cfg.CfgLong;
 import de.mhus.lib.core.cfg.CfgProvider;
 import de.mhus.lib.core.config.IConfig;
 import de.mhus.lib.core.directory.ResourceNode;
@@ -48,10 +50,13 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	private HashMap<String, RegistryValue> registry = new HashMap<>();
 	private TimerIfc timer;
 	private MTimerTask timerTask;
+	private CfgLong CFG_UPDATE_INTERVAL = new CfgLong(RegistryApiImpl.class, "updateInterval", 60000);
+	private String ident;
 
 	@Activate
 	public void doActivate(ComponentContext ctx) {
 		MApi.get().getCfgManager().registerCfgProvider(RegistryApi.class.getCanonicalName(), this);
+		ident = MApi.lookup(ServerIdent.class).toString();
 		load(false);
 		MThread.asynchron(new Runnable() {
 			
@@ -81,10 +86,14 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 				checkUpdate();
 			}
 		};
-		timer.schedule(timerTask, 30000, MTimeInterval.MINUTE_IN_MILLISECOUNDS );
+		timer.schedule(timerTask, 10000, CFG_UPDATE_INTERVAL.value() );
 	}
 
 	protected void checkUpdate() {
+		
+		// send worker update
+		setParameter(PATH_WORKER + ident + "@pid", MSystem.getHostname() + ":" + MSystem.getPid(), CFG_UPDATE_INTERVAL.value() * 2, true, false, false);
+		
 		final long now = System.currentTimeMillis();
 		synchronized (registry) {
 			registry.entrySet().removeIf(entry -> {
@@ -156,27 +165,45 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	}
 
 	@Override
-	public boolean setParameter(String path, String value, long timeout, boolean readOnly, boolean persistent) {
+	public boolean setParameter(String path, String value, long timeout, boolean readOnly, boolean persistent, boolean local) {
 		path = validateParameterPath(path);
 		if (value == null) throw new NullPointerException("null value not allowed");
-		RegistryValue current = getNodeParameter(path);
-		String source = MApi.lookup(ServerIdent.class).toString();
-		
-		if (current != null) {
-			if (	current.getTimeout() == 0
-					&& timeout == 0
-					&& MSystem.equals(current.getValue(), value) 
-					&& current.isReadOnly() == readOnly 
-					&& current.isPersistent() == persistent
-				) return false;
-			if (current.isReadOnly() && !current.getSource().equals(source))
-				throw new AccessDeniedException("The entry is read only");
+		String source = ident;
+		if (local) {
+			source = SOURCE_LOCAL;
+			timeout = 0;
 		}
-		// Put into registry
+		RegistryValue current = getNodeParameter(path);
+		
 		RegistryValue entry = new RegistryValue(value, source, System.currentTimeMillis(), path, timeout, readOnly, persistent);
+		if (current != null) {
+			RegistryValue c = current;
+			if (!local && current.isLocal()) c = current.getRemoteValue();
+			if (!local && c != null) {
+				if (	c.getTimeout() == 0
+						&& timeout == 0
+						&& MSystem.equals(c.getValue(), value) 
+						&& c.isReadOnly() == readOnly 
+						&& c.isPersistent() == persistent
+					) return false;
+				if (c.isReadOnly() && !c.getSource().equals(source))
+					throw new AccessDeniedException("The entry is read only");
+			}
+			if (!local && current.isLocal()) {
+				current.setRemoteValue(entry);
+				return false;
+			}
+			if (entry.isLocal()) {
+				entry.setRemoteValue(c);
+			}
+		}
+		
+
+		// Put into registry
 		synchronized (registry) {
 			registry.put(path, entry);
 		}
+				
 		// save to file if/was persistent
 		if (entry.isPersistent() || current != null && current.isPersistent())
 			try {
@@ -185,7 +212,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 				log().d(e);
 			}
 		// publish to other nodes
-		if (!path.startsWith(RegistryApi.PATH_LOCAL)) {
+		if (!path.startsWith(RegistryApi.PATH_LOCAL) && !entry.isLocal()) {
 			for (RegistryProvider provider : MOsgi.getServices(RegistryProvider.class, null)) {
 				try {
 					provider.publish(entry);
@@ -195,7 +222,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 			}
 		}
 		// fire Cfg events
-		if (!path.startsWith(RegistryApi.PATH_SYSTEM)) {
+		if (!path.startsWith(RegistryApi.PATH_SYSTEM) && !path.startsWith(RegistryApi.PATH_WORKER)) {
 			try {
 				MApi.getCfgUpdater().doUpdate(RegistryApi.class.getCanonicalName(), path);
 			} catch (Throwable t) {
@@ -211,10 +238,37 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 		RegistryValue current = getNodeParameter(path);
 		if (current == null) return false;
 		
-		String source = MApi.lookup(ServerIdent.class).toString();
-		if (current.isReadOnly() && !current.getSource().equals(source))
+		// in case of local ...
+		if (current.isLocal()) {
+			RegistryValue entry = current.getRemoteValue();
+			synchronized (registry) {
+				registry.remove(path);
+			}
+			if (entry != null) {
+				setLocalParameter(entry);
+				if (entry != null && entry.isPersistent())
+					try {
+						save();
+					} catch (IOException e) {
+						log().d(e);
+					}
+				return true;
+			} else {
+				// send Cfg events
+				if (!path.startsWith(RegistryApi.PATH_SYSTEM)) {
+					try {
+						MApi.getCfgUpdater().doUpdate(RegistryApi.class.getCanonicalName(), path);
+					} catch (Throwable t) {
+						log().d(t);
+					}
+				}
+				return true;
+			}
+		}
+		
+		if (current.isReadOnly() && !current.getSource().equals(ident))
 			throw new AccessDeniedException("The entry is readOnly");
-
+	
 		// update memory registry
 		RegistryValue entry = null;
 		synchronized (registry) {
@@ -236,7 +290,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 			}
 		}
 		// send Cfg events
-		if (!path.startsWith(RegistryApi.PATH_SYSTEM)) {
+		if (!path.startsWith(RegistryApi.PATH_SYSTEM) && !path.startsWith(RegistryApi.PATH_WORKER)) {
 			try {
 				MApi.getCfgUpdater().doUpdate(RegistryApi.class.getCanonicalName(), path);
 			} catch (Throwable t) {
@@ -249,15 +303,21 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	@Override
 	public void setLocalParameter(RegistryValue value) {
 		if (value == null || value.getPath() == null || value.getValue() == null) throw new NullPointerException();
-		if (value.getPath().startsWith(RegistryApi.PATH_LOCAL)) return;
+		if (value.getPath().startsWith(RegistryApi.PATH_LOCAL) || value.isLocal()) return;
 		
 		synchronized (registry) {
 			RegistryValue cur = registry.get(value.getPath());
-			if (cur != null && cur.isReadOnly() && !cur.getSource().equals(value.getSource()))
-				return;
+			if (cur != null ) {
+				if (cur.isLocal()) {
+					cur.setRemoteValue(value);
+					return;
+				}
+				if ( cur.isReadOnly() && !cur.getSource().equals(value.getSource()))
+					return;
+			}
 			registry.put(value.getPath(), value);
 		}
-		if (!value.getPath().startsWith(RegistryApi.PATH_SYSTEM)) {
+		if (!value.getPath().startsWith(RegistryApi.PATH_SYSTEM) && !value.getPath().startsWith(RegistryApi.PATH_WORKER)) {
 			try {
 				MApi.getCfgUpdater().doUpdate(RegistryApi.class.getCanonicalName(), value.getPath());
 			} catch (Throwable t) {
@@ -279,7 +339,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 			}
 			registry.remove(path);
 		}
-		if (!path.startsWith(RegistryApi.PATH_SYSTEM)) {
+		if (!path.startsWith(RegistryApi.PATH_SYSTEM) && !path.startsWith(RegistryApi.PATH_WORKER)) {
 			try {
 				MApi.getCfgUpdater().doUpdate(RegistryApi.class.getCanonicalName(), path);
 			} catch (Throwable t) {
@@ -291,7 +351,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	@Override
 	public Collection<RegistryValue> getAll() {
 		synchronized (registry) {
-			return Collections.unmodifiableCollection(registry.values());
+			return Collections.unmodifiableCollection(new LinkedList<>(registry.values()));
 		}
 	}
 
@@ -574,10 +634,9 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	@Override
 	public void save() throws IOException {
 		MProperties p = new MProperties();
-		String ident = MApi.lookup(ServerIdent.class).toString();
 		for (RegistryValue entry : getAll())
-			if (entry.getSource().equals(ident) && entry.isPersistent()) {
-				p.setString(entry.getPath(), entry.isReadOnly() + ":" + entry.getTimeout() + ":" + entry.getValue());
+			if ((entry.getSource().equals(ident) || entry.isLocal()) && entry.isPersistent()) {
+				p.setString(entry.getPath(), entry.isReadOnly() + "|" + entry.getTimeout() + "|" + entry.getSource() + "|" + entry.getValue());
 			}
 		p.save(getFile());
 	}
@@ -591,11 +650,15 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 		File file = getFile();
 		if (!file.exists()) return;
 		MProperties prop = MProperties.load(file);
-		String ident = MApi.lookup(ServerIdent.class).toString();
 		long updated = System.currentTimeMillis();
 		for (Entry<String, Object> entry : prop.entrySet()) {
-			String[] split = entry.getValue().toString().split(":", 3);
-			setLocalParameter(new RegistryValue(split[2], ident, updated, entry.getKey(), MCast.tolong(split[1],0), MCast.toboolean(split[0], true), true));
+			String[] split = entry.getValue().toString().split("\\|", 4);
+			if (!SOURCE_LOCAL.equals(split[2])) {
+				split[2] = ident;
+				setLocalParameter(new RegistryValue(split[3], split[2], updated, entry.getKey(), MCast.tolong(split[1],0), MCast.toboolean(split[0], true), true));
+			} else {
+				setParameter(entry.getKey(), split[3], 0, true, true, true);
+			}
 		}
 		if (push)
 			publishAll();

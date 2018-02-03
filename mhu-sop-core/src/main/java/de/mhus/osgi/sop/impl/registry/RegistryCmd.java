@@ -44,6 +44,9 @@ public class RegistryCmd implements Action {
 	@Option(name="-f", aliases="--full", description="Full output of content",required=false)
 	boolean fullOutput = false;
 	
+	@Option(name="-l", aliases="--local", description="Local overwrite",required=false)
+	boolean local = false;
+	
 	@Override
 	public Object execute() throws Exception {
 		RegistryApi api = MApi.lookup(RegistryApi.class);
@@ -83,10 +86,21 @@ public class RegistryCmd implements Action {
 			System.out.println("Updated   : " + MDate.toIsoDateTime(entry.getUpdated()) + " Age: " + MTimeInterval.getIntervalAsString( System.currentTimeMillis() - entry.getUpdated() ));
 			System.out.println("Timeout   : " + entry.getTimeout() + " " + (entry.getTimeout() > 0 ? MTimeInterval.getIntervalAsString( entry.getTimeout() - ( System.currentTimeMillis() - entry.getUpdated() ) ) : ""));
 			System.out.println("Value     : " + entry.getValue());
+			
+			RegistryValue c = entry.getRemoteValue();
+			if (c != null) {
+				System.out.println("Remote Path      : " + c.getPath());
+				System.out.println("Remote Source    : " + c.getSource());
+				System.out.println("Remote Persistent: " + c.isPersistent());
+				System.out.println("Remote Readonly  : " + c.isReadOnly());
+				System.out.println("Remote Updated   : " + MDate.toIsoDateTime(c.getUpdated()) + " Age: " + MTimeInterval.getIntervalAsString( System.currentTimeMillis() - c.getUpdated() ));
+				System.out.println("Remote Timeout   : " + c.getTimeout() + " " + (c.getTimeout() > 0 ? MTimeInterval.getIntervalAsString( c.getTimeout() - ( System.currentTimeMillis() - c.getUpdated() ) ) : ""));
+				System.out.println("Remote Value     : " + c.getValue());
+			}
 		} else
 		if (cmd.equals("set") || cmd.equals("add")) {
 			if (MString.isIndex(path, '@')) {
-				if (api.setParameter(path, parameters[0], timeout, !writable, persistent))
+				if (api.setParameter(path, parameters[0], timeout, !writable, persistent, local))
 					System.out.println("SET");
 				else
 					System.out.println("NOT CHANGED");
@@ -94,7 +108,7 @@ public class RegistryCmd implements Action {
 				for (int i = 0; i < parameters.length; i++) {
 					String k = MString.beforeIndex(parameters[i], '=');
 					String v = MString.afterIndex(parameters[i], '=');
-					if (api.setParameter(path + "@" + k, v, timeout, !writable, persistent))
+					if (api.setParameter(path + "@" + k, v, timeout, !writable, persistent, local))
 						System.out.println(k + " SET");
 					else
 						System.out.println(k + " NOT CHANGED");
