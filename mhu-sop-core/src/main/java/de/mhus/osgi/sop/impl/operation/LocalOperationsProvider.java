@@ -219,6 +219,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import aQute.bnd.annotation.component.Activate;
 import aQute.bnd.annotation.component.Component;
 import aQute.bnd.annotation.component.Deactivate;
+import aQute.bnd.annotation.component.Reference;
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MLog;
@@ -268,6 +269,9 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
 		context = null;
 	}
 
+	@Reference
+	public void getAccessApi(AccessApi api) {}
+	
 	private class MyServiceTrackerCustomizer implements ServiceTrackerCustomizer<Operation,Operation> {
 
 		@Override
