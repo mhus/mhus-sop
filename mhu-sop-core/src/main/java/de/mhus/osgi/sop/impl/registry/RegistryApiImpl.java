@@ -300,8 +300,11 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	public RegistryPathControl getPathController(String path) {
 		synchronized (pathControllers) {
 			for (String p : pathControllers.keySet())
-				if (path.startsWith(p))
-					return pathControllers.get(p);
+				if (path.startsWith(p)) {
+					RegistryPathControl c = pathControllers.get(p);
+					if (c.isTakeControl(path))
+						return c;
+				}
 		}
 		return null;
 	}

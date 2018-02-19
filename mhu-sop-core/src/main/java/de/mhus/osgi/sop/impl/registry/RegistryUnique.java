@@ -52,4 +52,9 @@ public class RegistryUnique implements RegistryPathControl {
 		return true;
 	}
 
+	@Override
+	public boolean isTakeControl(String path) {
+		return true;
+	}
+
 }
