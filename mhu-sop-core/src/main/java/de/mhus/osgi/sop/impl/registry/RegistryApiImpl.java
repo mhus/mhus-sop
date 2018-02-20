@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.osgi.framework.ServiceReference;
@@ -51,13 +52,14 @@ import de.mhus.osgi.sop.api.registry.RegistryValue;
 @Component(provide={RegistryApi.class,RegistryManager.class},immediate=true)
 public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManager, CfgProvider {
 
+	public static final int DEFAULT_PRIORITY = 100;
 	private IConfig configProxy = new MyConfig();
 	private HashMap<String, RegistryValue> registry = new HashMap<>();
 	private TimerIfc timer;
 	private MTimerTask timerTask;
 	private CfgLong CFG_UPDATE_INTERVAL = new CfgLong(RegistryApiImpl.class, "updateInterval", 60000);
 	private String ident;
-	private HashMap<String, RegistryPathControl> pathControllers = new HashMap<>();
+	private TreeSet<ControlDescriptor> pathControllers = new TreeSet<>();
 	private MServiceTracker<RegistryPathControl> pathControllerTracker = new MServiceTracker<RegistryPathControl>(RegistryPathControl.class) {
 		
 		@Override
@@ -77,9 +79,8 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 				return;
 			}
 			path = validateNodePath(path);
-			if (!path.endsWith("/")) path = path +"/";
 			synchronized (pathControllers) {
-				pathControllers.put(path, service);
+				pathControllers.add(new ControlDescriptor(reference, service));
 			}
 		}
 	};
@@ -299,11 +300,11 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	@Override
 	public RegistryPathControl getPathController(String path) {
 		synchronized (pathControllers) {
-			for (String p : pathControllers.keySet())
-				if (path.startsWith(p)) {
-					RegistryPathControl c = pathControllers.get(p);
-					if (c.isTakeControl(path))
-						return c;
+			// pathControllers is ordered by priority and reverse path, use the first one matching
+			for (ControlDescriptor desc : pathControllers)
+				if (path.startsWith(desc.path)) {
+					if (desc.service.isTakeControl(path))
+						return desc.service;
 				}
 		}
 		return null;
@@ -789,4 +790,56 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 		return new File("etc/" + RegistryApi.class.getCanonicalName() + ".properties");
 	}
 
+	private class ControlDescriptor implements Comparable<ControlDescriptor> {
+
+		private String orgPath;
+		private String path;
+		private int priority;
+		private long bundleId;
+		private RegistryPathControl service;
+
+		public ControlDescriptor(ServiceReference<RegistryPathControl> reference, RegistryPathControl service) {
+			orgPath = (String) reference.getProperty("path");
+			path = orgPath;
+			if (!path.endsWith("/")) path = path +"/";
+			priority = MCast.toint(reference.getProperty("priority"), DEFAULT_PRIORITY);
+			bundleId = reference.getBundle().getBundleId();
+			this.service = service;
+		}
+
+		@Override
+		public int compareTo(ControlDescriptor o) {
+			// order priority to top
+			int out = 0;
+			out = Integer.compare(priority, o.priority);
+			if (out != 0) return out;
+			// order path reverse - longer path first
+			out = -path.compareTo(o.path);
+			if (out != 0) return out;
+			// if path and prio are the same, compare the service object, allow multiple services with the same path.
+			out = Integer.compare(service.hashCode(), o.service.hashCode());
+			return out;
+		}
+		
+		@Override
+		public boolean equals(Object in) {
+			if (in == null) return false;
+			if (in instanceof String)
+				return orgPath.equals(in);
+			if (in instanceof ControlDescriptor) {
+				ControlDescriptor d = (ControlDescriptor)in;
+				return service == d.service;
+				// return orgPath.equals(d.orgPath) && priority == d.priority && hash == d.hash;
+			}
+			if (in instanceof RegistryPathControl)
+				return service == in;
+			return false;
+		}
+		
+		@Override
+		public String toString() {
+			return path + "(" + priority + ") [" + bundleId + "]";
+		}
+		
+	}
 }
