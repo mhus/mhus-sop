@@ -67,7 +67,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 			String path = (String) reference.getProperty("path");
 			if (path == null) return;
 			synchronized (pathControllers) {
-				pathControllers.remove(path);
+				pathControllers.remove(new ControlDescriptor(path));
 			}
 		}
 		
@@ -798,6 +798,10 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 		private long bundleId;
 		private RegistryPathControl service;
 
+		public ControlDescriptor(String path) {
+			orgPath = path;
+		}
+		
 		public ControlDescriptor(ServiceReference<RegistryPathControl> reference, RegistryPathControl service) {
 			orgPath = (String) reference.getProperty("path");
 			path = orgPath;
