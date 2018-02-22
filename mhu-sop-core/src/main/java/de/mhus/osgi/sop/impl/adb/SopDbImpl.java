@@ -223,6 +223,7 @@ import de.mhus.osgi.sop.api.adb.Reference;
 import de.mhus.osgi.sop.api.adb.Reference.TYPE;
 import de.mhus.osgi.sop.api.adb.ReferenceCollector;
 import de.mhus.osgi.sop.api.model.ActionTask;
+import de.mhus.osgi.sop.api.model.Journal;
 import de.mhus.osgi.sop.api.model.ObjectParameter;
 import de.mhus.osgi.sop.api.model.Register;
 
@@ -241,6 +242,7 @@ public class SopDbImpl extends MLog implements DbSchemaService {
 		list.add(ObjectParameter.class);
 		list.add(ActionTask.class);
 		list.add(Register.class);
+		list.add(Journal.class);
 	}
 
 	@Override

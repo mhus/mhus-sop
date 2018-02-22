@@ -252,11 +252,24 @@ public class AdbApiImpl extends MLog implements AdbApi {
 
 //	@Activate
 	public void doActivate() {
-		context = FrameworkUtil.getBundle(AdbApiImpl.class).getBundleContext();
-		accessTracker = new ServiceTracker<>(context, DbSchemaService.class, new MyAccessTrackerCustomizer() );
-		accessTracker.open();
+		BundleContext context = FrameworkUtil.getBundle(AdbApiImpl.class).getBundleContext();
+		doActivate(context);
+	}
+	public void doActivate(BundleContext context) {
+		this.context = context;
+		init();
 	}
 	
+	private void init() {
+		if (accessTracker == null) {
+			if (context == null)
+				context = FrameworkUtil.getBundle(AdbApiImpl.class).getBundleContext();
+			if (context != null) {
+				accessTracker = new ServiceTracker<>(context, DbSchemaService.class, new MyAccessTrackerCustomizer() );
+				accessTracker.open();
+			}
+		}
+	}
 //	@Deactivate
 	public void doDeactivate() {
 		accessTracker.close();
@@ -444,6 +457,7 @@ public class AdbApiImpl extends MLog implements AdbApi {
 
 	@Override
 	public DbManager getManager() {
+		init();
 		return SopDbImpl.getManager();
 	}
 
@@ -501,6 +515,7 @@ public class AdbApiImpl extends MLog implements AdbApi {
 
 
 	protected DbSchemaService getController(String type) throws MException {
+		init();
 		if (type == null) throw new MException("type is null");
 		DbSchemaService ret = controllers.get(type);
 		if (ret == null) throw new MException("Access Controller not found",type);
@@ -673,6 +688,7 @@ public class AdbApiImpl extends MLog implements AdbApi {
 		if (c.isAdminMode()) return true;
 		return canDelete(c, obj);
 	}
+	@Override
 	public boolean canCreate(DbMetadata obj) throws MException {
 		if (obj == null) return false;
 		AaaContext c = getCurrent();
@@ -680,6 +696,7 @@ public class AdbApiImpl extends MLog implements AdbApi {
 		return canCreate(c, obj);
 	}
 	
+	@Override
 	public <T extends DbMetadata> T getObject(Class<T> type, UUID id) throws MException {
 		return getObject(type.getCanonicalName(), id);
 	}

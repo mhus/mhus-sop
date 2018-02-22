@@ -203,16 +203,29 @@
  */
 package de.mhus.osgi.sop.impl;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
 import aQute.bnd.annotation.component.Activate;
 import aQute.bnd.annotation.component.Component;
 import aQute.bnd.annotation.component.Deactivate;
+import de.mhus.lib.adb.DbCollection;
+import de.mhus.lib.adb.DbSchema;
+import de.mhus.lib.adb.query.AQuery;
+import de.mhus.lib.adb.query.Db;
 import de.mhus.lib.core.IProperties;
+import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MLog;
+import de.mhus.lib.core.MValidator;
 import de.mhus.lib.core.cfg.CfgProperties;
+import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.SopApi;
+import de.mhus.osgi.sop.api.model.Journal;
+import de.mhus.osgi.sop.impl.adb.SopDbImpl;
 
 @Component(immediate=true,provide=SopApi.class,name="SopApi")
 public class SopApiImpl extends MLog implements SopApi {
@@ -220,8 +233,9 @@ public class SopApiImpl extends MLog implements SopApi {
 
 	@SuppressWarnings("unused")
 	private BundleContext context;
-
 	private CfgProperties config = new CfgProperties(SopApi.class, "sop");
+	private long lastOrder = 0;
+	private long lastOrderTime = 0;
 	
 	@Activate
 	public void doActivate(ComponentContext ctx) {
@@ -238,5 +252,61 @@ public class SopApiImpl extends MLog implements SopApi {
 	public IProperties getMainConfiguration() {
 		return config.value();
 	}
-	
+
+	@Override
+	public Journal appendJournalEntry(String queue, String event, String... data) throws MException {
+		Journal item = SopDbImpl.getManager().inject(new Journal(queue,event,getJournalOrder(),data));
+		item.save();
+		return item;
+	}
+
+	private synchronized long getJournalOrder() {
+		long cur = System.currentTimeMillis();
+		if (cur != lastOrderTime) {
+			lastOrderTime  = cur;
+			lastOrder = lastOrderTime * 1000;
+		} else 
+		if (lastOrder % 1000 == 999) {
+			// overrun ...
+			log().w("journal order overrun");
+		} else
+		{
+			lastOrder++;
+		}
+		return lastOrder;
+	}
+
+	@Override
+	public Journal getJournalEntry(String id) throws MException {
+		long order = MCast.tolong(id, 0);
+		if (order > 0)
+			return SopDbImpl.getManager().getObjectByQualification(Db.query(Journal.class).eq("order", order));
+		if (MValidator.isUUID(id))
+			return SopDbImpl.getManager().getObject(Journal.class, UUID.fromString(id));
+		return null;
+	}
+
+	@Override
+	public DbSchema getDataSchema() {
+		return SopDbImpl.getManager().getSchema();
+	}
+
+	@Override
+	public List<Journal> getJournalEntries(String queue, long since, int max) throws MException {
+		AQuery<Journal> query = Db.query(Journal.class).eq("queue", queue);
+		if (since > 0)
+			query.gt(Db.attr("order"), Db.value(since));
+		query.asc("order");
+		DbCollection<Journal> res = SopDbImpl.getManager().getByQualification(query);
+		int cnt = 0;
+		LinkedList<Journal> out = new LinkedList<Journal>();
+		for (Journal j : res) {
+			out.add(j);
+			cnt++;
+			if (cnt > 100)
+				res.close();
+		}
+		return out;
+	}
+
 }
