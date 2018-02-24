@@ -14,7 +14,6 @@ import de.mhus.lib.core.MDate;
 import de.mhus.lib.core.MString;
 import de.mhus.lib.core.MTimeInterval;
 import de.mhus.lib.core.console.ConsoleTable;
-import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.registry.RegistryApi;
 import de.mhus.osgi.sop.api.registry.RegistryManager;
 import de.mhus.osgi.sop.api.registry.RegistryPathControl;

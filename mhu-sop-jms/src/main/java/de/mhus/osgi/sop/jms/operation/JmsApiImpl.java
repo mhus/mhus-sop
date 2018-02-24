@@ -205,11 +205,8 @@ package de.mhus.osgi.sop.jms.operation;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.TimerTask;
 
-import javax.jms.JMSException;
 import javax.jms.MapMessage;
-import javax.jms.Message;
 
 import org.osgi.service.component.ComponentContext;
 import org.w3c.dom.Document;
@@ -218,15 +215,10 @@ import aQute.bnd.annotation.component.Activate;
 import aQute.bnd.annotation.component.Component;
 import aQute.bnd.annotation.component.Deactivate;
 import de.mhus.lib.core.MApi;
-import de.mhus.lib.core.MCollection;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MString;
 import de.mhus.lib.core.MSystem;
-import de.mhus.lib.core.MThread;
-import de.mhus.lib.core.MTimeInterval;
 import de.mhus.lib.core.MXml;
-import de.mhus.lib.core.base.service.TimerFactory;
-import de.mhus.lib.core.base.service.TimerIfc;
 import de.mhus.lib.core.cfg.CfgString;
 import de.mhus.lib.core.definition.DefRoot;
 import de.mhus.lib.core.service.ServerIdent;
@@ -235,7 +227,6 @@ import de.mhus.lib.form.ModelUtil;
 import de.mhus.lib.jms.ClientJms;
 import de.mhus.lib.jms.JmsConnection;
 import de.mhus.lib.jms.JmsDestination;
-import de.mhus.lib.jms.ServerJms;
 import de.mhus.lib.karaf.jms.JmsUtil;
 import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.operation.OperationAddress;

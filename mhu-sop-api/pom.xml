@@ -261,6 +261,12 @@
 	  <artifactId>org.osgi.core</artifactId>
 	  <version>5.0.0</version>
   </dependency>
+  		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>${servlet.version}</version>
+		</dependency>
+  
   </dependencies>
   
   

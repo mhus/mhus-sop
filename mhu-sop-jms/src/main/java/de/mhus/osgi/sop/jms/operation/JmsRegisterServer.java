@@ -210,20 +210,15 @@ import javax.jms.JMSException;
 import javax.jms.MapMessage;
 import javax.jms.Message;
 
-import org.osgi.service.component.ComponentContext;
 import org.w3c.dom.Document;
 
-import aQute.bnd.annotation.component.Activate;
 import aQute.bnd.annotation.component.Component;
-import aQute.bnd.annotation.component.Deactivate;
 import aQute.bnd.annotation.component.Reference;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCollection;
 import de.mhus.lib.core.MXml;
 import de.mhus.lib.core.definition.DefRoot;
 import de.mhus.lib.core.strategy.OperationDescription;
-import de.mhus.lib.core.util.MNlsProvider;
-import de.mhus.lib.core.util.Version;
 import de.mhus.lib.form.ModelUtil;
 import de.mhus.lib.jms.JmsChannel;
 import de.mhus.lib.jms.JmsDestination;
@@ -232,7 +227,6 @@ import de.mhus.lib.karaf.jms.AbstractJmsDataChannel;
 import de.mhus.lib.karaf.jms.JmsDataChannel;
 import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.operation.OperationAddress;
-import de.mhus.osgi.sop.api.registry.RegistryApi;
 import de.mhus.osgi.sop.api.registry.RegistryManager;
 import de.mhus.osgi.sop.api.registry.RegistryValue;
 import de.mhus.osgi.sop.jms.operation.JmsApiImpl.JmsOperationDescriptor;

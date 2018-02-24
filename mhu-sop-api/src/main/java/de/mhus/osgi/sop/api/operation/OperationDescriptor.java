@@ -208,11 +208,8 @@ import java.util.HashMap;
 
 import de.mhus.lib.basics.Named;
 import de.mhus.lib.basics.Versioned;
-import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.definition.DefRoot;
-import de.mhus.lib.core.strategy.DefaultTaskContext;
-import de.mhus.lib.core.strategy.Operation;
 import de.mhus.lib.core.strategy.OperationDescription;
 import de.mhus.lib.core.util.MNls;
 import de.mhus.lib.core.util.MNlsProvider;

@@ -1,7 +1,6 @@
 package de.mhus.osgi.sop.api.registry;
 
 import java.util.Collection;
-import java.util.List;
 
 public interface RegistryManager extends RegistryApi {
 

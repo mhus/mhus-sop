@@ -214,13 +214,9 @@ import java.util.UUID;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.component.ComponentContext;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-import aQute.bnd.annotation.component.Activate;
-import aQute.bnd.annotation.component.Component;
-import aQute.bnd.annotation.component.Deactivate;
 import de.mhus.lib.adb.DbCollection;
 import de.mhus.lib.adb.DbManager;
 import de.mhus.lib.adb.DbMetadata;

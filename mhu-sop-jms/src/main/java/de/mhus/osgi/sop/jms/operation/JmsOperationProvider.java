@@ -209,10 +209,8 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.TimerTask;
 
 import javax.jms.BytesMessage;
 import javax.jms.JMSException;
@@ -223,49 +221,34 @@ import javax.jms.TextMessage;
 
 import org.osgi.service.component.ComponentContext;
 
-import com.vaadin.data.util.GeneratedPropertyContainer;
-
 import aQute.bnd.annotation.component.Activate;
 import aQute.bnd.annotation.component.Component;
 import aQute.bnd.annotation.component.Deactivate;
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MApi;
-import de.mhus.lib.core.MCollection;
 import de.mhus.lib.core.MDate;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MProperties;
-import de.mhus.lib.core.MString;
 import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.MThread;
 import de.mhus.lib.core.MTimeInterval;
-import de.mhus.lib.core.base.service.TimerFactory;
-import de.mhus.lib.core.base.service.TimerIfc;
-import de.mhus.lib.core.definition.DefRoot;
 import de.mhus.lib.core.lang.TempFile;
-import de.mhus.lib.core.strategy.DefaultTaskContext;
 import de.mhus.lib.core.strategy.NotSuccessful;
-import de.mhus.lib.core.strategy.Operation;
-import de.mhus.lib.core.strategy.OperationDescription;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.core.util.VersionRange;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.errors.NotFoundException;
 import de.mhus.lib.jms.ClientJms;
 import de.mhus.lib.jms.JmsConnection;
-import de.mhus.lib.jms.JmsDestination;
 import de.mhus.lib.jms.MJms;
-import de.mhus.lib.jms.ServerJms;
 import de.mhus.lib.karaf.jms.JmsUtil;
 import de.mhus.osgi.sop.api.Sop;
-import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
 import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.operation.OperationAddress;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
-import de.mhus.osgi.sop.api.operation.OperationException;
 import de.mhus.osgi.sop.api.operation.OperationUtil;
 import de.mhus.osgi.sop.api.operation.OperationsProvider;
-import de.mhus.osgi.sop.api.util.ObjectUtil;
 import de.mhus.osgi.sop.jms.operation.JmsApiImpl.JmsOperationDescriptor;
 
 /**

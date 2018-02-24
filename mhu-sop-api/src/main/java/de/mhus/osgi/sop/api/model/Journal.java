@@ -2,7 +2,6 @@ package de.mhus.osgi.sop.api.model;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.adb.model.AttributeFeatureCut;

@@ -205,7 +205,6 @@ package de.mhus.osgi.sop.api.jms;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date;
@@ -218,13 +217,9 @@ import javax.jms.MapMessage;
 import javax.jms.Message;
 import javax.jms.ObjectMessage;
 
-import org.osgi.service.component.ComponentContext;
-
 import de.mhus.lib.core.IProperties;
-import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
-import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.MThread;
 import de.mhus.lib.core.pojo.DefaultFilter;
 import de.mhus.lib.core.pojo.PojoAttribute;

@@ -205,7 +205,6 @@ package de.mhus.osgi.sop.api.operation;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.strategy.OperationResult;

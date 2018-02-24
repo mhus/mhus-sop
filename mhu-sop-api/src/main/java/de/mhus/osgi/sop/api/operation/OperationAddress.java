@@ -203,8 +203,6 @@
  */
 package de.mhus.osgi.sop.api.operation;
 
-import java.util.Date;
-
 import de.mhus.lib.basics.Named;
 import de.mhus.lib.basics.Versioned;
 import de.mhus.lib.core.strategy.OperationDescription;
