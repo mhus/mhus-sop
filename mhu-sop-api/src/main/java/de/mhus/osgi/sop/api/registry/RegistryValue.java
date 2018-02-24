@@ -11,6 +11,8 @@ public class RegistryValue implements Comparable<RegistryValue>{
 	private boolean persistent;
 	private RegistryValue remoteValue;
 	private boolean local;
+	private String location;
+	private String name;
 	
 	public RegistryValue(String value, String source, long updated, String path, long timeout, boolean readOnly, boolean persistent) {
 		this.value = value;
@@ -21,6 +23,14 @@ public class RegistryValue implements Comparable<RegistryValue>{
 		this.readOnly = readOnly;
 		this.persistent = persistent;
 		this.local = RegistryApi.SOURCE_LOCAL.equals(source);
+		int p = path.indexOf('@');
+		if (p >=0) {
+			this.location = path.substring(0, p);
+			this.name = path.substring(p+1);
+		} else {
+			this.location = path;
+			this.name = null;
+		}
 	}
 
 	public String getValue() {
@@ -66,6 +76,14 @@ public class RegistryValue implements Comparable<RegistryValue>{
 
 	public void setRemoteValue(RegistryValue remoteValue) {
 		this.remoteValue = remoteValue;
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public String getLocation() {
+		return location;
 	}
 	
 }

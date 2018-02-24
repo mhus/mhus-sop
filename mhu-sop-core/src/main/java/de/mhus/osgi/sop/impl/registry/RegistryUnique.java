@@ -14,7 +14,7 @@ public class RegistryUnique implements RegistryPathControl {
 	@Override
 	public RegistryValue checkSetParameter(RegistryManager manager, RegistryValue value) {
 		if (value.getPath().endsWith("@seed")) {
-			RegistryValue cur = manager.getNodeParameter(value.getPath());
+			RegistryValue cur = manager.getParameter(value.getPath());
 			if (cur != null)
 				return null; // can't overwrite locally
 		}
@@ -28,9 +28,9 @@ public class RegistryUnique implements RegistryPathControl {
 	}
 
 	@Override
-	public RegistryValue checkSetLocalParameter(RegistryManager manager, RegistryValue value) {
+	public RegistryValue checkSetParameterFromRemote(RegistryManager manager, RegistryValue value) {
 		if (value.getPath().endsWith("@seed")) {
-			RegistryValue cur = manager.getNodeParameter(value.getPath());
+			RegistryValue cur = manager.getParameter(value.getPath());
 			long theirSeed = MCast.tolong(value.getValue(), Long.MIN_VALUE);
 			if (cur == null) {
 				// create my own seed
@@ -48,7 +48,7 @@ public class RegistryUnique implements RegistryPathControl {
 	}
 
 	@Override
-	public boolean checkRemoveLocalParameter(RegistryManager manager, RegistryValue value) {
+	public boolean checkRemoveParameterFromRemote(RegistryManager manager, RegistryValue value) {
 		return true;
 	}
 

@@ -339,13 +339,13 @@ public class JmsRegisterServer extends AbstractJmsDataChannel {
 							long timeout = m.getLong("timeout" + cnt);
 							boolean readOnly = m.getBoolean("readOnly" + cnt);
 							boolean persistent = m.getBoolean("persistent" + cnt);
-							api.setLocalParameter(new RegistryValue(value, ident, updated, path, timeout, readOnly, persistent));
+							api.setParameterFromRemote(new RegistryValue(value, ident, updated, path, timeout, readOnly, persistent));
 							cnt++;
 						}
 						if ("full".equals(scope)) {
 							for (RegistryValue value : api.getAll()) {
 								if (value.getSource().equals(ident) && value.getUpdated() < updated)
-									api.removeLocalParameter(value.getPath(), ident);
+									api.removeParameterFromRemote(value.getPath(), ident);
 							}
 						}
 					} else
@@ -355,7 +355,7 @@ public class JmsRegisterServer extends AbstractJmsDataChannel {
 						String ident = m.getStringProperty("ident");
 						while (m.getString("path" + cnt) != null) {
 							String path = m.getString("path" + cnt);
-							api.removeLocalParameter(path, ident);
+							api.removeParameterFromRemote(path, ident);
 							cnt++;
 						}
 					} else

@@ -17,7 +17,7 @@ public interface RegistryApi {
 	 * @param path Node path and parameter name e.g. '/node1/node2@parameter'
 	 * @return The value or null if not found
 	 */
-	RegistryValue getNodeParameter(String path);
+	RegistryValue getParameter(String path);
 	
 	/**
 	 * Returns a list of children nodes.

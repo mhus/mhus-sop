@@ -54,7 +54,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 
 	public static final int DEFAULT_PRIORITY = 100;
 	private IConfig configProxy = new MyConfig();
-	private HashMap<String, RegistryValue> registry = new HashMap<>();
+	private TreeMap<String, RegistryValue> registry = new TreeMap<>();
 	private TimerIfc timer;
 	private MTimerTask timerTask;
 	private CfgLong CFG_UPDATE_INTERVAL = new CfgLong(RegistryApiImpl.class, "updateInterval", 60000);
@@ -160,7 +160,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	}
 
 	@Override
-	public RegistryValue getNodeParameter(String path) {
+	public RegistryValue getParameter(String path) {
 		path = validateParameterPath(path);
 		synchronized (registry) {
 			return registry.get(path);
@@ -174,8 +174,9 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 		final String pathx = path.equals("/") ? path : path + "/";
 		final int posx = pathx.length()+1;
 		synchronized (registry) {
-			registry.forEach((k,v) -> { 
-				if (k.startsWith(pathx)) {
+			for (Entry<String, RegistryValue> entry : registry.entrySet()) {
+				if (entry.getKey().startsWith(pathx)) {
+					String k = entry.getKey();
 					int p = k.indexOf('@');
 					if (p > 0) k = k.substring(0, p);
 					p = k.indexOf('/', posx);
@@ -183,8 +184,9 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 						out.add(k.substring(posx-1,p));
 					else
 						out.add(k.substring(posx-1));
-				}
-			});
+				} else 
+				if (out.size() > 0 || entry.getKey().compareTo(pathx) > 0) break; // in ordered TreeHash we found one and now it's the end of the block
+			}
 		}
 		return out;
 	}
@@ -196,11 +198,12 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 		final String pathx = path + "@";
 		final int posx = pathx.length()+1;
 		synchronized (registry) {
-			registry.forEach((k,v) -> { 
-				if (k.startsWith(pathx)) {
-					out.add(k.substring(posx));
-				}
-			});
+			for (Entry<String, RegistryValue> entry : registry.entrySet()) {
+				if (entry.getKey().startsWith(pathx)) {
+					out.add(entry.getKey().substring(posx));
+				} else
+				if (out.size() > 0 || entry.getKey().compareTo(pathx) > 0) break; // in ordered TreeHash we found one and now it's the end of the block
+			}
 		}
 		return out;
 	}
@@ -211,11 +214,12 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 		final TreeSet<RegistryValue> out = new java.util.TreeSet<>();
 		final String pathx = path + "@";
 		synchronized (registry) {
-			registry.forEach((k,v) -> { 
-				if (k.startsWith(pathx)) {
-					out.add(v);
-				}
-			});
+			for (Entry<String, RegistryValue> entry : registry.entrySet()) {
+				if (entry.getKey().startsWith(pathx)) {
+					out.add(entry.getValue());
+				} else
+				if (out.size() > 0 || entry.getKey().compareTo(pathx) > 0) break; // in ordered TreeHash we found one and now it's the end of the block
+			}
 		}
 		return out;
 	}
@@ -229,7 +233,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 			source = SOURCE_LOCAL;
 			timeout = 0;
 		}
-		RegistryValue current = getNodeParameter(path);
+		RegistryValue current = getParameter(path);
 		
 		RegistryValue entry = new RegistryValue(value, source, System.currentTimeMillis(), path, timeout, readOnly, persistent);
 		if (current != null) {
@@ -313,7 +317,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	@Override
 	public boolean removeParameter(String path) {
 		path = validateParameterPath(path);
-		RegistryValue current = getNodeParameter(path);
+		RegistryValue current = getParameter(path);
 		if (current == null) return false;
 		
 		// in case of local ...
@@ -323,7 +327,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 				registry.remove(path);
 			}
 			if (entry != null) {
-				setLocalParameter(entry);
+				setParameterFromRemote(entry);
 				if (entry != null && entry.isPersistent())
 					try {
 						save();
@@ -387,7 +391,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	}
 
 	@Override
-	public void setLocalParameter(RegistryValue value) {
+	public void setParameterFromRemote(RegistryValue value) {
 		if (value == null || value.getPath() == null || value.getValue() == null) throw new NullPointerException();
 		if (value.getPath().startsWith(RegistryApi.PATH_LOCAL) || value.isLocal()) return;
 		
@@ -395,7 +399,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 		if (!value.getPath().startsWith(PATH_WORKER) && !value.isLocal()) {
 			RegistryPathControl controller = getPathController(value.getPath());
 			if (controller != null) {
-				value = controller.checkSetLocalParameter(this, value);
+				value = controller.checkSetParameterFromRemote(this, value);
 				if (value == null) return;
 			}
 		}
@@ -422,7 +426,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	}
 
 	@Override
-	public void removeLocalParameter(String path, String source) {
+	public void removeParameterFromRemote(String path, String source) {
 		removeLocalParameter(path, source, false);
 	}
 	
@@ -440,7 +444,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 		if (!path.startsWith(PATH_WORKER) && !cur.isLocal()) {
 			RegistryPathControl controller = getPathController(path);
 			if (controller != null) {
-				if (!controller.checkRemoveLocalParameter(this, cur))
+				if (!controller.checkRemoveParameterFromRemote(this, cur))
 					return;
 			}
 		}
@@ -622,14 +626,14 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 
 		@Override
 		public Object getProperty(String name) {
-			RegistryValue value = getNodeParameter(name);
+			RegistryValue value = getParameter(name);
 			if (value == null) return null;
 			return value.getValue();
 		}
 
 		@Override
 		public boolean isProperty(String name) {
-			RegistryValue value = getNodeParameter(name);
+			RegistryValue value = getParameter(name);
 			return value != null;
 		}
 
@@ -727,14 +731,14 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 
 		@Override
 		public Object getProperty(String name) {
-			RegistryValue value = getNodeParameter(path + "@" + name);
+			RegistryValue value = getParameter(path + "@" + name);
 			if (value == null) return null;
 			return value.getValue();
 		}
 
 		@Override
 		public boolean isProperty(String name) {
-			RegistryValue value = getNodeParameter(path + "@" + name);
+			RegistryValue value = getParameter(path + "@" + name);
 			return value != null;
 		}
 
@@ -777,7 +781,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 			String[] split = entry.getValue().toString().split("\\|", 4);
 			if (!SOURCE_LOCAL.equals(split[2])) {
 				split[2] = ident;
-				setLocalParameter(new RegistryValue(split[3], split[2], updated, entry.getKey(), MCast.tolong(split[1],0), MCast.toboolean(split[0], true), true));
+				setParameterFromRemote(new RegistryValue(split[3], split[2], updated, entry.getKey(), MCast.tolong(split[1],0), MCast.toboolean(split[0], true), true));
 			} else {
 				setParameter(entry.getKey(), split[3], 0, true, true, true);
 			}

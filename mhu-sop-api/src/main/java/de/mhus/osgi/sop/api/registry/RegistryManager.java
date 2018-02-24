@@ -10,14 +10,14 @@ public interface RegistryManager extends RegistryApi {
 	 * 
 	 * @param value
 	 */
-	void setLocalParameter(RegistryValue value);
+	void setParameterFromRemote(RegistryValue value);
 
 	/**
 	 * Remove the parameter from local registry
 	 * @param path
 	 * @param source 
 	 */
-	void removeLocalParameter(String path, String source);
+	void removeParameterFromRemote(String path, String source);
 
 	Collection<RegistryValue> getAll();
 

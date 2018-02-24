@@ -317,7 +317,10 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
 			String acl = OperationUtil.getOption(tags, OperationDescriptor.TAG_DEFAULT_ACL, "");
 			try {
 				AccessApi aaa = MApi.lookup(AccessApi.class);
-				acl = aaa.getResourceAccessAcl(aaa.getCurrenAccount(), "local.operation", desc.getPath(), "execute", acl);
+				if (aaa != null)
+					acl = aaa.getResourceAccessAcl(aaa.getCurrenAccount(), "local.operation", desc.getPath(), "execute", acl);
+				else
+					log().w("AccessApi not found",desc,acl);
 			} catch (Throwable t) {
 				log().i(t);
 			}

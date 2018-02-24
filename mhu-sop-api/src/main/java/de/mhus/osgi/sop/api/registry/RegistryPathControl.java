@@ -40,7 +40,7 @@ public interface RegistryPathControl {
 	 * @param value
 	 * @return The value, modified value or null to deny setting.
 	 */
-	RegistryValue checkSetLocalParameter(RegistryManager manager, RegistryValue value);
+	RegistryValue checkSetParameterFromRemote(RegistryManager manager, RegistryValue value);
 
 	/**
 	 * The method can deny local removal of a parameter.
@@ -49,6 +49,6 @@ public interface RegistryPathControl {
 	 * @param value
 	 * @return false to deny removal.
 	 */
-	boolean checkRemoveLocalParameter(RegistryManager manager, RegistryValue value);
+	boolean checkRemoveParameterFromRemote(RegistryManager manager, RegistryValue value);
 
 }

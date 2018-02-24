@@ -79,7 +79,7 @@ public class RegistryCmd implements Action {
 			}
 		} else
 		if (cmd.equals("get")) {
-			RegistryValue entry = api.getNodeParameter(path);
+			RegistryValue entry = api.getParameter(path);
 			System.out.println("Path      : " + entry.getPath());
 			System.out.println("Source    : " + entry.getSource());
 			System.out.println("Persistent: " + entry.isPersistent());
