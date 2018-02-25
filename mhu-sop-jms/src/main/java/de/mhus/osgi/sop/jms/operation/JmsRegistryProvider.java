@@ -10,23 +10,23 @@ public class JmsRegistryProvider extends MLog implements RegistryProvider {
 
 	
 	@Override
-	public void publish(RegistryValue entry) {
-		JmsApiImpl.instance.registryPublish(entry);
+	public boolean publish(RegistryValue entry) {
+		return JmsApiImpl.instance.registryPublish(entry);
 	}
 
 	@Override
-	public void remove(String path) {
-		JmsApiImpl.instance.registryRemove(path);
+	public boolean remove(String path) {
+		return JmsApiImpl.instance.registryRemove(path);
 	}
 
 	@Override
-	public void publishAll() {
-		JmsApiImpl.instance.sendLocalRegistry();
+	public boolean publishAll() {
+		return JmsApiImpl.instance.sendLocalRegistry();
 	}
 
 	@Override
-	public void requestAll() {
-		JmsApiImpl.instance.requestRegistry();		
+	public boolean requestAll() {
+		return JmsApiImpl.instance.requestRegistry();		
 	}
 
 }

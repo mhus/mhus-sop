@@ -349,7 +349,7 @@ public class JmsApiImpl extends MLog implements JmsApi {
 		
 	}
 
-	public void registryPublish(RegistryValue entry) {
+	public boolean registryPublish(RegistryValue entry) {
 		try {
 			checkClient();
 
@@ -367,12 +367,14 @@ public class JmsApiImpl extends MLog implements JmsApi {
 			msg.setBoolean("persistent0", entry.isPersistent());
 			
 			registerClient.sendJms(msg);
+			return true;
 		} catch (Throwable t) {
 			log().w(t);
 		}
+		return false;
 	}
 
-	public void registryRemove(String path) {
+	public boolean registryRemove(String path) {
 		try {
 			checkClient();
 
@@ -385,12 +387,14 @@ public class JmsApiImpl extends MLog implements JmsApi {
 			msg.setString("path0", path);
 			
 			registerClient.sendJms(msg);
+			return true;
 		} catch (Throwable t) {
 			log().w(t);
 		}
+		return false;
 	}
 
-	public void sendLocalRegistry() {
+	public boolean sendLocalRegistry() {
 		try {
 			checkClient();
 
@@ -405,7 +409,7 @@ public class JmsApiImpl extends MLog implements JmsApi {
 			RegistryManager api = MApi.lookup(RegistryManager.class);
 			if (api == null) {
 				log().d("sendLocalRegistry: API not found");
-				return;
+				return false;
 			}
 			int cnt = 0;
 			for (RegistryValue entry : api.getAll()) {
@@ -419,12 +423,14 @@ public class JmsApiImpl extends MLog implements JmsApi {
 				}
 			}
 			registerClient.sendJms(msg);
+			return true;
 		} catch (Throwable t) {
 			log().w(t);
 		}
+		return false;
 	}
 
-	public void requestRegistry() {
+	public boolean requestRegistry() {
 		try {
 			checkClient();
 			MapMessage msg = registerClient.createMapMessage();
@@ -432,9 +438,11 @@ public class JmsApiImpl extends MLog implements JmsApi {
 			msg.setStringProperty("connection", MApi.lookup(JmsApi.class).getDefaultConnectionName());
 			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.queueName.value());
 			registerClient.sendJmsOneWay(msg);
+			return true;
 		} catch (Throwable t) {
 			log().w(t);
 		}
+		return false;
 	}
 
 }

@@ -60,9 +60,9 @@ public interface RegistryApi {
 
 	Set<RegistryValue> getParameters(String path);
 
-	void publishAll();
+	boolean publishAll();
 
-	void requestAll();
+	boolean requestAll();
 
 	void save() throws IOException;
 

@@ -76,7 +76,10 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 				log().w("Found PathControl without path",reference,service);
 				return;
 			}
-			path = validateNodePath(path);
+			if (path.indexOf('@') > 0)
+				path = validateParameterPath(path);
+			else
+				path = validateNodePath(path);
 			synchronized (pathControllers) {
 				pathControllers.add(new ControlDescriptor(reference, service));
 			}
@@ -94,7 +97,9 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 			@Override
 			public void run() {
 				MThread.sleep(10000);
-				publishAll();
+				while (!publishAll()) {
+					MThread.sleep(10000);
+				}
 			}
 		});
 	}
@@ -478,25 +483,29 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	}
 
 	@Override
-	public void publishAll() {
+	public boolean publishAll() {
+		boolean res = true;
 		for (RegistryProvider provider : MOsgi.getServices(RegistryProvider.class, null)) {
 			try {
-				provider.publishAll();
+				if (!provider.publishAll()) res = false;
 			} catch (Throwable t) {
 				log().d(provider,t);
 			}
 		}
+		return res;
 	}
 
 	@Override
-	public void requestAll() {
+	public boolean requestAll() {
+		boolean res = true;
 		for (RegistryProvider provider : MOsgi.getServices(RegistryProvider.class, null)) {
 			try {
-				provider.requestAll();
+				if (!provider.requestAll()) res = false;
 			} catch (Throwable t) {
 				log().d(provider,t);
 			}
 		}
+		return res;
 	}
 	
 	private String validateParameterPath(String name) {
@@ -807,7 +816,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 		public ControlDescriptor(ServiceReference<RegistryPathControl> reference, RegistryPathControl service) {
 			orgPath = (String) reference.getProperty("path");
 			path = orgPath;
-			if (!path.endsWith("/")) path = path +"/";
+			if (!path.endsWith("/") && !path.endsWith("@")) path = path +"/";
 			priority = MCast.toint(reference.getProperty("priority"), DEFAULT_PRIORITY);
 			bundleId = reference.getBundle().getBundleId();
 			this.service = service;

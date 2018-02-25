@@ -2,12 +2,12 @@ package de.mhus.osgi.sop.api.registry;
 
 public interface RegistryProvider {
 
-	void publish(RegistryValue entry);
+	boolean publish(RegistryValue entry);
 
-	void remove(String path);
+	boolean remove(String path);
 
-	void publishAll();
+	boolean publishAll();
 
-	void requestAll();
+	boolean requestAll();
 
 }
