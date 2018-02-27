@@ -268,7 +268,7 @@
 		</dependency>
 		<dependency>
 			<groupId>de.mhus.lib</groupId>
-			<artifactId>mhu-lib-persistence</artifactId>
+			<artifactId>mhu-lib-annotations</artifactId>
 			<version>${mhulib.version}</version>
 			<scope>provided</scope>
 		</dependency>
