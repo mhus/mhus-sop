@@ -255,6 +255,18 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>de.mhus.lib</groupId>
+			<artifactId>mhu-lib-annotations</artifactId>
+			<version>${mhulib.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>de.mhus.lib</groupId>
+			<artifactId>mhu-lib-karaf</artifactId>
+			<version>${mhulib.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>de.mhus.osgi</groupId>
 			<artifactId>mhu-sop-api</artifactId>
 			<version>${project.version}</version>
