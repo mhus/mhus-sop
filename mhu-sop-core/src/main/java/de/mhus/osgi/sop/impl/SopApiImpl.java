@@ -321,6 +321,7 @@ public class SopApiImpl extends MLog implements SopApi {
 		return SopDbImpl.getManager().getObject(Foundation.class, id);
 	}
 
+	@Override
 	public UUID getDefaultFoundationId() {
 		return SopDbImpl.instance().getDefaultFoundationId();
 	}

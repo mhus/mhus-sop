@@ -229,4 +229,6 @@ public interface SopApi extends SApi {
 
 	DbMetadata getFoundation(UUID id) throws MException;
 
+	UUID getDefaultFoundationId();
+	
 }
