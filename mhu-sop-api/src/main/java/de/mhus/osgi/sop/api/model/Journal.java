@@ -2,22 +2,28 @@ package de.mhus.osgi.sop.api.model;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.adb.model.AttributeFeatureCut;
 import de.mhus.lib.annotations.adb.DbIndex;
 import de.mhus.lib.annotations.adb.DbPersistent;
+import de.mhus.lib.core.MApi;
 import de.mhus.lib.errors.MException;
+import de.mhus.osgi.sop.api.SopApi;
 
-public class Journal extends DbMetadata {
+public class Journal extends DbMetadata implements FoundationRelated {
 
 	public static final String QUEUE_BPM = "bpm";
 	
 	@DbPersistent(ro=true)
-	@DbIndex({"1","2"})
+	@DbIndex({"u1","3"})
+	private UUID foundation;
+	@DbPersistent(ro=true)
+	@DbIndex({"u1","2"})
 	private long order;
 	@DbPersistent(size=10,ro=true)
-	@DbIndex({"1"})
+	@DbIndex({"u1"})
 	private String queue;
 	@DbPersistent(ro=true,features=AttributeFeatureCut.NAME)
 	private String event;
@@ -26,7 +32,8 @@ public class Journal extends DbMetadata {
 
 	public Journal() {}
 	
-	public Journal(String queue, String event, long order, String ... data) {
+	public Journal(UUID foundation, String queue, String event, long order, String ... data) {
+		this.foundation = foundation;
 		this.queue = queue;
 		this.event = event;
 		this.order = order;
@@ -53,8 +60,13 @@ public class Journal extends DbMetadata {
 	}
 
 	@Override
+	public UUID getFoundation() {
+		return foundation;
+	}
+
+	@Override
 	public DbMetadata findParentObject() throws MException {
-		return null;
+		return MApi.lookup(SopApi.class).getFoundation(getFoundation());
 	}
 
 }

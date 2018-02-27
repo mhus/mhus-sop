@@ -204,22 +204,29 @@
 package de.mhus.osgi.sop.api;
 
 import java.util.List;
+import java.util.UUID;
 
+import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.adb.DbSchema;
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.errors.MException;
+import de.mhus.osgi.sop.api.model.FoundationGroup;
 import de.mhus.osgi.sop.api.model.Journal;
 
 public interface SopApi extends SApi {
 
 	IProperties getMainConfiguration();
 
-	Journal appendJournalEntry(String queue, String event, String ... data) throws MException;
+	Journal appendJournalEntry(UUID foundation, String queue, String event, String ... data) throws MException;
 
 	Journal getJournalEntry(String id) throws MException;
 
 	DbSchema getDataSchema();
 
 	List<Journal> getJournalEntries(String queue, long since, int max) throws MException;
+
+	FoundationGroup getFoundationGroup(String group) throws MException;
+
+	DbMetadata getFoundation(UUID id) throws MException;
 
 }

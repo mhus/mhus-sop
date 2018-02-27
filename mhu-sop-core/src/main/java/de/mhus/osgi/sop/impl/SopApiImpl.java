@@ -214,6 +214,7 @@ import aQute.bnd.annotation.component.Activate;
 import aQute.bnd.annotation.component.Component;
 import aQute.bnd.annotation.component.Deactivate;
 import de.mhus.lib.adb.DbCollection;
+import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.adb.DbSchema;
 import de.mhus.lib.adb.query.AQuery;
 import de.mhus.lib.adb.query.Db;
@@ -224,12 +225,13 @@ import de.mhus.lib.core.MValidator;
 import de.mhus.lib.core.cfg.CfgProperties;
 import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.SopApi;
+import de.mhus.osgi.sop.api.model.Foundation;
+import de.mhus.osgi.sop.api.model.FoundationGroup;
 import de.mhus.osgi.sop.api.model.Journal;
 import de.mhus.osgi.sop.impl.adb.SopDbImpl;
 
 @Component(immediate=true,provide=SopApi.class,name="SopApi")
 public class SopApiImpl extends MLog implements SopApi {
-	
 
 	@SuppressWarnings("unused")
 	private BundleContext context;
@@ -254,8 +256,8 @@ public class SopApiImpl extends MLog implements SopApi {
 	}
 
 	@Override
-	public Journal appendJournalEntry(String queue, String event, String... data) throws MException {
-		Journal item = SopDbImpl.getManager().inject(new Journal(queue,event,getJournalOrder(),data));
+	public Journal appendJournalEntry(UUID foundation, String queue, String event, String... data) throws MException {
+		Journal item = SopDbImpl.getManager().inject(new Journal(foundation, queue,event,getJournalOrder(),data));
 		item.save();
 		return item;
 	}
@@ -309,4 +311,17 @@ public class SopApiImpl extends MLog implements SopApi {
 		return out;
 	}
 
+	@Override
+	public FoundationGroup getFoundationGroup(String group) throws MException {
+		return SopDbImpl.getManager().getObjectByQualification(Db.query(FoundationGroup.class).eq("name", group));
+	}
+
+	@Override
+	public DbMetadata getFoundation(UUID id) throws MException {
+		return SopDbImpl.getManager().getObject(Foundation.class, id);
+	}
+
+	public UUID getDefaultFoundationId() {
+		return SopDbImpl.instance().getDefaultFoundationId();
+	}
 }

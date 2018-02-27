@@ -210,6 +210,7 @@ import aQute.bnd.annotation.component.Component;
 import de.mhus.lib.adb.DbManager;
 import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.adb.Persistable;
+import de.mhus.lib.adb.query.Db;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.security.Account;
@@ -223,6 +224,8 @@ import de.mhus.osgi.sop.api.adb.Reference;
 import de.mhus.osgi.sop.api.adb.Reference.TYPE;
 import de.mhus.osgi.sop.api.adb.ReferenceCollector;
 import de.mhus.osgi.sop.api.model.ActionTask;
+import de.mhus.osgi.sop.api.model.Foundation;
+import de.mhus.osgi.sop.api.model.FoundationGroup;
 import de.mhus.osgi.sop.api.model.Journal;
 import de.mhus.osgi.sop.api.model.ObjectParameter;
 import de.mhus.osgi.sop.api.model.Register;
@@ -243,12 +246,33 @@ public class SopDbImpl extends MLog implements DbSchemaService {
 		list.add(ActionTask.class);
 		list.add(Register.class);
 		list.add(Journal.class);
+		list.add(Foundation.class);
+		list.add(FoundationGroup.class);
 	}
 
 	@Override
-	public void doInitialize(DbManagerService ngnDbService) {
-		this.service = ngnDbService;
+	public void doInitialize(DbManagerService service) {
+		this.service = service;
 		instance = this;
+		
+		try {
+			DbManager db = service.getManager();
+			// init base structure
+			FoundationGroup defGroup = db.getObjectByQualification(Db.query(FoundationGroup.class).eq("name", ""));
+			if (defGroup == null) {
+				defGroup = db.inject(new FoundationGroup(""));
+				defGroup.save();
+			}
+			
+			Foundation defFound = db.getObjectByQualification(Db.query(Foundation.class).eq("ident", ""));
+			if (defFound == null) {
+				defFound = db.inject(new Foundation("",""));
+				defFound.save();
+			}
+			
+		} catch (Throwable t) {
+			log().f(t);
+		}
 	}
 
 	@Override
@@ -380,6 +404,11 @@ public class SopDbImpl extends MLog implements DbSchemaService {
 	public void doCleanup() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public UUID getDefaultFoundationId() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

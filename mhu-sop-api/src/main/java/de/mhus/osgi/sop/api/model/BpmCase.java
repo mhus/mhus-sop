@@ -208,25 +208,34 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import de.mhus.lib.adb.DbMetadata;
+import de.mhus.lib.annotations.adb.DbIndex;
 import de.mhus.lib.annotations.adb.DbPersistent;
 import de.mhus.lib.core.IReadProperties;
+import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MDate;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MSystem;
 import de.mhus.lib.errors.MException;
+import de.mhus.osgi.sop.api.SopApi;
 
-public class BpmCase extends DbMetadata {
+public class BpmCase extends DbMetadata implements FoundationRelated {
 
 	public enum STATUS {NEW,PROGRESS,CLOSED,ERROR}
 	
+	@DbPersistent(ro=true)
+	@DbIndex({"1"})
+	private UUID foundation;
 	@DbPersistent
+	@DbIndex({"u2"})
 	private String bpmId;
 	@DbPersistent(ro=true)
 	private String process;
 	@DbPersistent(ro=true)
+	@DbIndex({"u2"})
 	private String processor;
 	@DbPersistent(ro=true)
 	private String mapped;
@@ -250,8 +259,9 @@ public class BpmCase extends DbMetadata {
 	public BpmCase() {}
 
 	
-	public BpmCase(String bpmId, String processor, String process, String mapped, String customId, Map<String, Object> parameters) {
+	public BpmCase(UUID foundation, String bpmId, String processor, String process, String mapped, String customId, Map<String, Object> parameters) {
 		super();
+		this.foundation = foundation;
 		this.bpmId = bpmId;
 		this.processor = processor;
 		this.process = process;
@@ -326,12 +336,6 @@ public class BpmCase extends DbMetadata {
 	public void setBpmId(String bpmId) {
 		this.bpmId = bpmId;
 	}
-	
-	@Override
-	public DbMetadata findParentObject() throws MException {
-		return null;
-	}
-
 
 	public long getStatusCode() {
 		return statusCode;
@@ -379,6 +383,16 @@ public class BpmCase extends DbMetadata {
 
 	public String getProcessor() {
 		return processor;
+	}
+
+	@Override
+	public UUID getFoundation() {
+		return foundation;
+	}
+
+	@Override
+	public DbMetadata findParentObject() throws MException {
+		return MApi.lookup(SopApi.class).getFoundation(getFoundation());
 	}
 
 }
