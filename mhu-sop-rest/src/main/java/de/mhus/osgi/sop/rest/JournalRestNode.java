@@ -9,6 +9,7 @@ import de.mhus.lib.adb.DbSchema;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.pojo.MPojo;
+import de.mhus.lib.core.pojo.PojoModelFactory;
 import de.mhus.osgi.sop.api.SopApi;
 import de.mhus.osgi.sop.api.model.Journal;
 import de.mhus.osgi.sop.api.rest.CallContext;
@@ -38,12 +39,12 @@ public class JournalRestNode extends JsonNode<JournalQueue>{
 		long since = MCast.tolong( callContext.getParameter("_since"), 0);
 		
 		SopApi api = MApi.lookup(SopApi.class);
-		DbSchema schema = api.getDataSchema();
+		PojoModelFactory factory = api.getDataPojoModelFactory();
 		ArrayNode list = result.createArrayNode();
 		List<Journal> res = api.getJournalEntries(queue.getName(), since, 100);
 		for (Journal j : res) {
 			ObjectNode obj = list.addObject();
-			MPojo.pojoToJson(j, obj, schema);
+			MPojo.pojoToJson(j, obj, factory);
 		}
 		
 	}

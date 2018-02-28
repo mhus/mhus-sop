@@ -223,6 +223,7 @@ import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MValidator;
 import de.mhus.lib.core.cfg.CfgProperties;
+import de.mhus.lib.core.pojo.PojoModelFactory;
 import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.SopApi;
 import de.mhus.osgi.sop.api.model.Foundation;
@@ -289,11 +290,6 @@ public class SopApiImpl extends MLog implements SopApi {
 	}
 
 	@Override
-	public DbSchema getDataSchema() {
-		return SopDbImpl.getManager().getSchema();
-	}
-
-	@Override
 	public List<Journal> getJournalEntries(String queue, long since, int max) throws MException {
 		AQuery<Journal> query = Db.query(Journal.class).eq("queue", queue);
 		if (since > 0)
@@ -324,5 +320,10 @@ public class SopApiImpl extends MLog implements SopApi {
 	@Override
 	public UUID getDefaultFoundationId() {
 		return SopDbImpl.instance().getDefaultFoundationId();
+	}
+
+	@Override
+	public PojoModelFactory getDataPojoModelFactory() {
+		return SopDbImpl.getManager().getPojoModelFactory();
 	}
 }

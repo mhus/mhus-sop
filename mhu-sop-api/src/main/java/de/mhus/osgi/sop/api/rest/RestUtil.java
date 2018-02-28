@@ -215,6 +215,7 @@ import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.logging.Log;
 import de.mhus.lib.core.pojo.PojoAttribute;
 import de.mhus.lib.core.pojo.PojoModel;
+import de.mhus.lib.core.pojo.PojoModelFactory;
 import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.adb.AdbApi;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
@@ -224,8 +225,7 @@ public class RestUtil {
 	private static Log log = Log.getLog(RestUtil.class);
 
 	public static void updateObject(CallContext callContext, Object obj, boolean publicOnly) throws IOException {
-		DbManager manager = MApi.lookup(AdbApi.class).getManager();
-		DbSchema schema = manager.getSchema();
+		PojoModelFactory schema = MApi.lookup(AdbApi.class).getManager().getPojoModelFactory();
 
 		PojoModel model = schema.createPojoModel(obj.getClass());
 		for (String name : callContext.getParameterNames()) {
@@ -242,8 +242,7 @@ public class RestUtil {
 	}
 
 	public static void updateObject(IProperties props, Object obj, boolean publicOnly) throws IOException {
-		DbManager manager = MApi.lookup(AdbApi.class).getManager();
-		DbSchema schema = manager.getSchema();
+		PojoModelFactory schema = MApi.lookup(AdbApi.class).getManager().getPojoModelFactory();
 
 		PojoModel model = schema.createPojoModel(obj.getClass());
 		for (String name : props.keys()) {

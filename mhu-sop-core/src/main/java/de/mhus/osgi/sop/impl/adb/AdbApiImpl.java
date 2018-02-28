@@ -227,6 +227,7 @@ import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MConstants;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.errors.MException;
+import de.mhus.lib.xdb.XdbService;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
 import de.mhus.osgi.sop.api.aaa.ContextCachedItem;
@@ -277,7 +278,7 @@ public class AdbApiImpl extends MLog implements AdbApi {
 	@Override
 	public ActionTask createActionTask(String queue, String action, String target, String[] properties, boolean smart) throws MException {
 
-		DbManager manager = getManager();	
+		XdbService manager = getManager();	
 
 		if (smart) {
 			ActionTask t = manager.getObjectByQualification(Db.query(ActionTask.class).eq("queue", queue).eq("action", action).eq("target", target));
@@ -298,7 +299,7 @@ public class AdbApiImpl extends MLog implements AdbApi {
 	@Override
 	public List<ActionTask> getQueue(String queue, int max) throws MException {
 		LinkedList<ActionTask> out = new LinkedList<ActionTask>();
-		DbManager manager = getManager();	
+		XdbService manager = getManager();	
 		
 		DbCollection<ActionTask> res = manager.getByQualification(Db.query(ActionTask.class).eq(Db.attr("queue"), Db.value(queue)));
 		for (ActionTask task : res) {
@@ -318,7 +319,7 @@ public class AdbApiImpl extends MLog implements AdbApi {
 	public List<ObjectParameter> getParameters(String type, UUID id) throws MException {
 		
 		
-		DbManager manager = getManager();
+		XdbService manager = getManager();
 		List<ObjectParameter> out = manager.getByQualification(
 				Db.query(ObjectParameter.class)
 				.eq(Db.attr("objecttype"), Db.value(type))
@@ -343,7 +344,7 @@ public class AdbApiImpl extends MLog implements AdbApi {
 				
 		ObjectParameter out = getParameter(type, id, key);
 		if (out == null) {
-			DbManager manager = getManager();
+			XdbService manager = getManager();
 			if (key == null) return;
 			out = manager.inject(new ObjectParameter());
 			out.setObjectType(type);
@@ -406,7 +407,7 @@ public class AdbApiImpl extends MLog implements AdbApi {
 	@Override
 	public ObjectParameter getParameter(String type, UUID id, String key) throws MException {
 		
-		DbManager manager = getManager();
+		XdbService manager = getManager();
 		ObjectParameter out = manager.getByQualification(
 				Db.query(ObjectParameter.class)
 				.eq(Db.attr("objecttype"), Db.value(type))
@@ -432,7 +433,7 @@ public class AdbApiImpl extends MLog implements AdbApi {
 	public List<UUID> getIds(String type, String key, String value) throws MException {
 
 		LinkedList<UUID> out = new LinkedList<>();
-		DbManager manager = getManager();
+		XdbService manager = getManager();
 		for ( ObjectParameter p : manager.getByQualification(
 				Db.query(ObjectParameter.class)
 				.eq(Db.attr("objecttype"), Db.value(type))
@@ -452,7 +453,7 @@ public class AdbApiImpl extends MLog implements AdbApi {
 	}
 
 	@Override
-	public DbManager getManager() {
+	public XdbService getManager() {
 		init();
 		return SopDbImpl.getManager();
 	}
@@ -467,7 +468,7 @@ public class AdbApiImpl extends MLog implements AdbApi {
 	public List<ObjectParameter> getParameters(Class<?> type, String key,
 			String value) throws MException {
 		LinkedList<ObjectParameter> out = new LinkedList<>();
-		DbManager manager = SopDbImpl.getManager();
+		XdbService manager = SopDbImpl.getManager();
 		for ( ObjectParameter p : manager.getByQualification(
 				Db.query(ObjectParameter.class)
 				.eq(Db.attr("objecttype"), Db.value(type.getCanonicalName()))

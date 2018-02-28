@@ -277,6 +277,7 @@ public class SopDbSchema extends AbstractDbSchema {
 				DbMetadata obj = (DbMetadata)object;
 				try {
 					AdbApi adb = MApi.lookup(AdbApi.class);
+					if (adb == null) return; // means in init .. say ok
 					switch(right) {
 					case CREATE:
 						if (!adb.canCreate(obj))

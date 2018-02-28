@@ -222,6 +222,9 @@ public interface AccessApi extends SApi {
 
 	// access
 	
+	public static final String ROOT_NAME = "root";
+	public static final String GUEST_NAME = "guest";
+	
 	AaaContext process(String ticket);
 	AaaContext release(String ticket);
 	AaaContext process(Account ac, Trust trust, boolean admin);

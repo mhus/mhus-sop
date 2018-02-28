@@ -213,6 +213,7 @@ import de.mhus.lib.adb.DbManager;
 import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.adb.query.AQuery;
 import de.mhus.lib.errors.MException;
+import de.mhus.lib.xdb.XdbService;
 import de.mhus.osgi.sop.api.SApi;
 import de.mhus.osgi.sop.api.model.ActionTask;
 import de.mhus.osgi.sop.api.model.ObjectParameter;
@@ -221,7 +222,7 @@ public interface AdbApi extends SApi {
 
 	int PAGE_SIZE = 100;
 
-	DbManager getManager();
+	XdbService getManager();
 
 	ActionTask createActionTask(String queue, String action, String target, String[] properties, boolean smart) throws MException;
 

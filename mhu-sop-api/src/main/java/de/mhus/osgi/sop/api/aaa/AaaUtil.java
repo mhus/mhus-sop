@@ -205,6 +205,7 @@ package de.mhus.osgi.sop.api.aaa;
 
 import java.util.List;
 
+import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.logging.Log;
 import de.mhus.lib.core.security.Account;
 import de.mhus.lib.core.security.Rightful;
@@ -276,6 +277,20 @@ public class AaaUtil {
 		if (acl == null) return false;
 		String[] parts = acl.split(",");
 		return hasAccess(account, parts);
+	}
+
+	public static void enterRoot() {
+		AccessApi api = MApi.lookup(AccessApi.class);
+		if (api == null) return;
+		AaaContext rootContext = api.processAdminSession();
+	}
+
+	public static void leaveRoot() {
+		AccessApi api = MApi.lookup(AccessApi.class);
+		if (api == null) return;
+		AaaContext context = api.getCurrent();
+		if (context == null || !context.isAdminMode() || !context.getAccount().getName().equals("root") || !context.isAdminMode()) return;
+		api.release(context);
 	}
 
 }

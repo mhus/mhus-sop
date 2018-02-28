@@ -245,10 +245,7 @@ public abstract class AbstractObjectListNode<T> extends JsonNode<T> {
 	}
 
 	protected PojoModelFactory getPojoModelFactory() {
-		DbManager manager = MApi.lookup(AdbApi.class).getManager();
-		DbSchema schema = manager.getSchema();
-		return schema;
-//		return MPojo.getDefaultModelFactory();
+		return MApi.lookup(AdbApi.class).getManager().getPojoModelFactory();
 	}
 
 	protected abstract List<T> getObjectList(CallContext callContext) throws MException;

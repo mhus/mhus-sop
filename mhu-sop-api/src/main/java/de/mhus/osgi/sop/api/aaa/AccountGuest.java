@@ -214,13 +214,13 @@ import de.mhus.lib.errors.NotSupportedException;
 
 public class AccountGuest implements Account {
 
-	private String name = "Guest";
+	private String name = AccessApi.GUEST_NAME;
 	private HashSet<String> groups = new HashSet<>();
 	private IProperties properties = new MProperties();
 
 	@Override
 	public String getName() {
-		return "guest";
+		return AccessApi.GUEST_NAME;
 	}
 
 	@Override
@@ -233,8 +233,9 @@ public class AccountGuest implements Account {
 		return true;
 	}
 
+	@Override
 	public String toString() {
-		return "guest";
+		return AccessApi.GUEST_NAME;
 	}
 
 	@Override

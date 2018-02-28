@@ -217,6 +217,7 @@ import aQute.bnd.annotation.component.Deactivate;
 import de.mhus.lib.adb.DbManager;
 import de.mhus.lib.adb.DbSchema;
 import de.mhus.lib.core.MApi;
+import de.mhus.lib.errors.MException;
 import de.mhus.lib.karaf.adb.DbManagerService;
 import de.mhus.lib.karaf.adb.DbManagerServiceImpl;
 import de.mhus.lib.sql.DataSourceProvider;
@@ -255,7 +256,7 @@ public class SopDbManagerService extends DbManagerServiceImpl {
 	}
 
 	@Override
-	public void doInitialize() throws Exception {
+	public void doInitialize() throws MException {
 		setDataSourceName(MApi.getCfg(DbManagerService.class).getExtracted("dataSourceName", "db_sop") );
 	}
 
@@ -271,12 +272,18 @@ public class SopDbManagerService extends DbManagerServiceImpl {
 
 			DbSchemaService service = context.getService(reference);
 			String name = service.getClass().getCanonicalName();
-			service.doInitialize(SopDbManagerService.this);
+			service.doInitialize(SopDbManagerService.this.getManager());
 
 			synchronized (schemaList) {
 				schemaList.put(name, service);
 				updateManager();
 			}	
+			
+			try {
+				service.doPostInitialize(SopDbManagerService.this.getManager());
+			} catch (Throwable t) {
+				log().w(name,t);
+			}
 			return service;
 		}
 

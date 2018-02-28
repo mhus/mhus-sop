@@ -207,6 +207,7 @@ import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.security.Account;
 import de.mhus.lib.errors.NotSupportedException;
+import de.mhus.osgi.sop.api.aaa.AccessApi;
 
 public class AccountRoot implements Account {
 
@@ -214,7 +215,7 @@ public class AccountRoot implements Account {
 
 	@Override
 	public String getName() {
-		return "root";
+		return AccessApi.ROOT_NAME;
 	}
 
 	@Override
@@ -227,8 +228,9 @@ public class AccountRoot implements Account {
 		return false;
 	}
 
+	@Override
 	public String toString() {
-		return "root";
+		return AccessApi.ROOT_NAME;
 	}
 
 	@Override
@@ -238,7 +240,7 @@ public class AccountRoot implements Account {
 
 	@Override
 	public String getDisplayName() {
-		return "Root";
+		return AccessApi.ROOT_NAME;
 	}
 
 	@Override

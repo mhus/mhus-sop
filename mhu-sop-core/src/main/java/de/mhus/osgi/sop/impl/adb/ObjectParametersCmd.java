@@ -217,6 +217,7 @@ import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MConstants;
 import de.mhus.lib.core.MString;
 import de.mhus.lib.core.console.ConsoleTable;
+import de.mhus.lib.xdb.XdbService;
 import de.mhus.osgi.sop.api.adb.AdbApi;
 import de.mhus.osgi.sop.api.model.ObjectParameter;
 import de.mhus.osgi.sop.api.util.ObjectUtil;
@@ -240,7 +241,7 @@ public class ObjectParametersCmd implements Action {
 	@Override
 	public Object execute() throws Exception {
 
-		DbManager manager = MApi.lookup(AdbApi.class).getManager();
+		XdbService manager = MApi.lookup(AdbApi.class).getManager();
 				
 		if (type.equals("parameter")) {
 			

@@ -216,7 +216,9 @@ import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.security.Account;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.karaf.adb.DbManagerService;
+import de.mhus.lib.xdb.XdbService;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
+import de.mhus.osgi.sop.api.aaa.AaaUtil;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
 import de.mhus.osgi.sop.api.adb.AdbApi;
 import de.mhus.osgi.sop.api.adb.DbSchemaService;
@@ -233,7 +235,8 @@ import de.mhus.osgi.sop.api.model.Register;
 @Component(provide=DbSchemaService.class,immediate=true)
 public class SopDbImpl extends MLog implements DbSchemaService {
 
-	private DbManagerService service;
+	private XdbService service;
+	private UUID defFoundationId;
 	private static SopDbImpl instance;
 
 	public static SopDbImpl instance() {
@@ -251,27 +254,31 @@ public class SopDbImpl extends MLog implements DbSchemaService {
 	}
 
 	@Override
-	public void doInitialize(DbManagerService service) {
+	public void doInitialize(XdbService service) {
 		this.service = service;
 		instance = this;
+	}
+
+	@Override
+	public void doPostInitialize(XdbService manager) throws Exception {
 		
+		AaaUtil.enterRoot();
 		try {
-			DbManager db = service.getManager();
 			// init base structure
-			FoundationGroup defGroup = db.getObjectByQualification(Db.query(FoundationGroup.class).eq("name", ""));
+			FoundationGroup defGroup = service.getObjectByQualification(Db.query(FoundationGroup.class).eq("name", ""));
 			if (defGroup == null) {
-				defGroup = db.inject(new FoundationGroup(""));
+				defGroup = service.inject(new FoundationGroup(""));
 				defGroup.save();
 			}
 			
-			Foundation defFound = db.getObjectByQualification(Db.query(Foundation.class).eq("ident", ""));
+			Foundation defFound = service.getObjectByQualification(Db.query(Foundation.class).eq("ident", ""));
 			if (defFound == null) {
-				defFound = db.inject(new Foundation("",""));
+				defFound = service.inject(new Foundation("",""));
 				defFound.save();
 			}
-			
-		} catch (Throwable t) {
-			log().f(t);
+			defFoundationId = defFound.getId();
+		} finally {
+			AaaUtil.leaveRoot();
 		}
 	}
 
@@ -281,10 +288,9 @@ public class SopDbImpl extends MLog implements DbSchemaService {
 		service = null;
 	}
 
-	public static DbManager getManager() {
+	public static XdbService getManager() {
 		return instance
-				.service
-				.getManager();
+				.service;
 	}
 	
 	@Override
@@ -388,27 +394,26 @@ public class SopDbImpl extends MLog implements DbSchemaService {
 	}
 
 	@Override
-	public void collectReferences(DbMetadata object,
+	public void collectReferences(Persistable object,
 			ReferenceCollector collector) {
-		if (object == null) return;
+		if (object == null || !(object instanceof DbMetadata)) return;
+		DbMetadata meta = (DbMetadata)object;
 		try {
-			for (ObjectParameter p : MApi.lookup(AdbApi.class).getParameters(object.getClass(), object.getId())) {
+			for (ObjectParameter p : MApi.lookup(AdbApi.class).getParameters(object.getClass(), meta.getId())) {
 				collector.foundReference(new Reference<DbMetadata>(p,TYPE.CHILD));
 			}
 		} catch (MException e) {
-			log().d(object.getClass(),object.getId(),e);
+			log().d(object.getClass(),meta.getId(),e);
 		}
 	}
 
 	@Override
 	public void doCleanup() {
-		// TODO Auto-generated method stub
 		
 	}
 
 	public UUID getDefaultFoundationId() {
-		// TODO Auto-generated method stub
-		return null;
+		return defFoundationId;
 	}
 	
 }
