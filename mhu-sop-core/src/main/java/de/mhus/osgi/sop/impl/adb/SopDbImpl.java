@@ -385,6 +385,14 @@ public class SopDbImpl extends MLog implements DbSchemaService {
 			return SopDbImpl.getManager().getObject(ObjectParameter.class, id);
 		if (type.equals(ActionTask.class.getCanonicalName()))
 			return SopDbImpl.getManager().getObject(ActionTask.class, id);
+		if (type.equals(Foundation.class.getCanonicalName()))
+			return SopDbImpl.getManager().getObject(Foundation.class, id);
+		if (type.equals(FoundationGroup.class.getCanonicalName()))
+			return SopDbImpl.getManager().getObject(FoundationGroup.class, id);
+		if (type.equals(Journal.class.getCanonicalName()))
+			return SopDbImpl.getManager().getObject(Journal.class, id);
+//		if (type.equals(Register.class.getCanonicalName()))
+//			return SopDbImpl.getManager().getObject(Register.class, id);
 		throw new MException("unknown type",type);
 	}
 
