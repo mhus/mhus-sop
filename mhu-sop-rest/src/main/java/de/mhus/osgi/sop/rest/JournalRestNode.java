@@ -11,7 +11,7 @@ import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.pojo.MPojo;
 import de.mhus.lib.core.pojo.PojoModelFactory;
 import de.mhus.osgi.sop.api.SopApi;
-import de.mhus.osgi.sop.api.model.Journal;
+import de.mhus.osgi.sop.api.model.SopJournal;
 import de.mhus.osgi.sop.api.rest.CallContext;
 import de.mhus.osgi.sop.api.rest.JsonNode;
 import de.mhus.osgi.sop.api.rest.JsonResult;
@@ -41,8 +41,8 @@ public class JournalRestNode extends JsonNode<JournalQueue>{
 		SopApi api = MApi.lookup(SopApi.class);
 		PojoModelFactory factory = api.getDataPojoModelFactory();
 		ArrayNode list = result.createArrayNode();
-		List<Journal> res = api.getJournalEntries(queue.getName(), since, 100);
-		for (Journal j : res) {
+		List<SopJournal> res = api.getJournalEntries(queue.getName(), since, 100);
+		for (SopJournal j : res) {
 			ObjectNode obj = list.addObject();
 			MPojo.pojoToJson(j, obj, factory);
 		}

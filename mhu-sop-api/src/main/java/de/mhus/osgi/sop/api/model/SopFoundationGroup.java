@@ -4,14 +4,14 @@ import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.annotations.adb.DbPersistent;
 import de.mhus.lib.errors.MException;
 
-public class FoundationGroup extends DbMetadata {
+public class SopFoundationGroup extends DbMetadata {
 
 	@DbPersistent
 	private String name;
 	
-	public FoundationGroup() {}
+	public SopFoundationGroup() {}
 	
-	public FoundationGroup(String name) {
+	public SopFoundationGroup(String name) {
 		this.name = name;
 	}
 	

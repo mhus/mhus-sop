@@ -211,7 +211,7 @@ import de.mhus.lib.annotations.adb.DbPersistent;
 import de.mhus.lib.core.MSystem;
 import de.mhus.lib.errors.MException;
 
-public class ObjectParameter extends DbMetadata {
+public class SopObjectParameter extends DbMetadata {
 
 	public static final String TYPE_GLOBAL = "_global";
 

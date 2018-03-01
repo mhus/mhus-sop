@@ -215,8 +215,8 @@ import de.mhus.lib.adb.query.AQuery;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.xdb.XdbService;
 import de.mhus.osgi.sop.api.SApi;
-import de.mhus.osgi.sop.api.model.ActionTask;
-import de.mhus.osgi.sop.api.model.ObjectParameter;
+import de.mhus.osgi.sop.api.model.SopActionTask;
+import de.mhus.osgi.sop.api.model.SopObjectParameter;
 
 public interface AdbApi extends SApi {
 
@@ -224,14 +224,14 @@ public interface AdbApi extends SApi {
 
 	XdbService getManager();
 
-	ActionTask createActionTask(String queue, String action, String target, String[] properties, boolean smart) throws MException;
+	SopActionTask createActionTask(String queue, String action, String target, String[] properties, boolean smart) throws MException;
 
-	List<ActionTask> getQueue(String queue, int max) throws MException;
+	List<SopActionTask> getQueue(String queue, int max) throws MException;
 
-	List<ObjectParameter> getParameters(Class<?> type, UUID id)
+	List<SopObjectParameter> getParameters(Class<?> type, UUID id)
 			throws MException;
 
-	List<ObjectParameter> getParameters(String type, UUID id) throws MException;
+	List<SopObjectParameter> getParameters(String type, UUID id) throws MException;
 
 	void setGlobalParameter(String key, String value) throws MException;
 
@@ -241,7 +241,7 @@ public interface AdbApi extends SApi {
 	void setParameter(String type, UUID id, String key, String value)
 			throws MException;
 
-	ObjectParameter getGlobalParameter(String key) throws MException;
+	SopObjectParameter getGlobalParameter(String key) throws MException;
 
 	String getValue(String type, UUID id, String key, String def)
 			throws MException;
@@ -249,21 +249,21 @@ public interface AdbApi extends SApi {
 	String getValue(Class<?> type, UUID id, String key, String def)
 			throws MException;
 
-	ObjectParameter getParameter(String type, UUID id, String key)
+	SopObjectParameter getParameter(String type, UUID id, String key)
 			throws MException;
 
-	ObjectParameter getParameter(Class<?> type, UUID id, String key)
+	SopObjectParameter getParameter(Class<?> type, UUID id, String key)
 			throws MException;
 
 	void deleteParameters(Class<?> type, UUID id) throws MException;
 
-	List<ObjectParameter> getParameters(Class<?> type, String key, String value) throws MException;
+	List<SopObjectParameter> getParameters(Class<?> type, String key, String value) throws MException;
 
 	<T> LinkedList<T> collectResults(AQuery<T> asc, int page) throws MException;
 
-	ObjectParameter getRecursiveParameter(DbMetadata obj, String key) throws MException;
+	SopObjectParameter getRecursiveParameter(DbMetadata obj, String key) throws MException;
 
-	List<ActionTask> getActionTaskPage(String queue, int size);
+	List<SopActionTask> getActionTaskPage(String queue, int size);
 	
 	boolean canRead(DbMetadata obj) throws MException;
 	boolean canUpdate(DbMetadata obj) throws MException;

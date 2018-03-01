@@ -219,7 +219,7 @@ import de.mhus.lib.core.MString;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.lib.xdb.XdbService;
 import de.mhus.osgi.sop.api.adb.AdbApi;
-import de.mhus.osgi.sop.api.model.ObjectParameter;
+import de.mhus.osgi.sop.api.model.SopObjectParameter;
 import de.mhus.osgi.sop.api.util.ObjectUtil;
 
 @Command(scope = "mhus", name = "parameter", description = "Handle object parameters")
@@ -251,7 +251,7 @@ public class ObjectParametersCmd implements Action {
 				ConsoleTable out = new ConsoleTable();
 				out.setHeaderValues("Key","Type","Object","Value","Id");
 				
-				for (ObjectParameter p : manager.getByQualification(Db.query(ObjectParameter.class).eq(Db.attr("key"), Db.value(id))))
+				for (SopObjectParameter p : manager.getByQualification(Db.query(SopObjectParameter.class).eq(Db.attr("key"), Db.value(id))))
 					out.addRowValues( p.getKey(), p.getObjectType(), p.getObjectId(), p.getValue(), p.getId() );
 				
 				out.print(System.out);
@@ -279,7 +279,7 @@ public class ObjectParametersCmd implements Action {
 			ConsoleTable table = new ConsoleTable();
 			table.setHeaderValues("KEY","VALUE");
 
-			for (ObjectParameter param : MApi.lookup(AdbApi.class).getParameters(cType, rId)) {
+			for (SopObjectParameter param : MApi.lookup(AdbApi.class).getParameters(cType, rId)) {
 				table.addRowValues(param.getKey(),param.getValue());
 			}
 			table.print(System.out);
@@ -294,7 +294,7 @@ public class ObjectParametersCmd implements Action {
 		} break;
 		case "remove": {
 			for (String p : params) {
-				ObjectParameter pp = MApi.lookup(AdbApi.class).getParameter(cType, rId, p);
+				SopObjectParameter pp = MApi.lookup(AdbApi.class).getParameter(cType, rId, p);
 				if (pp != null)
 					pp.delete();
 				else
@@ -303,18 +303,18 @@ public class ObjectParametersCmd implements Action {
 			System.out.println("OK");
 		} break;
 		case "clean": {
-			for (ObjectParameter param : MApi.lookup(AdbApi.class).getParameters(cType, rId)) {
+			for (SopObjectParameter param : MApi.lookup(AdbApi.class).getParameters(cType, rId)) {
 				param.delete();
 			}
 			System.out.println("OK");
 		} break;
 		case "get": {
-			ObjectParameter p = MApi.lookup(AdbApi.class).getParameter(cType, rId, params[0]);
+			SopObjectParameter p = MApi.lookup(AdbApi.class).getParameter(cType, rId, params[0]);
 			if (p != null)
 				System.out.println(p.getValue());
 		} break;
 		case "recursive": {
-			ObjectParameter p = MApi.lookup(AdbApi.class).getParameter(cType, rId, params[0]);
+			SopObjectParameter p = MApi.lookup(AdbApi.class).getParameter(cType, rId, params[0]);
 			if (p != null)
 				System.out.println(p.getValue());
 		} break;

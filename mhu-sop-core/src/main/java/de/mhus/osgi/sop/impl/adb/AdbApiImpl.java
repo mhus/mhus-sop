@@ -236,8 +236,8 @@ import de.mhus.osgi.sop.api.adb.DbSchemaService;
 import de.mhus.osgi.sop.api.adb.Reference;
 import de.mhus.osgi.sop.api.adb.Reference.TYPE;
 import de.mhus.osgi.sop.api.adb.ReferenceCollector;
-import de.mhus.osgi.sop.api.model.ActionTask;
-import de.mhus.osgi.sop.api.model.ObjectParameter;
+import de.mhus.osgi.sop.api.model.SopActionTask;
+import de.mhus.osgi.sop.api.model.SopObjectParameter;
 import de.mhus.osgi.sop.impl.AaaContextImpl;
 
 //@Component(immediate=true) done by blueprint
@@ -276,16 +276,16 @@ public class AdbApiImpl extends MLog implements AdbApi {
 	}
 
 	@Override
-	public ActionTask createActionTask(String queue, String action, String target, String[] properties, boolean smart) throws MException {
+	public SopActionTask createActionTask(String queue, String action, String target, String[] properties, boolean smart) throws MException {
 
 		XdbService manager = getManager();	
 
 		if (smart) {
-			ActionTask t = manager.getObjectByQualification(Db.query(ActionTask.class).eq("queue", queue).eq("action", action).eq("target", target));
+			SopActionTask t = manager.getObjectByQualification(Db.query(SopActionTask.class).eq("queue", queue).eq("action", action).eq("target", target));
 			if (t != null) return t;
 		}		
 		
-		ActionTask task = manager.inject(new ActionTask());
+		SopActionTask task = manager.inject(new SopActionTask());
 		task.setQueue(queue);
 		task.setAction(action);
 		task.setProperties(properties);
@@ -297,12 +297,12 @@ public class AdbApiImpl extends MLog implements AdbApi {
 	}
 
 	@Override
-	public List<ActionTask> getQueue(String queue, int max) throws MException {
-		LinkedList<ActionTask> out = new LinkedList<ActionTask>();
+	public List<SopActionTask> getQueue(String queue, int max) throws MException {
+		LinkedList<SopActionTask> out = new LinkedList<SopActionTask>();
 		XdbService manager = getManager();	
 		
-		DbCollection<ActionTask> res = manager.getByQualification(Db.query(ActionTask.class).eq(Db.attr("queue"), Db.value(queue)));
-		for (ActionTask task : res) {
+		DbCollection<SopActionTask> res = manager.getByQualification(Db.query(SopActionTask.class).eq(Db.attr("queue"), Db.value(queue)));
+		for (SopActionTask task : res) {
 			out.add(task);
 			if (max > 0 && out.size() >= max) break;
 		}
@@ -311,17 +311,17 @@ public class AdbApiImpl extends MLog implements AdbApi {
 	}
 
 	@Override
-	public List<ObjectParameter> getParameters(Class<?> type, UUID id) throws MException {
+	public List<SopObjectParameter> getParameters(Class<?> type, UUID id) throws MException {
 		return getParameters(type.getCanonicalName(), id);
 	}
 	
 	@Override
-	public List<ObjectParameter> getParameters(String type, UUID id) throws MException {
+	public List<SopObjectParameter> getParameters(String type, UUID id) throws MException {
 		
 		
 		XdbService manager = getManager();
-		List<ObjectParameter> out = manager.getByQualification(
-				Db.query(ObjectParameter.class)
+		List<SopObjectParameter> out = manager.getByQualification(
+				Db.query(SopObjectParameter.class)
 				.eq(Db.attr("objecttype"), Db.value(type))
 				.eq(Db.attr("objectid"),Db.value(id))
 				).toCacheAndClose();
@@ -331,7 +331,7 @@ public class AdbApiImpl extends MLog implements AdbApi {
 
 	@Override
 	public void setGlobalParameter(String key, String value) throws MException {
-		setParameter(ObjectParameter.TYPE_GLOBAL, MConstants.EMPTY_UUID, key, value);
+		setParameter(SopObjectParameter.TYPE_GLOBAL, MConstants.EMPTY_UUID, key, value);
 	}
 
 	@Override
@@ -342,11 +342,11 @@ public class AdbApiImpl extends MLog implements AdbApi {
 	@Override
 	public void setParameter(String type, UUID id, String key, String value) throws MException {
 				
-		ObjectParameter out = getParameter(type, id, key);
+		SopObjectParameter out = getParameter(type, id, key);
 		if (out == null) {
 			XdbService manager = getManager();
 			if (key == null) return;
-			out = manager.inject(new ObjectParameter());
+			out = manager.inject(new SopObjectParameter());
 			out.setObjectType(type);
 			out.setObjectId(id);
 			out.setKey(key);
@@ -383,8 +383,8 @@ public class AdbApiImpl extends MLog implements AdbApi {
 //	}
 	
 	@Override
-	public ObjectParameter getGlobalParameter(String key) throws MException {
-		return getParameter(ObjectParameter.TYPE_GLOBAL, MConstants.EMPTY_UUID, key);
+	public SopObjectParameter getGlobalParameter(String key) throws MException {
+		return getParameter(SopObjectParameter.TYPE_GLOBAL, MConstants.EMPTY_UUID, key);
 	}
 	
 	@Override
@@ -394,22 +394,22 @@ public class AdbApiImpl extends MLog implements AdbApi {
 	
 	@Override
 	public String getValue(String type, UUID id, String key, String def) throws MException {
-		ObjectParameter p = getParameter(type, id, key);
+		SopObjectParameter p = getParameter(type, id, key);
 		if (p == null || p.getValue() == null) return def;
 		return p.getValue();
 	}
 	
 	@Override
-	public ObjectParameter getParameter(Class<?> type, UUID id, String key) throws MException {
+	public SopObjectParameter getParameter(Class<?> type, UUID id, String key) throws MException {
 		return getParameter(type.getCanonicalName(), id, key);
 	}
 	
 	@Override
-	public ObjectParameter getParameter(String type, UUID id, String key) throws MException {
+	public SopObjectParameter getParameter(String type, UUID id, String key) throws MException {
 		
 		XdbService manager = getManager();
-		ObjectParameter out = manager.getByQualification(
-				Db.query(ObjectParameter.class)
+		SopObjectParameter out = manager.getByQualification(
+				Db.query(SopObjectParameter.class)
 				.eq(Db.attr("objecttype"), Db.value(type))
 				.eq(Db.attr("objectid"),Db.value(id))
 				.eq(Db.attr("key"), Db.value(key))
@@ -418,11 +418,11 @@ public class AdbApiImpl extends MLog implements AdbApi {
 	}
 
 	@Override
-	public ObjectParameter getRecursiveParameter(DbMetadata obj, String key) throws MException {
+	public SopObjectParameter getRecursiveParameter(DbMetadata obj, String key) throws MException {
 		int level = 10;
 		while (obj != null && level > 0) {
 			if (obj == null || key == null) return null;
-			ObjectParameter out = getParameter(obj.getClass().getCanonicalName(), obj.getId(), key);
+			SopObjectParameter out = getParameter(obj.getClass().getCanonicalName(), obj.getId(), key);
 			if (out != null) return out;
 			obj = obj.findParentObject();
 			level--;
@@ -434,8 +434,8 @@ public class AdbApiImpl extends MLog implements AdbApi {
 
 		LinkedList<UUID> out = new LinkedList<>();
 		XdbService manager = getManager();
-		for ( ObjectParameter p : manager.getByQualification(
-				Db.query(ObjectParameter.class)
+		for ( SopObjectParameter p : manager.getByQualification(
+				Db.query(SopObjectParameter.class)
 				.eq(Db.attr("objecttype"), Db.value(type))
 				.eq(Db.attr("key"),Db.value(key))
 				.eq(Db.attr("value"), Db.value(value))
@@ -447,7 +447,7 @@ public class AdbApiImpl extends MLog implements AdbApi {
 
 	public void deleteAll(String type, UUID id) throws MException {
 
-		for (ObjectParameter p : getParameters( type, id))
+		for (SopObjectParameter p : getParameters( type, id))
 			if (canDelete(p))
 				p.delete();
 	}
@@ -460,17 +460,17 @@ public class AdbApiImpl extends MLog implements AdbApi {
 
 	@Override
 	public void deleteParameters(Class<?> type, UUID id) throws MException {
-		for (ObjectParameter p : getParameters( type, id))
+		for (SopObjectParameter p : getParameters( type, id))
 			p.delete();
 	}
 
 	@Override
-	public List<ObjectParameter> getParameters(Class<?> type, String key,
+	public List<SopObjectParameter> getParameters(Class<?> type, String key,
 			String value) throws MException {
-		LinkedList<ObjectParameter> out = new LinkedList<>();
+		LinkedList<SopObjectParameter> out = new LinkedList<>();
 		XdbService manager = SopDbImpl.getManager();
-		for ( ObjectParameter p : manager.getByQualification(
-				Db.query(ObjectParameter.class)
+		for ( SopObjectParameter p : manager.getByQualification(
+				Db.query(SopObjectParameter.class)
 				.eq(Db.attr("objecttype"), Db.value(type.getCanonicalName()))
 				.eq(Db.attr("key"),Db.value(key))
 				.eq(Db.attr("value"), Db.value(value))
@@ -494,11 +494,11 @@ public class AdbApiImpl extends MLog implements AdbApi {
 	}
 
 	@Override
-	public List<ActionTask> getActionTaskPage(String queue, int size) {
+	public List<SopActionTask> getActionTaskPage(String queue, int size) {
 		
-		LinkedList<ActionTask> out = new LinkedList<ActionTask>();
+		LinkedList<SopActionTask> out = new LinkedList<SopActionTask>();
 		try {
-			DbCollection<ActionTask> res = getManager().getByQualification(Db.query(ActionTask.class).eq("queue", queue).desc("creationdate"));
+			DbCollection<SopActionTask> res = getManager().getByQualification(Db.query(SopActionTask.class).eq("queue", queue).desc("creationdate"));
 			while (res.hasNext()) {
 				out.add(res.next());
 				if (out.size() >= size) break;

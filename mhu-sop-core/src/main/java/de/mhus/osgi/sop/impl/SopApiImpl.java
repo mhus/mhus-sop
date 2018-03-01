@@ -226,9 +226,9 @@ import de.mhus.lib.core.cfg.CfgProperties;
 import de.mhus.lib.core.pojo.PojoModelFactory;
 import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.SopApi;
-import de.mhus.osgi.sop.api.model.Foundation;
-import de.mhus.osgi.sop.api.model.FoundationGroup;
-import de.mhus.osgi.sop.api.model.Journal;
+import de.mhus.osgi.sop.api.model.SopFoundation;
+import de.mhus.osgi.sop.api.model.SopFoundationGroup;
+import de.mhus.osgi.sop.api.model.SopJournal;
 import de.mhus.osgi.sop.impl.adb.SopDbImpl;
 
 @Component(immediate=true,provide=SopApi.class,name="SopApi")
@@ -257,8 +257,8 @@ public class SopApiImpl extends MLog implements SopApi {
 	}
 
 	@Override
-	public Journal appendJournalEntry(UUID foundation, String queue, String event, String... data) throws MException {
-		Journal item = SopDbImpl.getManager().inject(new Journal(foundation, queue,event,getJournalOrder(),data));
+	public SopJournal appendJournalEntry(UUID foundation, String queue, String event, String... data) throws MException {
+		SopJournal item = SopDbImpl.getManager().inject(new SopJournal(foundation, queue,event,getJournalOrder(),data));
 		item.save();
 		return item;
 	}
@@ -280,25 +280,25 @@ public class SopApiImpl extends MLog implements SopApi {
 	}
 
 	@Override
-	public Journal getJournalEntry(String id) throws MException {
+	public SopJournal getJournalEntry(String id) throws MException {
 		long order = MCast.tolong(id, 0);
 		if (order > 0)
-			return SopDbImpl.getManager().getObjectByQualification(Db.query(Journal.class).eq("order", order));
+			return SopDbImpl.getManager().getObjectByQualification(Db.query(SopJournal.class).eq("order", order));
 		if (MValidator.isUUID(id))
-			return SopDbImpl.getManager().getObject(Journal.class, UUID.fromString(id));
+			return SopDbImpl.getManager().getObject(SopJournal.class, UUID.fromString(id));
 		return null;
 	}
 
 	@Override
-	public List<Journal> getJournalEntries(String queue, long since, int max) throws MException {
-		AQuery<Journal> query = Db.query(Journal.class).eq("queue", queue);
+	public List<SopJournal> getJournalEntries(String queue, long since, int max) throws MException {
+		AQuery<SopJournal> query = Db.query(SopJournal.class).eq("queue", queue);
 		if (since > 0)
 			query.gt(Db.attr("order"), Db.value(since));
 		query.asc("order");
-		DbCollection<Journal> res = SopDbImpl.getManager().getByQualification(query);
+		DbCollection<SopJournal> res = SopDbImpl.getManager().getByQualification(query);
 		int cnt = 0;
-		LinkedList<Journal> out = new LinkedList<Journal>();
-		for (Journal j : res) {
+		LinkedList<SopJournal> out = new LinkedList<SopJournal>();
+		for (SopJournal j : res) {
 			out.add(j);
 			cnt++;
 			if (cnt > 100)
@@ -308,13 +308,13 @@ public class SopApiImpl extends MLog implements SopApi {
 	}
 
 	@Override
-	public FoundationGroup getFoundationGroup(String group) throws MException {
-		return SopDbImpl.getManager().getObjectByQualification(Db.query(FoundationGroup.class).eq("name", group));
+	public SopFoundationGroup getFoundationGroup(String group) throws MException {
+		return SopDbImpl.getManager().getObjectByQualification(Db.query(SopFoundationGroup.class).eq("name", group));
 	}
 
 	@Override
 	public DbMetadata getFoundation(UUID id) throws MException {
-		return SopDbImpl.getManager().getObject(Foundation.class, id);
+		return SopDbImpl.getManager().getObject(SopFoundation.class, id);
 	}
 
 	@Override

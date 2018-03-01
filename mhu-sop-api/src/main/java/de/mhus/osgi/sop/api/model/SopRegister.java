@@ -211,7 +211,7 @@ import de.mhus.lib.annotations.adb.DbPersistent;
 import de.mhus.lib.annotations.adb.DbPrimaryKey;
 import de.mhus.lib.basics.UuidIdentificable;
 
-public class Register extends DbComfortableObject implements UuidIdentificable {
+public class SopRegister extends DbComfortableObject implements UuidIdentificable {
 
 	@DbPrimaryKey
 	private UUID id;
@@ -234,10 +234,10 @@ public class Register extends DbComfortableObject implements UuidIdentificable {
 	private String value2;
 	
 	
-	public Register() {
+	public SopRegister() {
 	}
 	
-	public Register(String name, String key1, String key2, String value1, String value2) {
+	public SopRegister(String name, String key1, String key2, String value1, String value2) {
 		super();
 		this.name = name;
 		this.key1 = key1;

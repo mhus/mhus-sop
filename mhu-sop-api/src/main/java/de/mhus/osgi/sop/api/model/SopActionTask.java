@@ -209,7 +209,7 @@ import de.mhus.lib.annotations.adb.DbPersistent;
 import de.mhus.lib.core.MSystem;
 import de.mhus.lib.errors.MException;
 
-public class ActionTask extends DbMetadata {
+public class SopActionTask extends DbMetadata {
 	
 	@DbPersistent(ro=true)
 	@DbIndex({"xq","xqt"})

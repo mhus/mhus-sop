@@ -12,7 +12,7 @@ import de.mhus.lib.core.MApi;
 import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.SopApi;
 
-public class Journal extends DbMetadata implements FoundationRelated {
+public class SopJournal extends DbMetadata implements FoundationRelated {
 
 	public static final String QUEUE_BPM = "bpm";
 	
@@ -30,9 +30,9 @@ public class Journal extends DbMetadata implements FoundationRelated {
 	@DbPersistent(ro=true,features=AttributeFeatureCut.NAME)
 	private HashMap<String,String> data;
 
-	public Journal() {}
+	public SopJournal() {}
 	
-	public Journal(UUID foundation, String queue, String event, long order, String ... data) {
+	public SopJournal(UUID foundation, String queue, String event, long order, String ... data) {
 		this.foundation = foundation;
 		this.queue = queue;
 		this.event = event;

@@ -210,11 +210,11 @@ import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.adb.AdbApi;
-import de.mhus.osgi.sop.api.model.ObjectParameter;
+import de.mhus.osgi.sop.api.model.SopObjectParameter;
 
 public class ObjectUtil {
 	
-	public static ObjectParameter getParameter(Class<?> type, UUID id, String key) throws MException {
+	public static SopObjectParameter getParameter(Class<?> type, UUID id, String key) throws MException {
 		return MApi.lookup(AdbApi.class).getParameter(type, id, key);
 	}
 
@@ -226,7 +226,7 @@ public class ObjectUtil {
 		MApi.lookup(AdbApi.class).deleteParameters(type, id);
 	}
 
-	public static List<ObjectParameter> getParameters(Class<?> type, String key, String value) throws MException {
+	public static List<SopObjectParameter> getParameters(Class<?> type, String key, String value) throws MException {
 		return MApi.lookup(AdbApi.class).getParameters(type, key, value);
 	}
 
@@ -236,7 +236,7 @@ public class ObjectUtil {
 	}
 	
 	public static String getRecursiveValue(DbMetadata obj, String key, String def) {
-		ObjectParameter out = null;
+		SopObjectParameter out = null;
 		try {
 			out = MApi.lookup(AdbApi.class).getRecursiveParameter(obj, key);
 		} catch (MException e) {

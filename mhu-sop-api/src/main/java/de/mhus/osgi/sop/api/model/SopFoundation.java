@@ -6,16 +6,16 @@ import de.mhus.lib.core.MApi;
 import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.SopApi;
 
-public class Foundation extends DbMetadata {
+public class SopFoundation extends DbMetadata {
 
 	@DbPersistent
 	private String group = "";
 	@DbPersistent
 	private String ident;
 	
-	public Foundation() {}
+	public SopFoundation() {}
 	
-	public Foundation(String ident, String group) {
+	public SopFoundation(String ident, String group) {
 		super();
 		this.ident = ident;
 		this.group = group;
