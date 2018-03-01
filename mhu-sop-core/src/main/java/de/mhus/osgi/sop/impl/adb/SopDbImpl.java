@@ -281,6 +281,24 @@ public class SopDbImpl extends AbstractDbSchemaService {
 				defFound.save();
 			}
 			defFoundationId = defFound.getId();
+			try {
+				SopAcl acl = service.getObjectByQualification(Db.query(SopAcl.class).eq("target", defFoundationId.toString()));
+				if (acl == null) {
+					acl = service.inject(new SopAcl(defFoundationId.toString(), "*=r"));
+					acl.save();
+				}
+			} catch (Throwable t) {
+				log().w(t);
+			}
+			try {
+				SopAcl acl = service.getObjectByQualification(Db.query(SopAcl.class).eq("target", defFoundationId + "_"));
+				if (acl == null) {
+					acl = service.inject(new SopAcl(defFoundationId.toString() + "_", "*=r"));
+					acl.save();
+				}
+			} catch (Throwable t) {
+				log().w(t);
+			}
 		} finally {
 			AaaUtil.leaveRoot();
 		}

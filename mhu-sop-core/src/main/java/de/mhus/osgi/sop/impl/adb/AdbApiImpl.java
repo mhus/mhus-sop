@@ -270,10 +270,12 @@ public class AdbApiImpl extends MLog implements AdbApi {
 	}
 //	@Deactivate
 	public void doDeactivate() {
-		accessTracker.close();
+		if (accessTracker != null)
+			accessTracker.close();
 		accessTracker = null;
 		context = null;
-		controllers.clear();
+		if (controllers != null)
+			controllers.clear();
 	}
 
 	@Override
