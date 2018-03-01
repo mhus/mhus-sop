@@ -211,6 +211,7 @@ import de.mhus.lib.adb.DbManager;
 import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.adb.Persistable;
 import de.mhus.lib.adb.query.Db;
+import de.mhus.lib.basics.UuidIdentificable;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.security.Account;
@@ -414,8 +415,8 @@ public class SopDbImpl extends MLog implements DbSchemaService {
 	@Override
 	public void collectReferences(Persistable object,
 			ReferenceCollector collector) {
-		if (object == null || !(object instanceof DbMetadata)) return;
-		DbMetadata meta = (DbMetadata)object;
+		if (object == null || !(object instanceof UuidIdentificable)) return;
+		UuidIdentificable meta = (UuidIdentificable)object;
 		try {
 			for (SopObjectParameter p : MApi.lookup(AdbApi.class).getParameters(object.getClass(), meta.getId())) {
 				collector.foundReference(new Reference<DbMetadata>(p,TYPE.CHILD));
