@@ -225,12 +225,13 @@ import de.mhus.osgi.sop.api.adb.DbSchemaService;
 import de.mhus.osgi.sop.api.adb.Reference;
 import de.mhus.osgi.sop.api.adb.Reference.TYPE;
 import de.mhus.osgi.sop.api.adb.ReferenceCollector;
-import de.mhus.osgi.sop.api.model.ActionTask;
-import de.mhus.osgi.sop.api.model.Foundation;
-import de.mhus.osgi.sop.api.model.FoundationGroup;
-import de.mhus.osgi.sop.api.model.Journal;
-import de.mhus.osgi.sop.api.model.ObjectParameter;
-import de.mhus.osgi.sop.api.model.Register;
+import de.mhus.osgi.sop.api.model.SopActionTask;
+import de.mhus.osgi.sop.api.model.SopFoundation;
+import de.mhus.osgi.sop.api.model.SopFoundationGroup;
+import de.mhus.osgi.sop.api.model.FoundationRelated;
+import de.mhus.osgi.sop.api.model.SopJournal;
+import de.mhus.osgi.sop.api.model.SopObjectParameter;
+import de.mhus.osgi.sop.api.model.SopRegister;
 
 @Component(provide=DbSchemaService.class,immediate=true)
 public class SopDbImpl extends MLog implements DbSchemaService {
@@ -245,12 +246,12 @@ public class SopDbImpl extends MLog implements DbSchemaService {
 	
 	@Override
 	public void registerObjectTypes(List<Class<? extends Persistable>> list) {
-		list.add(ObjectParameter.class);
-		list.add(ActionTask.class);
-		list.add(Register.class);
-		list.add(Journal.class);
-		list.add(Foundation.class);
-		list.add(FoundationGroup.class);
+		list.add(SopObjectParameter.class);
+		list.add(SopActionTask.class);
+		list.add(SopRegister.class);
+		list.add(SopJournal.class);
+		list.add(SopFoundation.class);
+		list.add(SopFoundationGroup.class);
 	}
 
 	@Override
@@ -265,15 +266,15 @@ public class SopDbImpl extends MLog implements DbSchemaService {
 		AaaUtil.enterRoot();
 		try {
 			// init base structure
-			FoundationGroup defGroup = service.getObjectByQualification(Db.query(FoundationGroup.class).eq("name", ""));
+			SopFoundationGroup defGroup = service.getObjectByQualification(Db.query(SopFoundationGroup.class).eq("name", ""));
 			if (defGroup == null) {
-				defGroup = service.inject(new FoundationGroup(""));
+				defGroup = service.inject(new SopFoundationGroup(""));
 				defGroup.save();
 			}
 			
-			Foundation defFound = service.getObjectByQualification(Db.query(Foundation.class).eq("ident", ""));
+			SopFoundation defFound = service.getObjectByQualification(Db.query(SopFoundation.class).eq("ident", ""));
 			if (defFound == null) {
-				defFound = service.inject(new Foundation("",""));
+				defFound = service.inject(new SopFoundation("",""));
 				defFound.save();
 			}
 			defFoundationId = defFound.getId();
@@ -297,13 +298,13 @@ public class SopDbImpl extends MLog implements DbSchemaService {
 	public boolean canRead(AaaContext account, DbMetadata obj)
 			throws MException {
 		
-		if (obj instanceof ObjectParameter) {
-			ObjectParameter o = (ObjectParameter)obj;
+		if (obj instanceof SopObjectParameter) {
+			SopObjectParameter o = (SopObjectParameter)obj;
 			if (o.getKey() == null || o.getKey().startsWith("private.")) return false;
 			
 			String type = o.getObjectType();
 			if (type == null) return false;
-			if (type.equals(ObjectParameter.class.getCanonicalName())) return true;
+			if (type.equals(SopObjectParameter.class.getCanonicalName())) return true;
 			
 			
 //			Ace ace = Sop.getApi(SopApi.class).findAce(account.getAccountId(), type, o.getObjectId() );
@@ -312,6 +313,15 @@ public class SopDbImpl extends MLog implements DbSchemaService {
 			
 			return MApi.lookup(AccessApi.class).hasResourceAccess(account.getAccount(), type, String.valueOf(o.getObjectId()), Account.ACT_READ, null);
 		}
+		if (obj instanceof SopFoundation) {
+			
+		}
+		if (obj instanceof SopFoundationGroup) {
+			return true;
+		}
+		if (obj instanceof FoundationRelated) {
+			UUID fId = ((FoundationRelated)obj).getFoundation();
+		}
 		
 		return false;
 	}
@@ -319,13 +329,13 @@ public class SopDbImpl extends MLog implements DbSchemaService {
 	@Override
 	public boolean canUpdate(AaaContext account, DbMetadata obj)
 			throws MException {
-		if (obj instanceof ObjectParameter) {
-			ObjectParameter o = (ObjectParameter)obj;
+		if (obj instanceof SopObjectParameter) {
+			SopObjectParameter o = (SopObjectParameter)obj;
 			if (o.getKey() == null || o.getKey().startsWith("private.")) return false;
 			
 			String type = o.getObjectType();
 			if (type == null) return false;
-			if (type.equals(ObjectParameter.class.getCanonicalName())) return true;
+			if (type.equals(SopObjectParameter.class.getCanonicalName())) return true;
 			
 //			Ace ace = Sop.getApi(SopApi.class).findAce(account.getAccountId(), type, o.getObjectId() );
 //			if (ace == null) return false;
@@ -339,13 +349,13 @@ public class SopDbImpl extends MLog implements DbSchemaService {
 	@Override
 	public boolean canDelete(AaaContext account, DbMetadata obj)
 			throws MException {
-		if (obj instanceof ObjectParameter) {
-			ObjectParameter o = (ObjectParameter)obj;
+		if (obj instanceof SopObjectParameter) {
+			SopObjectParameter o = (SopObjectParameter)obj;
 			if (o.getKey() == null || o.getKey().startsWith("private.")) return false;
 			
 			String type = o.getObjectType();
 			if (type == null) return false;
-			if (type.equals(ObjectParameter.class.getCanonicalName())) return true;
+			if (type.equals(SopObjectParameter.class.getCanonicalName())) return true;
 			
 //			Ace ace = Sop.getApi(SopApi.class).findAce(account.getAccountId(), type, o.getObjectId() );
 //			if (ace == null) return false;
@@ -359,16 +369,16 @@ public class SopDbImpl extends MLog implements DbSchemaService {
 	public boolean canCreate(AaaContext account, DbMetadata obj)
 			throws MException {
 		
-		if (obj instanceof ActionTask)
+		if (obj instanceof SopActionTask)
 			return true;
 		
-		if (obj instanceof ObjectParameter) {
-			ObjectParameter o = (ObjectParameter)obj;
+		if (obj instanceof SopObjectParameter) {
+			SopObjectParameter o = (SopObjectParameter)obj;
 			if (o.getKey() == null || o.getKey().startsWith("private.")) return false;
 			
 			String type = o.getObjectType();
 			if (type == null) return false;
-			if (type.equals(ObjectParameter.class.getCanonicalName())) return true;
+			if (type.equals(SopObjectParameter.class.getCanonicalName())) return true;
 			
 //			Ace ace = Sop.getApi(SopApi.class).findAce(account.getAccountId(), type, o.getObjectId() );
 //			if (ace == null) return false;
@@ -381,16 +391,16 @@ public class SopDbImpl extends MLog implements DbSchemaService {
 
 	@Override
 	public DbMetadata getObject(String type, UUID id) throws MException {
-		if (type.equals(ObjectParameter.class.getCanonicalName()))
-			return SopDbImpl.getManager().getObject(ObjectParameter.class, id);
-		if (type.equals(ActionTask.class.getCanonicalName()))
-			return SopDbImpl.getManager().getObject(ActionTask.class, id);
-		if (type.equals(Foundation.class.getCanonicalName()))
-			return SopDbImpl.getManager().getObject(Foundation.class, id);
-		if (type.equals(FoundationGroup.class.getCanonicalName()))
-			return SopDbImpl.getManager().getObject(FoundationGroup.class, id);
-		if (type.equals(Journal.class.getCanonicalName()))
-			return SopDbImpl.getManager().getObject(Journal.class, id);
+		if (type.equals(SopObjectParameter.class.getCanonicalName()))
+			return SopDbImpl.getManager().getObject(SopObjectParameter.class, id);
+		if (type.equals(SopActionTask.class.getCanonicalName()))
+			return SopDbImpl.getManager().getObject(SopActionTask.class, id);
+		if (type.equals(SopFoundation.class.getCanonicalName()))
+			return SopDbImpl.getManager().getObject(SopFoundation.class, id);
+		if (type.equals(SopFoundationGroup.class.getCanonicalName()))
+			return SopDbImpl.getManager().getObject(SopFoundationGroup.class, id);
+		if (type.equals(SopJournal.class.getCanonicalName()))
+			return SopDbImpl.getManager().getObject(SopJournal.class, id);
 //		if (type.equals(Register.class.getCanonicalName()))
 //			return SopDbImpl.getManager().getObject(Register.class, id);
 		throw new MException("unknown type",type);
@@ -407,7 +417,7 @@ public class SopDbImpl extends MLog implements DbSchemaService {
 		if (object == null || !(object instanceof DbMetadata)) return;
 		DbMetadata meta = (DbMetadata)object;
 		try {
-			for (ObjectParameter p : MApi.lookup(AdbApi.class).getParameters(object.getClass(), meta.getId())) {
+			for (SopObjectParameter p : MApi.lookup(AdbApi.class).getParameters(object.getClass(), meta.getId())) {
 				collector.foundReference(new Reference<DbMetadata>(p,TYPE.CHILD));
 			}
 		} catch (MException e) {
