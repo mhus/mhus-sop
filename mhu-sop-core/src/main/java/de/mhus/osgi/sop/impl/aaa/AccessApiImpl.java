@@ -203,8 +203,6 @@
  */
 package de.mhus.osgi.sop.impl.aaa;
 
-import java.util.WeakHashMap;
-
 import org.osgi.service.component.ComponentContext;
 
 import aQute.bnd.annotation.component.Activate;
@@ -216,6 +214,7 @@ import de.mhus.lib.core.MString;
 import de.mhus.lib.core.security.Account;
 import de.mhus.lib.core.security.AccountSource;
 import de.mhus.lib.core.security.AuthorizationSource;
+import de.mhus.lib.core.util.SoftHashMap;
 import de.mhus.lib.errors.AccessDeniedException;
 import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
@@ -234,8 +233,8 @@ public class AccessApiImpl extends MLog implements AccessApi {
 
 	private static AaaContextImpl ROOT_CONTEXT = new RootContext();
 	private static AaaContextImpl GUEST_CONTEXT = new GuestContext();
-	protected WeakHashMap<String, Account> accountCache = new WeakHashMap<String, Account>();
-	protected WeakHashMap<String, Trust> trustCache = new WeakHashMap<String, Trust>();
+	protected SoftHashMap<String, Account> accountCache = new SoftHashMap<String, Account>();
+	protected SoftHashMap<String, Trust> trustCache = new SoftHashMap<String, Trust>();
 
 	private AccountSource accountSource;
 	private TrustSource trustSource;

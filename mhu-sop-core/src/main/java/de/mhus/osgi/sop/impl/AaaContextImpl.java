@@ -220,7 +220,6 @@ public class AaaContextImpl implements AaaContext {
 	protected AaaContextImpl parent;
 	private Account account;
 	protected boolean adminMode = false;
-	protected SoftHashMap<String, ContextCachedItem> cache = new SoftHashMap<String, ContextCachedItem>();
 	private Trust trust;
 
 	public AaaContextImpl(Account account) {
@@ -268,47 +267,17 @@ public class AaaContextImpl implements AaaContext {
 	}
 	
 	@Override
-	public ContextCachedItem getCached(String key) {
+	public <T> T getCached(String key) {
 		if (key == null) return null;
-		synchronized (cache) {
-			ContextCachedItem ret = cache.get(key);
-			if (ret != null ) {
-				if (ret.isValid())
-					return ret;
-				else
-					cache.remove(key);
-			}
-			return null;
-		}
+		return ContextCacheService.get(this, key);
 	}
 	
 	@Override
-	public void setCached(String key, ContextCachedItem item) {
+	public void setCached(String key, long ttl, Object item) {
 		if (key == null || item == null) return;
-		synchronized (cache) {
-			cache.put(key, item);
-		}
-	}
-
-	public void clearCache() {
-		cache.clear();
+		ContextCacheService.set(this, key, ttl, item);
 	}
 	
-	public void cleanupCache() {
-		cache.cleanup();
-		synchronized (cache) {
-			Iterator<Entry<String, ContextCachedItem>> iterator = cache.entrySet().iterator();
-			while (iterator.hasNext()) {
-				Entry<String, ContextCachedItem> entry = iterator.next();
-				if (entry.getValue() != null && !entry.getValue().isValid())
-					iterator.remove();
-			}
-		}
-	}
-	
-	public int cacheSize() {
-		return cache.size();
-	}
 	@Override
 	public Trust getTrust() {
 		return trust;

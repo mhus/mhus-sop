@@ -211,6 +211,6 @@ public interface AaaContext {
 	Trust getTrust();
 	boolean isAdminMode();
 	String getAccountId();
-	ContextCachedItem getCached(String key);
-	void setCached(String key, ContextCachedItem item);
+	<T> T getCached(String key);
+	void setCached(String key, long ttl, Object item);
 }

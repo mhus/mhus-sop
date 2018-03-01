@@ -218,6 +218,11 @@ public class ContextCachedItem {
 		this.ttl = ttl;
 	}
 	
+	public ContextCachedItem(long ttl, Object obj) {
+		this.ttl = ttl;
+		setObject(obj);
+	}
+	
 	private long ttl = 1000 * 60;
 	private long created = System.currentTimeMillis();
 	

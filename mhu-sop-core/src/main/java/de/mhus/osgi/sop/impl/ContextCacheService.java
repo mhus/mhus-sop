@@ -201,127 +201,77 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package de.mhus.osgi.sop.api.adb;
+package de.mhus.osgi.sop.impl;
 
-import java.util.UUID;
+import org.osgi.service.component.ComponentContext;
 
-import de.mhus.lib.adb.DbMetadata;
-import de.mhus.lib.adb.Persistable;
-import de.mhus.lib.adb.query.Db;
-import de.mhus.lib.basics.AclControlled;
-import de.mhus.lib.basics.UuidIdentificable;
-import de.mhus.lib.core.MApi;
-import de.mhus.lib.core.MLog;
-import de.mhus.lib.core.MTimeInterval;
-import de.mhus.lib.core.MValidator;
-import de.mhus.lib.core.cfg.CfgLong;
-import de.mhus.lib.core.security.Account;
-import de.mhus.lib.core.security.Ace;
+import aQute.bnd.annotation.component.Activate;
+import aQute.bnd.annotation.component.Component;
+import aQute.bnd.annotation.component.Deactivate;
 import de.mhus.lib.core.util.SoftHashMap;
-import de.mhus.lib.errors.MException;
+import de.mhus.lib.karaf.services.AbstractCacheControl;
+import de.mhus.lib.karaf.services.CacheControlIfc;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
-import de.mhus.osgi.sop.api.aaa.AaaUtil;
-import de.mhus.osgi.sop.api.aaa.AccessApi;
 import de.mhus.osgi.sop.api.aaa.ContextCachedItem;
-import de.mhus.osgi.sop.api.model.SopAcl;
 
-public abstract class AbstractDbSchemaService extends MLog implements DbSchemaService {
+@Component(provide=CacheControlIfc.class)
+public class ContextCacheService extends AbstractCacheControl {
 
-	public static CfgLong CFG_TIMEOUT = new CfgLong(DbSchemaService.class, "cacheTimeout", MTimeInterval.MINUTE_IN_MILLISECOUNDS * 5);
+	private SoftHashMap<String, ContextCachedItem> cache = new SoftHashMap<String, ContextCachedItem>();
+	private static ContextCacheService instance;
+
+	@Activate
+	public void doActivate(ComponentContext ctx) {
+		instance = this;
+	}
 	
-	@Override
-	public boolean canRead(AaaContext context, Persistable obj)
-			throws MException {
-//		return MApi.lookup(AccessApi.class).hasResourceAccess(account.getAccount(),obj.getClass().getName(), String.valueOf(obj.getId()), Account.ACT_READ, null);
-		return getAce(context, obj).canRead();
+	@Deactivate
+	public void doDeactivate(ComponentContext ctx) {
+		instance = null;
 	}
 
 	@Override
-	public boolean canUpdate(AaaContext context, Persistable obj)
-			throws MException {
-//		return MApi.lookup(AccessApi.class).hasResourceAccess(account.getAccount(),obj.getClass().getName(), String.valueOf(obj.getId()), Account.ACT_UPDATE, null);
-		return getAce(context, obj).canUpdate();
+	public long getSize() {
+		synchronized (cache) {
+			return cache.size();
+		}
 	}
 
 	@Override
-	public boolean canDelete(AaaContext context, Persistable obj)
-			throws MException {
-//		return MApi.lookup(AccessApi.class).hasResourceAccess(context.getAccount(),obj.getClass().getName(), String.valueOf(obj.getId()), Account.ACT_DELETE, null);
-		return getAce(context, obj).canDelete();
+	public void clear() {
+		synchronized (cache) {
+			cache.clear();
+		}
 	}
 
-	public Ace getAce(AaaContext context, Persistable obj) throws MException {
-
-		if (obj == null) return Ace.ACE_NONE;
-		if (context.isAdminMode()) return Ace.ACE_ALL;
-		
-		String ident = null;
-		if (obj instanceof UuidIdentificable) {
-			UUID uuid = ((UuidIdentificable)obj).getId();
-			if (uuid != null)
-				ident = uuid.toString();
+	private void privSet(AaaContext context, String key, long ttl, Object value) {
+		if (!enabled) return;
+		synchronized (cache) {
+			cache.put(context.getAccountId() + "|" + key, new ContextCachedItem(ttl, value));
 		}
-		
-		if (ident != null) {
-			Ace cont = context.getCached("adb|"+ident);
-			if (cont != null)
-				return cont;
-		}
-		
-		String acl = null;
-		Ace ace = null;
-		
-		if (obj instanceof AclControlled) {
-			acl = ((AclControlled)obj).getAcl();
-		}
-		if (acl == null && ident != null) {
-			SopAcl aclObject = MApi.lookup(AdbApi.class).getManager().getObjectByQualification(Db.query(SopAcl.class).eq("target", ident ));
-			if (aclObject != null)
-				acl = aclObject.getList();
-		}
-		if (acl == null) {
-			acl = getAcl(context, obj);
-		}
-		if (acl != null) {
-			ace = AaaUtil.getAccessAce(context, acl);
-		} else
-			ace = Ace.ACE_NONE;
-		
-		if (ident != null)
-			context.setCached("adb|"+ident, CFG_TIMEOUT.value(), ace);
-		return ace;
 	}
-
-	/**
-	 * Return a corresponding acl to access the object.
-	 * @param obj
-	 * @return
-	 * @throws MException 
-	 */
-	protected abstract String getAcl(AaaContext context, Persistable obj) throws MException;
-
-	@Override
-	public Persistable getObject(String type, UUID id) throws MException {
-		try {
-			Class<?> clazz = Class.forName(type, true, this.getClass().getClassLoader());
-			if (clazz != null) {
-				return (Persistable)MApi.lookup(AdbApi.class).getManager().getObject(clazz, id);
+	
+	private Object privGet(AaaContext context, String key) {
+		synchronized (cache) {
+			ContextCachedItem cont = cache.get(context.getAccountId() + "|" + key);
+			if (cont == null) return null;
+			if (!cont.isValid()) {
+				cache.remove(context.getAccountId() + "|" + key);
+				return null;
 			}
-		} catch (Throwable t) {
-			throw new MException("type error",type,t);
+			return cont.getObject();
 		}
-		throw new MException("unknown type",type);
 	}
-
-	@Override
-	public Persistable getObject(String type, String id) throws MException {
-		try {
-			if (MValidator.isUUID(id))
-				return getObject(type, UUID.fromString(id));
-		} catch (Throwable t) {
-			throw new MException("type error",type,t);
-		}
-		throw new MException("unknown type",type);
+	
+	public static void set(AaaContext context, String key, long ttl, Object value) {
+		if (instance == null) return;
+		instance.privSet(context, key, ttl, value);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static <T> T get(AaaContext context, String key) {
+		if (instance == null) return null;
+		return (T)instance.privGet(context, key);
 	}
 	
 }

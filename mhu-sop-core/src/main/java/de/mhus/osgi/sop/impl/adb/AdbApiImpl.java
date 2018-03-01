@@ -227,6 +227,7 @@ import de.mhus.lib.basics.UuidIdentificable;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MConstants;
 import de.mhus.lib.core.MLog;
+import de.mhus.lib.core.MTimeInterval;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.xdb.XdbService;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
@@ -525,62 +526,62 @@ public class AdbApiImpl extends MLog implements AdbApi {
 	protected boolean canRead(AaaContext c, DbMetadata obj)
 			throws MException {
 		
-		ContextCachedItem item = ((AaaContextImpl)c).getCached("ace_read"+ "|" + obj.getId());
+		Boolean item = ((AaaContextImpl)c).getCached("ace_read|" + obj.getId());
 		if (item != null)
-			return item.bool;
+			return item;
 
 		DbSchemaService controller = getController(obj.getClass().getCanonicalName());
 		if (controller == null) return false;
 
 		ContextCachedItem ret = new ContextCachedItem();
 		ret.bool = controller.canRead(c,obj);
-		((AaaContextImpl)c).setCached("ace_read"+ "|" + obj.getId(),ret);
+		((AaaContextImpl)c).setCached("ace_read|" + obj.getId(), MTimeInterval.MINUTE_IN_MILLISECOUNDS * 5, ret);
 		return ret.bool;
 	}
 
 	protected boolean canUpdate(AaaContext c, DbMetadata obj)
 			throws MException {
 		
-		ContextCachedItem item = ((AaaContextImpl)c).getCached("ace_update"+ "|" + obj.getId());
+		Boolean item = ((AaaContextImpl)c).getCached("ace_update|" + obj.getId());
 		if (item != null)
-			return item.bool;
+			return item;
 
 		DbSchemaService controller = getController(obj.getClass().getCanonicalName());
 		if (controller == null) return false;
 		
 		ContextCachedItem ret = new ContextCachedItem();
 		ret.bool = controller.canUpdate(c,obj);
-		((AaaContextImpl)c).setCached("ace_update"+ "|" + obj.getId(),ret);
+		((AaaContextImpl)c).setCached("ace_update|" + obj.getId(),MTimeInterval.MINUTE_IN_MILLISECOUNDS * 5, ret);
 		return ret.bool;
 	}
 
 	protected boolean canDelete(AaaContext c, DbMetadata obj)
 			throws MException {
 		
-		ContextCachedItem item = ((AaaContextImpl)c).getCached("ace_delete"+ "|" + obj.getId());
+		Boolean item = ((AaaContextImpl)c).getCached("ace_delete"+ "|" + obj.getId());
 		if (item != null)
-			return item.bool;
+			return item;
 
 		DbSchemaService controller = getController(obj.getClass().getCanonicalName());
 		if (controller == null) return false;
 
 		ContextCachedItem ret = new ContextCachedItem();
 		ret.bool = controller.canDelete(c,obj);
-		((AaaContextImpl)c).setCached("ace_delete"+ "|" + obj.getId(),ret);
+		((AaaContextImpl)c).setCached("ace_delete|" + obj.getId(), MTimeInterval.MINUTE_IN_MILLISECOUNDS * 5,ret);
 		return ret.bool;
 	}
 
 	protected boolean canCreate(AaaContext c, DbMetadata obj) throws MException {
-		ContextCachedItem item = ((AaaContextImpl)c).getCached("ace_create"+ "|" + obj.getId());
+		Boolean item = ((AaaContextImpl)c).getCached("ace_create"+ "|" + obj.getId());
 		if (item != null)
-			return item.bool;
+			return item;
 		
 		DbSchemaService controller = getController(obj.getClass().getCanonicalName());
 		if (controller == null) return false;
 		
 		ContextCachedItem ret = new ContextCachedItem();
 		ret.bool = controller.canCreate(c,obj);
-		((AaaContextImpl)c).setCached("ace_create"+ "|" + obj.getId(),ret);
+		((AaaContextImpl)c).setCached("ace_create|" + obj.getId(),MTimeInterval.MINUTE_IN_MILLISECOUNDS * 5, ret);
 		return ret.bool;
 	}
 

@@ -230,7 +230,6 @@ public class AccessCmd implements Action {
 	@Argument(index=0, name="cmd", required=true, description=
 			"Command login <account>,"
 			+ " logout, id, info,"
-			+ " cache, cache.clear, local.cache.clear, local.cache.cleanup,"
 			+ " synchronize <account>,"
 			+ " validate <account> <password>,"
 			+ " synchronizer <type>,"
@@ -317,22 +316,6 @@ public class AccessCmd implements Action {
 				table.addRowValues(entry.getKey(), entry.getValue().getClass(), bundle.getSymbolicName() );
 			}
 			table.print(System.out);
-		} else
-		if (cmd.equals("cache")) {
-			AaaContextImpl context = (AaaContextImpl) api.getCurrentOrGuest();
-			System.out.println("Cache Size: " + context.cacheSize());
-		} else
-		if (cmd.equals("local.cache.clear")) {
-			AaaContextImpl context = (AaaContextImpl) api.getCurrentOrGuest();
-			System.out.println("Cache Size: " + context.cacheSize());
-			context.clearCache();
-			System.out.println("Cache Size: " + context.cacheSize());
-		} else
-		if (cmd.equals("local.cache.cleanup")) {
-			AaaContextImpl context = (AaaContextImpl) api.getCurrentOrGuest();
-			System.out.println("Cache Size: " + context.cacheSize());
-			context.cleanupCache();
-			System.out.println("Cache Size: " + context.cacheSize());
 		} else
 		if (cmd.equals("md5")) {
 			System.out.println( MPassword.encodePasswordMD5(parameters[0]) );
