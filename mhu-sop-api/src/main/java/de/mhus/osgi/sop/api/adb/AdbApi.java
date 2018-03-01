@@ -211,6 +211,7 @@ import java.util.UUID;
 
 import de.mhus.lib.adb.DbManager;
 import de.mhus.lib.adb.DbMetadata;
+import de.mhus.lib.adb.Persistable;
 import de.mhus.lib.adb.query.AQuery;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.xdb.XdbService;
@@ -278,8 +279,8 @@ public interface AdbApi extends SApi {
 	
 	Set<Entry<String, DbSchemaService>> getController();
 
-	void onDelete(DbMetadata object);
+	void onDelete(Persistable object);
 
-	void collectRefereces(DbMetadata object, ReferenceCollector collector);
+	void collectRefereces(Persistable object, ReferenceCollector collector);
 
 }

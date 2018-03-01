@@ -203,10 +203,10 @@
  */
 package de.mhus.osgi.sop.api.adb;
 
-import de.mhus.lib.adb.DbMetadata;
+import de.mhus.lib.adb.Persistable;
 import de.mhus.lib.core.MLog;
 
-public class Reference<T extends DbMetadata> extends MLog {
+public class Reference<T extends Persistable> extends MLog {
 
 	public enum TYPE {CHILD,PARENT,OTHER}
 	private T object;

@@ -208,6 +208,7 @@ import java.util.List;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.logging.Log;
 import de.mhus.lib.core.security.Account;
+import de.mhus.lib.core.security.Ace;
 import de.mhus.lib.core.security.Rightful;
 
 public class AaaUtil {
@@ -225,6 +226,9 @@ public class AaaUtil {
 
 		try {
 			for (String line : acl) {
+				if (line == null) continue;
+				line = line.trim();
+				if (line.length() == 0 || line.startsWith("#")) continue;
 				if (line.startsWith("not:")) {
 					line = line.substring(4);
 					if (accessControl.hasGroup(line)) return false;
@@ -252,6 +256,9 @@ public class AaaUtil {
 
 		try {
 			for (String line : acl) {
+				if (line == null) continue;
+				line = line.trim();
+				if (line.length() == 0 || line.startsWith("#")) continue;
 				if (line.startsWith("not:")) {
 					line = line.substring(4);
 					if (accessControl.hasGroup(line)) return false;
@@ -279,9 +286,83 @@ public class AaaUtil {
 		return hasAccess(account, parts);
 	}
 
+	public static Ace getAccessAce(AaaContext context, List<String> acl) {
+		if (context.isAdminMode()) return Ace.ACE_ALL;
+		return getAccessAce(context.getAccount(), acl);
+	}
+
+	public static Ace getAccessAce(Rightful accessControl, List<String> acl) {
+		if (accessControl == null || acl == null )
+			return Ace.ACE_NONE;
+
+		try {
+			for (String line : acl) {
+				if (line == null || line.length() == 0 || line.startsWith("#")) continue;
+				int p = line.indexOf('=');
+				String rule = line;
+				String ace = Ace.RIGHTS_NONE;
+				if (p >= 0) {
+					rule = line.substring(0, p);
+					ace = line.substring(p+1);
+				}
+				rule = rule.trim();
+				ace = ace.trim();
+				if (rule.startsWith("user:")) {
+					rule = rule.substring(5);
+					if (accessControl.getName().equals(rule)) return new Ace(ace);
+				} else
+				if (rule.equals("*") || accessControl.hasGroup(rule)) return new Ace(ace);
+			}
+		} catch (Throwable t) {
+			log.d(acl, accessControl, t);
+		}
+		return Ace.ACE_NONE;
+		
+	}
+	
+	public static Ace getAccessAce(AaaContext context, String acl) {
+		if (context.isAdminMode()) return Ace.ACE_ALL;
+		return getAccessAce(context.getAccount(), acl.split(","));
+	}
+	
+	public static Ace getAccessAce(AaaContext context, String[] acl) {
+		if (context.isAdminMode()) return Ace.ACE_ALL;
+		return getAccessAce(context.getAccount(), acl);
+	}
+
+	public static Ace getAccessAce(Rightful accessControl, String[] acl) {
+		if (accessControl == null || acl == null )
+			return Ace.ACE_NONE;
+
+		try {
+			for (String line : acl) {
+				if (line == null || line.length() == 0 || line.startsWith("#")) continue;
+				int p = line.indexOf('=');
+				String rule = line;
+				String ace = Ace.RIGHTS_NONE;
+				if (p >= 0) {
+					rule = line.substring(0, p);
+					ace = line.substring(p+1);
+				}
+				rule = rule.trim();
+				ace = ace.trim();
+				if (rule.startsWith("user:")) {
+					rule = rule.substring(5);
+					if (accessControl.getName().equals(rule)) return new Ace(ace);
+				} else
+				if (rule.equals("*") || accessControl.hasGroup(rule)) return new Ace(ace);
+			}
+		} catch (Throwable t) {
+			log.d(acl, accessControl, t);
+		}
+		return Ace.ACE_NONE;
+		
+	}
+	
 	public static void enterRoot() {
 		AccessApi api = MApi.lookup(AccessApi.class);
 		if (api == null) return;
+		@SuppressWarnings("unused")
 		AaaContext rootContext = api.processAdminSession();
 	}
 

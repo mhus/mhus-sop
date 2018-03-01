@@ -222,13 +222,13 @@ public interface DbSchemaService {
 
 	void doDestroy();
 
-	boolean canRead(AaaContext context, DbMetadata obj) throws MException;
-	boolean canUpdate(AaaContext context, DbMetadata obj) throws MException;
-	boolean canDelete(AaaContext context, DbMetadata obj) throws MException;
-	boolean canCreate(AaaContext context, DbMetadata obj) throws MException;
+	boolean canRead(AaaContext context, Persistable obj) throws MException;
+	boolean canUpdate(AaaContext context, Persistable obj) throws MException;
+	boolean canDelete(AaaContext context, Persistable obj) throws MException;
+	boolean canCreate(AaaContext context, Persistable obj) throws MException;
 
-	DbMetadata getObject(String type, UUID id) throws MException;
-	DbMetadata getObject(String type, String id) throws MException;
+	Persistable getObject(String type, UUID id) throws MException;
+	Persistable getObject(String type, String id) throws MException;
 	
 	void collectReferences(Persistable object, ReferenceCollector collector);
 	

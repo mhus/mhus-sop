@@ -207,7 +207,6 @@ import java.util.List;
 import java.util.UUID;
 
 import aQute.bnd.annotation.component.Component;
-import de.mhus.lib.adb.DbManager;
 import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.adb.Persistable;
 import de.mhus.lib.adb.query.Db;
@@ -215,12 +214,13 @@ import de.mhus.lib.basics.UuidIdentificable;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.security.Account;
+import de.mhus.lib.core.security.Ace;
 import de.mhus.lib.errors.MException;
-import de.mhus.lib.karaf.adb.DbManagerService;
 import de.mhus.lib.xdb.XdbService;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AaaUtil;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
+import de.mhus.osgi.sop.api.adb.AbstractDbSchemaService;
 import de.mhus.osgi.sop.api.adb.AdbApi;
 import de.mhus.osgi.sop.api.adb.DbSchemaService;
 import de.mhus.osgi.sop.api.adb.Reference;
@@ -230,12 +230,13 @@ import de.mhus.osgi.sop.api.model.SopActionTask;
 import de.mhus.osgi.sop.api.model.SopFoundation;
 import de.mhus.osgi.sop.api.model.SopFoundationGroup;
 import de.mhus.osgi.sop.api.model.FoundationRelated;
+import de.mhus.osgi.sop.api.model.SopAcl;
 import de.mhus.osgi.sop.api.model.SopJournal;
 import de.mhus.osgi.sop.api.model.SopObjectParameter;
 import de.mhus.osgi.sop.api.model.SopRegister;
 
 @Component(provide=DbSchemaService.class,immediate=true)
-public class SopDbImpl extends MLog implements DbSchemaService {
+public class SopDbImpl extends AbstractDbSchemaService {
 
 	private XdbService service;
 	private UUID defFoundationId;
@@ -253,6 +254,7 @@ public class SopDbImpl extends MLog implements DbSchemaService {
 		list.add(SopJournal.class);
 		list.add(SopFoundation.class);
 		list.add(SopFoundationGroup.class);
+		list.add(SopAcl.class);
 	}
 
 	@Override
@@ -295,122 +297,122 @@ public class SopDbImpl extends MLog implements DbSchemaService {
 				.service;
 	}
 	
-	@Override
-	public boolean canRead(AaaContext account, DbMetadata obj)
-			throws MException {
-		
-		if (obj instanceof SopObjectParameter) {
-			SopObjectParameter o = (SopObjectParameter)obj;
-			if (o.getKey() == null || o.getKey().startsWith("private.")) return false;
-			
-			String type = o.getObjectType();
-			if (type == null) return false;
-			if (type.equals(SopObjectParameter.class.getCanonicalName())) return true;
-			
-			
-//			Ace ace = Sop.getApi(SopApi.class).findAce(account.getAccountId(), type, o.getObjectId() );
-//			if (ace == null) return false;
-//			return ace.canRead();
-			
-			return MApi.lookup(AccessApi.class).hasResourceAccess(account.getAccount(), type, String.valueOf(o.getObjectId()), Account.ACT_READ, null);
-		}
-		if (obj instanceof SopFoundation) {
-			
-		}
-		if (obj instanceof SopFoundationGroup) {
-			return true;
-		}
-		if (obj instanceof FoundationRelated) {
-			UUID fId = ((FoundationRelated)obj).getFoundation();
-		}
-		
-		return false;
-	}
+//	@Override
+//	public boolean canRead(AaaContext account, Persistable obj)
+//			throws MException {
+//		
+//		if (obj instanceof SopObjectParameter) {
+//			SopObjectParameter o = (SopObjectParameter)obj;
+//			if (o.getKey() == null || o.getKey().startsWith("private.")) return false;
+//			
+//			String type = o.getObjectType();
+//			if (type == null) return false;
+//			if (type.equals(SopObjectParameter.class.getCanonicalName())) return true;
+//			
+//			
+////			Ace ace = Sop.getApi(SopApi.class).findAce(account.getAccountId(), type, o.getObjectId() );
+////			if (ace == null) return false;
+////			return ace.canRead();
+//			
+//			return MApi.lookup(AccessApi.class).hasResourceAccess(account.getAccount(), type, String.valueOf(o.getObjectId()), Account.ACT_READ, null);
+//		}
+//		if (obj instanceof SopFoundation) {
+//			
+//		}
+//		if (obj instanceof SopFoundationGroup) {
+//			return true;
+//		}
+//		if (obj instanceof FoundationRelated) {
+//			UUID fId = ((FoundationRelated)obj).getFoundation();
+//		}
+//		
+//		return false;
+//	}
 
-	@Override
-	public boolean canUpdate(AaaContext account, DbMetadata obj)
-			throws MException {
-		if (obj instanceof SopObjectParameter) {
-			SopObjectParameter o = (SopObjectParameter)obj;
-			if (o.getKey() == null || o.getKey().startsWith("private.")) return false;
-			
-			String type = o.getObjectType();
-			if (type == null) return false;
-			if (type.equals(SopObjectParameter.class.getCanonicalName())) return true;
-			
-//			Ace ace = Sop.getApi(SopApi.class).findAce(account.getAccountId(), type, o.getObjectId() );
-//			if (ace == null) return false;
-//			return ace.canUpdate();
-			return MApi.lookup(AccessApi.class).hasResourceAccess(account.getAccount(), type, String.valueOf(o.getObjectId()), Account.ACT_UPDATE, null);
+//	@Override
+//	public boolean canUpdate(AaaContext account, Persistable obj)
+//			throws MException {
+//		if (obj instanceof SopObjectParameter) {
+//			SopObjectParameter o = (SopObjectParameter)obj;
+//			if (o.getKey() == null || o.getKey().startsWith("private.")) return false;
+//			
+//			String type = o.getObjectType();
+//			if (type == null) return false;
+//			if (type.equals(SopObjectParameter.class.getCanonicalName())) return true;
+//			
+////			Ace ace = Sop.getApi(SopApi.class).findAce(account.getAccountId(), type, o.getObjectId() );
+////			if (ace == null) return false;
+////			return ace.canUpdate();
+//			return MApi.lookup(AccessApi.class).hasResourceAccess(account.getAccount(), type, String.valueOf(o.getObjectId()), Account.ACT_UPDATE, null);
+//
+//		}
+//		return false;
+//	}
 
-		}
-		return false;
-	}
+//	@Override
+//	public boolean canDelete(AaaContext account, Persistable obj)
+//			throws MException {
+//		if (obj instanceof SopObjectParameter) {
+//			SopObjectParameter o = (SopObjectParameter)obj;
+//			if (o.getKey() == null || o.getKey().startsWith("private.")) return false;
+//			
+//			String type = o.getObjectType();
+//			if (type == null) return false;
+//			if (type.equals(SopObjectParameter.class.getCanonicalName())) return true;
+//			
+////			Ace ace = Sop.getApi(SopApi.class).findAce(account.getAccountId(), type, o.getObjectId() );
+////			if (ace == null) return false;
+////			return ace.canDelete();
+//			return MApi.lookup(AccessApi.class).hasResourceAccess(account.getAccount(), type, String.valueOf(o.getObjectId()), Account.ACT_DELETE, null);
+//		}
+//		return false;
+//	}
 
-	@Override
-	public boolean canDelete(AaaContext account, DbMetadata obj)
-			throws MException {
-		if (obj instanceof SopObjectParameter) {
-			SopObjectParameter o = (SopObjectParameter)obj;
-			if (o.getKey() == null || o.getKey().startsWith("private.")) return false;
-			
-			String type = o.getObjectType();
-			if (type == null) return false;
-			if (type.equals(SopObjectParameter.class.getCanonicalName())) return true;
-			
-//			Ace ace = Sop.getApi(SopApi.class).findAce(account.getAccountId(), type, o.getObjectId() );
-//			if (ace == null) return false;
-//			return ace.canDelete();
-			return MApi.lookup(AccessApi.class).hasResourceAccess(account.getAccount(), type, String.valueOf(o.getObjectId()), Account.ACT_DELETE, null);
-		}
-		return false;
-	}
+//	@Override
+//	public boolean canCreate(AaaContext account, Persistable obj)
+//			throws MException {
+//		
+//		if (obj instanceof SopActionTask)
+//			return true;
+//		
+//		if (obj instanceof SopObjectParameter) {
+//			SopObjectParameter o = (SopObjectParameter)obj;
+//			if (o.getKey() == null || o.getKey().startsWith("private.")) return false;
+//			
+//			String type = o.getObjectType();
+//			if (type == null) return false;
+//			if (type.equals(SopObjectParameter.class.getCanonicalName())) return true;
+//			
+////			Ace ace = Sop.getApi(SopApi.class).findAce(account.getAccountId(), type, o.getObjectId() );
+////			if (ace == null) return false;
+////			return ace.canCreate();
+//			return MApi.lookup(AccessApi.class).hasResourceAccess(account.getAccount(), type, String.valueOf(o.getObjectId()), Account.ACT_CREATE, null);
+//		}
+//		
+//		return false;
+//	}
 
-	@Override
-	public boolean canCreate(AaaContext account, DbMetadata obj)
-			throws MException {
-		
-		if (obj instanceof SopActionTask)
-			return true;
-		
-		if (obj instanceof SopObjectParameter) {
-			SopObjectParameter o = (SopObjectParameter)obj;
-			if (o.getKey() == null || o.getKey().startsWith("private.")) return false;
-			
-			String type = o.getObjectType();
-			if (type == null) return false;
-			if (type.equals(SopObjectParameter.class.getCanonicalName())) return true;
-			
-//			Ace ace = Sop.getApi(SopApi.class).findAce(account.getAccountId(), type, o.getObjectId() );
-//			if (ace == null) return false;
-//			return ace.canCreate();
-			return MApi.lookup(AccessApi.class).hasResourceAccess(account.getAccount(), type, String.valueOf(o.getObjectId()), Account.ACT_CREATE, null);
-		}
-		
-		return false;
-	}
+//	@Override
+//	public Persistable getObject(String type, UUID id) throws MException {
+//		if (type.equals(SopObjectParameter.class.getCanonicalName()))
+//			return SopDbImpl.getManager().getObject(SopObjectParameter.class, id);
+//		if (type.equals(SopActionTask.class.getCanonicalName()))
+//			return SopDbImpl.getManager().getObject(SopActionTask.class, id);
+//		if (type.equals(SopFoundation.class.getCanonicalName()))
+//			return SopDbImpl.getManager().getObject(SopFoundation.class, id);
+//		if (type.equals(SopFoundationGroup.class.getCanonicalName()))
+//			return SopDbImpl.getManager().getObject(SopFoundationGroup.class, id);
+//		if (type.equals(SopJournal.class.getCanonicalName()))
+//			return SopDbImpl.getManager().getObject(SopJournal.class, id);
+////		if (type.equals(Register.class.getCanonicalName()))
+////			return SopDbImpl.getManager().getObject(Register.class, id);
+//		throw new MException("unknown type",type);
+//	}
 
-	@Override
-	public DbMetadata getObject(String type, UUID id) throws MException {
-		if (type.equals(SopObjectParameter.class.getCanonicalName()))
-			return SopDbImpl.getManager().getObject(SopObjectParameter.class, id);
-		if (type.equals(SopActionTask.class.getCanonicalName()))
-			return SopDbImpl.getManager().getObject(SopActionTask.class, id);
-		if (type.equals(SopFoundation.class.getCanonicalName()))
-			return SopDbImpl.getManager().getObject(SopFoundation.class, id);
-		if (type.equals(SopFoundationGroup.class.getCanonicalName()))
-			return SopDbImpl.getManager().getObject(SopFoundationGroup.class, id);
-		if (type.equals(SopJournal.class.getCanonicalName()))
-			return SopDbImpl.getManager().getObject(SopJournal.class, id);
-//		if (type.equals(Register.class.getCanonicalName()))
-//			return SopDbImpl.getManager().getObject(Register.class, id);
-		throw new MException("unknown type",type);
-	}
-
-	@Override
-	public DbMetadata getObject(String type, String id) throws MException {
-		return getObject(type, UUID.fromString(id));
-	}
+//	@Override
+//	public Persistable getObject(String type, String id) throws MException {
+//		return getObject(type, UUID.fromString(id));
+//	}
 
 	@Override
 	public void collectReferences(Persistable object,
@@ -419,7 +421,7 @@ public class SopDbImpl extends MLog implements DbSchemaService {
 		UuidIdentificable meta = (UuidIdentificable)object;
 		try {
 			for (SopObjectParameter p : MApi.lookup(AdbApi.class).getParameters(object.getClass(), meta.getId())) {
-				collector.foundReference(new Reference<DbMetadata>(p,TYPE.CHILD));
+				collector.foundReference(new Reference<Persistable>(p,TYPE.CHILD));
 			}
 		} catch (MException e) {
 			log().d(object.getClass(),meta.getId(),e);
@@ -433,6 +435,51 @@ public class SopDbImpl extends MLog implements DbSchemaService {
 
 	public UUID getDefaultFoundationId() {
 		return defFoundationId;
+	}
+
+	@Override
+	protected String getAcl(AaaContext context, Persistable obj) throws MException {
+		
+		if (obj instanceof SopFoundationGroup) {
+			return Ace.RIGHTS_RO;
+		}
+		if (obj instanceof FoundationRelated) {
+			UUID fId = ((FoundationRelated)obj).getFoundation();
+			SopFoundation f = getManager().getObject(SopFoundation.class, fId);
+			if (f == null) return Ace.RIGHTS_NONE;
+			SopAcl aclObject = MApi.lookup(AdbApi.class).getManager().getObjectByQualification(Db.query(SopAcl.class).eq("target", fId + "_" ));
+			if (aclObject == null)
+				return getAce(context,f).getRights();
+			return aclObject.getList();
+		}
+		
+		return null;
+	}
+
+	@Override
+	public boolean canCreate(AaaContext context, Persistable obj) throws MException {
+		if (obj == null) return false;
+		if (context.isAdminMode()) return true;
+		if (obj instanceof FoundationRelated) {
+			UUID fId = ((FoundationRelated)obj).getFoundation();
+			SopFoundation f = getManager().getObject(SopFoundation.class, fId);
+			if (f == null) return false;
+			{
+				SopAcl aclObject = MApi.lookup(AdbApi.class).getManager().getObjectByQualification(Db.query(SopAcl.class).eq("target", fId + "_" + obj.getClass().getSimpleName() ));
+				if (aclObject != null) {
+					Ace ace = AaaUtil.getAccessAce(context, aclObject.getList());
+					return ace.canCreate();
+				}
+			}
+			{
+				SopAcl aclObject = MApi.lookup(AdbApi.class).getManager().getObjectByQualification(Db.query(SopAcl.class).eq("target", fId + "_" ));
+				if (aclObject != null) {
+					Ace ace = AaaUtil.getAccessAce(context, aclObject.getList());
+					return ace.canCreate();
+				}
+			}
+		}
+		return false;
 	}
 	
 }

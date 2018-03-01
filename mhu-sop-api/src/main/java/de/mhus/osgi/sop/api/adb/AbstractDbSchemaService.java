@@ -206,44 +206,112 @@ package de.mhus.osgi.sop.api.adb;
 import java.util.UUID;
 
 import de.mhus.lib.adb.DbMetadata;
+import de.mhus.lib.adb.Persistable;
+import de.mhus.lib.adb.query.Db;
+import de.mhus.lib.basics.AclControlled;
+import de.mhus.lib.basics.UuidIdentificable;
 import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.MLog;
+import de.mhus.lib.core.MTimeInterval;
+import de.mhus.lib.core.MValidator;
+import de.mhus.lib.core.cfg.CfgLong;
 import de.mhus.lib.core.security.Account;
+import de.mhus.lib.core.security.Ace;
+import de.mhus.lib.core.util.SoftHashMap;
 import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
+import de.mhus.osgi.sop.api.aaa.AaaUtil;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
+import de.mhus.osgi.sop.api.model.SopAcl;
 
-public abstract class AbstractDbSchemaService implements DbSchemaService {
+public abstract class AbstractDbSchemaService extends MLog implements DbSchemaService {
 
+	public static CfgLong CFG_TIMEOUT = new CfgLong(DbSchemaService.class, "cacheTimeout", MTimeInterval.MINUTE_IN_MILLISECOUNDS * 5);
+	SoftHashMap<String, AceCont> aceCache = new SoftHashMap<>();
+	
 	@Override
-	public boolean canRead(AaaContext account, DbMetadata obj)
+	public boolean canRead(AaaContext context, Persistable obj)
 			throws MException {
-		return MApi.lookup(AccessApi.class).hasResourceAccess(account.getAccount(),obj.getClass().getName(), String.valueOf(obj.getId()), Account.ACT_READ, null);
+//		return MApi.lookup(AccessApi.class).hasResourceAccess(account.getAccount(),obj.getClass().getName(), String.valueOf(obj.getId()), Account.ACT_READ, null);
+		return getAce(context, obj).canRead();
 	}
 
 	@Override
-	public boolean canUpdate(AaaContext account, DbMetadata obj)
+	public boolean canUpdate(AaaContext context, Persistable obj)
 			throws MException {
-		return MApi.lookup(AccessApi.class).hasResourceAccess(account.getAccount(),obj.getClass().getName(), String.valueOf(obj.getId()), Account.ACT_UPDATE, null);
+//		return MApi.lookup(AccessApi.class).hasResourceAccess(account.getAccount(),obj.getClass().getName(), String.valueOf(obj.getId()), Account.ACT_UPDATE, null);
+		return getAce(context, obj).canUpdate();
 	}
 
 	@Override
-	public boolean canDelete(AaaContext account, DbMetadata obj)
+	public boolean canDelete(AaaContext context, Persistable obj)
 			throws MException {
-		return MApi.lookup(AccessApi.class).hasResourceAccess(account.getAccount(),obj.getClass().getName(), String.valueOf(obj.getId()), Account.ACT_DELETE, null);
+//		return MApi.lookup(AccessApi.class).hasResourceAccess(context.getAccount(),obj.getClass().getName(), String.valueOf(obj.getId()), Account.ACT_DELETE, null);
+		return getAce(context, obj).canDelete();
 	}
 
-	@Override
-	public boolean canCreate(AaaContext account, DbMetadata obj)
-			throws MException {
-		return MApi.lookup(AccessApi.class).hasResourceAccess(account.getAccount(),obj.getClass().getName(), String.valueOf(obj.getId()), Account.ACT_CREATE, null);
+	public Ace getAce(AaaContext context, Persistable obj) throws MException {
+
+		if (obj == null) return Ace.ACE_NONE;
+		if (context.isAdminMode()) return Ace.ACE_ALL;
+		
+		String ident = null;
+		if (obj instanceof UuidIdentificable) {
+			UUID uuid = ((UuidIdentificable)obj).getId();
+			if (uuid != null)
+				ident = uuid.toString();
+		}
+		
+		if (ident != null) {
+			AceCont cont = aceCache.get(ident);
+			if (cont != null) {
+				if (cont.isExpired()) {
+					aceCache.remove(ident);
+					cont = null;
+				}
+			}
+			if (cont != null)
+				return cont.ace;
+		}
+		
+		String acl = null;
+		Ace ace = null;
+		
+		if (obj instanceof AclControlled) {
+			acl = ((AclControlled)obj).getAcl();
+		}
+		if (acl == null && ident != null) {
+			SopAcl aclObject = MApi.lookup(AdbApi.class).getManager().getObjectByQualification(Db.query(SopAcl.class).eq("target", ident ));
+			if (aclObject != null)
+				acl = aclObject.getList();
+		}
+		if (acl == null) {
+			acl = getAcl(context, obj);
+		}
+		if (acl != null) {
+			ace = AaaUtil.getAccessAce(context, acl);
+		} else
+			ace = Ace.ACE_NONE;
+		
+		if (ident != null)
+			aceCache.put(ident, new AceCont(ace));
+		return ace;
 	}
 
+	/**
+	 * Return a corresponding acl to access the object.
+	 * @param obj
+	 * @return
+	 * @throws MException 
+	 */
+	protected abstract String getAcl(AaaContext context, Persistable obj) throws MException;
+
 	@Override
-	public DbMetadata getObject(String type, UUID id) throws MException {
+	public Persistable getObject(String type, UUID id) throws MException {
 		try {
 			Class<?> clazz = Class.forName(type, true, this.getClass().getClassLoader());
 			if (clazz != null) {
-				return (DbMetadata)MApi.lookup(AdbApi.class).getManager().getObject(clazz, id);
+				return (Persistable)MApi.lookup(AdbApi.class).getManager().getObject(clazz, id);
 			}
 		} catch (Throwable t) {
 			throw new MException("type error",type,t);
@@ -252,12 +320,24 @@ public abstract class AbstractDbSchemaService implements DbSchemaService {
 	}
 
 	@Override
-	public DbMetadata getObject(String type, String id) throws MException {
+	public Persistable getObject(String type, String id) throws MException {
 		try {
-			return getObject(type, UUID.fromString(id));
+			if (MValidator.isUUID(id))
+				return getObject(type, UUID.fromString(id));
 		} catch (Throwable t) {
 			throw new MException("type error",type,t);
 		}
+		throw new MException("unknown type",type);
 	}
 	
+	private static class AceCont {
+		Ace ace;
+		long created = System.currentTimeMillis();
+		public AceCont(Ace ace) {
+			this.ace = ace;
+		}
+		boolean isExpired() {
+			return MTimeInterval.isTimeOut(created, CFG_TIMEOUT.value());
+		}
+	}
 }

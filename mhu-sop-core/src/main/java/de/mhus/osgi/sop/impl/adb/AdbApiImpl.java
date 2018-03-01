@@ -223,6 +223,7 @@ import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.adb.Persistable;
 import de.mhus.lib.adb.query.AQuery;
 import de.mhus.lib.adb.query.Db;
+import de.mhus.lib.basics.UuidIdentificable;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MConstants;
 import de.mhus.lib.core.MLog;
@@ -605,7 +606,7 @@ public class AdbApiImpl extends MLog implements AdbApi {
 	}
 
 	@Override
-	public void onDelete(DbMetadata object) {
+	public void onDelete(Persistable object) {
 
 		if (object == null) return;
 		
@@ -616,10 +617,11 @@ public class AdbApiImpl extends MLog implements AdbApi {
 				if (ref.getType() == TYPE.CHILD) {
 					if (ref.getObject() == null) return;
 					// be sure not cause an infinity loop, a object should only be deleted once ...
-					if (list.contains(ref.getObject().getId()))
-						return;
-					list.add(ref.getObject().getId());
-					
+					if (ref.getObject() instanceof UuidIdentificable) {
+						if (list.contains(((UuidIdentificable)ref.getObject()).getId()))
+							return;
+						list.add(((UuidIdentificable)ref.getObject()).getId());
+					}			
 					// delete the object and dependencies
 					try {
 						doDelete(ref);
@@ -637,11 +639,11 @@ public class AdbApiImpl extends MLog implements AdbApi {
 		log().d("start delete",ref.getObject(),ref.getType());
 		onDelete(ref.getObject());
 		log().d("delete",ref);
-		ref.getObject().delete();
+		getManager().delete(ref.getObject());
 	}
 
 	@Override
-	public void collectRefereces(DbMetadata object, ReferenceCollector collector) {
+	public void collectRefereces(Persistable object, ReferenceCollector collector) {
 
 		if (object == null) return;
 
