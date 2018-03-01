@@ -279,10 +279,14 @@ public class SopDbManagerService extends DbManagerServiceImpl {
 				updateManager();
 			}	
 			
-			try {
-				service.doPostInitialize(SopDbManagerService.this.getManager());
-			} catch (Throwable t) {
-				log().w(name,t);
+			if (SopDbManagerService.this.getManager() != null) {
+				// already open
+				log().d("addingService","doPostInitialize",name);
+				try {
+					service.doPostInitialize(SopDbManagerService.this.getManager());
+				} catch (Throwable t) {
+					log().w(name,t);
+				}
 			}
 			return service;
 		}
@@ -329,6 +333,20 @@ public class SopDbManagerService extends DbManagerServiceImpl {
 	@Override
 	public String getServiceName() {
 		return MApi.getCfg(DbManagerService.class).getString("serviceName", "sop");
+	}
+
+	@Override
+	protected void doPostOpen() throws MException {
+		synchronized (schemaList) {
+			schemaList.forEach((name,service) -> {
+				log().d("doPostOpen","doPostInitialize",name);
+				try {
+					service.doPostInitialize(getManager());
+				} catch (Exception e) {
+					log().e("doPostInitialize",name,e);
+				}
+			});
+		}
 	}
 
 }
