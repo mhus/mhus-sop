@@ -222,7 +222,7 @@ import de.mhus.osgi.sop.api.adb.AdbApi;
 import de.mhus.osgi.sop.api.model.SopObjectParameter;
 import de.mhus.osgi.sop.api.util.ObjectUtil;
 
-@Command(scope = "mhus", name = "parameter", description = "Handle object parameters")
+@Command(scope = "sop", name = "parameter", description = "Handle object parameters")
 @Service
 public class ObjectParametersCmd implements Action {
 

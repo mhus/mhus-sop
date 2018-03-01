@@ -41,4 +41,8 @@ public class SopAcl extends DbMetadata implements AclControlled {
 		return target;
 	}
 
+	public void setList(String list) {
+		this.list = list;
+	}
+
 }

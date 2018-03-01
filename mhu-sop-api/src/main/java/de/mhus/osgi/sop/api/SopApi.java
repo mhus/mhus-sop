@@ -211,6 +211,7 @@ import de.mhus.lib.adb.DbSchema;
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.pojo.PojoModelFactory;
 import de.mhus.lib.errors.MException;
+import de.mhus.osgi.sop.api.model.SopAcl;
 import de.mhus.osgi.sop.api.model.SopFoundationGroup;
 import de.mhus.osgi.sop.api.model.SopJournal;
 
@@ -231,5 +232,7 @@ public interface SopApi extends SApi {
 	DbMetadata getFoundation(UUID id) throws MException;
 
 	UUID getDefaultFoundationId();
+
+	SopAcl getAcl(String id) throws MException;
 	
 }

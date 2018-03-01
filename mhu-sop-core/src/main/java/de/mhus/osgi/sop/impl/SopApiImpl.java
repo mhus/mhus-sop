@@ -226,6 +226,7 @@ import de.mhus.lib.core.cfg.CfgProperties;
 import de.mhus.lib.core.pojo.PojoModelFactory;
 import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.SopApi;
+import de.mhus.osgi.sop.api.model.SopAcl;
 import de.mhus.osgi.sop.api.model.SopFoundation;
 import de.mhus.osgi.sop.api.model.SopFoundationGroup;
 import de.mhus.osgi.sop.api.model.SopJournal;
@@ -325,5 +326,11 @@ public class SopApiImpl extends MLog implements SopApi {
 	@Override
 	public PojoModelFactory getDataPojoModelFactory() {
 		return SopDbImpl.getManager().getPojoModelFactory();
+	}
+
+	@Override
+	public SopAcl getAcl(String id) throws MException {
+		SopAcl acl = SopDbImpl.getManager().getObjectByQualification(Db.query(SopAcl.class).eq("target", id));
+		return acl;
 	}
 }
