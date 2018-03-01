@@ -204,23 +204,31 @@
 package de.mhus.osgi.sop.api.rest;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.UUID;
 
+import de.mhus.lib.adb.DbCollection;
 import de.mhus.lib.adb.DbManager;
 import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.adb.DbSchema;
+import de.mhus.lib.adb.query.AQuery;
 import de.mhus.lib.annotations.generic.Public;
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.MCast;
+import de.mhus.lib.core.MString;
 import de.mhus.lib.core.logging.Log;
 import de.mhus.lib.core.pojo.PojoAttribute;
 import de.mhus.lib.core.pojo.PojoModel;
 import de.mhus.lib.core.pojo.PojoModelFactory;
 import de.mhus.lib.errors.MException;
+import de.mhus.lib.xdb.XdbService;
 import de.mhus.osgi.sop.api.adb.AdbApi;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 
 public class RestUtil {
+	
+	private static final int PAGE_SIZE = 1000;
 	
 	private static Log log = Log.getLog(RestUtil.class);
 
@@ -282,6 +290,38 @@ public class RestUtil {
 	public static RestResult doExecuteBpm(String string, CallContext callContext, String nodeId) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public static int getPageFromSearch(String search) {
+		if (MString.isEmpty(search) || !search.startsWith("page:"))
+			return 0;
+		search = search.substring(5);
+		if (search.indexOf(',') >= 0)
+			return MCast.toint(MString.beforeIndex(search, ','), 0);
+		return MCast.toint(search, 0);
+	}
+
+	public static String getFilterFromSearch(String search) {
+		if (MString.isEmpty(search))
+			return null;
+		if (search.startsWith("page:")) {
+			if (search.indexOf(',') >= 0)
+				return MString.afterIndex(search, ',');
+			return null;
+		}
+		return search;
+	}
+
+	public static <T> LinkedList<T> collectResults(XdbService service, AQuery<T> query, int page) throws MException {
+		LinkedList<T> list = new LinkedList<T>();
+		DbCollection<T> res = service.getByQualification(query);
+		if (!res.skip(page * PAGE_SIZE)) return list;
+		while (res.hasNext()) {
+			list.add(res.next());
+			if (list.size() >= PAGE_SIZE) break;
+		}
+		res.close();
+		return list;
 	}
 
 }

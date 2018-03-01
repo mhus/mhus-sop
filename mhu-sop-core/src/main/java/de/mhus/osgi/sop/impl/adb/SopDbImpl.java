@@ -227,6 +227,7 @@ import de.mhus.osgi.sop.api.adb.Reference;
 import de.mhus.osgi.sop.api.adb.Reference.TYPE;
 import de.mhus.osgi.sop.api.adb.ReferenceCollector;
 import de.mhus.osgi.sop.api.model.SopActionTask;
+import de.mhus.osgi.sop.api.model.SopData;
 import de.mhus.osgi.sop.api.model.SopFoundation;
 import de.mhus.osgi.sop.api.model.SopFoundationGroup;
 import de.mhus.osgi.sop.api.model.FoundationRelated;
@@ -255,6 +256,7 @@ public class SopDbImpl extends AbstractDbSchemaService {
 		list.add(SopFoundation.class);
 		list.add(SopFoundationGroup.class);
 		list.add(SopAcl.class);
+		list.add(SopData.class);
 	}
 
 	@Override

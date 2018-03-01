@@ -374,4 +374,12 @@ public class AaaUtil {
 		api.release(context);
 	}
 
+	public static boolean isCurrentAdmin() {
+		AccessApi api = MApi.lookup(AccessApi.class);
+		if (api == null) return false;
+		AaaContext context = api.getCurrent();
+		if (context == null) return false;
+		return context.isAdminMode();
+	}
+
 }

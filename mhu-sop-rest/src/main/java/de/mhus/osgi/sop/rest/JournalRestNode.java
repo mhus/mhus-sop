@@ -5,6 +5,7 @@ import java.util.List;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
 
+import aQute.bnd.annotation.component.Component;
 import de.mhus.lib.adb.DbSchema;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCast;
@@ -15,7 +16,9 @@ import de.mhus.osgi.sop.api.model.SopJournal;
 import de.mhus.osgi.sop.api.rest.CallContext;
 import de.mhus.osgi.sop.api.rest.JsonNode;
 import de.mhus.osgi.sop.api.rest.JsonResult;
+import de.mhus.osgi.sop.api.rest.RestNodeService;
 
+@Component(immediate=true,provide=RestNodeService.class)
 public class JournalRestNode extends JsonNode<JournalQueue>{
 
 	@Override

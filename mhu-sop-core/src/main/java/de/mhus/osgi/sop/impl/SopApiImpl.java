@@ -203,6 +203,7 @@
  */
 package de.mhus.osgi.sop.impl;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -218,18 +219,27 @@ import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.adb.DbSchema;
 import de.mhus.lib.adb.query.AQuery;
 import de.mhus.lib.adb.query.Db;
+import de.mhus.lib.adb.query.SearchHelper;
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MLog;
+import de.mhus.lib.core.MString;
 import de.mhus.lib.core.MValidator;
 import de.mhus.lib.core.cfg.CfgProperties;
 import de.mhus.lib.core.pojo.PojoModelFactory;
 import de.mhus.lib.errors.MException;
+import de.mhus.lib.errors.NotFoundException;
+import de.mhus.lib.karaf.MOsgi;
+import de.mhus.lib.xdb.XdbService;
 import de.mhus.osgi.sop.api.SopApi;
+import de.mhus.osgi.sop.api.data.SopDataController;
 import de.mhus.osgi.sop.api.model.SopAcl;
+import de.mhus.osgi.sop.api.model.SopData;
 import de.mhus.osgi.sop.api.model.SopFoundation;
 import de.mhus.osgi.sop.api.model.SopFoundationGroup;
 import de.mhus.osgi.sop.api.model.SopJournal;
+import de.mhus.osgi.sop.api.rest.RestUtil;
+import de.mhus.osgi.sop.api.util.SopUtil;
 import de.mhus.osgi.sop.impl.adb.SopDbImpl;
 
 @Component(immediate=true,provide=SopApi.class,name="SopApi")
@@ -241,6 +251,15 @@ public class SopApiImpl extends MLog implements SopApi {
 	private long lastOrder = 0;
 	private long lastOrderTime = 0;
 	
+	private static final SearchHelper SEARCH_HELPER_DATA = new SearchHelper() {
+		@Override
+		public String findKeyForValue(AQuery<?> query, String value) {
+			if (MValidator.isUUID(value))
+				return "id";
+			return "foreignid";
+		}
+	};
+
 	@Activate
 	public void doActivate(ComponentContext ctx) {
 		context = ctx.getBundleContext();
@@ -333,4 +352,181 @@ public class SopApiImpl extends MLog implements SopApi {
 		SopAcl acl = SopDbImpl.getManager().getObjectByQualification(Db.query(SopAcl.class).eq("target", id));
 		return acl;
 	}
+
+	@Override
+	public XdbService getManager() {
+		return SopDbImpl.getManager();
+	}
+
+	@Override
+	public SopDataController getDataSyncHandlerForType(String type) {
+		try {
+			SopDataController out = MOsgi.getService(SopDataController.class, "(type=" + type + ")");
+			return out;
+		} catch (NotFoundException e) {
+			return null;
+		}
+	}
+
+	@Override
+	public List<SopData> getSopData(UUID foundId, String type, String search, boolean publicAccess, Boolean archived,
+	        Date due) throws MException {
+		int 	page 	= RestUtil.getPageFromSearch(search);
+		String filter 	= RestUtil.getFilterFromSearch(search);
+		
+		AQuery<SopData> query = Db.query(SopData.class);
+		if (type != null)
+			query.eq(Db.attr("type"), Db.value(type));
+		if (foundId != null)
+			query.eq(Db.attr("foundation"), Db.value(foundId));
+		if (publicAccess)
+//			query.eq(Db.attr("ispublic"), Db.value(true));
+			query.eq("ispublic", true);
+		if (due != null)
+			query.lt(Db.attr("due"), Db.value(due));
+
+		boolean isArchived = false;
+		
+		if (MString.isSet(filter)) {
+			for (String part : filter.split(" ")) {
+				part = part.trim();
+				if (MString.isIndex(part, ':')) {
+					String key = MString.beforeIndex(part, ':');
+					String val = MString.afterIndex(part, ':');
+					
+					switch(key) {
+					case "value1":
+						query.eq("value1",val);break;
+					case "value2":
+						query.eq("value2",val);break;
+					case "value3":
+						query.eq("value3",val);break;
+					case "value4":
+						query.eq("value4",val);break;
+					case "value5":
+						query.eq("value5",val);break;
+					case "*value1*":
+						query.like("value1","%"+val+"%");break;
+					case "*value2*":
+						query.like("value2","%"+val+"%");break;
+					case "*value3*":
+						query.like("value3","%"+val+"%");break;
+					case "*value4*":
+						query.like("value4","%"+val+"%");break;
+					case "*value5*":
+						query.like("value5","%"+val+"%");break;
+					case "writable":
+						query.eq("iswritable", MCast.toboolean(val, false));break;
+					case "archived":
+						isArchived = true;
+						if (!"all".equals(val))
+							query.eq("archived", MCast.toboolean(val, false));
+						break;
+					case "status":
+						query.eq("status", val); break;
+					}
+					
+	//				if (key.equals("archive") && MCast.toboolean(val, false))
+	//					query.eq("archived", true);
+						
+				} else {
+					query.or( Db.eq("foreignid", part), Db.like("value1", "%"+part+"%"),Db.like("value2", "%"+part+"%"),Db.like("value3", "%"+part+"%"),Db.like("value4", "%"+part+"%"),Db.like("value5", "%"+part+"%")  );
+				}
+			}
+		}
+
+		if (!isArchived)
+			if (archived != null)
+				query.eq(Db.attr("archived"), Db.value(archived.booleanValue()));
+
+		query.desc("foreignid");
+		
+		LinkedList<SopData> out = RestUtil.collectResults(getManager(),query,page);
+		return out;
+	}
+
+	@Override
+	public SopData getSopData(UUID foundId, UUID id, boolean sync) throws MException {
+		SopData out = getManager().getObject(SopData.class, id);
+		
+		if (out == null) return null;
+		if (foundId != null && !out.getFoundation().equals(foundId))
+			return null;
+		
+		if (sync)
+			syncSopData(out, false, true);
+		
+		return out;
+	}
+
+	@Override
+	public SopData getSopData(UUID foundId, String id, boolean sync) throws MException {
+		SopData out = null;
+		if (MValidator.isUUID(id)) {
+			out = getManager().getObject(SopData.class, UUID.fromString(id));
+		} else {
+			out = getManager().getObjectByQualification(
+					Db.extendObjectQueryFromSearch(
+							Db.query(SopData.class),
+							id,
+							SEARCH_HELPER_DATA
+					));
+		}
+		if (out == null) return null;
+		if (foundId != null && !out.getFoundation().equals(foundId))
+			return null;
+		
+		if (sync)
+			syncSopData(out, false, true);
+		
+		return out;
+	}
+
+	@Override
+	public SopData getSopDataByForeignId(UUID orgaId, String type, String id) throws MException {
+		return getManager().getObjectByQualification(Db.query(SopData.class)
+				.eq(SopData::getFoundation, orgaId)
+				.eq(SopData::getType, type)
+				.eq(SopData::getForeignId, id));
+	}
+
+	@Override
+	public boolean syncSopData(SopData obj, boolean forced, boolean save) {
+		
+		if (obj == null) return false;
+		
+		SopDataController sync = getDataSyncHandlerForType(obj.getType());
+		if (sync == null) {
+			log().t("Synchronizer for type not found",obj);
+			return false;
+		}
+		
+		if (!forced) {
+			if (!sync.isNeedSync(obj))
+				return false;
+		}
+		
+		log().d("Synchronize SopData",obj);
+		obj.setLastSyncMsg("ok", false);
+		try {
+			sync.synchronizeSopData(obj);
+		} catch (Throwable t) {
+			log().i("SopData sync failed",obj,t);
+			obj.setLastSyncTry(true);
+			obj.setLastSyncMsg(t.toString(), true);
+			return false;
+		}
+		
+		obj.setLastSyncTry(false);
+		obj.setLastSync(obj.getLastSyncTry());
+		try {
+			if (save)
+				obj.save();
+		} catch (MException e) {
+			log().w(obj,e);
+		}
+		return true;
+		
+	}
+	
 }
