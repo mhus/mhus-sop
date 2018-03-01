@@ -86,5 +86,7 @@ public interface SopDataController {
 	 * @throws Exception 
 	 */
 	OperationResult actionSopDataOperation(SopData data, String action, IProperties p) throws Exception;
+
+	void synchronizeSopData(SopData obj);
 	
 }
