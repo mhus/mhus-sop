@@ -15,31 +15,6 @@ import de.mhus.osgi.sop.api.rest.CallContext;
 public interface SopDataController {
 
 	/**
-	 * Called to pull data from remote by SopDataBackend and REST read calls.
-	 * Do not save the object, it will be filled with more data and saved by the 
-	 * caller.
-	 * 
-	 * @param object
-	 * @throws Exception
-	 */
-	void synchronizeSopData(SopData object) throws Exception;
-
-	/**
-	 * Called if a DB Object is send to the SopDataBackend to push. e.g. if a Organization
-	 * object is imported or changed by the Tr Importer.
-	 * 
-	 * @param object
-	 */
-	void pushObject(DbMetadata object);
-
-	/**
-	 * Called if a DB Object is send to SopDataBackend to delete.
-	 * 
-	 * @param object
-	 */
-	void deleteObject(DbMetadata object);
-
-	/**
 	 * Called from REST if a SopData should be created. The object is fully filled
 	 * the method has to call the 'save()' method.
 	 * 
