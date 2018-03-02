@@ -205,10 +205,10 @@ package de.mhus.osgi.sop.api.aaa;
 
 import java.util.List;
 
+import de.mhus.lib.basics.Ace;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.logging.Log;
 import de.mhus.lib.core.security.Account;
-import de.mhus.lib.core.security.Ace;
 import de.mhus.lib.core.security.Rightful;
 
 public class AaaUtil {

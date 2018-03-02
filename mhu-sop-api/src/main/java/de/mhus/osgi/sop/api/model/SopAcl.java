@@ -4,8 +4,8 @@ import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.annotations.adb.DbIndex;
 import de.mhus.lib.annotations.adb.DbPersistent;
 import de.mhus.lib.annotations.adb.DbType.TYPE;
+import de.mhus.lib.basics.Ace;
 import de.mhus.lib.basics.AclControlled;
-import de.mhus.lib.core.security.Ace;
 import de.mhus.lib.errors.MException;
 
 public class SopAcl extends DbMetadata implements AclControlled {
