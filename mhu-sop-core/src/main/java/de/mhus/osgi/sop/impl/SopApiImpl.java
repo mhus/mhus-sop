@@ -371,7 +371,7 @@ public class SopApiImpl extends MLog implements SopApi {
 	}
 
 	@Override
-	public SopDataController getDataSyncHandlerForType(String type) {
+	public SopDataController getDataSyncControllerForType(String type) {
 		try {
 			SopDataController out = MOsgi.getService(SopDataController.class, "(type=" + type + ")");
 			return out;
@@ -507,7 +507,7 @@ public class SopApiImpl extends MLog implements SopApi {
 		
 		if (obj == null) return false;
 		
-		SopDataController sync = getDataSyncHandlerForType(obj.getType());
+		SopDataController sync = getDataSyncControllerForType(obj.getType());
 		if (sync == null) {
 			log().t("Synchronizer for type not found",obj);
 			return false;

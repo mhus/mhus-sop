@@ -81,7 +81,7 @@ public class DataNode extends AbstractObjectListNode<SopData>{
 		List<SopData> ret = api.getSopData(orga.getId(), type, search, true, archived, due);
 		
 		if (type != null) {
-			SopDataController control = api.getDataSyncHandlerForType(type);
+			SopDataController control = api.getDataSyncControllerForType(type);
 			if (control == null)
 				throw new RestException(OperationResult.NOT_SUPPORTED, "Unknown type " + type );
 			control.syncListBeforeLoad(orga, type, search, archived, due, ret);
@@ -133,7 +133,7 @@ public class DataNode extends AbstractObjectListNode<SopData>{
 	protected void doPrepareForOutput(SopData obj, CallContext context, boolean listMode) throws MException {
 		super.doPrepareForOutput(obj, context, listMode);
 		String type = obj.getType();
-		SopDataController control = MApi.lookup(SopApi.class).getDataSyncHandlerForType(type);
+		SopDataController control = MApi.lookup(SopApi.class).getDataSyncControllerForType(type);
 		if (control != null) {
 			control.doPrepareForOutput(obj, context, listMode);
 		}
@@ -143,7 +143,7 @@ public class DataNode extends AbstractObjectListNode<SopData>{
 	public RestResult doAction(CallContext callContext) throws Exception {
 		SopData data = getObjectFromContext(callContext, SopData.class);
 
-		SopDataController handler = MApi.lookup(SopApi.class).getDataSyncHandlerForType(data.getType());
+		SopDataController handler = MApi.lookup(SopApi.class).getDataSyncControllerForType(data.getType());
 		MProperties p = new MProperties();
 		for (String name : callContext.getParameterNames())
 			if (!name.startsWith("_") || name.startsWith("__"))

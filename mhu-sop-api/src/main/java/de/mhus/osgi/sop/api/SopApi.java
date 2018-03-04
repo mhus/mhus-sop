@@ -242,7 +242,7 @@ public interface SopApi extends SApi {
 	
 	XdbService getManager();
 
-	SopDataController getDataSyncHandlerForType(String type);
+	SopDataController getDataSyncControllerForType(String type);
 
 	List<SopData> getSopData(UUID orgaId, String type, String search, boolean publicAccess, Boolean archived, Date due) throws MException;
 
