@@ -216,14 +216,15 @@ import aQute.bnd.annotation.component.Component;
 import aQute.bnd.annotation.component.Deactivate;
 import de.mhus.lib.adb.DbCollection;
 import de.mhus.lib.adb.DbMetadata;
-import de.mhus.lib.adb.DbSchema;
 import de.mhus.lib.adb.query.AQuery;
 import de.mhus.lib.adb.query.Db;
 import de.mhus.lib.adb.query.SearchHelper;
 import de.mhus.lib.core.IProperties;
+import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MString;
+import de.mhus.lib.core.MTimeInterval;
 import de.mhus.lib.core.MValidator;
 import de.mhus.lib.core.cfg.CfgProperties;
 import de.mhus.lib.core.pojo.PojoModelFactory;
@@ -232,6 +233,8 @@ import de.mhus.lib.errors.NotFoundException;
 import de.mhus.lib.karaf.MOsgi;
 import de.mhus.lib.xdb.XdbService;
 import de.mhus.osgi.sop.api.SopApi;
+import de.mhus.osgi.sop.api.aaa.AaaContext;
+import de.mhus.osgi.sop.api.aaa.AccessApi;
 import de.mhus.osgi.sop.api.data.SopDataController;
 import de.mhus.osgi.sop.api.model.SopAcl;
 import de.mhus.osgi.sop.api.model.SopData;
@@ -239,7 +242,6 @@ import de.mhus.osgi.sop.api.model.SopFoundation;
 import de.mhus.osgi.sop.api.model.SopFoundationGroup;
 import de.mhus.osgi.sop.api.model.SopJournal;
 import de.mhus.osgi.sop.api.rest.RestUtil;
-import de.mhus.osgi.sop.api.util.SopUtil;
 import de.mhus.osgi.sop.impl.adb.SopDbImpl;
 
 @Component(immediate=true,provide=SopApi.class,name="SopApi")
@@ -251,6 +253,16 @@ public class SopApiImpl extends MLog implements SopApi {
 	private long lastOrder = 0;
 	private long lastOrderTime = 0;
 	
+	
+	private static final SearchHelper SEARCH_HELPER_FOUNDATION = new SearchHelper() {
+		@Override
+		public String findKeyForValue(AQuery<?> query, String value) {
+			if (MValidator.isUUID(value))
+				return "id";
+			return "ident";
+		}
+	};
+
 	private static final SearchHelper SEARCH_HELPER_DATA = new SearchHelper() {
 		@Override
 		public String findKeyForValue(AQuery<?> query, String value) {
@@ -527,6 +539,63 @@ public class SopApiImpl extends MLog implements SopApi {
 		}
 		return true;
 		
+	}
+
+	@Override
+	public List<SopFoundation> searchFoundations(String search) throws MException {
+		int 	page 	= RestUtil.getPageFromSearch(search);
+		String	filter 	= RestUtil.getFilterFromSearch(search);
+
+		AaaContext context = MApi.lookup(AccessApi.class).getCurrent();
+		
+		if (!context.isAdminMode()) {
+			List<UUID> list = ContextCacheService.get(context, SopFoundation.class.getCanonicalName() + "_" + search );
+			if (list != null) {
+				LinkedList<SopFoundation> out = new LinkedList<>();
+				for (UUID id : list) {
+					SopFoundation o = getFoundation(id.toString());
+					if (o != null)
+						out.add(o);
+				}
+				return out;
+			}
+		}
+		// cache.get( );
+		
+		LinkedList<SopFoundation> out = RestUtil.collectResults(
+				getManager(),
+				Db.extendObjectQueryFromSearch(
+					Db.query(SopFoundation.class),
+					filter,
+					SEARCH_HELPER_FOUNDATION
+				)
+				,
+				page
+				);
+		
+		if (!context.isAdminMode() && out.size() < RestUtil.MAX_RETURN_SIZE ) {
+			LinkedList<UUID> cached = new LinkedList<UUID>();
+			for (SopFoundation o : out)
+				cached.add(o.getId());
+			
+			ContextCacheService.set(context, SopFoundation.class.getCanonicalName() + "_" + search, MTimeInterval.HOUR_IN_MILLISECOUNDS , cached );
+		}
+
+		
+		return out;
+	}
+
+	@Override
+	public SopFoundation getFoundation(String id) throws MException {
+		if (MValidator.isUUID(id))
+			return getManager().getObject(SopFoundation.class, UUID.fromString(id));
+
+		return getManager().getObjectByQualification(
+				Db.extendObjectQueryFromSearch(
+						Db.query(SopFoundation.class),
+						id,
+						SEARCH_HELPER_FOUNDATION
+				));
 	}
 	
 }

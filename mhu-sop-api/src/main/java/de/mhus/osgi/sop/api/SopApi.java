@@ -216,6 +216,7 @@ import de.mhus.lib.xdb.XdbService;
 import de.mhus.osgi.sop.api.data.SopDataController;
 import de.mhus.osgi.sop.api.model.SopAcl;
 import de.mhus.osgi.sop.api.model.SopData;
+import de.mhus.osgi.sop.api.model.SopFoundation;
 import de.mhus.osgi.sop.api.model.SopFoundationGroup;
 import de.mhus.osgi.sop.api.model.SopJournal;
 
@@ -252,5 +253,9 @@ public interface SopApi extends SApi {
 	SopData getSopDataByForeignId(UUID orgaId, String type, String id) throws MException;
 
 	boolean syncSopData(SopData obj, boolean forced, boolean save);
+
+	List<SopFoundation> searchFoundations(String search) throws MException;
+
+	SopFoundation getFoundation(String id) throws MException;
 
 }

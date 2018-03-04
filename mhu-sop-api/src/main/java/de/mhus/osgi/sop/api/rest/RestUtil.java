@@ -229,6 +229,8 @@ import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 public class RestUtil {
 	
 	private static final int PAGE_SIZE = 1000;
+
+	public static final int MAX_RETURN_SIZE = 1000;
 	
 	private static Log log = Log.getLog(RestUtil.class);
 

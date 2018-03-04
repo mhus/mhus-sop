@@ -37,7 +37,7 @@ public class DataNode extends AbstractObjectListNode<SopData>{
 	
 	@Override
 	public String[] getParentNodeIds() {
-		return new String[] {"organization"};
+		return new String[] {"foundation"};
 	}
 
 	@Override
