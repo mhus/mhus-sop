@@ -2,15 +2,17 @@ package de.mhus.osgi.sop.rest;
 
 import java.util.List;
 
+import aQute.bnd.annotation.component.Component;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.SopApi;
-import de.mhus.osgi.sop.api.model.SopAcl;
 import de.mhus.osgi.sop.api.model.SopFoundation;
 import de.mhus.osgi.sop.api.rest.AbstractObjectListNode;
 import de.mhus.osgi.sop.api.rest.CallContext;
 import de.mhus.osgi.sop.api.rest.Node;
+import de.mhus.osgi.sop.api.rest.RestNodeService;
 
+@Component(immediate=true,provide=RestNodeService.class)
 public class FoundationNode extends AbstractObjectListNode<SopFoundation> {
 
 	@Override
