@@ -118,13 +118,19 @@ public class DataNode extends AbstractObjectListNode<SopData>{
 		
 		SopFoundation found = getObjectFromContext(callContext, SopFoundation.class);
 		SopData data = null;
-		int pos = id.indexOf(':');
-		if (pos > 1) {
-			String type = id.substring(0, pos);
-			id = id.substring(pos+1);
+		String type = callContext.getParameter("_type");
+		if (type == null) {
+			int pos = id.indexOf(':');
+			if (pos > 1) {
+				type = id.substring(0, pos);
+				id = id.substring(pos+1);
+			}
+		}
+		if (type != null)
 			data = api.getSopDataByForeignId(found.getId(), type, id);
-		} else
+		else
 			data = api.getSopData(found.getId(), id, true);
+		
 		if (data != null && !data.isIsPublic()) return null;
 		return data;
 	}
