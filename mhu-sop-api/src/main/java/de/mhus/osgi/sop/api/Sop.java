@@ -290,7 +290,7 @@ public class Sop {
 		if (password == null) return null;
 		if (password.length() < 2 || !password.startsWith("`")) return password;
 		if (password.charAt(1) == 'A') {
-			StringBuffer out = new StringBuffer();
+			StringBuilder out = new StringBuilder();
 			for (int i = 2; i < password.length(); i++) {
 				char c = password.charAt(i);
 				switch (c) {

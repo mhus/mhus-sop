@@ -230,7 +230,7 @@ public class SopFileLogger extends FileLogger {
 
 	@Override
 	protected String getInfo() {
-		StringBuffer out = new StringBuffer();
+		StringBuilder out = new StringBuilder();
 		out.append(Thread.currentThread().getId()).append(',');
 		out.append(Thread.currentThread().getName()).append(',');
 		
@@ -241,7 +241,7 @@ public class SopFileLogger extends FileLogger {
 	}
 
 	@Override
-    protected void prepare(StringBuffer sb) {
+    protected void prepare(StringBuilder sb) {
 	}
 
 	@Override

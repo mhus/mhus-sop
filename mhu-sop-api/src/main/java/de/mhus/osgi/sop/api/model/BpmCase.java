@@ -365,7 +365,7 @@ public class BpmCase extends DbMetadata implements FoundationRelated {
 		else
 			sourceName = source.getClass().getCanonicalName();
 
-		StringBuffer m = new StringBuffer().append(MDate.toIso8601(new Date())).append('|').append(sourceName);
+		StringBuilder m = new StringBuilder().append(MDate.toIso8601(new Date())).append('|').append(sourceName);
 		if (msg != null) {
 			for (Object x : msg)
 				if (x != null) m.append('|').append(MCast.toString(x));

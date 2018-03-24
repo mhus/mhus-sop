@@ -448,7 +448,7 @@ public class RestServlet extends HttpServlet {
 	}
 
 	private String getParameterLog(Map<?,?> parameterMap) {
-		StringBuffer out = new StringBuffer().append('{');
+		StringBuilder out = new StringBuilder().append('{');
 		for (Map.Entry<?,?> entry : parameterMap.entrySet()) {
 			out.append(entry.getKey()).append("=[");
 			Object val = entry.getValue();
