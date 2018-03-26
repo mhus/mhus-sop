@@ -203,8 +203,7 @@
  */
 package de.mhus.osgi.sop.api.rest;
 
-import javax.transaction.NotSupportedException;
-
+import de.mhus.lib.errors.NotSupportedException;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 
 public abstract class JsonNode<T> extends AbstractNode<T>{

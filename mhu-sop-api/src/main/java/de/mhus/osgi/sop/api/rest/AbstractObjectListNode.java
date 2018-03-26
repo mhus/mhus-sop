@@ -208,16 +208,24 @@ import java.util.List;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
 
-import de.mhus.lib.adb.DbManager;
-import de.mhus.lib.adb.DbSchema;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.annotations.generic.Public;
 import de.mhus.lib.core.pojo.MPojo;
+import de.mhus.lib.core.pojo.PojoModel;
 import de.mhus.lib.core.pojo.PojoModelFactory;
+import de.mhus.lib.core.pojo.PojoParser;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.errors.MException;
-import de.mhus.osgi.sop.api.adb.AdbApi;
 
 public abstract class AbstractObjectListNode<T> extends JsonNode<T> {
+
+	private static final PojoModelFactory POJO_FACTORY = new PojoModelFactory() {
+		
+		@SuppressWarnings("unchecked")
+		@Override
+		public PojoModel createPojoModel(Class<?> clazz) {
+			return new PojoParser().parse(clazz, "_", new Class[] { Public.class }).filter(true,false,true,false,true).getModel();
+		}
+	};
 
 	@Override
 	public void doRead(JsonResult result, CallContext callContext)
@@ -245,7 +253,7 @@ public abstract class AbstractObjectListNode<T> extends JsonNode<T> {
 	}
 
 	protected PojoModelFactory getPojoModelFactory() {
-		return MApi.lookup(AdbApi.class).getManager().getPojoModelFactory();
+		return POJO_FACTORY;
 	}
 
 	protected abstract List<T> getObjectList(CallContext callContext) throws MException;
