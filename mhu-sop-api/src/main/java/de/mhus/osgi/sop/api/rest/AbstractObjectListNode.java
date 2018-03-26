@@ -254,7 +254,7 @@ public abstract class AbstractObjectListNode<T> extends JsonNode<T> {
 	}
 
 	@Override
-	public void doUpdate(JsonResult result, CallContext callContext)
+	protected void doUpdate(JsonResult result, CallContext callContext)
 			throws Exception {
 		T obj = getObjectFromContext(callContext);
 		if (obj == null) throw new RestException(OperationResult.NOT_FOUND);

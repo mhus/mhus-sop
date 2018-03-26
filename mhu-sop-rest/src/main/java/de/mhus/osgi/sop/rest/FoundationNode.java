@@ -22,7 +22,7 @@ public class FoundationNode extends AbstractObjectListNode<SopFoundation> {
 
 	@Override
 	public String getNodeId() {
-		return "foundation";
+		return FOUNDATION_ID;
 	}
 
 	@Override

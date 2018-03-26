@@ -209,6 +209,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.Servlet;
@@ -333,7 +334,9 @@ public class RestServlet extends HttpServlet {
 	        AccessApi access = MApi.lookup(AccessApi.class);
 	        AaaContext user = null;
 	        try {
-	        	user = access.process(ticket);
+	        	String localeStr = req.getHeader("Accept-Language");
+	        	Locale locale = localeStr == null ? null : Locale.forLanguageTag(localeStr);
+	        	user = access.process(ticket, locale);
 	        } catch (AccessDeniedException e) {
 //	        	log.d("access denied",ticket,e);
 	            resp.setHeader("WWW-Authenticate", "BASIC realm=\"rest\"");  

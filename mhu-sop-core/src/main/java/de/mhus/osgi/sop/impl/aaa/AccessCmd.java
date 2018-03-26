@@ -203,6 +203,7 @@
  */
 package de.mhus.osgi.sop.impl.aaa;
 
+import java.util.Locale;
 import java.util.Map.Entry;
 
 import org.apache.karaf.shell.api.action.Action;
@@ -261,7 +262,7 @@ public class AccessCmd implements Action {
 		} else
 		if (cmd.equals("login")) {
 			Account ac = api.getAccount(parameters[0]);
-			AaaContext cur = api.process(ac, null, admin);
+			AaaContext cur = api.process(ac, null, admin,  parameters.length > 1 ? Locale.forLanguageTag(parameters[1]) : null);
 			System.out.println(cur);
 		} else
 		if (cmd.equals("admin")) {

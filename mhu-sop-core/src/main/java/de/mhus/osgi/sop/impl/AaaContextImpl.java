@@ -203,16 +203,13 @@
  */
 package de.mhus.osgi.sop.impl;
 
-import java.util.Iterator;
-import java.util.Map.Entry;
+import java.util.Locale;
 
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.security.Account;
-import de.mhus.lib.core.util.SoftHashMap;
 import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
-import de.mhus.osgi.sop.api.aaa.ContextCachedItem;
 import de.mhus.osgi.sop.api.aaa.Trust;
 
 public class AaaContextImpl implements AaaContext {
@@ -221,11 +218,12 @@ public class AaaContextImpl implements AaaContext {
 	private Account account;
 	protected boolean adminMode = false;
 	private Trust trust;
+	protected Locale locale;
 
 	public AaaContextImpl(Account account) {
 		this.account = account;
 	}
-	public AaaContextImpl(Account account, Trust trust, boolean admin) throws MException {
+	public AaaContextImpl(Account account, Trust trust, boolean admin, Locale locale) throws MException {
 		this.account = account;
 		this.trust = trust;
 		if (admin) {
@@ -281,6 +279,10 @@ public class AaaContextImpl implements AaaContext {
 	@Override
 	public Trust getTrust() {
 		return trust;
+	}
+	@Override
+	public Locale getLocale() {
+		return locale;
 	}
 	
 }

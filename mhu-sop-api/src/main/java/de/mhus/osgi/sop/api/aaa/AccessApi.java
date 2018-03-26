@@ -203,6 +203,8 @@
  */
 package de.mhus.osgi.sop.api.aaa;
 
+import java.util.Locale;
+
 import de.mhus.lib.core.security.Account;
 import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.SApi;
@@ -225,9 +227,9 @@ public interface AccessApi extends SApi {
 	public static final String ROOT_NAME = "root";
 	public static final String GUEST_NAME = "guest";
 	
-	AaaContext process(String ticket);
+	AaaContext process(String ticket, Locale locale);
 	AaaContext release(String ticket);
-	AaaContext process(Account ac, Trust trust, boolean admin);
+	AaaContext process(Account ac, Trust trust, boolean admin, Locale locale);
 	AaaContext release(Account ac);
 	AaaContext release(AaaContext context);
 	void resetContext();

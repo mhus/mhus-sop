@@ -203,6 +203,8 @@
  */
 package de.mhus.osgi.sop.api.aaa;
 
+import java.util.Locale;
+
 import de.mhus.lib.core.security.Account;
 
 public interface AaaContext {
@@ -213,4 +215,5 @@ public interface AaaContext {
 	String getAccountId();
 	<T> T getCached(String key);
 	void setCached(String key, long ttl, Object item);
+	Locale getLocale();
 }

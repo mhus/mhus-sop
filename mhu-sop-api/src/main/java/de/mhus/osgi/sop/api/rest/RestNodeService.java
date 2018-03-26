@@ -208,6 +208,7 @@ package de.mhus.osgi.sop.api.rest;
 public interface RestNodeService extends Node {
 
 	String ROOT_ID = "";
+	String FOUNDATION_ID = "foundation";
 	String PUBLIC_ID = "public";
 	String GENERAL_ID = "general";
 

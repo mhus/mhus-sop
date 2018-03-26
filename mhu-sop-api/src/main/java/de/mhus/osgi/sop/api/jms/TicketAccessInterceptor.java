@@ -203,6 +203,8 @@
  */
 package de.mhus.osgi.sop.api.jms;
 
+import java.util.Locale;
+
 import javax.jms.JMSException;
 import javax.jms.Message;
 
@@ -218,6 +220,7 @@ import de.mhus.osgi.sop.api.aaa.AccessApi;
 public class TicketAccessInterceptor extends MLog implements JmsInterceptor {
 
 	public static final CfgString TICKET_KEY = new CfgString(JmsApi.class, "aaaTicketName", "mhus.ticket");
+	public static final CfgString LOCALE_KEY = new CfgString(JmsApi.class, "aaaLocaleName", "mhus.locale");
 	public static final CfgBoolean RELAXED = new CfgBoolean(JmsApi.class, "aaaRelaxed", true);
 	
 	@Override
@@ -236,13 +239,15 @@ public class TicketAccessInterceptor extends MLog implements JmsInterceptor {
 				else
 					throw new AccessDeniedException("access api not found");
 			}
+			String localeStr = message.getStringProperty(LOCALE_KEY.value());
+			Locale locale = localeStr == null ? null : Locale.forLanguageTag(localeStr);
 			if (ticket == null)
-				api.process(api.getGuestAccount(),null,false);
+				api.process(api.getGuestAccount(),null,false, locale);
 			else
-				api.process(ticket);
+				api.process(ticket, locale);
 		} catch (Throwable t) {
 			log().i("Incoming Access Denied",message);
-			throw t;
+			throw new RuntimeException(t);
 		}
 	}
 

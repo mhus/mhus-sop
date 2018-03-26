@@ -203,6 +203,8 @@
  */
 package de.mhus.osgi.sop.impl.aaa;
 
+import java.util.Locale;
+
 import org.osgi.service.component.ComponentContext;
 
 import aQute.bnd.annotation.component.Activate;
@@ -258,7 +260,7 @@ public class AccessApiImpl extends MLog implements AccessApi {
 	}
 	
 	@Override
-	public AaaContext process(String ticket) {
+	public AaaContext process(String ticket, Locale locale) {
 		
 		if (ticket == null)
 			throw new AccessDeniedException("null");
@@ -333,14 +335,14 @@ public class AccessApiImpl extends MLog implements AccessApi {
 		} else
 			throw new AccessDeniedException("unknown ticket type",parts[0]);
 				
-		return process(info, trustInfo, admin);
+		return process(info, trustInfo, admin, locale);
 	}
 	
 	@Override
-	public AaaContext process(Account info, Trust trust, boolean admin) {
+	public AaaContext process(Account info, Trust trust, boolean admin, Locale locale) {
 		AaaContextImpl c = null;
 		try {
-			c = new AaaContextImpl(info,trust,admin);
+			c = new AaaContextImpl(info,trust,admin, locale);
 		} catch (MException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
