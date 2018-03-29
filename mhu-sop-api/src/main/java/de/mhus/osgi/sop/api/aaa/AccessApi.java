@@ -282,5 +282,6 @@ public interface AccessApi extends SApi {
 	AccountGuest getGuestAccount();
 	String getResourceAccessAcl(Account account, String resourceName, String id, String action, String def);
 	String getGroupAccessAcl(Account account, String aclName, String action, String def);
+	AaaContext processUserSession(String user, Locale locale);
 
 }

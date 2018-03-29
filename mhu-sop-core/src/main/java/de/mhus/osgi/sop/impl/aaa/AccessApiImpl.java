@@ -258,7 +258,25 @@ public class AccessApiImpl extends MLog implements AccessApi {
 		if (context == null) return;
 		ContextPool.getInstance().set((AaaContextImpl) context);
 	}
-	
+
+	@Override
+	public AaaContext processUserSession(String user, Locale locale) {
+		log().d("user session",user);
+		Account info = null;
+		try {
+			info = getAccount(user);
+		} catch (MException e) {
+			log().w(user,e);
+		}
+		if (info == null)
+			throw new AccessDeniedException("null",user);
+		if (!info.isValid())
+			throw new AccessDeniedException("invalid",user);
+
+		return process(info, null, false, locale);
+
+	}
+
 	@Override
 	public AaaContext process(String ticket, Locale locale) {
 		
@@ -270,6 +288,7 @@ public class AccessApiImpl extends MLog implements AccessApi {
 		Trust trustInfo = null;
 		
 		String[] parts = ticket.split(TicketUtil.SEP);
+		
 		if (parts.length > 0 && parts[0].equals(TicketUtil.ACCOUNT)) {
 			
 			// ACCOUNT AUTH

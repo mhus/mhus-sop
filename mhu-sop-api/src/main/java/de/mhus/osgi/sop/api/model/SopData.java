@@ -71,11 +71,11 @@ public class SopData extends DbMetadata implements FoundationRelated {
 	private Date lastSync;
 
 	@DbPersistent
-	@Public(readable=false,writeable=false)
+	@Public(readable=false,writable=false)
 	private Date lastSyncTry;
 
 	@DbPersistent(size=100,features=AttributeFeatureCut.NAME)
-	@Public(readable=false,writeable=false)
+	@Public(readable=false,writable=false)
 	private String lastSyncMsg;
 	
 	

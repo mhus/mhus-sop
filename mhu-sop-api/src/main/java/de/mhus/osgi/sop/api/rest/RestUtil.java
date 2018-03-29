@@ -243,7 +243,7 @@ public class RestUtil {
 			PojoAttribute<Object> attr = model.getAttribute(name);
 			if (attr != null) {
 				Public p = attr.getAnnotation(Public.class);
-				if (!publicOnly || p != null && p.readable() && p.writeable()) {
+				if (!publicOnly || p != null && p.readable() && p.writable()) {
 					// set
 					attr.set(obj, callContext.getParameter(name));
 				}
@@ -260,7 +260,7 @@ public class RestUtil {
 			PojoAttribute<Object> attr = model.getAttribute(name);
 			if (attr != null) {
 				Public p = attr.getAnnotation(Public.class);
-				if (!publicOnly || p != null && p.readable() && p.writeable()) {
+				if (!publicOnly || p != null && p.readable() && p.writable()) {
 					// set
 					attr.set(obj, props.get(name));
 				}
