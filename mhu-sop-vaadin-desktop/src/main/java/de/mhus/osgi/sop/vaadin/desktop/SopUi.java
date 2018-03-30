@@ -33,6 +33,7 @@ import de.mhus.lib.core.cfg.CfgString;
 import de.mhus.lib.core.logging.Log;
 import de.mhus.lib.core.logging.MLogUtil;
 import de.mhus.lib.core.security.AccessControl;
+import de.mhus.lib.core.security.Account;
 import de.mhus.lib.core.security.MSecurity;
 import de.mhus.lib.vaadin.VaadinAccessControl;
 import de.mhus.lib.vaadin.desktop.Desktop;
@@ -51,7 +52,7 @@ public class SopUi extends UI implements SopUiApi {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private static CfgString CFG_REALM = new CfgString(SopUi.class, "realm", "karaf");
+//	private static CfgString CFG_REALM = new CfgString(SopUi.class, "realm", "karaf");
 	private static Log log = Log.getLog(SopUi.class);
 	private Desktop desktop;
 	private AccessControl accessControl;
@@ -136,7 +137,8 @@ public class SopUi extends UI implements SopUiApi {
         
         host = request.getHeader("Host");
         
-        accessControl = new VaadinAccessControl(CFG_REALM.value());
+//        accessControl = new VaadinAccessControl(CFG_REALM.value());
+        accessControl = new VaadinSopAccessControl();
 
         if (!accessControl.isUserSignedIn()) {
             setContent(new LoginScreen(accessControl, new LoginScreen.LoginListener() {
@@ -373,16 +375,12 @@ public class SopUi extends UI implements SopUiApi {
 	}
 
 	@Override
-	public Subject getCurrentUser() {
-		return (Subject)getSession().getAttribute(VaadinAccessControl.SUBJECT_ATTR);
+	public Account getCurrentUser() {
+		return VaadinSopAccessControl.getUserAccount(getSession());
 	}
 
 	protected String getCurrentUserName() {
-		try {
-			return MSecurity.getUser( getCurrentUser() ).getName();
-		} catch (Throwable t) {
-			return "?";
-		}
+		return VaadinSopAccessControl.getUserName(getSession());
 	}
 
 	public void requestBegin() {
@@ -398,8 +396,8 @@ public class SopUi extends UI implements SopUiApi {
 	public void requestEnd() {
 		AccessApi aaa = MApi.lookup(AccessApi.class);
 		
-		AaaContext acontext = (AaaContext) getSession().getAttribute("_aaacontext");
-		aaa.release(acontext);
+//		AaaContext acontext = (AaaContext) getSession().getAttribute("_aaacontext");
+		aaa.resetContext();
 		
 		MLogUtil.releaseTrailConfig();
 	}
