@@ -374,12 +374,12 @@ public class SopUi extends UI implements SopUiApi {
 		return accessRights;
 	}
 
-	@Override
 	public Account getCurrentUser() {
 		return VaadinSopAccessControl.getUserAccount(getSession());
 	}
 
-	protected String getCurrentUserName() {
+	@Override
+	public String getCurrentUserName() {
 		return VaadinSopAccessControl.getUserName(getSession());
 	}
 
