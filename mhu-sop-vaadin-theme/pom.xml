@@ -181,7 +181,7 @@
        APPENDIX: How to apply the Apache License to your work.
 
           To apply the Apache License to your work, attach the following
-          boilerplate notice, with the fields enclosed by brackets "{}"
+          boilerplate notice, with the fields enclosed by brackets "[]"
           replaced with your own identifying information. (Don't include
           the brackets!)  The text should be enclosed in the appropriate
           comment syntax for the file format. We also recommend that a
@@ -204,229 +204,130 @@
        limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>de.mhus.osgi</groupId>
+		<artifactId>mhus-sop</artifactId>
+		<version>1.3.2-SNAPSHOT</version>
+	</parent>
+  <artifactId>mhu-sop-vaadin-theme</artifactId>
+    <packaging>bundle</packaging>
 
-    <modelVersion>4.0.0</modelVersion>
+    <description>Sop Desktop GUI Theme</description>
 
-    <groupId>de.mhus.osgi</groupId>
-    <artifactId>mhus-sop</artifactId>
-    <version>1.3.2-SNAPSHOT</version>
-    <packaging>pom</packaging>
-  <name>MHUS OSGi Tools</name>
-  <description>A set of tools to improve OSGi frameworks and karaf</description>
-  <url>http://www.mhus.de</url>
+    <dependencies>
 
-  <licenses>
-    <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-  <scm>
-    <url>https://github.com/mhus/mhus-osgi-tools</url>
-    <connection>scm:git:https://github.com/mhus/mhus-osgi-tools/</connection>
-  </scm>
-  <developers>
-    <developer>
-      <id>mhu</id>
-      <name>Mike Hummel</name>
-      <email>mh@mhus.de</email>
-      <url>http://www.mhus.de</url>
-    </developer>
-  </developers>
-    <properties>
-		<mhulib.version>3.3.3-SNAPSHOT</mhulib.version>
-		<osgitools.version>1.3.3-SNAPSHOT</osgitools.version>
-		<ports.version>1.3.2</ports.version>
-        <scr.packages>*</scr.packages>
-        <felix.scr.version>1.6.0</felix.scr.version>
-        <karaf.version>4.0.10</karaf.version>
-        <karaf.tool.version>4.0.10</karaf.tool.version>
-        <bndlib.version>1.50.0</bndlib.version>
-        <felix.metatype.version>1.0.10</felix.metatype.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<compileSource>1.8</compileSource>
-        <bundle.plugin.version>2.5.3</bundle.plugin.version>
-        <osgi.version>5.0.0</osgi.version>
-        <cxf.version>3.1.5</cxf.version>
-		<vaadin.version>7.7.9</vaadin.version>
-		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
-		<gwt.version>2.3.0</gwt.version>
-		<gwt.plugin.version>2.2.0</gwt.plugin.version>
-		<osgi.version>5.0.0</osgi.version>	
-		<jaxws.version>1.0-MR1</jaxws.version>
-		<javax.mail.version>1.4.1</javax.mail.version>
-		<javax.activation.version>1.1.1</javax.activation.version>
-        <felix.version>4.2.4</felix.version>
-        <felix.plugin.version>3.0.1</felix.plugin.version>
-        <maven.version>2.0.9</maven.version>
-		<dependency.jetty.version>8.1.14.v20131031</dependency.jetty.version>
-		<pax.version>3.1.0</pax.version>
-		<servlet.version>3.1.0</servlet.version>
-      </properties>
+    	<dependency>
+    		<groupId>com.vaadin</groupId>
+    		<artifactId>vaadin-server</artifactId>
+    		<version>${vaadin.version}</version>
+    	</dependency>
+    	<dependency>
+    		<groupId>com.vaadin</groupId>
+    		<artifactId>vaadin-shared</artifactId>
+    		<version>${vaadin.version}</version>
+    	</dependency>
+    	        
+    </dependencies>
 
-   <build>
-           <defaultGoal>install</defaultGoal>
-	
-    <plugins>
-    
+    <build>
+        <plugins>
             <plugin>
-                <groupId>de.mhus.ports.karaf.tooling</groupId>
-                <artifactId>karaf-services-maven-plugin</artifactId>
-                <configuration>
-                	<artifactInclude>.*mhu.*</artifactInclude>
-                </configuration>
-            </plugin>
-    
-		<plugin>
-		  <artifactId>maven-compiler-plugin</artifactId>
-		  <version>3.0</version>
-		  <configuration>
-		    <source>${compileSource}</source>
-		    <target>${compileSource}</target>
-		  </configuration>
-		</plugin>    
-
-        <plugin>
-		  <artifactId>maven-assembly-plugin</artifactId>
-		  <version>2.1</version> 
-		  <configuration>
-		    <finalName>doc</finalName>
-		    <descriptors>
-		      <descriptor>descriptor.xml</descriptor>
-		    </descriptors>
-		  </configuration>
-		</plugin> 
-
-		<plugin>
-	      <groupId>org.apache.maven.plugins</groupId>
-	      <artifactId>maven-javadoc-plugin</artifactId>
-	      <configuration>
-	      	<failOnError>false</failOnError>
-	      </configuration>
-	    </plugin>		
-		<plugin>
-		    <groupId>com.mycila</groupId>
-		    <artifactId>license-maven-plugin</artifactId>
-		    <version>2.3</version>
-		    <configuration>
-		        <header>LICENSE.txt</header>
-		        <properties>
-		            <owner>Mike Hummel</owner>
-		            <email>mh@mhus.de</email>
-		        </properties>
-		        <excludes>
-		            <exclude>README.txt</exclude>
-		            <exclude>README.md</exclude>
-		            <exclude>LICENSE.txt</exclude>
-		            <exclude>src/test/resources/**</exclude>
-		            <exclude>src/main/resources/**</exclude>
-		            <exclude>mhu-liferay-theme/src/main/webapp/**</exclude>
-		            <exclude>docs/**</exclude>
-		        </excludes>
-		    </configuration>
-		    <executions>
-		        <execution>
-		            <goals>
-		                <goal>format</goal>
-		            </goals>
-		        </execution>
-		    </executions>
-		</plugin>			
-		
-    </plugins>
-    
-    	<pluginManagement>
-			<plugins>
-                <plugin>
-                    <groupId>de.mhus.ports.karaf.tooling</groupId>
-                    <artifactId>karaf-services-maven-plugin</artifactId>
-                    <version>${karaf.version}</version>
-                    <executions>
-                        <execution>
-                            <id>service-metadata-generate</id>
-                            <phase>process-classes</phase>
-                            <goals>
-                                <goal>service-metadata-generate</goal>
-                            </goals>
-			                <configuration>
-			                	<artifactInclude>.*mhu.*</artifactInclude>
-			                </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-			</plugins>    	
-    	</pluginManagement>
-    	    
-  </build>
-
-    <modules>
-      <module>mhu-sop-api</module>
-      <module>mhu-sop-core</module>
-      <module>mhu-sop-jms</module>
-      <module>mhu-sop-rest</module>
-      <module>mhu-sop-vaadin-desktop</module>
-      <module>mhu-sop-vaadin-theme</module>
-    </modules>
-
-
-	<distributionManagement>
-	  
-          <repository>
-            <id>sonatype-nexus-staging</id>
-            <name>Sonatype Nexus release repository</name>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-          </repository>
-          	  
-	</distributionManagement>
-
-        <profiles>
-          <profile>
-            <id>release-sign-artifacts</id>
-            <activation>
-              <property>
-                <name>performRelease</name>
-                <value>true</value>
-              </property>
-            </activation>
-            <build>
-              <plugins>
-                <plugin>
-                  <groupId>org.apache.maven.plugins</groupId>
-                  <artifactId>maven-gpg-plugin</artifactId>
-                  <version>1.4</version>
-                  <configuration>
-                    <passphrase>${gpg.passphrase}</passphrase>
-                  </configuration>
-                  <executions>
-                    <execution>
-                      <id>sign-artifacts</id>
-                      <phase>verify</phase>
-                      <goals>
-                        <goal>sign</goal>
-                      </goals>
-                    </execution>
-                  </executions>
-                </plugin>
-              </plugins>
-            </build>
-          </profile>
-
-        </profiles>
-
-	<dependencyManagement>
-		<dependencies>
-            <dependency>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>${felix.plugin.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.maven</groupId>
-                <artifactId>maven-plugin-api</artifactId>
-                <version>${maven.version}</version>
-            </dependency>
-		</dependencies>
-	</dependencyManagement>
+                <version>${bundle.plugin.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Version>${project.version}</Bundle-Version>
+                        <Export-Package>de.mhus.osgi.sop.vaadin.theme.*;version=${project.version}</Export-Package>
+                        <Import-Package>*</Import-Package>
+                        <Include-Resource>
+                        	VAADIN=${basedir}/target/classes/VAADIN
+                        </Include-Resource>
+                    </instructions>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-maven-plugin</artifactId>
+                <configuration>
+                    <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
+                    <webappDirectory>${basedir}/target/classes/VAADIN/widgetsets</webappDirectory>
+                    <draftCompile>false</draftCompile>
+                    <compileReport>false</compileReport>
+                    <style>OBF</style>
+                    <strict>true</strict>
+					<vaadin.theme>vaadinsample</vaadin.theme> 
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>update-theme</goal>
+                            <goal>update-widgetset</goal>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+      			<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-war-plugin</artifactId>
+					<version>2.3</version>
+					<configuration>
+						<failOnMissingWebXml>false</failOnMissingWebXml>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>com.vaadin</groupId>
+					<artifactId>vaadin-maven-plugin</artifactId>
+					<version>${vaadin.plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>2.5</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>2.4</version>
+				</plugin>
+                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+                <!-- TODO Remove when http://dev.vaadin.com/ticket/14924 is resolved -->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>com.vaadin</groupId>
+                                        <artifactId>vaadin-maven-plugin</artifactId>
+                                        <versionRange>[7.1.11,)</versionRange>
+                                        <goals>
+                                            <goal>update-theme</goal>
+                                            <goal>resources</goal>
+                                            <goal>update-widgetset</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
 </project>

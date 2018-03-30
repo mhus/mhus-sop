@@ -223,3 +223,13 @@ Test unique master handling:
 registry set /system/master/test@seed 1
 
 
+SOP Desktop:
+
+feature:install mhu-osgi-vaadin
+
+install -s mvn:de.mhus.ports/vaadin-refresher/1.3.2-SNAPSHOT
+install -s mvn:de.mhus.osgi/mhu-sop-vaadin-theme/1.3.2-SNAPSHOT
+install -s mvn:de.mhus.osgi/mhu-sop-vaadin-desktop/1.3.2-SNAPSHOT
+
+
+
