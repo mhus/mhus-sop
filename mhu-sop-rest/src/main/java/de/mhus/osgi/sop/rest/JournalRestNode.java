@@ -21,7 +21,6 @@ import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
 
 import aQute.bnd.annotation.component.Component;
-import de.mhus.lib.adb.DbSchema;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.pojo.MPojo;

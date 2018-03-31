@@ -17,9 +17,7 @@ package de.mhus.osgi.sop.api.data;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
-import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.errors.MException;
@@ -51,7 +49,7 @@ public interface SopDataController {
 	 * Called by HfoApi to check if a sync is needed. The method will not be called fi the sync is forced.
 	 * 
 	 * @param obj
-	 * @return
+	 * @return true if data need sync
 	 */
 	boolean isNeedSync(SopData obj);
 
@@ -69,12 +67,14 @@ public interface SopDataController {
 	/**
 	 * Called by the REST before a list of SopData is loaded. Needed to sync all objects or invalidate objects
 	 * before loading the data.
+	 * @param found 
 	 * 
 	 * @param orga
 	 * @param type
 	 * @param search
 	 * @param archived
 	 * @param due
+	 * @param list 
 	 * @param ret 
 	 */
 	void syncListBeforeLoad(SopFoundation found, String type, String search, Boolean archived, Date due, List<SopData> list);
@@ -87,7 +87,7 @@ public interface SopDataController {
 	 * @param data
 	 * @param action
 	 * @param parameters
-	 * @return
+	 * @return Result
 	 * @throws Exception
 	 */
 	OperationResult actionSopData(SopData data, String action, IProperties parameters) throws Exception;
@@ -96,8 +96,9 @@ public interface SopDataController {
 	 * Action from the the SopDataOperation routed to the controller.
 	 * 
 	 * @param data
+	 * @param action 
 	 * @param p
-	 * @return
+	 * @return Result
 	 * @throws Exception 
 	 */
 	OperationResult actionSopDataOperation(SopData data, String action, IProperties p) throws Exception;

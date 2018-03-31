@@ -113,6 +113,7 @@ public class KarafAaaSource implements AccountSource {
 
 	private class KarafAccount implements Account {
 
+		@SuppressWarnings("unused")
 		private BackingEngine engine;
 		private UserPrincipal user;
 		private HashSet<String> groups = new HashSet<>();
@@ -158,6 +159,7 @@ public class KarafAaaSource implements AccountSource {
 			return getName();
 		}
 		
+		@Override
 		public String toString() {
 			return getName() + "@" + realm;
 		}

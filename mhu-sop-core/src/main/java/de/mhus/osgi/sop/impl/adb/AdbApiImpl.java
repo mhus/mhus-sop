@@ -30,7 +30,6 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 import de.mhus.lib.adb.DbCollection;
-import de.mhus.lib.adb.DbManager;
 import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.adb.Persistable;
 import de.mhus.lib.adb.query.AQuery;

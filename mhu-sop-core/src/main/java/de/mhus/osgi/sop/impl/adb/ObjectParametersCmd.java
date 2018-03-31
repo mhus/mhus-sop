@@ -22,7 +22,6 @@ import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
-import de.mhus.lib.adb.DbManager;
 import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.adb.query.Db;
 import de.mhus.lib.core.MApi;

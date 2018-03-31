@@ -17,10 +17,6 @@ package de.mhus.osgi.sop.api.rest;
 
 import java.util.List;
 
-import javax.transaction.NotSupportedException;
-
-import de.mhus.osgi.sop.api.operation.OperationDescriptor;
-
 public abstract class AbstractNode<T> implements RestNodeService {
 
 	public static final String ID 		= "_id";
@@ -74,12 +70,6 @@ public abstract class AbstractNode<T> implements RestNodeService {
 	
 	protected abstract T getObjectForId(CallContext context, String id) throws Exception;
 
-	protected abstract OperationDescriptor getCreateAction();
-
-	protected abstract OperationDescriptor getUpdateAction();
-	
-	protected abstract OperationDescriptor getDeleteAction();
-
 	@Override
 	public RestResult doAction(CallContext callContext) throws Exception {
 /*
@@ -87,41 +77,32 @@ public abstract class AbstractNode<T> implements RestNodeService {
 		Method method = getClass().getMethod(methodName, CallContext.class);
 		return (RestResult) method.invoke(this, callContext);
 */
-		return RestUtil.doExecuteBpm((String)null, callContext, getNodeId());
+		return RestUtil.doExecuteRestAction( callContext, null, getNodeId());
 	}
 
-	@Override
-	public RestResult doCreate(CallContext callContext) throws Exception {
-//		JsonResult result = new JsonResult();
-//		doCreate(result, callContext);
-//		return result;
-		OperationDescriptor oper = getCreateAction();
-		if (oper == null)
-			throw new NotSupportedException();
-		return RestUtil.doExecuteBpm( oper, callContext, getNodeId());
-	}
-
-	@Override
-	public RestResult doUpdate(CallContext callContext) throws Exception {
-//		JsonResult result = new JsonResult();
-//		doUpdate(result, callContext);
-//		return result;
-		OperationDescriptor oper = getUpdateAction();
-		if (oper == null)
-			throw new NotSupportedException();
-		return RestUtil.doExecuteBpm( oper, callContext, getNodeId());
-	}
-
-
-	@Override
-	public RestResult doDelete(CallContext callContext) throws Exception {
-//		JsonResult result = new JsonResult();
-//		doDelete(result, callContext);
-//		return result;
-		OperationDescriptor oper = getDeleteAction();
-		if (oper == null)
-			throw new NotSupportedException();
-		return RestUtil.doExecuteBpm( oper, callContext, getNodeId());
-	}
+//	@Override
+//	public RestResult doCreate(CallContext callContext) throws Exception {
+//		OperationDescriptor oper = getCreateAction();
+//		if (oper == null)
+//			throw new NotSupportedException();
+//		return RestUtil.doExecuteRestAction( callContext, oper, getNodeId());
+//	}
+//
+//	@Override
+//	public RestResult doUpdate(CallContext callContext) throws Exception {
+//		OperationDescriptor oper = getUpdateAction();
+//		if (oper == null)
+//			throw new NotSupportedException();
+//		return RestUtil.doExecuteRestAction( callContext, oper, getNodeId());
+//	}
+//
+//
+//	@Override
+//	public RestResult doDelete(CallContext callContext) throws Exception {
+//		OperationDescriptor oper = getDeleteAction();
+//		if (oper == null)
+//			throw new NotSupportedException();
+//		return RestUtil.doExecuteRestAction( callContext, oper, getNodeId());
+//	}
 
 }

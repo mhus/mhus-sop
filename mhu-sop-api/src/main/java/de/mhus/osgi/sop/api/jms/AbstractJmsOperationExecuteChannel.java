@@ -85,6 +85,7 @@ public abstract class AbstractJmsOperationExecuteChannel extends AbstractJmsData
 		return out;
 	}
 
+	@SuppressWarnings("rawtypes")
 	protected Message received(Message msg) throws JMSException {
 		
 		String path = msg.getStringProperty(Sop.PARAM_OPERATION_PATH);
@@ -174,6 +175,7 @@ public abstract class AbstractJmsOperationExecuteChannel extends AbstractJmsData
 						((BytesMessage)ret).writeBytes(buffer, 0, size);
 					}
 				}
+				is.close();
 			} catch (IOException e) {
 				throw new JMSException(e.toString());
 			}

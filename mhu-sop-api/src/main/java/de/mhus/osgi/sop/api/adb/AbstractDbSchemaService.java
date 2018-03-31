@@ -17,7 +17,6 @@ package de.mhus.osgi.sop.api.adb;
 
 import java.util.UUID;
 
-import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.adb.Persistable;
 import de.mhus.lib.adb.query.Db;
 import de.mhus.lib.basics.Ace;
@@ -28,13 +27,9 @@ import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MTimeInterval;
 import de.mhus.lib.core.MValidator;
 import de.mhus.lib.core.cfg.CfgLong;
-import de.mhus.lib.core.security.Account;
-import de.mhus.lib.core.util.SoftHashMap;
 import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AaaUtil;
-import de.mhus.osgi.sop.api.aaa.AccessApi;
-import de.mhus.osgi.sop.api.aaa.ContextCachedItem;
 import de.mhus.osgi.sop.api.model.SopAcl;
 
 public abstract class AbstractDbSchemaService extends MLog implements DbSchemaService {

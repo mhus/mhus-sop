@@ -84,7 +84,7 @@ public class JmsRegisterServer extends AbstractJmsDataChannel {
 
 					if ("operations".equals(type)) {
 						String queue = m.getStringProperty("queue");
-						String connection = jmsApi.getDefaultConnectionName(); //TODO
+						String connection = jmsApi.getDefaultConnectionName(); //TODO configurable?
 						int cnt = 0;
 						String path = null;
 						synchronized (JmsApiImpl.instance.register) {
@@ -104,7 +104,8 @@ public class JmsRegisterServer extends AbstractJmsDataChannel {
 									} catch (Throwable t) {}
 								}
 								HashMap<String, String> parameters = null;
-								for (Enumeration<String> enu = m.getMapNames(); enu.hasMoreElements();) {
+								for (@SuppressWarnings("unchecked")
+								Enumeration<String> enu = m.getMapNames(); enu.hasMoreElements();) {
 									String key = enu.nextElement();
 									String start = "param" + cnt + ".";
 									if (key.startsWith(start)) {

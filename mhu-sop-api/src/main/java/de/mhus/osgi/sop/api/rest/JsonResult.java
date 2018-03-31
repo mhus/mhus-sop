@@ -89,6 +89,7 @@ public class JsonResult implements RestResult {
     	return (ObjectNode)json;
 	}
 	
+	@Override
 	public String toString() {
 		StringWriter w = new StringWriter();
 		PrintWriter p = new PrintWriter(w);

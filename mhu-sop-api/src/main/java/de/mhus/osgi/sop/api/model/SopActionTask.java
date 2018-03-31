@@ -42,6 +42,7 @@ public class SopActionTask extends DbMetadata {
 		this.queue = queue;
 	}
 	
+	@Override
 	public String toString() {
 		return MSystem.toString(this, getId(), queue, getCreationDate(), action);
 	}

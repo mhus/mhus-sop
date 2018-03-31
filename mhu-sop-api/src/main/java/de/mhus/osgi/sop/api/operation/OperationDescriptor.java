@@ -101,7 +101,7 @@ public class OperationDescriptor implements MNlsProvider, Nls, Named, Versioned 
 	/**
 	 * Every action should have a parameter definition. If
 	 * parameter definitions are not supported, the method will return null;
-	 * @return
+	 * @return Definition
 	 */
 	public ParameterDefinitions getParameterDefinitions() {
 		return description.getParameterDefinitions();
@@ -110,7 +110,7 @@ public class OperationDescriptor implements MNlsProvider, Nls, Named, Versioned 
 	/**
 	 * An action can provide a form component but it's not necessary. If
 	 * parameter definitions are not supported, the method will return null;
-	 * @return
+	 * @return Form
 	 */
 	public DefRoot getForm() {
 		return description.getForm();

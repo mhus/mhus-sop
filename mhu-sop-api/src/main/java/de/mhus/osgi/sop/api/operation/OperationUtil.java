@@ -89,6 +89,7 @@ public class OperationUtil {
 	
 	private static class OperationInvocationHandler implements InvocationHandler {
 
+		@SuppressWarnings("unused")
 		private Class<?> ifc;
 		private OperationDescriptor desc;
 

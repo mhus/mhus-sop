@@ -21,8 +21,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
-import javax.security.auth.Subject;
-
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
@@ -44,13 +42,10 @@ import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
-import de.mhus.lib.core.cfg.CfgString;
 import de.mhus.lib.core.logging.Log;
 import de.mhus.lib.core.logging.MLogUtil;
 import de.mhus.lib.core.security.AccessControl;
 import de.mhus.lib.core.security.Account;
-import de.mhus.lib.core.security.MSecurity;
-import de.mhus.lib.vaadin.VaadinAccessControl;
 import de.mhus.lib.vaadin.desktop.Desktop;
 import de.mhus.lib.vaadin.desktop.GuiSpace;
 import de.mhus.lib.vaadin.desktop.GuiSpaceService;

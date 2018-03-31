@@ -20,7 +20,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map.Entry;
-import java.util.UUID;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -33,7 +32,6 @@ import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MProperties;
-import de.mhus.lib.core.MString;
 import de.mhus.lib.core.MXml;
 import de.mhus.lib.core.security.Account;
 import de.mhus.lib.errors.NotSupportedException;
@@ -85,14 +83,6 @@ public class AccountFile extends MLog implements Account {
 		}
 	}
 
-	private UUID toUUID(String value) {
-		if (MString.isEmpty(value)) return null;
-		try {
-			return UUID.fromString(value);
-		} catch (IllegalArgumentException e) {}
-		return null;
-	}
-
 	@Override
 	public String getName() {
 		return account;
@@ -127,6 +117,7 @@ public class AccountFile extends MLog implements Account {
 	}
 
 
+	@Override
 	public String toString() {
 		return account + " " + name;
 	}

@@ -136,7 +136,6 @@ public class RestServlet extends HttpServlet {
 	
 	        logAccess(id,req.getRemoteAddr(),req.getRemotePort(),ticket,method,req.getPathInfo(),req.getParameterMap());
 	
-	        @SuppressWarnings("unchecked")
 			CallContext callContext = new CallContext(new HttpRequest(req.getParameterMap()), method, context);
 	        
 	        RestApi restService = MApi.lookup(RestApi.class);

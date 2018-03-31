@@ -23,7 +23,6 @@ import org.codehaus.jackson.node.ObjectNode;
 import aQute.bnd.annotation.component.Component;
 import de.mhus.lib.core.pojo.MPojo;
 import de.mhus.lib.errors.MException;
-import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 import de.mhus.osgi.sop.api.rest.AbstractObjectListNode;
 import de.mhus.osgi.sop.api.rest.CallContext;
 import de.mhus.osgi.sop.api.rest.JsonResult;
@@ -71,21 +70,6 @@ public class PublicRestNode extends AbstractObjectListNode<Object> {
 		Method method = getClass().getMethod(methodName, JsonResult.class, CallContext.class);
 		method.invoke(this, result, callContext);
 		return result;
-	}
-
-	@Override
-	protected OperationDescriptor getCreateAction() {
-		return null;
-	}
-
-	@Override
-	protected OperationDescriptor getUpdateAction() {
-		return null;
-	}
-
-	@Override
-	protected OperationDescriptor getDeleteAction() {
-		return null;
 	}
 
 }

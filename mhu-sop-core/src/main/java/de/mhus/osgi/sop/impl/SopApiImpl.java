@@ -32,6 +32,7 @@ import de.mhus.lib.adb.query.AQuery;
 import de.mhus.lib.adb.query.Db;
 import de.mhus.lib.adb.query.SearchHelper;
 import de.mhus.lib.core.IProperties;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MLog;
@@ -306,12 +307,13 @@ public class SopApiImpl extends MLog implements SopApi {
 		return out;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public SopData getSopDataByForeignId(UUID orgaId, String type, String id) throws MException {
 		return getManager().getObjectByQualification(Db.query(SopData.class)
-				.eq(SopData::getFoundation, orgaId)
-				.eq(SopData::getType, type)
-				.eq(SopData::getForeignId, id));
+				.eq(M.n(SopData::getFoundation), orgaId)
+				.eq(M.n(SopData::getType), type)
+				.eq(M.n(SopData::getForeignId), id));
 	}
 
 	@Override

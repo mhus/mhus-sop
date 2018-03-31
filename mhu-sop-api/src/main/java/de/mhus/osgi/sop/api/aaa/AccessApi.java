@@ -69,9 +69,11 @@ public interface AccessApi extends SApi {
 	 * - group name to allow group
 	 * 
 	 * @param account
+	 * @param acl 
 	 * @param resourceName Name of the resource
 	 * @param id The id of the object
 	 * @param action The action to do or null for general access
+	 * @param def 
 	 * @return x
 	 */
 	boolean hasGroupAccess(Account account, String acl, String action, String def);

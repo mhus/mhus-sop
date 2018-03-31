@@ -65,6 +65,7 @@ public class TrustFile implements Trust {
 		return trust;
 	}
 
+	@Override
 	public boolean isValid() {
 		return valide;
 	}

@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.UUID;
 
 import de.mhus.lib.adb.DbMetadata;
-import de.mhus.lib.adb.DbSchema;
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.pojo.PojoModelFactory;
 import de.mhus.lib.errors.MException;

@@ -70,6 +70,7 @@ public interface RegistryApi {
 	 * Remove a node or parameter. And publish the information.
 	 * 
 	 * @param path
+	 * @return true if was removed
 	 */
 	boolean removeParameter(String path);
 

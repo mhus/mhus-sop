@@ -24,7 +24,7 @@ public interface RegistryPathControl {
 	 * 
 	 * @param path Path of the Node
 	 * 
-	 * @return
+	 * @return true if is controlled by this controller.
 	 */
 	boolean isTakeControl(String path);
 

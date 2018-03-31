@@ -20,16 +20,13 @@ import java.util.LinkedList;
 import java.util.UUID;
 
 import de.mhus.lib.adb.DbCollection;
-import de.mhus.lib.adb.DbManager;
 import de.mhus.lib.adb.DbMetadata;
-import de.mhus.lib.adb.DbSchema;
 import de.mhus.lib.adb.query.AQuery;
 import de.mhus.lib.annotations.generic.Public;
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MString;
-import de.mhus.lib.core.logging.Log;
 import de.mhus.lib.core.pojo.PojoAttribute;
 import de.mhus.lib.core.pojo.PojoModel;
 import de.mhus.lib.core.pojo.PojoModelFactory;
@@ -44,7 +41,7 @@ public class RestUtil {
 
 	public static final int MAX_RETURN_SIZE = 1000;
 	
-	private static Log log = Log.getLog(RestUtil.class);
+//	private static Log log = Log.getLog(RestUtil.class);
 
 	public static void updateObject(CallContext callContext, Object obj, boolean publicOnly) throws IOException {
 		PojoModelFactory schema = MApi.lookup(AdbApi.class).getManager().getPojoModelFactory();
@@ -92,16 +89,7 @@ public class RestUtil {
 		return callContext.getParameter(getObjectIdParameterName(clazz));
 	}
 
-	public static RestResult doExecuteBpm(OperationDescriptor oper, CallContext callContext, String source) throws MException {
-		return doExecuteRestAction(callContext, oper, source );
-	}
-	
-	private static RestResult doExecuteRestAction(CallContext callContext, OperationDescriptor descriptor, String source) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public static RestResult doExecuteBpm(String string, CallContext callContext, String nodeId) {
+	public static RestResult doExecuteRestAction(CallContext callContext, OperationDescriptor descriptor, String source) {
 		// TODO Auto-generated method stub
 		return null;
 	}

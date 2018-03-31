@@ -48,6 +48,7 @@ public class OperationException extends Exception {
 		return returnCode;
 	}
 
+	@Override
 	public String toString() {
 		return returnCode + " " + super.toString();
 	}
