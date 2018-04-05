@@ -75,13 +75,13 @@ public class ContextCacheService extends AbstractCacheControl {
 		}
 	}
 	
-	public static void set(AaaContext context, String key, long ttl, Object value) {
+	static void set(AaaContext context, String key, long ttl, Object value) {
 		if (instance == null) return;
 		instance.privSet(context, key, ttl, value);
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static <T> T get(AaaContext context, String key) {
+	static <T> T get(AaaContext context, String key) {
 		if (instance == null) return null;
 		return (T)instance.privGet(context, key);
 	}

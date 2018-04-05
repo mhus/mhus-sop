@@ -19,6 +19,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Collection;
+import java.util.Map;
+import java.util.TreeMap;
 
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCast;
@@ -80,7 +82,7 @@ public class OperationUtil {
 	
 	@SuppressWarnings("unchecked")
 	public static <T> T createOpertionProxy(Class<T> ifc, OperationDescriptor desc) throws MException {
-		if (!desc.getTitle().equals(ifc.getName()))
+		if (!desc.getPath().equals(ifc.getName()))
 			throw new MException("Interface and operation do not match", ifc.getName(), desc.getName() );
 		
 		return (T)Proxy.newProxyInstance(ifc.getClassLoader(), new Class[] {ifc}, new OperationInvocationHandler(ifc,desc));
@@ -126,6 +128,19 @@ public class OperationUtil {
 			return res.getResult();
 		}
 		
+	}
+
+	public static Map<String,String> getParameters(OperationDescriptor desc) {
+		TreeMap<String,String> out = new TreeMap<>();
+		for (String key : desc.getParameterKeys())
+			out.put(key, desc.getParameter(key));
+		return out;
+	}
+
+	public static <T> T getOperationIfc(Class<T> ifc) throws MException {
+		OperationApi api = MApi.lookup(OperationApi.class);
+		OperationDescriptor desc = api.findOperation(ifc.getCanonicalName(), null, null);
+		return createOpertionProxy(ifc, desc);
 	}
 	
 }

@@ -41,7 +41,8 @@ import de.mhus.osgi.sop.impl.AaaContextImpl;
 public class AccessCmd implements Action {
 
 	@Argument(index=0, name="cmd", required=true, description=
-			"Command login <account>,"
+			"Command:\n"
+			+ " login <account>,"
 			+ " logout, id, info,"
 			+ " synchronize <account>,"
 			+ " validate <account> <password>,"

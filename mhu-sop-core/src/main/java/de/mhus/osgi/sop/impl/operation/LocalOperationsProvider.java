@@ -33,7 +33,6 @@ import aQute.bnd.annotation.component.Reference;
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MLog;
-import de.mhus.lib.core.cfg.CfgBoolean;
 import de.mhus.lib.core.strategy.DefaultTaskContext;
 import de.mhus.lib.core.strategy.NotSuccessful;
 import de.mhus.lib.core.strategy.Operation;
@@ -43,18 +42,17 @@ import de.mhus.lib.core.util.VersionRange;
 import de.mhus.lib.errors.AccessDeniedException;
 import de.mhus.lib.errors.NotFoundException;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
-import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.operation.OperationAddress;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 import de.mhus.osgi.sop.api.operation.OperationException;
 import de.mhus.osgi.sop.api.operation.OperationUtil;
 import de.mhus.osgi.sop.api.operation.OperationsProvider;
+import de.mhus.osgi.sop.api.util.SopUtil;
 
 @Component(immediate=true,provide=OperationsProvider.class,properties="provider=local")
 public class LocalOperationsProvider extends MLog implements OperationsProvider {
 
 	static final String PROVIDER_NAME = "local";
-	public static final CfgBoolean RELAXED = new CfgBoolean(JmsApi.class, "aaaRelaxed", true);
 
 	private BundleContext context;
 	private ServiceTracker<Operation,Operation> nodeTracker;
@@ -119,6 +117,9 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
 			if (tagsStr2 != null)
 				for (String item : String.valueOf(tagsStr2).split(";"))
 					tags.add(item);
+			
+			tags.add(OperationDescriptor.TAG_IDENT + "=" + SopUtil.getServerIdent());
+			tags.add(OperationDescriptor.TAG_HOST + "=localhost");
 			
 			String acl = OperationUtil.getOption(tags, OperationDescriptor.TAG_DEFAULT_ACL, "");
 			try {
@@ -223,7 +224,6 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
 				throw new AccessDeniedException("internal error", t);
 			}
 		} else
-		if (!RELAXED.value())
 			throw new AccessDeniedException("Access api not found");
 		
 		DefaultTaskContext taskContext = new DefaultTaskContext(getClass());

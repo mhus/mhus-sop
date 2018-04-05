@@ -49,7 +49,6 @@ import de.mhus.lib.core.cfg.CfgProvider;
 import de.mhus.lib.core.config.IConfig;
 import de.mhus.lib.core.directory.ResourceNode;
 import de.mhus.lib.core.directory.WritableResourceNode;
-import de.mhus.lib.core.service.ServerIdent;
 import de.mhus.lib.errors.AccessDeniedException;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.errors.NotSupportedException;
@@ -61,6 +60,7 @@ import de.mhus.osgi.sop.api.registry.RegistryManager;
 import de.mhus.osgi.sop.api.registry.RegistryPathControl;
 import de.mhus.osgi.sop.api.registry.RegistryProvider;
 import de.mhus.osgi.sop.api.registry.RegistryValue;
+import de.mhus.osgi.sop.api.util.SopUtil;
 
 @Component(provide={RegistryApi.class,RegistryManager.class},immediate=true)
 public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManager, CfgProvider {
@@ -71,7 +71,6 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	private TimerIfc timer;
 	private MTimerTask timerTask;
 	private CfgLong CFG_UPDATE_INTERVAL = new CfgLong(RegistryApiImpl.class, "updateInterval", 60000);
-	private String ident;
 	private TreeSet<ControlDescriptor> pathControllers = new TreeSet<>();
 	private MServiceTracker<RegistryPathControl> pathControllerTracker = new MServiceTracker<RegistryPathControl>(RegistryPathControl.class) {
 		
@@ -104,7 +103,6 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	@Activate
 	public void doActivate(ComponentContext ctx) {
 		MApi.get().getCfgManager().registerCfgProvider(RegistryApi.class.getCanonicalName(), this);
-		ident = MApi.lookup(ServerIdent.class).toString();
 		pathControllerTracker.start();
 		load(false);
 		MThread.asynchron(new Runnable() {
@@ -115,6 +113,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 				while (!publishAll()) {
 					MThread.sleep(10000);
 				}
+				requestAll();
 			}
 		});
 	}
@@ -143,7 +142,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	protected void checkUpdate() {
 		
 		// send worker update
-		setParameter(PATH_WORKER + ident + "@pid", MSystem.getHostname() + ":" + MSystem.getPid(), CFG_UPDATE_INTERVAL.value() * 2, true, false, false);
+		setParameter(PATH_WORKER + SopUtil.getServerIdent() + "@pid", MSystem.getHostname() + ":" + MSystem.getPid(), CFG_UPDATE_INTERVAL.value() * 2, true, false, false);
 		
 		final long now = System.currentTimeMillis();
 		LinkedList<RegistryValue> values = null;
@@ -246,7 +245,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	public boolean setParameter(String path, String value, long timeout, boolean readOnly, boolean persistent, boolean local) {
 		path = validateParameterPath(path);
 		if (value == null) throw new NullPointerException("null value not allowed");
-		String source = ident;
+		String source = SopUtil.getServerIdent();
 		if (local) {
 			source = SOURCE_LOCAL;
 			timeout = 0;
@@ -366,7 +365,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 			}
 		}
 		
-		if (current.isReadOnly() && !current.getSource().equals(ident))
+		if (current.isReadOnly() && !current.getSource().equals(SopUtil.getServerIdent()))
 			throw new AccessDeniedException("The entry is readOnly");
 	
 		// let the controller check the action
@@ -783,7 +782,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	public void save() throws IOException {
 		MProperties p = new MProperties();
 		for (RegistryValue entry : getAll())
-			if ((entry.getSource().equals(ident) || entry.isLocal()) && entry.isPersistent()) {
+			if ((entry.getSource().equals(SopUtil.getServerIdent()) || entry.isLocal()) && entry.isPersistent()) {
 				p.setString(entry.getPath(), entry.isReadOnly() + "|" + entry.getTimeout() + "|" + entry.getSource() + "|" + entry.getValue());
 			}
 		p.save(getFile());
@@ -802,7 +801,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 		for (Entry<String, Object> entry : prop.entrySet()) {
 			String[] split = entry.getValue().toString().split("\\|", 4);
 			if (!SOURCE_LOCAL.equals(split[2])) {
-				split[2] = ident;
+				split[2] = SopUtil.getServerIdent();
 				setParameterFromRemote(new RegistryValue(split[3], split[2], updated, entry.getKey(), MCast.tolong(split[1],0), MCast.toboolean(split[0], true), true));
 			} else {
 				setParameter(entry.getKey(), split[3], 0, true, true, true);

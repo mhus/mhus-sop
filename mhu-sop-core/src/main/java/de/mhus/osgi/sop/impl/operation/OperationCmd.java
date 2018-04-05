@@ -36,6 +36,7 @@ import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.operation.OperationAddress;
 import de.mhus.osgi.sop.api.operation.OperationApi;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
+import de.mhus.osgi.sop.api.operation.OperationUtil;
 
 @Command(scope = "sop", name = "operation", description = "Operation commands")
 @Service
@@ -50,8 +51,8 @@ public class OperationCmd implements Action {
 	@Argument(index=2, name="parameters", required=false, description="More Parameters", multiValued=true)
     String[] parameters;
 
-	@Option(name="-c", aliases="--connection", description="JMS Connection Name",required=false)
-	String conName = null;
+//	@Option(name="-c", aliases="--connection", description="JMS Connection Name",required=false)
+//	String conName = null;
 
 	@Option(name="-q", aliases="--queue", description="JMS Connection Queue OperationChannel",required=false)
 	String queueName = null;
@@ -65,19 +66,22 @@ public class OperationCmd implements Action {
 	@Option(name="-p", aliases="--print", description="Print File Content",required=false)
 	boolean print = false;
 	
+	@Option(name="-f", aliases="--full", description="Full output",required=false)
+	boolean full = false;
+	
 	@Override
 	public Object execute() throws Exception {
 
-		if (conName == null)
-			conName = MApi.lookup(JmsApi.class).getDefaultConnectionName();
+//		if (conName == null)
+//			conName = MApi.lookup(JmsApi.class).getDefaultConnectionName();
 		
 		OperationApi api = MApi.lookup(OperationApi.class);
 		
 		if (cmd.equals("list")) {
-			ConsoleTable out = new ConsoleTable();
-			out.setHeaderValues("address","title","tags","acl");
+			ConsoleTable out = new ConsoleTable(full);
+			out.setHeaderValues("address","title","tags","acl", "parameters");
 			for (OperationDescriptor desc : api.findOperations(path,version == null ? null : new VersionRange(version),null)) {
-				out.addRowValues(desc.getAddress(),desc.getTitle(),desc.getTags(), desc.getAcl());
+				out.addRowValues(desc.getAddress(),desc.getTitle(),desc.getTags(), desc.getAcl(),OperationUtil.getParameters(desc));
 			}
 			out.print(System.out);
 		} else

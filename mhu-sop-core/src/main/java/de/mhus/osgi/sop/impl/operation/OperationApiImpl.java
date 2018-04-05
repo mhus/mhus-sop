@@ -85,7 +85,7 @@ public class OperationApiImpl extends MLog implements OperationApi {
 		context = null;
 	}
 
-	@Reference(service=TimerFactory.class)
+	@Reference(service=TimerFactory.class,optional=true)
 	public void setTimerFactory(TimerFactory factory) {
 		log().i("create timer");
 		timer = factory.getTimer();

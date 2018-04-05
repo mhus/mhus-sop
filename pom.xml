@@ -181,6 +181,7 @@
       <module>mhu-sop-rest</module>
       <module>mhu-sop-vaadin-desktop</module>
       <module>mhu-sop-vaadin-theme</module>
+      <module>mhu-sop-mailqueue</module>
     </modules>
 
 

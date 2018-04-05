@@ -17,12 +17,22 @@ package de.mhus.osgi.sop.api.util;
 
 import java.io.File;
 
+import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.service.ServerIdent;
+
 public class SopUtil {
 	
 	private static File base = new File("sop");
+	private static String ident;
 	
 	public static File getFile(String path) {
 		return new File(base, path);
+	}
+
+	public static String getServerIdent() {
+		if (ident == null)
+			ident = MApi.lookup(ServerIdent.class).toString();
+		return ident;
 	}
 
 }
