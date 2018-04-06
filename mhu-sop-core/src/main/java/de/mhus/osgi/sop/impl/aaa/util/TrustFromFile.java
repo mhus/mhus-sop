@@ -25,7 +25,6 @@ import org.xml.sax.SAXException;
 
 import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MLog;
-import de.mhus.lib.core.util.SoftHashMap;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.Trust;
 import de.mhus.osgi.sop.api.aaa.TrustSource;
