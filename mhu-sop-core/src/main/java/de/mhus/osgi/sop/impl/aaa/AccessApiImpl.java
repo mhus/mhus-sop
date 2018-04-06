@@ -148,7 +148,7 @@ public class AccessApiImpl extends MLog implements AccessApi {
 			trustInfo = getTrust(trust);
 			if (trustInfo == null)
 				throw new AccessDeniedException("null",account);
-			if (!trustInfo.validatePassword(MPassword.decode(secret)))
+			if (!trustInfo.validateWithPassword(MPassword.decode(secret)))
 				throw new AccessDeniedException("password",account);
 			if (!trustInfo.isValid())
 				throw new AccessDeniedException("invalid",account);
@@ -184,14 +184,14 @@ public class AccessApiImpl extends MLog implements AccessApi {
 		return c;
 	}
 
-	public synchronized Trust getTrust(String trust) {
+	private synchronized Trust getTrust(String trust) {
 		
 		if (trust == null)
 			throw new AccessDeniedException("null");
 
-		AaaContext c = getCurrentOrGuest();
-		if (!c.isAdminMode())
-			throw new AccessDeniedException("admin only");
+//		AaaContext c = getCurrentOrGuest();
+//		if (!c.isAdminMode())
+//			throw new AccessDeniedException("admin only");
 
 		Trust out = trustCache.get(trust);
 		if (out != null) {
@@ -345,9 +345,9 @@ public class AccessApiImpl extends MLog implements AccessApi {
 	}
 
 	@Override
-	public String createTrustTicket(AaaContext user) {
+	public String createTrustTicket(String name, AaaContext user) {
 		if (trustSource == null) return null;
-		return trustSource.createTrustTicket(user);
+		return trustSource.createTrustTicket(name, user);
 	}
 
 	@Reference(optional=true,dynamic=true)

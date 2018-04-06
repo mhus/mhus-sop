@@ -23,8 +23,10 @@ public interface Trust {
 
 	public boolean isValid();
 
-	public boolean validatePassword(String password);
+	public boolean validateWithPassword(String in);
 
+	public String encodeWithPassword();
+	
 	public boolean isChanged();
 
 	IProperties getProperties();

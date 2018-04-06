@@ -19,6 +19,6 @@ public interface TrustSource {
 
 	Trust findTrust(String trust);
 
-	String createTrustTicket(AaaContext user);
+	String createTrustTicket(String name, AaaContext user);
 
 }

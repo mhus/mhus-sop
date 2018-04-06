@@ -23,23 +23,25 @@ import javax.jms.Message;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.cfg.CfgBoolean;
-import de.mhus.lib.core.cfg.CfgString;
 import de.mhus.lib.errors.AccessDeniedException;
 import de.mhus.lib.errors.MRuntimeException;
 import de.mhus.lib.jms.JmsInterceptor;
+import de.mhus.osgi.sop.api.Sop;
+import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
+import de.mhus.osgi.sop.api.util.SopUtil;
 
 public class TicketAccessInterceptor extends MLog implements JmsInterceptor {
 
-	public static final CfgString TICKET_KEY = new CfgString(JmsApi.class, "aaaTicketName", "mhus.ticket");
-	public static final CfgString LOCALE_KEY = new CfgString(JmsApi.class, "aaaLocaleName", "mhus.locale");
+//	public static final CfgString TICKET_KEY = new CfgString(JmsApi.class, "aaaTicketParameter", "mhus.ticket");
+//	public static final CfgString LOCALE_KEY = new CfgString(JmsApi.class, "aaaLocaleParameter", "mhus.locale");
 	public static final CfgBoolean RELAXED = new CfgBoolean(JmsApi.class, "aaaRelaxed", true);
 	
 	@Override
 	public void begin(Message message) {
 		String ticket;
 		try {
-			ticket = message.getStringProperty(TICKET_KEY.value());
+			ticket = message.getStringProperty(Sop.PARAM_AAA_TICKET);
 		} catch (JMSException e) {
 			throw new MRuntimeException(e);
 		}
@@ -51,7 +53,7 @@ public class TicketAccessInterceptor extends MLog implements JmsInterceptor {
 				else
 					throw new AccessDeniedException("access api not found");
 			}
-			String localeStr = message.getStringProperty(LOCALE_KEY.value());
+			String localeStr = message.getStringProperty(Sop.PARAM_LOCALE);
 			Locale locale = localeStr == null ? null : Locale.forLanguageTag(localeStr);
 			if (ticket == null)
 				api.process(api.getGuestAccount(),null,false, locale);
@@ -71,7 +73,7 @@ public class TicketAccessInterceptor extends MLog implements JmsInterceptor {
 
 		String ticket;
 		try {
-			ticket = message.getStringProperty(TICKET_KEY.value());
+			ticket = message.getStringProperty(Sop.PARAM_AAA_TICKET);
 		} catch (JMSException e) {
 			throw new MRuntimeException(e);
 		}
@@ -82,8 +84,24 @@ public class TicketAccessInterceptor extends MLog implements JmsInterceptor {
 	}
 
 	@Override
-	public void prepare(Message answer) {
+	public void prepare(Message message) {
 
+		AccessApi api = MApi.lookup(AccessApi.class);
+		if (api == null) return;
+		
+		AaaContext current = api.getCurrent();
+		if (current == null) return;
+			
+		String ticket = api.createTrustTicket(SopUtil.TRUST_NAME.value(), current);
+		Locale l = current.getLocale();
+		if (l == null) l = Locale.getDefault();
+		String locale = l.toString();
+		try {
+			message.setStringProperty(Sop.PARAM_AAA_TICKET, ticket);
+			message.setStringProperty(Sop.PARAM_LOCALE, locale);
+		} catch (JMSException e) {
+			throw new MRuntimeException(e);
+		}
 		
 	}
 

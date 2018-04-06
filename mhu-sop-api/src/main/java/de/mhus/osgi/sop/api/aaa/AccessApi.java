@@ -55,7 +55,7 @@ public interface AccessApi extends SApi {
 	AaaContext processAdminSession();
 	boolean validatePassword(Account account, String password);
 
-	String createTrustTicket(AaaContext user);
+	String createTrustTicket(String trustName, AaaContext user);
 
 	/**
 	 * Check if a resource access is granted to the account

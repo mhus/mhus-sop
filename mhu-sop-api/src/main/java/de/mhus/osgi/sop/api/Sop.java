@@ -31,7 +31,8 @@ public class Sop {
 	public static final String OPERATION_INFO = "_get";
 	public static final String PARAM_OPERATION_ID = "id";
 
-	public static final String PARAM_AAA_TICKET = "_aaa_ticket";
+	public static final String PARAM_AAA_TICKET = "_sop_aaa_ticket";
+	public static final String PARAM_LOCALE = "_sop_locale";
 
 	// public static final long MAX_MSG_BYTES = 1024 * 1024 * 100; // 100 MB
 

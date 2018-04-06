@@ -26,8 +26,10 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import de.mhus.lib.core.IProperties;
+import de.mhus.lib.core.MPassword;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MXml;
+import de.mhus.lib.core.crypt.MCrypt;
 import de.mhus.osgi.sop.api.aaa.Trust;
 
 public class TrustFile implements Trust {
@@ -51,7 +53,7 @@ public class TrustFile implements Trust {
 		file = f;
 		modified = f.lastModified();
 		
-		password = MXml.getElementByPath(doc.getDocumentElement(),"password").getAttribute("plain");
+		password = MCrypt.md5( MPassword.decode(MXml.getElementByPath(doc.getDocumentElement(),"password").getAttribute("plain")) );
 		name = MXml.getElementByPath(doc.getDocumentElement(),"information").getAttribute("name");
 				
 		Element xmlParams = MXml.getElementByPath(doc.getDocumentElement(), "properties");
@@ -70,9 +72,16 @@ public class TrustFile implements Trust {
 		return valide;
 	}
 
+	// TODO this is more less as more unsecure ... fix it!!!
 	@Override
-	public boolean validatePassword(String password) {
-		return password.equals(this.password);
+	public boolean validateWithPassword(String in) {
+		if (in == null) return false;
+		return in.equals(this.password);
+	}
+	
+	@Override
+	public String encodeWithPassword() {
+		return password;
 	}
 
 	@Override

@@ -17,6 +17,7 @@ package de.mhus.osgi.sop.impl.aaa.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -24,13 +25,17 @@ import org.xml.sax.SAXException;
 
 import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MLog;
+import de.mhus.lib.core.util.SoftHashMap;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.Trust;
 import de.mhus.osgi.sop.api.aaa.TrustSource;
 import de.mhus.osgi.sop.api.util.SopUtil;
+import de.mhus.osgi.sop.api.util.TicketUtil;
 
 public class TrustFromFile extends MLog implements TrustSource {
 
+	private HashMap<String, String> trustSecrets = new HashMap<>();
+	
 	@Override
 	public Trust findTrust(String trust) {
 		File file = SopUtil.getFile( "aaa/trust/" + MFile.normalize(trust.trim()).toLowerCase() + ".xml" );
@@ -45,8 +50,23 @@ public class TrustFromFile extends MLog implements TrustSource {
 	}
 
 	@Override
-	public String createTrustTicket(AaaContext user) {
-		return null;
+	public String createTrustTicket(String name, AaaContext user) {
+		if (user == null) return null;
+		String sec = null;
+		synchronized (trustSecrets) {
+			sec = trustSecrets.get(name);
+			if (sec == null) {
+				Trust trust = findTrust(name);
+				if (trust == null) return null;
+				sec = trust.encodeWithPassword();
+				trustSecrets.put(name, sec);
+			}
+		}
+		return TicketUtil.TRUST + TicketUtil.SEP 
+				+ name + TicketUtil.SEP 
+				+ sec + TicketUtil.SEP 
+				+ user.getAccountId() + TicketUtil.SEP 
+				+ (user.isAdminMode() ? TicketUtil.ADMIN : "");
 	}
 
 }

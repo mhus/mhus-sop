@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map.Entry;
 
 import javax.jms.BytesMessage;
@@ -61,6 +62,7 @@ import de.mhus.osgi.sop.api.operation.OperationAddress;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 import de.mhus.osgi.sop.api.operation.OperationUtil;
 import de.mhus.osgi.sop.api.operation.OperationsProvider;
+import de.mhus.osgi.sop.api.util.SopUtil;
 import de.mhus.osgi.sop.jms.operation.JmsApiImpl.JmsOperationDescriptor;
 
 /**
@@ -133,18 +135,19 @@ public class JmsOperationProvider extends MLog implements OperationsProvider {
 		
 		AccessApi api = MApi.lookup(AccessApi.class);
 		
-		String ticket = api == null ? null : api.createTrustTicket(api.getCurrent()); // TODO Configurable via execute options
+		String ticket = api == null ? null : api.createTrustTicket(SopUtil.TRUST_NAME.value(), api.getCurrent()); // TODO Configurable via execute options
+		Locale locale = api == null || api.getCurrent() == null ? Locale.getDefault() : api.getCurrent().getLocale();
 		long timeout = OperationUtil.getOption(executeOptions, JmsApi.OPT_TIMEOUT, MTimeInterval.MINUTE_IN_MILLISECOUNDS); // TODO Configurable via execute options
 		
 		try {
-			return doExecuteOperation(con, queueName, path, version, properties, ticket, timeout, executeOptions);
+			return doExecuteOperation(con, queueName, path, version, properties, ticket, locale, timeout, executeOptions);
 		} catch (Exception e) {
 			return new NotSuccessful(path, e.getMessage(), OperationResult.INTERNAL_ERROR);
 		}
 		
 	}
 
-	public OperationResult doExecuteOperation(JmsConnection con, String queueName, String operationName, String version, IProperties parameters, String ticket, long timeout, String ... options  ) throws Exception {
+	public OperationResult doExecuteOperation(JmsConnection con, String queueName, String operationName, String version, IProperties parameters, String ticket, Locale l, long timeout, String ... options  ) throws Exception {
 
 		if (con == null) throw new JMSException("connection is null");
 		ClientJms client = new ClientJms(con.createQueue(queueName));
@@ -190,8 +193,11 @@ public class JmsOperationProvider extends MLog implements OperationsProvider {
 		msg.setStringProperty(Sop.PARAM_OPERATION_PATH, operationName);
 		msg.setStringProperty(Sop.PARAM_OPERATION_VERSION, version);
 
+		if (l == null) l = Locale.getDefault();
+		String locale = l.toString();
 
 		msg.setStringProperty(Sop.PARAM_AAA_TICKET, ticket );
+		msg.setStringProperty(Sop.PARAM_LOCALE, locale );
 		client.setTimeout(timeout);
     	// Send Request
     	

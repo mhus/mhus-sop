@@ -18,10 +18,13 @@ package de.mhus.osgi.sop.api.util;
 import java.io.File;
 
 import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.cfg.CfgString;
 import de.mhus.lib.core.service.ServerIdent;
+import de.mhus.osgi.sop.api.jms.JmsApi;
 
 public class SopUtil {
 	
+	public static final CfgString TRUST_NAME = new CfgString(JmsApi.class, "aaaTrustName", "default");
 	private static File base = new File("sop");
 	private static String ident;
 	
