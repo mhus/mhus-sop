@@ -1,5 +1,6 @@
 package de.mhus.osgi.sop.api.dfs;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
@@ -31,7 +32,7 @@ public interface DfsApi {
 	 * @param uri Uri to the requested file
 	 * @return File queue handle
 	 */
-	MUri requestFile(MUri uri);
+	MUri exportFile(MUri uri);
 
 	/**
 	 * Request a list of directory entries (if supported by the
@@ -43,5 +44,11 @@ public interface DfsApi {
 	Map<String, MUri> getDirectoryList(MUri uri);
 
 	Collection<String> listProviders();
-	
+
+	void importFile(MUri queueUri, MUri target) throws IOException;
+
+	void deleteFile(MUri uri) throws IOException;
+
+	void createDirecories(MUri uri) throws IOException;
+
 }

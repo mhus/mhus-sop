@@ -18,7 +18,9 @@ import de.mhus.lib.core.util.MUri;
 import de.mhus.lib.core.util.MutableUri;
 import de.mhus.lib.core.util.SoftHashMap;
 import de.mhus.lib.core.util.Version;
+import de.mhus.lib.errors.MException;
 import de.mhus.lib.karaf.MOsgi;
+import de.mhus.osgi.sop.api.aaa.AaaUtil;
 import de.mhus.osgi.sop.api.dfs.DfsProviderOperation;
 import de.mhus.osgi.sop.api.dfs.FileInfo;
 import de.mhus.osgi.sop.api.dfs.FileQueueApi;
@@ -44,7 +46,7 @@ public class DfsSopProvider extends OperationToIfcProxy implements DfsProviderOp
 	}
 
 	@Override
-	public MUri provideFile(MUri uri) throws IOException {
+	public MUri exportFile(MUri uri) throws IOException {
 		File dir = getDirectory();
 		File file = new File (dir, MFile.normalizePath(uri.getPath()) );
 		if (!file.exists() && !file.isFile()) return null;
@@ -116,6 +118,51 @@ public class DfsSopProvider extends OperationToIfcProxy implements DfsProviderOp
 	protected void initOperationDescription(HashMap<String, String> parameters) {
 		parameters.put(PARAM_SCHEME, "sop");
 		parameters.put(OperationDescription.TAGS, "acl=*");
+	}
+
+	@Override
+	public void importFile(MUri queueUri, MUri target) throws IOException {
+		if (!AaaUtil.isCurrentAdmin())
+			throw new IOException("Not supported");
+		
+		File dir = getDirectory();
+		File file = new File (dir, MFile.normalizePath(target.getPath()) );
+		dir = file.getParentFile();
+		if (!dir.exists() || !dir.isDirectory())
+			throw new IOException("Directory not found");
+		
+		FileQueueApi api = MApi.lookup(FileQueueApi.class);
+		File fromFile;
+		try {
+			fromFile = api.loadFile(queueUri);
+		} catch (MException e) {
+			throw new IOException(e);
+		}
+		MFile.copyFile(fromFile, file);
+	}
+
+	@Override
+	public void deleteFile(MUri uri) throws IOException {
+		if (!AaaUtil.isCurrentAdmin())
+			throw new IOException("Not supported");
+		
+		File dir = getDirectory();
+		File file = new File (dir, MFile.normalizePath(uri.getPath()) );
+
+		MFile.deleteDir(file);
+	}
+
+	@Override
+	public void createDirecories(MUri uri) throws IOException {
+		if (!AaaUtil.isCurrentAdmin())
+			throw new IOException("Not supported");
+		
+		File dir = getDirectory();
+		dir = new File (dir, MFile.normalizePath(uri.getPath()) );
+		
+		if (dir.exists() && dir.isFile())
+			throw new IOException("file exists");
+		dir.mkdirs();
 	}
 
 }

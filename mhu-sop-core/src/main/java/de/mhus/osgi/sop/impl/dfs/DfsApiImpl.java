@@ -50,18 +50,20 @@ public class DfsApiImpl extends MLog implements DfsApi {
 	}
 
 	@Override
-	public MUri requestFile(MUri uri) {
+	public MUri exportFile(MUri uri) {
 		if ( DfsApi.SCHEME_DFQ.equals(uri.getScheme())) {
 			return uri;
 		}
 		OperationApi api = MApi.lookup(OperationApi.class);
 		
 		LinkedList<String> tags = new LinkedList<>();
+		if (uri.getLocation() != null)
+			tags.add(OperationDescriptor.TAG_IDENT + "=" + uri.getLocation());
 		for (OperationDescriptor desc : api.findOperations(DfsProviderOperation.class.getCanonicalName(), null, tags)) {
 			if (uri.getScheme().equals(desc.getParameter(DfsProviderOperation.PARAM_SCHEME))) {
 				try {
 					DfsProviderOperation provider = OperationUtil.createOpertionProxy(DfsProviderOperation.class, desc);
-					MUri out = provider.provideFile(uri);
+					MUri out = provider.exportFile(uri);
 					if (out != null) return out;
 				} catch (Throwable t) {
 					log().w(desc,t);
@@ -77,6 +79,8 @@ public class DfsApiImpl extends MLog implements DfsApi {
 			return null;
 		OperationApi api = MApi.lookup(OperationApi.class);
 		LinkedList<String> tags = new LinkedList<>();
+		if (uri.getLocation() != null)
+			tags.add(OperationDescriptor.TAG_IDENT + "=" + uri.getLocation());
 		for (OperationDescriptor desc : api.findOperations(DfsProviderOperation.class.getCanonicalName(), null, tags)) {
 			if (uri.getScheme().equals(desc.getParameter(DfsProviderOperation.PARAM_SCHEME))) {
 				try {
@@ -99,6 +103,70 @@ public class DfsApiImpl extends MLog implements DfsApi {
 			out.add(desc.getParameter(DfsProviderOperation.PARAM_SCHEME) + "://" + OperationUtil.getOption(desc.getTags(), OperationDescriptor.TAG_IDENT, "" ) );
 		}
 		return out;
+	}
+
+	@Override
+	public void importFile(MUri queueUri, MUri target) throws IOException {
+		if ( DfsApi.SCHEME_DFQ.equals(target.getScheme())) 
+			return;
+		OperationApi api = MApi.lookup(OperationApi.class);
+		LinkedList<String> tags = new LinkedList<>();
+		if (target.getLocation() != null)
+			tags.add(OperationDescriptor.TAG_IDENT + "=" + target.getLocation());
+		for (OperationDescriptor desc : api.findOperations(DfsProviderOperation.class.getCanonicalName(), null, tags)) {
+			if (target.getScheme().equals(desc.getParameter(DfsProviderOperation.PARAM_SCHEME))) {
+				try {
+					DfsProviderOperation provider = OperationUtil.createOpertionProxy(DfsProviderOperation.class, desc);
+					provider.importFile(queueUri, target);
+					return;
+				} catch (Throwable t) {
+					log().w(desc,t);
+				}
+			}
+		}
+		
+	}
+
+	@Override
+	public void deleteFile(MUri uri) throws IOException {
+		if ( DfsApi.SCHEME_DFQ.equals(uri.getScheme())) 
+			return;
+		OperationApi api = MApi.lookup(OperationApi.class);
+		LinkedList<String> tags = new LinkedList<>();
+		if (uri.getLocation() != null)
+			tags.add(OperationDescriptor.TAG_IDENT + "=" + uri.getLocation());
+		for (OperationDescriptor desc : api.findOperations(DfsProviderOperation.class.getCanonicalName(), null, tags)) {
+			if (uri.getScheme().equals(desc.getParameter(DfsProviderOperation.PARAM_SCHEME))) {
+				try {
+					DfsProviderOperation provider = OperationUtil.createOpertionProxy(DfsProviderOperation.class, desc);
+					provider.deleteFile(uri);
+					return;
+				} catch (Throwable t) {
+					log().w(desc,t);
+				}
+			}
+		}
+	}
+
+	@Override
+	public void createDirecories(MUri uri) throws IOException {
+		if ( DfsApi.SCHEME_DFQ.equals(uri.getScheme())) 
+			return;
+		OperationApi api = MApi.lookup(OperationApi.class);
+		LinkedList<String> tags = new LinkedList<>();
+		if (uri.getLocation() != null)
+			tags.add(OperationDescriptor.TAG_IDENT + "=" + uri.getLocation());
+		for (OperationDescriptor desc : api.findOperations(DfsProviderOperation.class.getCanonicalName(), null, tags)) {
+			if (uri.getScheme().equals(desc.getParameter(DfsProviderOperation.PARAM_SCHEME))) {
+				try {
+					DfsProviderOperation provider = OperationUtil.createOpertionProxy(DfsProviderOperation.class, desc);
+					provider.createDirecories(uri);
+					return;
+				} catch (Throwable t) {
+					log().w(desc,t);
+				}
+			}
+		}
 	}
 
 }

@@ -143,6 +143,8 @@ public class FileQueueCmd implements Action {
 				System.out.println(provider);
 			}
 		} break;
+		default:
+			System.out.println("Unknown command");
 		}
 		
 		return null;

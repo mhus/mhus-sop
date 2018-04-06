@@ -29,8 +29,11 @@ public class DfsCmd implements Action {
 			+ "providers          - list all providers\n"
 			+ "list <dir uri>     - list directory content\n"
 			+ "info <file uri>    - list file infomation\n"
-			+ "require <file uri> - create a file queue for the file\n"
-			+ "print <file uri>   - create file queue entry and print content of file")
+			+ "export <file uri>  - create a file queue for the file\n"
+			+ "print <file uri>   - create file queue entry and print content of file\n"
+			+ "import <queue uri> <target uri> - Import a queued file into dfs\n"
+			+ "delete <uri>       - delete a dfs file\n"
+			+ "mkdir <uri>        - create all missing directorises")
 	String cmd; 
 
 	@Argument(index=1, name="parameters", required=false, description="More Parameters", multiValued=true)
@@ -72,20 +75,38 @@ public class DfsCmd implements Action {
 			System.out.println("Modified: " + MDate.toIso8601(new Date(info.getModified())));
 			System.out.println("URI     : " +info.getUri());
 		} break;
-		case "request": {
-			MUri uri = api.requestFile(MUri.toUri(parameters[0]));
-			System.out.println("Requested file: " + parameters[0]);
+		case "export": {
+			MUri uri = api.exportFile(MUri.toUri(parameters[0]));
+			System.out.println("Exported file: " + parameters[0]);
 			System.out.println("Queue: " + uri);
 		} break;
 		case "print": {
-			MUri uri = api.requestFile(MUri.toUri(parameters[0]));
+			MUri uri = api.exportFile(MUri.toUri(parameters[0]));
 			System.out.println("Requested file: " + parameters[0]);
 			System.out.println("Queue: " + uri);
 			System.out.println("------------ Content -------------");
 			File file = MApi.lookup(FileQueueApi.class).loadFile(uri);
 			System.out.println( MFile.readFile(file) );
 			System.out.println("-------------- END ---------------");
-		}
+		} break;
+		case "import": {
+			MUri queueUri = api.exportFile(MUri.toUri(parameters[0]));
+			MUri target = api.exportFile(MUri.toUri(parameters[1]));
+			api.importFile(queueUri, target);
+			System.out.println("OK");
+		} break;
+		case "delete": {
+			MUri uri = api.exportFile(MUri.toUri(parameters[0]));
+			api.deleteFile(uri);
+			System.out.println("OK");
+		} break;
+		case "mkdir": {
+			MUri uri = api.exportFile(MUri.toUri(parameters[0]));
+			api.createDirecories(uri);
+			System.out.println("OK");
+		} break;
+		default:
+			System.out.println("Unknown command");
 		}
 		return null;
 	}

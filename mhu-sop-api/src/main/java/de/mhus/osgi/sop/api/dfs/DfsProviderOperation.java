@@ -9,10 +9,28 @@ public interface DfsProviderOperation {
 
 	String PARAM_SCHEME = "scheme";
 
-	public FileInfo getFileInfo(MUri uri); 
+	FileInfo getFileInfo(MUri uri); 
 
-	public MUri provideFile(MUri uri) throws IOException;
+	MUri exportFile(MUri uri) throws IOException;
 
-	public Map<String, MUri> getDirectoryList(MUri uri);
+	Map<String, MUri> getDirectoryList(MUri uri);
 
+	void importFile(MUri queueUri, MUri target) throws IOException;
+	
+	/**
+	 * Delete file or directory.
+	 * 
+	 * @param uri
+	 * @throws IOException
+	 */
+	void deleteFile(MUri uri) throws IOException;
+	
+	/**
+	 * Create all the missing directories.
+	 * 
+	 * @param uri
+	 * @throws IOException
+	 */
+	void createDirecories(MUri uri) throws IOException;
+	
 }
