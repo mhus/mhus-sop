@@ -22,9 +22,13 @@ import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
 import de.mhus.lib.core.MTimeInterval;
 import de.mhus.lib.core.MValidator;
+import de.mhus.lib.core.cfg.CfgInt;
+import de.mhus.lib.core.cfg.CfgLong;
 import de.mhus.lib.core.util.MUri;
 import de.mhus.lib.core.util.MutableUri;
+import de.mhus.lib.errors.AccessDeniedException;
 import de.mhus.lib.errors.MException;
+import de.mhus.osgi.sop.api.aaa.AaaUtil;
 import de.mhus.osgi.sop.api.dfs.DfsApi;
 import de.mhus.osgi.sop.api.dfs.FileInfo;
 import de.mhus.osgi.sop.api.dfs.FileQueueApi;
@@ -37,12 +41,13 @@ import de.mhus.osgi.sop.api.util.SopUtil;
 @Component(immediate=true)
 public class FileQueueApiImpl extends MLog implements FileQueueApi {
 	
-	protected static long MAX_FILE_SIZE = 1024l * 1024l * 50l;
-	protected static long MAX_FILE_AGE = MTimeInterval.MINUTE_IN_MILLISECOUNDS * 30;
-	protected static final String READ_POINTER = "read_pointer";
-	protected static int MAX_FILES = 1000 * 2; // 1000 queues, every queue needs 2 files
+	protected static CfgLong CFG_MAX_QUEUE_SIZE = new CfgLong(FileQueueApi.class, "maxQueueSize", 1024l * 1024l * 1024l * 50l); // max 50 GB for all files
+	protected static CfgLong CFG_MAX_FILE_SIZE = new CfgLong(FileQueueApi.class, "maxFileSize", 1024l * 1024l * 50l); // max size per file 50 MB
+	protected static CfgInt CFG_MAX_FILES = new CfgInt(FileQueueApi.class, "maxFiles", 10000); // max number of files - 10000 are no working for windows os
 
 	static FileQueueApiImpl instance;
+	private int queueFileCnt;
+	private long queueFileSize;
 
 	@Activate
 	public void doActivate(ComponentContext ctx) {
@@ -53,80 +58,7 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 	public void doDeactivate(ComponentContext ctx) {
 		instance = null;
 	}
-/*
-	@Override
-	public File loadFile(FileInfo info) throws MException {
-		
-		File dir = getUploadDir();
-		File pFile = new File(dir, info.getFileReference() + ".properties");
-		File dFile = new File(dir, info.getFileReference() + ".data");
-		
-		synchronized (this) {
-			if (dFile.exists() && dFile.length() == info.getSize()) {
-				// load cached
-				MProperties prop = MProperties.load(pFile);
-				if (prop.getLong("modified", -1) == info.getModified()) {
-					prop.setLong("accessed", System.currentTimeMillis());
-					try {
-						prop.save(pFile);
-					} catch (IOException e) {
-						log().w(e);
-					}
-					return dFile;
-				}
-			}
-			if (dFile.exists()) dFile.delete();
-			if (pFile.exists()) pFile.delete();
-		}
-		
-		OperationApi api = MApi.lookup(OperationApi.class);
-		LinkedList<String> tags = new LinkedList<>();
-		tags.add(OperationDescriptor.TAG_IDENT + "=" + info.getFileSource());
-		OperationDescriptor desc = api.findOperation(FileQueueOperation.class.getCanonicalName(), null, tags);
-		FileQueueOperation operation = OperationUtil.createOpertionProxy(FileQueueOperation.class, desc);
-		File file = operation.getFile(info.getFileReference());
-		
-		synchronized (this) {
-			file.renameTo(dFile);
-			MProperties prop = new MProperties();
-			prop.setString("name", info.getName());
-			prop.setLong("size", info.getSize());
-			prop.setLong("modified", info.getModified());
-			prop.setLong("accessed", System.currentTimeMillis());
-			try {
-				prop.save(pFile);
-			} catch (IOException e) {
-				log().w(e);
-			}
-		}
-		
-		return file;
-	}
 
-	@Override
-	public UploadFileInfo createQueueFile(String name, long ttl) {
-
-		synchronized (this) {
-			UUID id = UUID.randomUUID();
-			
-			File dir = getUploadDir();
-			File pFile = new File(dir, id + ".properties");
-			File dFile = new File(dir, id + ".data");
-			
-			MProperties prop = new MProperties();
-			prop.setString("name", name);
-			prop.setLong("accessed", System.currentTimeMillis());
-			prop.setLong("expires", System.currentTimeMillis() + ttl);
-			try {
-				prop.save(pFile);
-			} catch (IOException e) {
-				log().w(e);
-			}
-			
-			return new UploadFileInfoImpl(dFile, name, id);
-		}
-	}
-*/
 	public static File getUploadDir() {
 		File dir = SopUtil.getFile("filequeue");
 		if (!dir.exists()) dir.mkdirs();
@@ -145,7 +77,7 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 
 	@Override
 	public UUID createQueueFile(String name, long ttl) throws IOException {
-		
+		checkFileQueueSize();
 		if (ttl <= 0) ttl = DEFAULT_TTL;
 
 		synchronized (this) {
@@ -166,13 +98,16 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 
 			prop.save(pFile);
 			
+			queueFileCnt++;
+			
 			return id;
 		}
 	}
 
 	@Override
 	public UUID takeFile(File file, boolean copy, long ttl) throws IOException {
-		
+		checkFileQueueSize();
+
 		if (ttl <= 0) ttl = DEFAULT_TTL;
 		
 		MProperties prop = new MProperties();
@@ -199,6 +134,8 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 			prop.setLong("ttl", ttl);
 
 			prop.save(pFile);
+			
+			queueFileCnt++;
 		}
 		return id;
 	}
@@ -231,9 +168,14 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 		File dir = getUploadDir();
 		File pFile = new File(dir, id + ".properties");
 		File dFile = new File(dir, id + ".data");
-
+		
 		if (!pFile.exists()) throw new FileNotFoundException(id.toString());
+		if (content == null || content.length == 0) return dFile.length();
+		
 		synchronized (this) {
+			if (/* queueFileSize > CFG_MAX_QUEUE_SIZE.value() || the max size of a file is guaranteed !! */
+					dFile.length()+content.length > CFG_MAX_FILE_SIZE.value() )
+				throw new IOException("maximum file size reached " + CFG_MAX_FILE_SIZE.value());
 			MProperties prop = MProperties.load(pFile);
 			if (!prop.getBoolean("queued", false))
 				throw new IOException("File not queued " + id);
@@ -242,6 +184,7 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 			os.write(content);
 			os.close();
 			
+			queueFileSize+=content.length;
 		}
 		return dFile.length();
 	}
@@ -258,7 +201,8 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 			if (!prop.getBoolean("queued", false))
 				throw new IOException("File not queued " + id);
 			
-			FileOutputStream os = new FileOutputStream(dFile);
+			FileOutputStream os = new QuotaFileOutputStream(dFile, CFG_MAX_FILE_SIZE.value()); 
+
 			return os;
 		}
 	}
@@ -406,7 +350,13 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 	public void cleanupQueue() {
 		File dir = getUploadDir();
 		synchronized (this) {
+			queueFileCnt = 0;
+			queueFileSize = 0;
 			for (File file : dir.listFiles()) {
+				
+				if (!file.getName().startsWith(".") && file.isFile()) {
+					queueFileSize+=file.length();
+				}
 				if (file.getName().endsWith(".properties")) {
 					try {
 						MProperties prop = MProperties.load(file);
@@ -423,8 +373,11 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 							if (dFile.exists()) {
 								dFile.setWritable(true, false);
 								dFile.delete();
+								queueFileSize-=dFile.length(); // could be distort size amount, but shit appends
 							}
 							file.delete();
+						} else {
+							queueFileCnt++;
 						}
 					} catch (Throwable t) {
 						log().e(file,t);
@@ -434,8 +387,17 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 		}
 	}
 
+	private void checkFileQueueSize() throws IOException {
+		synchronized (this) {
+			if (queueFileCnt > CFG_MAX_FILES.value()) 
+				throw new IOException("too much files in file queue " + queueFileCnt);
+			if (queueFileSize > CFG_MAX_QUEUE_SIZE.value())
+				throw new IOException("file queue quota reached " + queueFileSize);
+		}
+	}
+
 	@Override
-	public void touchFile(UUID id) throws IOException {
+	public void touchFile(UUID id, long ttl) throws IOException {
 		File dir = getUploadDir();
 		File pFile = new File(dir, id + ".properties");
 		
@@ -443,7 +405,7 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 		
 		MProperties prop = MProperties.load(pFile);
 		synchronized (this) {
-			
+			if (ttl > 0) prop.setLong("ttl", ttl);
 			prop.setLong("expires", prop.getLong("ttl", DEFAULT_TTL) + System.currentTimeMillis());
 			prop.setLong("accessed", System.currentTimeMillis());
 			
@@ -453,7 +415,11 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 	}
 
 	public Set<UUID> getQueuedIdList(boolean queued) {
+		
 		HashSet<UUID> out = new HashSet<>();
+		// only admin is allowed to watch id list, id is like a token and need to be protected
+		if (!AaaUtil.isCurrentAdmin()) throw new AccessDeniedException("only root is allowed to access ids"); 
+		
 		File dir = getUploadDir();
 		for (File file : dir.listFiles()) {
 			if (file.getName().endsWith(".properties")) {
@@ -486,9 +452,11 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 		File dFile = new File(dir, id + ".data");
 		if (pFile.exists()) pFile.delete();
 		if (dFile.exists()) {
+			queueFileSize-=dFile.length();
 			dFile.setWritable(true, false);
 			dFile.delete();
 		}
+		queueFileCnt--;
 	}
 
 	public void setParameter(UUID id, String key, String val) throws IOException {

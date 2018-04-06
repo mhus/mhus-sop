@@ -58,7 +58,7 @@ public class DfsSopProvider extends OperationToIfcProxy implements DfsProviderOp
 			try {
 				FileInfo localInfo = api.getFileInfo(id);
 				if (localInfo.getModified() == file.lastModified()) {
-					api.touchFile(id);
+					api.touchFile(id, 0);
 					return MUri.toUri(localInfo.getUri());
 				}
 			} catch (FileNotFoundException fnf) {

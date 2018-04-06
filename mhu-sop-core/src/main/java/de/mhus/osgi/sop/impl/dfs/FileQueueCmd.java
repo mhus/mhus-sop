@@ -10,6 +10,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MDate;
 import de.mhus.lib.core.MFile;
@@ -30,7 +31,7 @@ public class FileQueueCmd implements Action {
 			"Command:\n"
 			+ " load <uri>           - load a file from remote or local\n"
 			+ " list [ident]         - list queued files\n"
-			+ " touch                - touch file and extend expire time\n"
+			+ " touch <id> [ttl]     - touch file and extend expire time\n"
 			+ " info <id>            - print file properties\n"
 			+ " create <name>        - create a queued file\n"
 			+ " append <id> <content as string> - append content to the file\n"
@@ -83,7 +84,7 @@ public class FileQueueCmd implements Action {
 		} break;
 		case "touch": {
 			UUID id = UUID.fromString(parameters[0]);
-			api.touchFile(id);
+			api.touchFile(id, parameters.length > 1 ? M.c(parameters[1], 0) : 0);
 			System.out.println("OK");
 		} break;
 		case "info": {

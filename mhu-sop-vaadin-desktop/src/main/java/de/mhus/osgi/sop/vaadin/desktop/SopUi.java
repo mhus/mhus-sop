@@ -42,6 +42,7 @@ import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
+import de.mhus.lib.core.cfg.CfgBoolean;
 import de.mhus.lib.core.logging.Log;
 import de.mhus.lib.core.logging.MLogUtil;
 import de.mhus.lib.core.security.AccessControl;
@@ -56,6 +57,8 @@ import de.mhus.osgi.sop.api.aaa.AccessApi;
 @Theme("soptheme")
 @Widgetset("de.mhus.osgi.sop.vaadin.theme.SopWidgetset")
 public class SopUi extends UI implements SopUiApi {
+	
+	private static CfgBoolean CFG_GEEK_MODE = new CfgBoolean(SopUiApi.class, "geek", false);
 	
 	// https://ccsearch.creativecommons.org/image/detail/pugDQPO07WYrRd52PHD68Q==
 	// "cross process=loves" by Vivianna_love is licensed under CC BY 2.0
@@ -88,20 +91,21 @@ public class SopUi extends UI implements SopUiApi {
 			protected void initGui() {
         		super.initGui();
         		
-        		String part = UI.getCurrent().getPage().getUriFragment();
-        		
-        		Date now = new Date();
-        		if ("easter".equals(part) || now.getMonth() == 3 && (now.getDate() >= 10 && now.getDate() <= 17 ))
-        			addStyleName("desktop-easter");
-        		if ("towel".equals(part) || now.getMonth() == 4 && now.getDate() == 25)
-        			addStyleName("desktop-towel");
-        		if ("yoda".equals(part) || now.getMonth() == 4 && now.getDate() == 21)
-        			addStyleName("desktop-yoda");
-        		if ("pirate".equals(part) || now.getMonth() == 8 && now.getDate() == 19)
-        			addStyleName("desktop-pirate");
-        		if ("suit".equals(part) || now.getMonth() == 9 && now.getDate() == 13)
-        			addStyleName("desktop-suit");
-        		
+        		if (CFG_GEEK_MODE.value()) {
+        			String part = UI.getCurrent().getPage().getUriFragment();
+	        		Date now = new Date();
+	        		if ("geek_easter".equals(part) || now.getMonth() == 3 && (now.getDate() >= 10 && now.getDate() <= 17 ))
+	        			addStyleName("desktop-easter");
+	        		if ("geek_towel".equals(part) || now.getMonth() == 4 && now.getDate() == 25)
+	        			addStyleName("desktop-towel");
+	        		if ("geek_yoda".equals(part) || now.getMonth() == 4 && now.getDate() == 21)
+	        			addStyleName("desktop-yoda");
+	        		if ("geek_pirate".equals(part) || now.getMonth() == 8 && now.getDate() == 19)
+	        			addStyleName("desktop-pirate");
+	        		if ("geek_suit".equals(part) || now.getMonth() == 9 && now.getDate() == 13)
+	        			addStyleName("desktop-suit");
+        		}
+
         		refresher = new Refresher();
         		refresher.setRefreshInterval(1000);
         		refresher.addListener(new Refresher.RefreshListener() {
@@ -164,7 +168,7 @@ public class SopUi extends UI implements SopUiApi {
             showMainView();
         }
 	}
-
+	
 	private void showMainView() {
         addStyleName(ValoTheme.UI_WITH_MENU);
         setContent(desktop);

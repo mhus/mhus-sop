@@ -112,9 +112,11 @@ public interface FileQueueApi {
 	MUri getUri(UUID id) throws FileNotFoundException;
 
 	/**
+	 * Renew the lifetime of a file. Using the ttl to calculate the new expire time.
 	 * 
-	 * @param id
+	 * @param id Id of the local file
+	 * @param ttl The ttl in ms or 0 for the last used ttl.
 	 * @throws IOException 
 	 */
-	void touchFile(UUID id) throws IOException;
+	void touchFile(UUID id, long ttl) throws IOException;
 }
