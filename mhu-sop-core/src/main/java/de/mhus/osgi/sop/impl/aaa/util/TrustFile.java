@@ -30,10 +30,13 @@ import de.mhus.lib.core.MPassword;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MXml;
 import de.mhus.lib.core.crypt.MCrypt;
+import de.mhus.lib.core.util.Base64;
 import de.mhus.osgi.sop.api.aaa.Trust;
 
 public class TrustFile implements Trust {
 
+	private static final long MAX_TTL = 1000 * 60 * 30; // 30 min
+	
 	private Document doc;
 	private String trust;
 	private boolean valide;
@@ -72,16 +75,39 @@ public class TrustFile implements Trust {
 		return valide;
 	}
 
-	// TODO this is more less as more unsecure ... fix it!!!
 	@Override
 	public boolean validateWithPassword(String in) {
 		if (in == null) return false;
-		return in.equals(this.password);
+		
+		// split passwd and timestamp
+		int p = in.indexOf('-');
+		String pp = in.substring(0, p);
+		String pb = in.substring(p+1);
+		
+		// check password
+		{
+			byte[] b = Base64.decode(pp);
+			b = TmpMCrypt.decode(password, b);
+			if (!password.equals( new String(b) ))
+				return false;
+		}
+		
+		// check time stamp
+		{
+			byte[] b = Base64.decode(pb);
+			b = TmpMCrypt.decode(password, b);
+			long time = TmpMCrypt.bytesToLong(b);
+			long now = System.currentTimeMillis();
+			return time < now && time > now - MAX_TTL;
+		}
 	}
 	
 	@Override
 	public String encodeWithPassword() {
-		return password;
+		byte[] b = TmpMCrypt.longToBytes(System.currentTimeMillis());
+		b = TmpMCrypt.encode(password, b);
+		byte[] p = TmpMCrypt.encode(password, password.getBytes());
+		return Base64.encode(p) + "-" + Base64.encode(b);
 	}
 
 	@Override

@@ -347,7 +347,19 @@ public class AccessApiImpl extends MLog implements AccessApi {
 	@Override
 	public String createTrustTicket(String name, AaaContext user) {
 		if (trustSource == null) return null;
-		return trustSource.createTrustTicket(name, user);
+		Trust trust = getTrust(name);
+		if (trust == null) return null;
+
+		if (user == null) return null;
+
+		String sec = trust.encodeWithPassword();
+
+		return TicketUtil.TRUST + TicketUtil.SEP 
+				+ name + TicketUtil.SEP 
+				+ sec + TicketUtil.SEP 
+				+ user.getAccountId() + TicketUtil.SEP 
+				+ (user.isAdminMode() ? TicketUtil.ADMIN : "");
+		
 	}
 
 	@Reference(optional=true,dynamic=true)
