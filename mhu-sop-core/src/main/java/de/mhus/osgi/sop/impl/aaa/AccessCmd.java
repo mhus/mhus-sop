@@ -42,16 +42,20 @@ public class AccessCmd implements Action {
 
 	@Argument(index=0, name="cmd", required=true, description=
 			"Command:\n"
-			+ " login <account>,"
-			+ " logout, id, info,"
-			+ " synchronize <account>,"
-			+ " validate <account> <password>,"
-			+ " synchronizer <type>,"
-			+ " access <account> <name> [<action>]"
-			+ " reloadconfig,"
-			+ " md5 <password>,"
-			+ " admin,"
-			+ " idtree", multiValued=false)
+			+ " login <account>  - login\n"
+			+ " logout           - logout\n"
+			+ " admin            - login as admin\n"
+			+ " reset            - reset user context"
+			+ " id\n"
+			+ " info <account>\n"
+			+ " synchronize <account>\n"
+			+ " validate <account> <password>\n"
+			+ " synchronizer <type>\n"
+			+ " access <account> <name> [<action>]\n"
+			+ " reloadconfig\n"
+			+ " md5 <password>\n"
+			+ " idtree",
+			multiValued=false)
 	String cmd;
 	
 	@Argument(index=1, name="parameters", required=false, description="More Parameters", multiValued=true)
@@ -80,7 +84,7 @@ public class AccessCmd implements Action {
 		} else
 		if (cmd.equals("admin")) {
 			RootContext context = new RootContext();
-			context.setAdminMode(admin);
+			context.setAdminMode(true);
 			api.process(context);
 			System.out.println(context);
 		} else
@@ -89,9 +93,14 @@ public class AccessCmd implements Action {
 			cur = api.release(cur.getAccount());
 			System.out.println(cur);
 		} else
+		if (cmd.equals("reset")) {
+			api.resetContext();
+		} else
 		if (cmd.equals("id")) {
 			AaaContext cur = api.getCurrentOrGuest();
 			System.out.println(cur);
+			if (cur.isAdminMode())
+				System.out.println("Admin mode");
 		} else
 		if (cmd.equals("idtree")) {
 			AaaContextImpl cur = (AaaContextImpl) api.getCurrentOrGuest();

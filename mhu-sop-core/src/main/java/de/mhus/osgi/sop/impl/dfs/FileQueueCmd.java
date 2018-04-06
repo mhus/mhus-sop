@@ -62,21 +62,21 @@ public class FileQueueCmd implements Action {
 		} break;
 		case "list": {
 			ConsoleTable table = new ConsoleTable(full);
-			table.setHeaderValues("ID","Name","Size","Modified", "TTL");
 
 			if (parameters == null) {
+				table.setHeaderValues("ID","Name","Size","Modified", "TTL", "Source");
 				for (UUID id : FileQueueApiImpl.instance.getQueuedIdList(true)) {
 					FileInfo info = api.getFileInfo(id);
 					MProperties prop = FileQueueApiImpl.instance.getProperties(id);
 					String ttl = MTimeInterval.getIntervalAsString( prop.getLong("expires", 0) - System.currentTimeMillis());
-					table.addRowValues(id, info.getName(), MString.toByteDisplayString(info.getSize()), MDate.toIso8601(info.getModified()), ttl);
+					table.addRowValues(id, info.getName(), MString.toByteDisplayString(info.getSize()), MDate.toIso8601(info.getModified()), ttl, prop.getString("source", ""));
 				}
 			} else {
+				table.setHeaderValues("ID","Name","Size","Modified");
 				FileQueueOperation operation = FileQueueApiImpl.instance.getOperation(parameters[0]);
 				for (UUID id : operation.getQueuedIdList()) {
 					FileInfo info = operation.getFileInfo(id);
-					String ttl = "";
-					table.addRowValues(id, info.getName(), MString.toByteDisplayString(info.getSize()), MDate.toIso8601(info.getModified()), ttl);
+					table.addRowValues(id, info.getName(), MString.toByteDisplayString(info.getSize()), MDate.toIso8601(info.getModified()));
 				}
 				
 			}

@@ -48,6 +48,7 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 	static FileQueueApiImpl instance;
 	private int queueFileCnt;
 	private long queueFileSize;
+	private long lastManualQueueCleanup;
 
 	@Activate
 	public void doActivate(ComponentContext ctx) {
@@ -258,6 +259,9 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 			prop.setLong("size", info.getSize());
 			prop.setLong("modified", info.getModified());
 			prop.setLong("accessed", System.currentTimeMillis());
+			prop.setLong("ttl", DEFAULT_TTL);
+			prop.setLong("expires", System.currentTimeMillis() + DEFAULT_TTL);
+			prop.setString("source", uri.toString());
 			try {
 				prop.save(pFile);
 			} catch (IOException e) {
@@ -265,7 +269,7 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 			}
 		}
 		
-		return file;
+		return dFile;
 	}
 
 	@Override
@@ -389,7 +393,16 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 
 	private void checkFileQueueSize() throws IOException {
 		synchronized (this) {
-			if (queueFileCnt > CFG_MAX_FILES.value()) 
+			if (queueFileCnt > CFG_MAX_FILES.value() || queueFileSize > CFG_MAX_QUEUE_SIZE.value()) {
+				// if the queue is full a manual cleanup check will executed to - maybe - cleanup resources
+				// to avoid overload this will only be executed every 10 sec.
+				if (MTimeInterval.isTimeOut(lastManualQueueCleanup, 10000)) {
+					log().w("Manual File Queue Cleanup", queueFileCnt, queueFileSize);
+					cleanupQueue();
+					lastManualQueueCleanup = System.currentTimeMillis();
+				}
+			}
+			if (queueFileCnt > CFG_MAX_FILES.value())
 				throw new IOException("too much files in file queue " + queueFileCnt);
 			if (queueFileSize > CFG_MAX_QUEUE_SIZE.value())
 				throw new IOException("file queue quota reached " + queueFileSize);

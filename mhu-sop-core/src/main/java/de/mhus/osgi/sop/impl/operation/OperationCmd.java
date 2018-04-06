@@ -54,8 +54,8 @@ public class OperationCmd implements Action {
 //	@Option(name="-c", aliases="--connection", description="JMS Connection Name",required=false)
 //	String conName = null;
 
-	@Option(name="-q", aliases="--queue", description="JMS Connection Queue OperationChannel",required=false)
-	String queueName = null;
+//	@Option(name="-q", aliases="--queue", description="JMS Connection Queue OperationChannel",required=false)
+//	String queueName = null;
 	
 	@Option(name="-v", aliases="--version", description="Version Range [1.2.3,2.0.0)",required=false)
 	String version = null;
