@@ -16,6 +16,7 @@ import de.mhus.lib.errors.MException;
 import de.mhus.lib.errors.NotFoundException;
 import de.mhus.lib.karaf.MOsgi;
 import de.mhus.osgi.sop.api.SopApi;
+import de.mhus.osgi.sop.api.dfs.DfsApi;
 import de.mhus.osgi.sop.api.dfs.FileQueueApi;
 import de.mhus.osgi.sop.api.mailqueue.MailQueueOperation;
 import de.mhus.osgi.sop.api.util.SopUtil;
@@ -42,7 +43,14 @@ public class MailQueueOperationImpl extends OperationToIfcProxy implements MailQ
 		try {
 			// create folder
 			File dir = getMailFolder(task);
-			MFile.writeFile(new File(dir,"content.html"), content);
+			
+			if (content.startsWith(DfsApi.SCHEME_DFQ + ":")) {
+				FileQueueApi dfq = MApi.lookup(FileQueueApi.class);
+				File contentFrom = dfq.loadFile(MUri.toUri(content));
+				MFile.copyFile(contentFrom, new File(dir,"content.html"));
+			} else {
+				MFile.writeFile(new File(dir,"content.html"), content);
+			}
 			MProperties prop = new MProperties();
 			
 			if (attachments != null && attachments.length > 0) {

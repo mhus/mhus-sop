@@ -53,16 +53,16 @@ public class DfsUtil {
 	 * 
 	 * @param name A description of the usage for debug purpose
 	 * @param ttl The ttl in ms or 0 for default
-	 * @return The tmp file handle
+	 * @return The tmp file uri
 	 * @throws IOException
 	 */
-	public static File createTmpFile(String name, long ttl) throws IOException {
+	public static String createTmpFile(String name, long ttl) throws IOException {
 		FileQueueApi api = MApi.lookup(FileQueueApi.class);
 		UUID id = api.createQueueFile("tmp_" + name, ttl);
 		api.closeQueueFile(id);
 		File file = api.loadFile(id);
 		file.setWritable(true, true);
-		return file;
+		return api.getUri(id).toString();
 	}
 	
 }
