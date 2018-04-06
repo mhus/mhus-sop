@@ -32,8 +32,9 @@ public class PingOperation extends AbstractOperation {
 		String pid = MSystem.getPid();
 		String host = MSystem.getHostname();
 		String free = MSystem.freeMemoryAsString();
+		long time = System.currentTimeMillis();
 		
-		return new Successful(this, "ok", "user", user, "admin", ""+admin, "ident", ident, "pid", pid, "host", host, "free", free);
+		return new Successful(this, "ok", "user", user, "admin", ""+admin, "ident", ident, "pid", pid, "host", host, "free", free, "time", ""+time);
 	}
 
 	@Override
