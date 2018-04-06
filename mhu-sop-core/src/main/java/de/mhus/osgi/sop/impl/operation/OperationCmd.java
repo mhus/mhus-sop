@@ -17,6 +17,7 @@ package de.mhus.osgi.sop.impl.operation;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.LinkedList;
 
 import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Argument;
@@ -31,18 +32,26 @@ import de.mhus.lib.core.MXml;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.core.util.VersionRange;
+import de.mhus.lib.errors.MException;
 import de.mhus.lib.form.ModelUtil;
 import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.operation.OperationAddress;
 import de.mhus.osgi.sop.api.operation.OperationApi;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 import de.mhus.osgi.sop.api.operation.OperationUtil;
+import de.mhus.osgi.sop.impl.util.PingOperation;
 
 @Command(scope = "sop", name = "operation", description = "Operation commands")
 @Service
 public class OperationCmd implements Action {
 
-	@Argument(index=0, name="cmd", required=true, description="Command list, action, info <path>, execute <path> [key=value]*, search", multiValued=false)
+	@Argument(index=0, name="cmd", required=true, description="Command:\n"
+			+ " list\n"
+			+ " action\n"
+			+ " info <path>\n"
+			+ " execute <path> [key=value]*\n"
+			+ " search\n"
+			+ " ping [ident]", multiValued=false)
 	String cmd;
 	
 	@Argument(index=1, name="path", required=false, description="Path to Operation", multiValued=false)
@@ -77,6 +86,22 @@ public class OperationCmd implements Action {
 		
 		OperationApi api = MApi.lookup(OperationApi.class);
 		
+		if (cmd.equals("ping")) {
+			LinkedList<String> tags = new LinkedList<>();
+			if (parameters != null)
+				tags.add(OperationDescriptor.TAG_IDENT + "=" + parameters[0]);
+			OperationDescriptor desc = api.findOperation(PingOperation.class.getCanonicalName(), null, tags);
+			long now = System.currentTimeMillis();
+			OperationResult res = api.doExecute(desc, new MProperties());
+			if (!res.isSuccessful())
+				throw new MException("Ping not successful");
+			MProperties map = res.getResultAs();
+			long other = map.getLong("time", 0);
+			if (other <= 0)
+				throw new MException("No time sent");
+			long diff = other - now;
+			System.out.println("Time difference: " + diff);
+		} else
 		if (cmd.equals("list")) {
 			ConsoleTable out = new ConsoleTable(full);
 			out.setHeaderValues("address","title","tags","acl", "parameters");
