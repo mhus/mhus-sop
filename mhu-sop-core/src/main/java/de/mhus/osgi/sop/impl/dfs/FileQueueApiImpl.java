@@ -37,6 +37,7 @@ import de.mhus.osgi.sop.api.operation.OperationApi;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 import de.mhus.osgi.sop.api.operation.OperationUtil;
 import de.mhus.osgi.sop.api.util.SopUtil;
+import de.mhus.osgi.sop.impl.changeme.QuotaFileOutputStream;
 
 @Component(immediate=true)
 public class FileQueueApiImpl extends MLog implements FileQueueApi {

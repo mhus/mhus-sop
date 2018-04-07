@@ -1,4 +1,4 @@
-package de.mhus.osgi.sop.impl.aaa.util;
+package de.mhus.osgi.sop.impl.changeme;
 
 import org.apache.activemq.util.ByteArrayOutputStream;
 
@@ -6,10 +6,11 @@ import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MMath;
 import de.mhus.lib.core.crypt.MRandom;
 
-public class TmpMCrypt {
+public class MigratedToMhuLibCore {
 
 	private static final int MAX_SPACE = 10;
 
+	// in mhu-lib 3.3.4 MCrypt
 	public static byte[] encode(String passphrase, byte[] in) {
 		@SuppressWarnings("resource")
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -53,6 +54,7 @@ public class TmpMCrypt {
 		return out.toByteArray();
 	}
 
+	// in mhu-lib 3.3.4 MCrypt
 	public static byte[] decode(String passphrase, byte[] in) {
 		@SuppressWarnings("resource")
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -93,6 +95,7 @@ public class TmpMCrypt {
 		return out.toByteArray();
 	}
 
+	// in mhu-lib 3.3.4 MCast
 	public static byte[] longToBytes(long l) {
 	    byte[] result = new byte[8];
 	    for (int i = 7; i >= 0; i--) {
@@ -102,6 +105,7 @@ public class TmpMCrypt {
 	    return result;
 	}
 
+	// in mhu-lib 3.3.4 MCast
 	public static long bytesToLong(byte[] b) {
 	    long result = 0;
 	    for (int i = 0; i < 8; i++) {

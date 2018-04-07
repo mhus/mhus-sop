@@ -1,10 +1,11 @@
-package de.mhus.osgi.sop.impl.dfs;
+package de.mhus.osgi.sop.impl.changeme;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+// in mhu-lib 3.3.4 de.mhu.lib.core.io
 public class QuotaFileOutputStream extends FileOutputStream {
 
 	private File file;
