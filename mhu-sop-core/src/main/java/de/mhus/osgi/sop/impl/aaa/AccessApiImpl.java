@@ -35,6 +35,9 @@ import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AaaUtil;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
 import de.mhus.osgi.sop.api.aaa.AccountGuest;
+import de.mhus.osgi.sop.api.aaa.ModifyAccountApi;
+import de.mhus.osgi.sop.api.aaa.ModifyAuthorizationApi;
+import de.mhus.osgi.sop.api.aaa.ModifyTrustApi;
 import de.mhus.osgi.sop.api.aaa.Trust;
 import de.mhus.osgi.sop.api.aaa.TrustSource;
 import de.mhus.osgi.sop.api.util.TicketUtil;
@@ -459,6 +462,24 @@ public class AccessApiImpl extends MLog implements AccessApi {
 	@Override
 	public boolean hasGroupAccess(Account account, Class<?> who, String acl, String action, String def) {
 		return hasGroupAccess(account, who.getCanonicalName() + "_" + acl, action, def);
+	}
+
+	@Override
+	public ModifyAccountApi getModifyAccountApi() {
+		if (accountSource == null || !(accountSource instanceof ModifyAccountApi)) return null;
+		return (ModifyAccountApi)accountSource;
+	}
+
+	@Override
+	public ModifyAuthorizationApi getModifyAuthorizationApi() {
+		if (authorizationSource == null || !(authorizationSource instanceof ModifyAuthorizationApi)) return null;
+		return (ModifyAuthorizationApi)authorizationSource;
+	}
+
+	@Override
+	public ModifyTrustApi getModifyTrustApi() {
+		if (trustSource == null || !(trustSource instanceof ModifyTrustApi)) return null;
+		return (ModifyTrustApi)trustSource;
 	}
 	
 }
