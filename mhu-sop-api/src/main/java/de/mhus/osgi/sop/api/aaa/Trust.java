@@ -15,7 +15,7 @@
  */
 package de.mhus.osgi.sop.api.aaa;
 
-import de.mhus.lib.core.IProperties;
+import de.mhus.lib.core.IReadProperties;
 
 public interface Trust {
 
@@ -29,7 +29,7 @@ public interface Trust {
 	
 	public boolean isChanged();
 
-	IProperties getProperties();
+	IReadProperties getProperties();
 
 	String getName();
 

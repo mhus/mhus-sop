@@ -466,18 +466,21 @@ public class AccessApiImpl extends MLog implements AccessApi {
 
 	@Override
 	public ModifyAccountApi getModifyAccountApi() {
+		if (!AaaUtil.isCurrentAdmin()) throw new AccessDeniedException();
 		if (accountSource == null || !(accountSource instanceof ModifyAccountApi)) return null;
 		return (ModifyAccountApi)accountSource;
 	}
 
 	@Override
 	public ModifyAuthorizationApi getModifyAuthorizationApi() {
+		if (!AaaUtil.isCurrentAdmin()) throw new AccessDeniedException();
 		if (authorizationSource == null || !(authorizationSource instanceof ModifyAuthorizationApi)) return null;
 		return (ModifyAuthorizationApi)authorizationSource;
 	}
 
 	@Override
 	public ModifyTrustApi getModifyTrustApi() {
+		if (!AaaUtil.isCurrentAdmin()) throw new AccessDeniedException();
 		if (trustSource == null || !(trustSource instanceof ModifyTrustApi)) return null;
 		return (ModifyTrustApi)trustSource;
 	}
