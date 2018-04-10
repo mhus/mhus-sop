@@ -14,6 +14,15 @@
     limitations under the License.
 ====
 
+feature:repo-add activemq 5.12.1
+feature:repo-add cxf 3.1.5
+feature:repo-add mvn:de.mhus.osgi/mhu-sop-feature/1.3.2-SNAPSHOT/xml/features
+
+
+
+
+====
+
 install -s mvn:de.mhus.osgi/mhu-sop-api/1.3.2-SNAPSHOT
 install -s mvn:de.mhus.osgi/mhu-sop-core/1.3.2-SNAPSHOT
 install -s mvn:de.mhus.osgi/mhu-sop-jms/1.3.2-SNAPSHOT

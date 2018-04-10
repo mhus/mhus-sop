@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright 2018 Mike Hummel
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<features name="${project.artifactId}-${project.version}"
+	xmlns="http://karaf.apache.org/xmlns/features/v1.3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0 http://karaf.apache.org/xmlns/features/v1.3.0">
+
+	<feature name='mhu-sop-base' description='mhu-sop-base' version='${project.version}'>
+		<details>${project.description}</details>
+		<!-- <config>foo=bar</config> -->
+		<feature>scr</feature>
+		<feature>jdbc</feature>
+		<feature>openjpa</feature>
+		<feature>jndi</feature>
+
+		<bundle>mvn:org.jsoup/jsoup/1.8.3</bundle>
+		
+		<bundle>mvn:mysql/mysql-connector-java/5.1.18</bundle>
+		<bundle>mvn:org.apache.commons/commons-jexl/2.1.1</bundle>
+		<bundle><![CDATA[wrap:mvn:org.w3c.css/sac/1.3/$Bundle-SymbolicName=sac&Bundle-Version=1.3&Export-Package=org.w3c.css.sac;version="1.3",!*]]></bundle>
+
+		<bundle>mvn:org.codehaus.jackson/jackson-core-asl/1.9.5</bundle>
+		<bundle>mvn:org.codehaus.jackson/jackson-mapper-asl/1.9.5</bundle>
+		<bundle><![CDATA[wrap:mvn:org.apache.commons/commons-io/1.3.2/$Bundle-SymbolicName=commons-io&Bundle-Version=1.3.2&Export-Package=org.apache.commons.io;version="1.3.2",!*]]></bundle>
+
+		<bundle>mvn:de.mhus.lib/mhu-lib-annotations/${mhulib.version}</bundle>
+		<bundle>mvn:de.mhus.lib/mhu-lib-core/${mhulib.version}</bundle>
+		<bundle>mvn:de.mhus.lib/mhu-lib-persistence/${mhulib.version}</bundle>
+		<bundle>mvn:de.mhus.lib/mhu-lib-karaf/${mhulib.version}</bundle>
+		<bundle>mvn:de.mhus.lib/mhu-lib-j2ee/${mhulib.version}</bundle>
+
+		<bundle>mvn:de.mhus.osgi/mhu-osgi-commands/${osgitools.version}</bundle>
+		<bundle>mvn:de.mhus.osgi/mhu-karaf-xdb/${osgitools.version}</bundle>
+
+		<bundle>mvn:javax.xml.rpc/javax.xml.rpc-api/1.1.1</bundle>
+
+		<bundle>mvn:de.mhus.osgi/mhu-sop-api/${project.version}</bundle>
+		<bundle>mvn:de.mhus.osgi/mhu-sop-core/${project.version}</bundle>
+		
+	</feature>
+
+	<feature name='mhu-sop-rest' description='mhu-sop-rest' version='${project.version}'>
+		<feature>mhu-sop-base</feature>
+		<feature>http</feature>
+		<feature>http-whiteboard</feature>
+		
+		<bundle>mvn:de.mhus.osgi/mhu-sop-rest/${project.version}</bundle>
+	</feature>
+	
+	<feature name='mhu-sop-mailqueue' description='mhu-sop-mailqueue' version='${project.version}'>
+		<feature>mhu-sop-base</feature>
+		
+		<bundle>mvn:de.mhus.osgi/mhu-sop-mailqueue/${project.version}</bundle>
+	</feature>
+
+	<feature name='mhu-sop-jms' description='mhu-sop-jms' version='${project.version}'>
+		<feature>activemq-client</feature>
+		<feature>mhu-sop-base</feature>
+		<bundle>mvn:de.mhus.lib/mhu-lib-jms/${mhulib.version}</bundle>
+		<bundle>mvn:de.mhus.osgi/mhu-osgi-jms/${osgitools.version}</bundle>
+		
+		<bundle>mvn:de.mhus.osgi/mhu-sop-jms/${project.version}</bundle>
+		
+	</feature>
+	
+	<feature name='mhu-sop-vaadin' description='mhu-sop-vaadin' version='${project.version}'>
+		<feature>mhu-sop-base</feature>
+		
+		<bundle>mvn:de.mhus.ports/vaadin-shared-deps/${ports.version}</bundle>
+		<bundle>mvn:com.vaadin/vaadin-shared/${vaadin.version}</bundle>
+		<bundle>mvn:com.vaadin/vaadin-themes/${vaadin.version}</bundle>
+<!-- 
+		<bundle>mvn:com.vaadin.external.slf4j/vaadin-slf4j-jdk14/1.6.1</bundle>
+		<bundle>mvn:com.vaadin.external.atmosphere/atmosphere-runtime/2.2.9.vaadin2</bundle>
+		<bundle>mvn:com.vaadin/vaadin-push/${vaadin.version}</bundle>
+-->		
+		
+		<bundle>mvn:com.vaadin/vaadin-server/${vaadin.version}</bundle>
+		<bundle>mvn:com.vaadin/vaadin-client-compiled/${vaadin.version}</bundle>
+
+		<bundle>mvn:de.mhus.lib/mhu-lib-vaadin/${mhulib.version}</bundle>
+		<bundle>mvn:de.mhus.osgi/mhu-osgi-vaadinbridge/${osgitools.version}</bundle>
+		<bundle>mvn:de.mhus.osgi/mhu-karaf-vaadinbridge/${osgitools.version}</bundle>
+
+		<bundle>mvn:de.mhus.ports/vaadin-refresher/{ports.version}</bundle>
+		
+		<bundle>mvn:de.mhus.osgi/mhu-sop-vaadin-theme/${project.version}</bundle>
+		<bundle>mvn:de.mhus.osgi/mhu-sop-vaadin-desktop/${project.version}</bundle>
+
+	</feature>
+	
+	<feature name='mhu-sop-full' description='mhu-sop-full' version='${project.version}'>
+		<feature>mhu-osgi-base</feature>
+		<feature>mhu-osgi-mailer</feature>
+		<feature>mhu-osgi-jms</feature>
+		<feature>mhu-osgi-vaadin</feature>
+	</feature>
+			
+</features>
