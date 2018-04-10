@@ -34,7 +34,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 
 import aQute.bnd.annotation.component.Component;
-import de.mhus.lib.core.IProperties;
+import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.logging.LevelMapper;
 import de.mhus.lib.core.logging.Log;
@@ -166,7 +166,7 @@ public class RestServlet extends HttpServlet {
 	        if (user != null) {
 	        	Trust trust = user.getTrust();
 	        	if (trust != null) {
-	        		IProperties trustProp = trust.getProperties();
+	        		IReadProperties trustProp = trust.getProperties();
 	        		if (user.isAdminMode() && !trustProp.getBoolean("allowAdmin", true)) {
 	    	            sendError(errorResultType, id, resp, HttpServletResponse.SC_UNAUTHORIZED,"admin", null, null);
 	    	            return;

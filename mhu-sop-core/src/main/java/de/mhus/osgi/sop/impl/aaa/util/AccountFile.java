@@ -123,7 +123,7 @@ public class AccountFile extends MLog implements Account {
 	}
 	
 	@Override
-	public boolean isSyntetic() {
+	public boolean isSynthetic() {
 		return false;
 	}
 

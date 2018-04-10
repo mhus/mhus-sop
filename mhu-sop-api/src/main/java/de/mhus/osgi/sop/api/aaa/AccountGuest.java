@@ -51,7 +51,7 @@ public class AccountGuest implements Account {
 	}
 
 	@Override
-	public boolean isSyntetic() {
+	public boolean isSynthetic() {
 		return true;
 	}
 

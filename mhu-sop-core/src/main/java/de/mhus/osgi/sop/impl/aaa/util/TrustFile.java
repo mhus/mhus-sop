@@ -26,13 +26,13 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import de.mhus.lib.core.IProperties;
+import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MPassword;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MXml;
 import de.mhus.lib.core.crypt.MCrypt;
 import de.mhus.lib.core.util.Base64;
 import de.mhus.osgi.sop.api.aaa.Trust;
-import de.mhus.osgi.sop.impl.changeme.MigratedToMhuLibCore;
 
 public class TrustFile implements Trust {
 
@@ -88,7 +88,7 @@ public class TrustFile implements Trust {
 		// check password
 		{
 			byte[] b = Base64.decode(pp);
-			b = MigratedToMhuLibCore.decode(password, b);
+			b = MCrypt.decode(password, b);
 			if (!password.equals( new String(b) ))
 				return false;
 		}
@@ -96,8 +96,8 @@ public class TrustFile implements Trust {
 		// check time stamp
 		{
 			byte[] b = Base64.decode(pb);
-			b = MigratedToMhuLibCore.decode(password, b);
-			long time = MigratedToMhuLibCore.bytesToLong(b);
+			b = MCrypt.decode(password, b);
+			long time = MCast.bytesToLong(b);
 			long now = System.currentTimeMillis();
 			return time < now && time > now - MAX_TTL;
 		}
@@ -105,9 +105,9 @@ public class TrustFile implements Trust {
 	
 	@Override
 	public String encodeWithPassword() {
-		byte[] b = MigratedToMhuLibCore.longToBytes(System.currentTimeMillis());
-		b = MigratedToMhuLibCore.encode(password, b);
-		byte[] p = MigratedToMhuLibCore.encode(password, password.getBytes());
+		byte[] b = MCast.longToBytes(System.currentTimeMillis());
+		b = MCrypt.encode(password, b);
+		byte[] p = MCrypt.encode(password, password.getBytes());
 		return Base64.encode(p) + "-" + Base64.encode(b);
 	}
 

@@ -41,4 +41,6 @@ public interface ModifyTrustApi {
 	 */
 	void changeTrust(String name, IReadProperties properties) throws MException;
 
+	Trust getTrust(String string);
+
 }

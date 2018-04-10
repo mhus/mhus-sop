@@ -28,6 +28,8 @@ import de.mhus.lib.core.MString;
 import de.mhus.lib.core.security.Account;
 import de.mhus.lib.core.security.AccountSource;
 import de.mhus.lib.core.security.AuthorizationSource;
+import de.mhus.lib.core.security.ModifyAccountApi;
+import de.mhus.lib.core.security.ModifyAuthorizationApi;
 import de.mhus.lib.core.util.SoftHashMap;
 import de.mhus.lib.errors.AccessDeniedException;
 import de.mhus.lib.errors.MException;
@@ -35,8 +37,6 @@ import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AaaUtil;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
 import de.mhus.osgi.sop.api.aaa.AccountGuest;
-import de.mhus.osgi.sop.api.aaa.ModifyAccountApi;
-import de.mhus.osgi.sop.api.aaa.ModifyAuthorizationApi;
 import de.mhus.osgi.sop.api.aaa.ModifyTrustApi;
 import de.mhus.osgi.sop.api.aaa.Trust;
 import de.mhus.osgi.sop.api.aaa.TrustSource;
@@ -187,7 +187,7 @@ public class AccessApiImpl extends MLog implements AccessApi {
 		return c;
 	}
 
-	private synchronized Trust getTrust(String trust) {
+	protected synchronized Trust getTrust(String trust) {
 		
 		if (trust == null)
 			throw new AccessDeniedException("null");
@@ -467,22 +467,22 @@ public class AccessApiImpl extends MLog implements AccessApi {
 	@Override
 	public ModifyAccountApi getModifyAccountApi() {
 		if (!AaaUtil.isCurrentAdmin()) throw new AccessDeniedException();
-		if (accountSource == null || !(accountSource instanceof ModifyAccountApi)) return null;
-		return (ModifyAccountApi)accountSource;
+		if (accountSource == null) return null;
+		return accountSource.getModifyApi();
 	}
 
 	@Override
 	public ModifyAuthorizationApi getModifyAuthorizationApi() {
 		if (!AaaUtil.isCurrentAdmin()) throw new AccessDeniedException();
-		if (authorizationSource == null || !(authorizationSource instanceof ModifyAuthorizationApi)) return null;
-		return (ModifyAuthorizationApi)authorizationSource;
+		if (authorizationSource == null) return null;
+		return authorizationSource.getModifyApi();
 	}
 
 	@Override
 	public ModifyTrustApi getModifyTrustApi() {
 		if (!AaaUtil.isCurrentAdmin()) throw new AccessDeniedException();
-		if (trustSource == null || !(trustSource instanceof ModifyTrustApi)) return null;
-		return (ModifyTrustApi)trustSource;
+		if (trustSource == null ) return null;
+		return trustSource.getModifyApi();
 	}
 	
 }

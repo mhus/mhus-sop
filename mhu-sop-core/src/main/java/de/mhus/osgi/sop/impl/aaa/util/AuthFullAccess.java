@@ -17,6 +17,7 @@ package de.mhus.osgi.sop.impl.aaa.util;
 
 import de.mhus.lib.core.security.Account;
 import de.mhus.lib.core.security.AuthorizationSource;
+import de.mhus.lib.core.security.ModifyAuthorizationApi;
 
 public class AuthFullAccess implements AuthorizationSource {
 
@@ -28,6 +29,11 @@ public class AuthFullAccess implements AuthorizationSource {
 	@Override
 	public String getResourceAccessAcl(Account account, String aclName) {
 		return "*";
+	}
+
+	@Override
+	public ModifyAuthorizationApi getModifyApi() {
+		return null;
 	}
 
 }

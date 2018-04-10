@@ -33,6 +33,7 @@ import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.security.Account;
 import de.mhus.lib.core.security.AccountSource;
 import de.mhus.lib.core.security.LoginCallbackHandler;
+import de.mhus.lib.core.security.ModifyAccountApi;
 import de.mhus.lib.errors.NotSupportedException;
 import de.mhus.lib.karaf.MOsgi;
 
@@ -150,7 +151,7 @@ public class KarafAaaSource implements AccountSource {
 		}
 
 		@Override
-		public boolean isSyntetic() {
+		public boolean isSynthetic() {
 			return false;
 		}
 
@@ -179,6 +180,11 @@ public class KarafAaaSource implements AccountSource {
 			throw new NotSupportedException();
 		}
 		
+	}
+
+	@Override
+	public ModifyAccountApi getModifyApi() {
+		return null;
 	}
 	
 }

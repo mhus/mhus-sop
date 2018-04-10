@@ -19,4 +19,6 @@ public interface TrustSource {
 
 	Trust findTrust(String trust);
 
+	ModifyTrustApi getModifyApi();
+
 }

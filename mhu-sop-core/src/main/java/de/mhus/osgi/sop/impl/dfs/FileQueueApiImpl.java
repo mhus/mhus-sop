@@ -24,6 +24,7 @@ import de.mhus.lib.core.MTimeInterval;
 import de.mhus.lib.core.MValidator;
 import de.mhus.lib.core.cfg.CfgInt;
 import de.mhus.lib.core.cfg.CfgLong;
+import de.mhus.lib.core.io.QuotaFileOutputStream;
 import de.mhus.lib.core.util.MUri;
 import de.mhus.lib.core.util.MutableUri;
 import de.mhus.lib.errors.AccessDeniedException;
@@ -37,7 +38,6 @@ import de.mhus.osgi.sop.api.operation.OperationApi;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 import de.mhus.osgi.sop.api.operation.OperationUtil;
 import de.mhus.osgi.sop.api.util.SopUtil;
-import de.mhus.osgi.sop.impl.changeme.QuotaFileOutputStream;
 
 @Component(immediate=true)
 public class FileQueueApiImpl extends MLog implements FileQueueApi {

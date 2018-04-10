@@ -18,6 +18,8 @@ package de.mhus.osgi.sop.api.aaa;
 import java.util.Locale;
 
 import de.mhus.lib.core.security.Account;
+import de.mhus.lib.core.security.ModifyAccountApi;
+import de.mhus.lib.core.security.ModifyAuthorizationApi;
 import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.SApi;
 
@@ -36,6 +38,11 @@ import de.mhus.osgi.sop.api.SApi;
  *
  */
 public interface AccessApi extends SApi {
+
+	public static final String DISPLAY_NAME = "displayName";
+	public static final String FIRST_NAME = "firstName";
+	public static final String LAST_NAME = "lastName";
+	public static final String EMAIL = "email";
 
 	// access
 	
@@ -185,4 +192,5 @@ public interface AccessApi extends SApi {
 	 * @return The API or null if not supported
 	 */
 	ModifyTrustApi getModifyTrustApi();
+	
 }

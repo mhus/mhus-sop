@@ -23,10 +23,12 @@ import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.security.Account;
 import de.mhus.lib.core.security.AuthorizationSource;
+import de.mhus.lib.core.security.ModifyAuthorizationApi;
+import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.aaa.AaaUtil;
 import de.mhus.osgi.sop.api.util.SopUtil;
 
-public class AuthFromFile extends MLog implements AuthorizationSource {
+public class AuthFromFile extends MLog implements AuthorizationSource, ModifyAuthorizationApi {
 
 	@Override
 	public Boolean hasResourceAccess(Account account, String aclName) {
@@ -53,6 +55,34 @@ public class AuthFromFile extends MLog implements AuthorizationSource {
 		}
 		String acl = MFile.readFile(file);
 		return acl;
+	}
+
+	@Override
+	public void createAuthorization(String aclName, String acl) throws MException {
+		File file = SopUtil.getFile( "aaa/groupmapping/" + MFile.normalize(aclName.trim()).toLowerCase() + ".txt" );
+		
+		MFile.writeFile(file, acl);
+		
+	}
+
+	@Override
+	public void deleteAuthorization(String aclName) throws MException {
+		File file = SopUtil.getFile( "aaa/groupmapping/" + MFile.normalize(aclName.trim()).toLowerCase() + ".txt" );
+		if (!file.exists()) throw new MException("authorization not found", aclName);
+		
+		file.delete();
+	}
+
+	@Override
+	public ModifyAuthorizationApi getModifyApi() {
+		return this;
+	}
+
+	@Override
+	public String getAuthorizationAcl(String aclName) throws MException {
+		File file = SopUtil.getFile( "aaa/groupmapping/" + MFile.normalize(aclName.trim()).toLowerCase() + ".txt" );
+		if (!file.exists()) throw new MException("authorization not found", aclName);
+		return MFile.readFile(file);
 	}
 
 }
