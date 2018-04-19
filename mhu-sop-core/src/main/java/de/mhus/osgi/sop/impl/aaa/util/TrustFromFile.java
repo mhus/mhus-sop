@@ -66,6 +66,8 @@ public class TrustFromFile extends MLog implements TrustSource, ModifyTrustApi {
 	public void createTrust(String trust, String password, IReadProperties properties) throws MException {
 
 		File file = SopUtil.getFile( "aaa/trust/" + MFile.normalize(trust.trim()).toLowerCase() + ".xml" );
+		if (!file.getParentFile().exists())
+			file.getParentFile().mkdirs();
 		if (file.exists()) throw new MException("Trust already exists",trust);
 		
 		try {

@@ -15,10 +15,7 @@
  */
 package de.mhus.osgi.sop.vaadin.desktop;
 
-import java.io.File;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 
 import org.osgi.framework.BundleContext;
@@ -37,10 +34,8 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MFile;
-import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
 import de.mhus.lib.core.cfg.CfgBoolean;
 import de.mhus.lib.core.logging.Log;
@@ -276,28 +271,9 @@ public class SopUi extends UI implements SopUiApi {
 			return false;
 
 		try {
-			File file = new File("sop/aaa/groupmapping/" + MFile.normalize(role.trim()).toLowerCase() + ".txt"); 
-			if (!file.exists()) {
-				log.w("file not found",file);
-				return false;
-			}
-			List<String> lines = MFile.readLines(file, true);
-			for (String line : lines) {
-				line = MString.beforeLastIndex(line, '|'); // remove additional rights to only evaluate general access
-				if (line.startsWith("not:")) {
-					line = line.substring(4);
-					if (accessControl.hasGroup(line)) return false;
-				} else
-				if (line.startsWith("notuser:")) {
-					line = line.substring(8);
-					if (accessControl.getName().equals(line)) return false;
-				} else
-				if (line.startsWith("user:")) {
-					line = line.substring(5);
-					if (accessControl.getName().equals(line)) return true;
-				} else
-				if (line.equals("*") || accessControl.hasGroup(line)) return true;
-			}
+			AccessApi aaa = MApi.lookup(AccessApi.class);
+			Account account = aaa.getCurrenAccount();
+			return aaa.hasResourceAccess(account, GuiSpace.class.getCanonicalName(), MFile.normalize(role.trim()).toLowerCase(), "access", null);
 		} catch (Throwable t) {
 			log.d(role,t);
 		}
@@ -311,45 +287,12 @@ public class SopUi extends UI implements SopUiApi {
 			return false;
 
 		try {
-			File file = new File("sop/aaa/groupmapping/" + MFile.normalize(role.trim()).toLowerCase() + ".txt"); 
-			if (!file.exists()) {
-				log.w("file not found",file);
-				return false;
-			}
-			List<String> lines = MFile.readLines(file, true);
-			for (String line : lines) {
-				// read additional rights
-				HashSet<String> rights = new HashSet<>();
-				if (line.contains("|")) {
-					String[] parts = MString.splitIgnoreEmpty(line, "|", true);
-					if (parts.length > 1) {
-						line = parts[0];
-						for (int i = 1; i < parts.length; i++) {
-							rights.add(parts[i]);
-						}
-					}
-				}
-				if (line.startsWith("not:")) {
-					line = line.substring(4);
-					if (accessControl.hasGroup(line)) return false;
-				} else
-				if (line.startsWith("notuser:")) {
-					line = line.substring(8);
-					if (accessControl.getName().equals(line)) return false;
-				} else
-				if (line.startsWith("user:")) {
-					line = line.substring(5);
-					if (accessControl.getName().equals(line)) {
-						if (rights.contains("read"))
-							return false;
-						return true;
-					}
-				} else
-				if (line.equals("*") || (accessControl.hasGroup(line))) {
-					if (rights.contains("read"))
-						return false;
-					return true;
-				}
+			try {
+				AccessApi aaa = MApi.lookup(AccessApi.class);
+				Account account = aaa.getCurrenAccount();
+				return aaa.hasResourceAccess(account, GuiSpace.class.getCanonicalName(), MFile.normalize(role.trim()).toLowerCase(), "write", null);
+			} catch (Throwable t) {
+				log.d(role,t);
 			}
 		} catch (Throwable t) {
 			log.d(role,t);
@@ -358,36 +301,6 @@ public class SopUi extends UI implements SopUiApi {
 		
 	}
 	
-
-	@Override
-	public IProperties getCurrentUserAccess() {
-		MProperties accessRights = new MProperties();
-		if (accessControl == null || !accessControl.isUserSignedIn())
-			return accessRights;
-		
-		try {
-			File file = new File("sop/aaa/guiusers/" + MFile.normalize(accessControl.getName().trim()).toLowerCase() + ".txt"); 
-			if (!file.exists()) {
-				log.w("file not found",file);
-				return accessRights;
-			}
-			List<String> lines = MFile.readLines(file, true);
-			if (lines == null)
-				return new MProperties();
-			
-			if (lines.size() == 1 && "*".equals(lines.get(0)) || "admin".equalsIgnoreCase(lines.get(0))) {
-				accessRights.setString("read", "*");
-				accessRights.setString("write", "*");
-			} else {
-				accessRights = MProperties.load(file.getAbsolutePath());
-			}
-		} catch (Throwable t) {
-			log.d(t);
-		}
-		
-		return accessRights;
-	}
-
 	public Account getCurrentUser() {
 		return VaadinSopAccessControl.getUserAccount(getSession());
 	}

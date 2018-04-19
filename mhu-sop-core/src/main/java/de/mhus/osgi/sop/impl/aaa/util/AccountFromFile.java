@@ -74,7 +74,10 @@ public class AccountFromFile extends MLog implements AccountSource, ModifyAccoun
 	 */
 	@Override
 	public void createAccount(String account, String password, IReadProperties properties) throws MException {
+
 		File file = SopUtil.getFile( "aaa/account/" + MFile.normalize(account.trim()).toLowerCase() + ".xml" );
+		if (!file.getParentFile().exists())
+			file.getParentFile().mkdirs();
 		if (file.exists()) throw new MException("Account already exists",account);
 		
 		try {

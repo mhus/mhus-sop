@@ -31,8 +31,10 @@ import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MLog;
+import de.mhus.lib.core.MPassword;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MXml;
+import de.mhus.lib.core.crypt.MCrypt;
 import de.mhus.lib.core.security.Account;
 import de.mhus.lib.errors.NotSupportedException;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
@@ -46,7 +48,7 @@ public class AccountFile extends MLog implements Account {
 	private long modified;
 	private String name;
 	
-	private String password = null;
+	private String passwordMd5 = null;
 	private long timeout;
 	private Boolean isPasswordValidated = null;
 	private HashSet<String> groups = new HashSet<>();
@@ -64,7 +66,7 @@ public class AccountFile extends MLog implements Account {
 		
 		Element pwE = MXml.getElementByPath(doc.getDocumentElement(),"password");
 		if (pwE != null)
-				password = pwE.getAttribute("plain");
+				passwordMd5 = MCrypt.md5WithSalt(MPassword.decode( pwE.getAttribute("plain") ));
 		name = MXml.getElementByPath(doc.getDocumentElement(),"information").getAttribute("name");
 		
 		timeout = MCast.tolong( doc.getDocumentElement().getAttribute("timeout"), 0);
@@ -137,7 +139,7 @@ public class AccountFile extends MLog implements Account {
 	}
 
 	public boolean validatePasswordInternal(String password) {
-		return this.password.equals(password);
+		return MCrypt.validateMd5WithSalt(passwordMd5, password);
 	}
 
 	@Override

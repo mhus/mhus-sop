@@ -60,6 +60,8 @@ public class AuthFromFile extends MLog implements AuthorizationSource, ModifyAut
 	@Override
 	public void createAuthorization(String aclName, String acl) throws MException {
 		File file = SopUtil.getFile( "aaa/groupmapping/" + MFile.normalize(aclName.trim()).toLowerCase() + ".txt" );
+		if (!file.getParentFile().exists())
+			file.getParentFile().mkdirs();
 		
 		MFile.writeFile(file, acl);
 		

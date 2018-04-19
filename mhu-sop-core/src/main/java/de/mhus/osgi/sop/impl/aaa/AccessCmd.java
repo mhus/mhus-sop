@@ -28,15 +28,11 @@ import org.osgi.framework.FrameworkUtil;
 
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MPassword;
-import de.mhus.lib.core.MProperties;
-import de.mhus.lib.core.MString;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.lib.core.security.Account;
 import de.mhus.lib.core.security.ModifyAccountApi;
-import de.mhus.lib.core.security.ModifyAuthorizationApi;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
-import de.mhus.osgi.sop.api.aaa.ModifyTrustApi;
 import de.mhus.osgi.sop.api.aaa.Trust;
 import de.mhus.osgi.sop.api.adb.AdbApi;
 import de.mhus.osgi.sop.api.adb.DbSchemaService;
@@ -62,19 +58,7 @@ public class AccessCmd implements Action {
 			+ " access <account> <name> [<action>]\n"
 			+ " reloadconfig\n"
 			+ " md5 <password>\n"
-			+ " idtree\n"
-			+ " modify user create <name> <password> *[key=value]\n"
-			+ " modify user password <name> <newPassword>\n"
-			+ " modify user set <name> *[key=value]\n"
-			+ " modify user delete <name>\n"
-			+ " modify user add <name> <group>\n"
-			+ " modify user remove <name> <group>\n"
-			+ " modify trust create <name> <password> *[key=value]\n"
-			+ " modify trust password <name> <newPassword>\n"
-			+ " modify trust set <name> *[key=value]\n"
-			+ " modify trust delete <name>\n"
-			+ " modify auth create <name> <acl>\n"
-			+ " modify auth delete <name>",
+			+ " idtree\n",
 			multiValued=false)
 	String cmd;
 	
@@ -191,83 +175,6 @@ public class AccessCmd implements Action {
 		} else
 		if (cmd.equals("md5")) {
 			System.out.println( MPassword.encodePasswordMD5(parameters[0]) );
-		} else
-		if (cmd.equals("modify")) {
-			if (parameters[0].equals("user") && parameters[1].equals("create")) {
-				ModifyAccountApi modify = api.getModifyAccountApi();
-				MProperties properties = new MProperties();
-				for (int i = 4; i < parameters.length; i++)
-					properties.setString(MString.beforeIndex(parameters[i], '='), MString.afterIndex(parameters[i], '='));
-				modify.createAccount(parameters[2], parameters[3], properties);
-				System.out.println("OK");
-			} else
-			if (parameters[0].equals("user") && parameters[1].equals("password")) {
-				ModifyAccountApi modify = api.getModifyAccountApi();
-				modify.changePassword(parameters[2], parameters[3]);
-				System.out.println("OK");
-			} else
-			if (parameters[0].equals("user") && parameters[1].equals("set")) {
-				ModifyAccountApi modify = api.getModifyAccountApi();
-				MProperties properties = new MProperties();
-				for (int i = 3; i < parameters.length; i++)
-					properties.setString(MString.beforeIndex(parameters[i], '='), MString.afterIndex(parameters[i], '='));
-				modify.changeAccount(parameters[2], properties);
-				System.out.println("OK");
-			} else
-			if (parameters[0].equals("user") && parameters[1].equals("delete")) {
-				ModifyAccountApi modify = api.getModifyAccountApi();
-				modify.deleteAccount(parameters[2]);
-				System.out.println("OK");
-			} else
-			if (parameters[0].equals("user") && parameters[1].equals("add")) {
-				ModifyAccountApi modify = api.getModifyAccountApi();
-				modify.appendGroups(parameters[2], parameters[3]);
-				System.out.println("OK");
-			} else
-			if (parameters[0].equals("user") && parameters[1].equals("remove")) {
-				ModifyAccountApi modify = api.getModifyAccountApi();
-				modify.removeGroups(parameters[2], parameters[3]);
-				System.out.println("OK");
-			} else
-			if (parameters[0].equals("trust") && parameters[1].equals("create")) {
-				ModifyTrustApi modify = api.getModifyTrustApi();
-				MProperties properties = new MProperties();
-				for (int i = 4; i < parameters.length; i++)
-					properties.setString(MString.beforeIndex(parameters[i], '='), MString.afterIndex(parameters[i], '='));
-				modify.createTrust(parameters[2], parameters[3], properties);
-				System.out.println("OK");
-			} else
-			if (parameters[0].equals("trust") && parameters[1].equals("password")) {
-				ModifyTrustApi modify = api.getModifyTrustApi();
-				modify.changePassword(parameters[2], parameters[3]);
-				System.out.println("OK");
-			} else
-			if (parameters[0].equals("trust") && parameters[1].equals("set")) {
-				ModifyTrustApi modify = api.getModifyTrustApi();
-				MProperties properties = new MProperties();
-				for (int i = 3; i < parameters.length; i++)
-					properties.setString(MString.beforeIndex(parameters[i], '='), MString.afterIndex(parameters[i], '='));
-				modify.changeTrust(parameters[2], properties);
-				System.out.println("OK");
-			} else
-			if (parameters[0].equals("trust") && parameters[1].equals("delete")) {
-				ModifyTrustApi modify = api.getModifyTrustApi();
-				modify.deleteTrust(parameters[2]);
-				System.out.println("OK");
-			} else
-			if (parameters[0].equals("auth") && parameters[1].equals("create")) {
-				ModifyAuthorizationApi modify = api.getModifyAuthorizationApi();
-				modify.createAuthorization(parameters[2], parameters[3]);
-				System.out.println("OK");
-			} else
-			if (parameters[0].equals("auth") && parameters[1].equals("delete")) {
-				ModifyAuthorizationApi modify = api.getModifyAuthorizationApi();
-				modify.deleteAuthorization(parameters[2]);
-				System.out.println("OK");
-			} else {
-				System.out.println("Modify not found");
-			}
-				
 		} else
 			System.out.println("Command not found: " + cmd);
 			
