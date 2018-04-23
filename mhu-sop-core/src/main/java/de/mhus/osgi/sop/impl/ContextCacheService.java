@@ -21,8 +21,8 @@ import aQute.bnd.annotation.component.Activate;
 import aQute.bnd.annotation.component.Component;
 import aQute.bnd.annotation.component.Deactivate;
 import de.mhus.lib.core.util.SoftHashMap;
-import de.mhus.lib.karaf.services.AbstractCacheControl;
-import de.mhus.lib.karaf.services.CacheControlIfc;
+import de.mhus.osgi.services.AbstractCacheControl;
+import de.mhus.osgi.services.CacheControlIfc;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.ContextCachedItem;
 

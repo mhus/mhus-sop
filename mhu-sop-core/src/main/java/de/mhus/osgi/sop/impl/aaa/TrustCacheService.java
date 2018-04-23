@@ -16,8 +16,8 @@
 package de.mhus.osgi.sop.impl.aaa;
 
 import aQute.bnd.annotation.component.Component;
-import de.mhus.lib.karaf.services.AbstractCacheControl;
-import de.mhus.lib.karaf.services.CacheControlIfc;
+import de.mhus.osgi.services.AbstractCacheControl;
+import de.mhus.osgi.services.CacheControlIfc;
 
 @Component(provide=CacheControlIfc.class)
 public class TrustCacheService extends AbstractCacheControl {
