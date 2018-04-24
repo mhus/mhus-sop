@@ -22,7 +22,7 @@
 
     <groupId>de.mhus.osgi</groupId>
     <artifactId>mhus-sop</artifactId>
-    <version>1.3.2-SNAPSHOT</version>
+    <version>1.3.2</version>
     <packaging>pom</packaging>
   <name>MHUS OSGi Tools</name>
   <description>A set of tools to improve OSGi frameworks and karaf</description>
@@ -36,8 +36,8 @@
     </license>
   </licenses>
   <scm>
-    <url>https://github.com/mhus/mhus-osgi-tools</url>
-    <connection>scm:git:https://github.com/mhus/mhus-osgi-tools/</connection>
+    <url>https://github.com/mhus/mhus-sop</url>
+    <connection>scm:git:https://github.com/mhus/mhus-sop</connection>
   </scm>
   <developers>
     <developer>
@@ -48,9 +48,10 @@
     </developer>
   </developers>
     <properties>
-		<mhulib.version>3.3.4-SNAPSHOT</mhulib.version>
-		<osgitools.version>1.3.5-SNAPSHOT</osgitools.version>
-		<ports.version>1.3.4</ports.version>
+		<mhulib.version>3.3.4</mhulib.version>
+		<osgitools.version>1.4.0</osgitools.version>
+		<ports.version>1.3.5</ports.version>
+		<ports.vaadin.version>1.3.4</ports.vaadin.version>
 		
         <scr.packages>*</scr.packages>
         <felix.scr.version>1.6.0</felix.scr.version>
@@ -199,7 +200,7 @@
 
         <profiles>
           <profile>
-            <id>release-sign-artifacts</id>
+            <id>release</id>
             <activation>
               <property>
                 <name>performRelease</name>
@@ -211,7 +212,7 @@
                 <plugin>
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-gpg-plugin</artifactId>
-                  <version>1.4</version>
+                  <version>1.5</version>
                   <configuration>
                     <passphrase>${gpg.passphrase}</passphrase>
                   </configuration>

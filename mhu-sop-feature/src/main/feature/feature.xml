@@ -63,6 +63,8 @@
 	<feature name='mhu-sop-mailqueue' description='mhu-sop-mailqueue' version='${project.version}'>
 		<feature>mhu-sop-base</feature>
 		
+		<bundle>mvn:de.mhus.ports/ports-javaxmail/${ports.version}</bundle>
+		
 		<bundle>mvn:de.mhus.osgi/mhu-sop-mailqueue/${project.version}</bundle>
 	</feature>
 
@@ -79,7 +81,7 @@
 	<feature name='mhu-sop-vaadin' description='mhu-sop-vaadin' version='${project.version}'>
 		<feature>mhu-sop-base</feature>
 		
-		<bundle>mvn:de.mhus.ports/vaadin-shared-deps/${ports.version}</bundle>
+		<bundle>mvn:de.mhus.ports/vaadin-shared-deps/${ports.vaadin.version}</bundle>
 		<bundle>mvn:com.vaadin/vaadin-shared/${vaadin.version}</bundle>
 		<bundle>mvn:com.vaadin/vaadin-themes/${vaadin.version}</bundle>
 <!-- 
@@ -95,7 +97,7 @@
 		<bundle>mvn:de.mhus.osgi/mhu-osgi-vaadinbridge/${osgitools.version}</bundle>
 		<bundle>mvn:de.mhus.osgi/mhu-karaf-vaadinbridge/${osgitools.version}</bundle>
 
-		<bundle>mvn:de.mhus.ports/vaadin-refresher/{ports.version}</bundle>
+		<bundle>mvn:de.mhus.ports/vaadin-refresher/{ports.vaadin.version}</bundle>
 		
 		<bundle>mvn:de.mhus.osgi/mhu-sop-vaadin-theme/${project.version}</bundle>
 		<bundle>mvn:de.mhus.osgi/mhu-sop-vaadin-desktop/${project.version}</bundle>
