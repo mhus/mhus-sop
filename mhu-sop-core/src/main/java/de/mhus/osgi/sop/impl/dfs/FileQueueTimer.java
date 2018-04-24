@@ -1,8 +1,8 @@
 package de.mhus.osgi.sop.impl.dfs;
 
 import aQute.bnd.annotation.component.Component;
-import de.mhus.lib.karaf.services.SchedulerService;
-import de.mhus.lib.karaf.services.SchedulerServiceAdapter;
+import de.mhus.osgi.services.scheduler.SchedulerService;
+import de.mhus.osgi.services.scheduler.SchedulerServiceAdapter;
 
 @Component(provide=SchedulerService.class,immediate=true,properties="interval=*/15 * * * * *")
 public class FileQueueTimer extends SchedulerServiceAdapter {

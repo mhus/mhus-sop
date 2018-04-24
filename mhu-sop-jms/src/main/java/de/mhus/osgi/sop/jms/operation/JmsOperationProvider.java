@@ -54,7 +54,7 @@ import de.mhus.lib.errors.NotFoundException;
 import de.mhus.lib.jms.ClientJms;
 import de.mhus.lib.jms.JmsConnection;
 import de.mhus.lib.jms.MJms;
-import de.mhus.lib.karaf.jms.JmsUtil;
+import de.mhus.osgi.services.jms.JmsUtil;
 import de.mhus.osgi.sop.api.Sop;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
 import de.mhus.osgi.sop.api.jms.JmsApi;

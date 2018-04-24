@@ -14,7 +14,7 @@ import de.mhus.lib.core.util.MUri;
 import de.mhus.lib.core.util.Version;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.errors.NotFoundException;
-import de.mhus.lib.karaf.MOsgi;
+import de.mhus.osgi.services.MOsgi;
 import de.mhus.osgi.sop.api.SopApi;
 import de.mhus.osgi.sop.api.dfs.DfsApi;
 import de.mhus.osgi.sop.api.dfs.FileQueueApi;

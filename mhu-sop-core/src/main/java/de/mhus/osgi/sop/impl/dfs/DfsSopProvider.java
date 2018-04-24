@@ -19,7 +19,7 @@ import de.mhus.lib.core.util.MutableUri;
 import de.mhus.lib.core.util.SoftHashMap;
 import de.mhus.lib.core.util.Version;
 import de.mhus.lib.errors.MException;
-import de.mhus.lib.karaf.MOsgi;
+import de.mhus.osgi.services.MOsgi;
 import de.mhus.osgi.sop.api.aaa.AaaUtil;
 import de.mhus.osgi.sop.api.dfs.DfsProviderOperation;
 import de.mhus.osgi.sop.api.dfs.FileInfo;

@@ -18,7 +18,7 @@ package de.mhus.osgi.sop.api;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MString;
 import de.mhus.lib.jms.JmsConnection;
-import de.mhus.lib.karaf.jms.JmsUtil;
+import de.mhus.osgi.services.jms.JmsUtil;
 
 public class Sop {
 

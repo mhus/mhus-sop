@@ -24,8 +24,8 @@ import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MTimeInterval;
 import de.mhus.lib.core.logging.Log;
 import de.mhus.lib.errors.AccessDeniedException;
-import de.mhus.lib.karaf.adb.DbManagerService;
 import de.mhus.lib.sql.DbConnection;
+import de.mhus.osgi.services.adb.DbManagerService;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
 import de.mhus.osgi.sop.api.util.SopFileLogger;
 

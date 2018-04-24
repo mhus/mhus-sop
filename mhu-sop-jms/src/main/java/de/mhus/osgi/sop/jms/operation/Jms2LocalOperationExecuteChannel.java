@@ -35,7 +35,7 @@ import de.mhus.lib.core.util.VersionRange;
 import de.mhus.lib.errors.NotFoundException;
 import de.mhus.lib.jms.JmsChannel;
 import de.mhus.lib.jms.ServerJms;
-import de.mhus.lib.karaf.jms.JmsDataChannel;
+import de.mhus.osgi.services.jms.JmsDataChannel;
 import de.mhus.osgi.sop.api.jms.AbstractJmsOperationExecuteChannel;
 import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.jms.TicketAccessInterceptor;

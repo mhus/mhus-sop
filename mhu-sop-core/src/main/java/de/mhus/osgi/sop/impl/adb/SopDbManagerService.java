@@ -30,11 +30,11 @@ import de.mhus.lib.adb.DbManager;
 import de.mhus.lib.adb.DbSchema;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.errors.MException;
-import de.mhus.lib.karaf.adb.DbManagerService;
-import de.mhus.lib.karaf.adb.DbManagerServiceImpl;
 import de.mhus.lib.sql.DataSourceProvider;
 import de.mhus.lib.sql.DbPool;
 import de.mhus.lib.sql.PseudoDbPool;
+import de.mhus.osgi.services.adb.DbManagerService;
+import de.mhus.osgi.services.adb.DbManagerServiceImpl;
 import de.mhus.osgi.sop.api.adb.DbSchemaService;
 
 @Component(provide=DbManagerService.class,immediate=true)

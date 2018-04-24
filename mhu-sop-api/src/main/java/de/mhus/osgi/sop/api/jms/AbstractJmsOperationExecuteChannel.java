@@ -48,7 +48,7 @@ import de.mhus.lib.jms.JmsChannel;
 import de.mhus.lib.jms.JmsDestination;
 import de.mhus.lib.jms.MJms;
 import de.mhus.lib.jms.ServerJms;
-import de.mhus.lib.karaf.jms.AbstractJmsDataChannel;
+import de.mhus.osgi.services.jms.AbstractJmsDataChannel;
 import de.mhus.osgi.sop.api.Sop;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 

@@ -39,7 +39,7 @@ import de.mhus.lib.form.ModelUtil;
 import de.mhus.lib.jms.ClientJms;
 import de.mhus.lib.jms.JmsConnection;
 import de.mhus.lib.jms.JmsDestination;
-import de.mhus.lib.karaf.jms.JmsUtil;
+import de.mhus.osgi.services.jms.JmsUtil;
 import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.operation.OperationAddress;
 import de.mhus.osgi.sop.api.operation.OperationApi;

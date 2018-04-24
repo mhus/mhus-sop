@@ -12,9 +12,9 @@ import de.mhus.lib.core.MTimeInterval;
 import de.mhus.lib.core.mail.MSendMail;
 import de.mhus.lib.core.mail.MailAttachment;
 import de.mhus.lib.core.util.MUri;
-import de.mhus.lib.karaf.services.SchedulerService;
-import de.mhus.lib.karaf.services.SchedulerServiceAdapter;
 import de.mhus.lib.xdb.XdbService;
+import de.mhus.osgi.services.scheduler.SchedulerService;
+import de.mhus.osgi.services.scheduler.SchedulerServiceAdapter;
 import de.mhus.osgi.sop.api.SopApi;
 import de.mhus.osgi.sop.api.mailqueue.MailQueueOperation;
 
