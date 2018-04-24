@@ -103,11 +103,6 @@
             <artifactId>org.apache.karaf.shell.console</artifactId>
             <version>${karaf.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.karaf.bundle</groupId>
-            <artifactId>org.apache.karaf.bundle.core</artifactId>
-            <version>${karaf.version}</version>
-        </dependency>
 
 		<dependency>
 			<groupId>org.bonitasoft.engine</groupId>
