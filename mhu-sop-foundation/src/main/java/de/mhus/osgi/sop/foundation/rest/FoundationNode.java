@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.mhus.osgi.sop.rest;
+package de.mhus.osgi.sop.foundation.rest;
 
 import java.util.List;
 
 import aQute.bnd.annotation.component.Component;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.errors.MException;
-import de.mhus.osgi.sop.api.SopApi;
-import de.mhus.osgi.sop.api.model.SopFoundation;
+import de.mhus.osgi.sop.api.foundation.FoundationApi;
+import de.mhus.osgi.sop.api.foundation.model.SopFoundation;
 import de.mhus.osgi.sop.api.rest.AbstractObjectListNode;
 import de.mhus.osgi.sop.api.rest.CallContext;
 import de.mhus.osgi.sop.api.rest.Node;
@@ -42,7 +42,8 @@ public class FoundationNode extends AbstractObjectListNode<SopFoundation> {
 
 	@Override
 	protected List<SopFoundation> getObjectList(CallContext callContext) throws MException {
-		return MApi.lookup(SopApi.class).searchFoundations(callContext.getParameter(Node.SEARCH));
+		FoundationApi api = MApi.lookup(FoundationApi.class);
+		return api.searchFoundations(callContext.getParameter(Node.SEARCH));
 	}
 
 	@Override
@@ -52,7 +53,8 @@ public class FoundationNode extends AbstractObjectListNode<SopFoundation> {
 
 	@Override
 	protected SopFoundation getObjectForId(CallContext context, String id) throws Exception {
-		return MApi.lookup(SopApi.class).getFoundation(id);
+		FoundationApi api = MApi.lookup(FoundationApi.class);
+		return api.getFoundation(id);
 	}
 
 }

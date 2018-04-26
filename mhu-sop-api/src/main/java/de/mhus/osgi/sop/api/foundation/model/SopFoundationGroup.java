@@ -13,40 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.mhus.osgi.sop.api.model;
+package de.mhus.osgi.sop.api.foundation.model;
 
 import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.annotations.adb.DbPersistent;
-import de.mhus.lib.core.MApi;
 import de.mhus.lib.errors.MException;
-import de.mhus.osgi.sop.api.SopApi;
 
-public class SopFoundation extends DbMetadata {
+public class SopFoundationGroup extends DbMetadata {
 
 	@DbPersistent
-	private String group = "";
-	@DbPersistent
-	private String ident;
+	private String name;
 	
-	public SopFoundation() {}
+	public SopFoundationGroup() {}
 	
-	public SopFoundation(String ident, String group) {
-		super();
-		this.ident = ident;
-		this.group = group;
+	public SopFoundationGroup(String name) {
+		this.name = name;
 	}
-
+	
 	@Override
 	public DbMetadata findParentObject() throws MException {
-		return MApi.lookup(SopApi.class).getFoundationGroup(group);
+		return null;
 	}
 
-	public String getGroup() {
-		return group;
-	}
-
-	public String getIdent() {
-		return ident;
+	public String getName() {
+		return name;
 	}
 
 }

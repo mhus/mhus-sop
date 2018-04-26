@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.mhus.osgi.sop.impl.data;
+package de.mhus.osgi.sop.foundation.data;
 
 import java.util.Date;
 import java.util.List;
@@ -34,8 +34,9 @@ import de.mhus.lib.core.MValidator;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.osgi.sop.api.SopApi;
 import de.mhus.osgi.sop.api.data.SopDataController;
-import de.mhus.osgi.sop.api.model.SopData;
-import de.mhus.osgi.sop.api.model.SopFoundation;
+import de.mhus.osgi.sop.api.foundation.FoundationApi;
+import de.mhus.osgi.sop.api.foundation.model.SopData;
+import de.mhus.osgi.sop.api.foundation.model.SopFoundation;
 
 @Command(scope = "sop", name = "data", description = "Sop Data actions")
 @Service
@@ -67,7 +68,7 @@ public class SopDataCmd implements Action {
 	@Override
 	public Object execute() throws Exception {
 		
-		SopApi api = MApi.lookup(SopApi.class);
+		FoundationApi api = MApi.lookup(FoundationApi.class);
 		
 		if (cmd.equals("list")) {
 			SopFoundation found = api.getFoundation(params[0]);
@@ -170,7 +171,7 @@ public class SopDataCmd implements Action {
 				return null;
 			}
 			
-			SopData d = api.getManager().inject(new SopData(found, params[1]));
+			SopData d = MApi.lookup(SopApi.class).getManager().inject(new SopData(found, params[1]));
 			
 			
 			for (int i=2; i < params.length; i++) {

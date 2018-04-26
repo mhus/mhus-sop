@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.mhus.osgi.sop.api.model;
+package de.mhus.osgi.sop.api.foundation.model;
 
 import java.util.Date;
 import java.util.UUID;
@@ -27,7 +27,8 @@ import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MSystem;
 import de.mhus.lib.errors.MException;
-import de.mhus.osgi.sop.api.SopApi;
+import de.mhus.osgi.sop.api.foundation.FoundationApi;
+import de.mhus.osgi.sop.api.foundation.FoundationRelated;
 
 public class SopData extends DbMetadata implements FoundationRelated {
 	
@@ -113,7 +114,7 @@ public class SopData extends DbMetadata implements FoundationRelated {
 	@Override
 	public DbMetadata findParentObject() throws MException {
 		if (getFoundation() == null) return null;
-		return MApi.lookup(SopApi.class).getFoundation(getFoundation());
+		return MApi.lookup(FoundationApi.class).getFoundation(getFoundation());
 	}
 
 	public boolean isIsPublic() {

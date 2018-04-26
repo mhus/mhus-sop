@@ -24,8 +24,8 @@ import de.mhus.lib.core.MTimeInterval;
 import de.mhus.lib.core.strategy.NotSuccessful;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.errors.MException;
-import de.mhus.osgi.sop.api.model.SopData;
-import de.mhus.osgi.sop.api.model.SopFoundation;
+import de.mhus.osgi.sop.api.foundation.model.SopData;
+import de.mhus.osgi.sop.api.foundation.model.SopFoundation;
 import de.mhus.osgi.sop.api.rest.CallContext;
 
 public abstract class AbstractSopDataController extends MLog implements SopDataController {

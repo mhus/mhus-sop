@@ -13,23 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.mhus.osgi.sop.rest;
+package de.mhus.osgi.sop.api.foundation;
 
-public class JournalQueue {
+import java.util.UUID;
 
-	private String name;
+import de.mhus.lib.adb.DbMetadata;
+import de.mhus.lib.core.MApi;
+import de.mhus.lib.errors.MException;
+
+public interface FoundationRelated {
+
+	UUID getFoundation();
 	
-	public JournalQueue() {
-		
-	}
-	public JournalQueue(String name) {
-		this.name = name;
-	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
+	default public DbMetadata findParentObject() throws MException {
+		return MApi.lookup(FoundationApi.class).getFoundation(getFoundation());
 	}
 
 }

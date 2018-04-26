@@ -27,10 +27,10 @@ import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.ContextCachedItem;
 
 @Component(provide=CacheControlIfc.class)
-public class ContextCacheService extends AbstractCacheControl {
+public class CoreContextCacheService extends AbstractCacheControl {
 
 	private SoftHashMap<String, ContextCachedItem> cache = new SoftHashMap<String, ContextCachedItem>();
-	private static ContextCacheService instance;
+	private static CoreContextCacheService instance;
 
 	@Activate
 	public void doActivate(ComponentContext ctx) {

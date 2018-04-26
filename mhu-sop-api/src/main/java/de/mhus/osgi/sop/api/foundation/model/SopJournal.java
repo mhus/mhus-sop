@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.mhus.osgi.sop.api.model;
+package de.mhus.osgi.sop.api.foundation.model;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +25,8 @@ import de.mhus.lib.annotations.adb.DbIndex;
 import de.mhus.lib.annotations.adb.DbPersistent;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.errors.MException;
-import de.mhus.osgi.sop.api.SopApi;
+import de.mhus.osgi.sop.api.foundation.FoundationApi;
+import de.mhus.osgi.sop.api.foundation.FoundationRelated;
 
 public class SopJournal extends DbMetadata implements FoundationRelated {
 
@@ -81,7 +82,7 @@ public class SopJournal extends DbMetadata implements FoundationRelated {
 
 	@Override
 	public DbMetadata findParentObject() throws MException {
-		return MApi.lookup(SopApi.class).getFoundation(getFoundation());
+		return MApi.lookup(FoundationApi.class).getFoundation(getFoundation());
 	}
 
 }

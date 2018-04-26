@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.mhus.osgi.sop.rest;
+package de.mhus.osgi.sop.foundation.rest;
 
 import java.io.IOException;
 import java.util.Date;
@@ -32,11 +32,11 @@ import de.mhus.lib.core.logging.Log;
 import de.mhus.lib.core.pojo.MPojo;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.errors.MException;
-import de.mhus.osgi.sop.api.SopApi;
 import de.mhus.osgi.sop.api.aaa.AaaUtil;
 import de.mhus.osgi.sop.api.data.SopDataController;
-import de.mhus.osgi.sop.api.model.SopData;
-import de.mhus.osgi.sop.api.model.SopFoundation;
+import de.mhus.osgi.sop.api.foundation.FoundationApi;
+import de.mhus.osgi.sop.api.foundation.model.SopData;
+import de.mhus.osgi.sop.api.foundation.model.SopFoundation;
 import de.mhus.osgi.sop.api.rest.AbstractObjectListNode;
 import de.mhus.osgi.sop.api.rest.CallContext;
 import de.mhus.osgi.sop.api.rest.JsonResult;
@@ -62,7 +62,7 @@ public class DataNode extends AbstractObjectListNode<SopData>{
 
 	@Override
 	protected List<SopData> getObjectList(CallContext callContext) throws MException {
-		SopApi api = MApi.lookup(SopApi.class);
+		FoundationApi api = MApi.lookup(FoundationApi.class);
 		
 		SopFoundation orga = getObjectFromContext(callContext, SopFoundation.class);
 		Boolean archived = false;
@@ -129,7 +129,7 @@ public class DataNode extends AbstractObjectListNode<SopData>{
 
 	@Override
 	protected SopData getObjectForId(CallContext callContext, String id) throws Exception {
-		SopApi api = MApi.lookup(SopApi.class);
+		FoundationApi api = MApi.lookup(FoundationApi.class);
 		
 		SopFoundation found = getObjectFromContext(callContext, SopFoundation.class);
 		SopData data = null;
@@ -154,7 +154,8 @@ public class DataNode extends AbstractObjectListNode<SopData>{
 	protected void doPrepareForOutput(SopData obj, CallContext context, boolean listMode) throws MException {
 		super.doPrepareForOutput(obj, context, listMode);
 		String type = obj.getType();
-		SopDataController control = MApi.lookup(SopApi.class).getDataSyncControllerForType(type);
+		FoundationApi api = MApi.lookup(FoundationApi.class);
+		SopDataController control = api.getDataSyncControllerForType(type);
 		if (control != null) {
 			control.doPrepareForOutput(obj, context, listMode);
 		}
@@ -164,7 +165,8 @@ public class DataNode extends AbstractObjectListNode<SopData>{
 	public RestResult doAction(CallContext callContext) throws Exception {
 		SopData data = getObjectFromContext(callContext, SopData.class);
 
-		SopDataController handler = MApi.lookup(SopApi.class).getDataSyncControllerForType(data.getType());
+		FoundationApi api = MApi.lookup(FoundationApi.class);
+		SopDataController handler = api.getDataSyncControllerForType(data.getType());
 		MProperties p = new MProperties();
 		for (String name : callContext.getParameterNames())
 			if (!name.startsWith("_") || name.startsWith("__"))

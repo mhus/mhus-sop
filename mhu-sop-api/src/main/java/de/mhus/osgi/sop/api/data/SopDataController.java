@@ -21,8 +21,8 @@ import java.util.List;
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.errors.MException;
-import de.mhus.osgi.sop.api.model.SopData;
-import de.mhus.osgi.sop.api.model.SopFoundation;
+import de.mhus.osgi.sop.api.foundation.model.SopData;
+import de.mhus.osgi.sop.api.foundation.model.SopFoundation;
 import de.mhus.osgi.sop.api.rest.CallContext;
 
 public interface SopDataController {

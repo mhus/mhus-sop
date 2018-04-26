@@ -20,27 +20,19 @@ import java.util.UUID;
 
 import aQute.bnd.annotation.component.Component;
 import de.mhus.lib.adb.Persistable;
-import de.mhus.lib.adb.query.Db;
-import de.mhus.lib.basics.Ace;
 import de.mhus.lib.basics.UuidIdentificable;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.xdb.XdbService;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
-import de.mhus.osgi.sop.api.aaa.AaaUtil;
 import de.mhus.osgi.sop.api.adb.AbstractDbSchemaService;
 import de.mhus.osgi.sop.api.adb.AdbApi;
 import de.mhus.osgi.sop.api.adb.DbSchemaService;
 import de.mhus.osgi.sop.api.adb.Reference;
 import de.mhus.osgi.sop.api.adb.Reference.TYPE;
 import de.mhus.osgi.sop.api.adb.ReferenceCollector;
-import de.mhus.osgi.sop.api.model.FoundationRelated;
 import de.mhus.osgi.sop.api.model.SopAcl;
 import de.mhus.osgi.sop.api.model.SopActionTask;
-import de.mhus.osgi.sop.api.model.SopData;
-import de.mhus.osgi.sop.api.model.SopFoundation;
-import de.mhus.osgi.sop.api.model.SopFoundationGroup;
-import de.mhus.osgi.sop.api.model.SopJournal;
 import de.mhus.osgi.sop.api.model.SopObjectParameter;
 import de.mhus.osgi.sop.api.model.SopRegister;
 
@@ -60,11 +52,7 @@ public class SopDbImpl extends AbstractDbSchemaService {
 		list.add(SopObjectParameter.class);
 		list.add(SopActionTask.class);
 		list.add(SopRegister.class);
-		list.add(SopJournal.class);
-		list.add(SopFoundation.class);
-		list.add(SopFoundationGroup.class);
 		list.add(SopAcl.class);
-		list.add(SopData.class);
 	}
 
 	@Override
@@ -75,43 +63,6 @@ public class SopDbImpl extends AbstractDbSchemaService {
 
 	@Override
 	public void doPostInitialize(XdbService manager) throws Exception {
-		
-		AaaUtil.enterRoot();
-		try {
-			// init base structure
-			SopFoundationGroup defGroup = service.getObjectByQualification(Db.query(SopFoundationGroup.class).eq("name", ""));
-			if (defGroup == null) {
-				defGroup = service.inject(new SopFoundationGroup(""));
-				defGroup.save();
-			}
-			
-			SopFoundation defFound = service.getObjectByQualification(Db.query(SopFoundation.class).eq("ident", ""));
-			if (defFound == null) {
-				defFound = service.inject(new SopFoundation("",""));
-				defFound.save();
-			}
-			defFoundationId = defFound.getId();
-			try {
-				SopAcl acl = service.getObjectByQualification(Db.query(SopAcl.class).eq("target", defFoundationId.toString()));
-				if (acl == null) {
-					acl = service.inject(new SopAcl(defFoundationId.toString(), "*=r"));
-					acl.save();
-				}
-			} catch (Throwable t) {
-				log().w(t);
-			}
-			try {
-				SopAcl acl = service.getObjectByQualification(Db.query(SopAcl.class).eq("target", defFoundationId + "_"));
-				if (acl == null) {
-					acl = service.inject(new SopAcl(defFoundationId.toString() + "_", "*=r"));
-					acl.save();
-				}
-			} catch (Throwable t) {
-				log().w(t);
-			}
-		} finally {
-			AaaUtil.leaveRoot();
-		}
 	}
 
 	@Override
@@ -268,19 +219,6 @@ public class SopDbImpl extends AbstractDbSchemaService {
 	@Override
 	protected String getAcl(AaaContext context, Persistable obj) throws MException {
 		
-		if (obj instanceof SopFoundationGroup) {
-			return Ace.RIGHTS_RO;
-		}
-		if (obj instanceof FoundationRelated) {
-			UUID fId = ((FoundationRelated)obj).getFoundation();
-			SopFoundation f = getManager().getObject(SopFoundation.class, fId);
-			if (f == null) return Ace.RIGHTS_NONE;
-			SopAcl aclObject = MApi.lookup(AdbApi.class).getManager().getObjectByQualification(Db.query(SopAcl.class).eq("target", fId + "_" ));
-			if (aclObject == null)
-				return getAce(context,f).getRights();
-			return aclObject.getList();
-		}
-		
 		return null;
 	}
 
@@ -288,25 +226,6 @@ public class SopDbImpl extends AbstractDbSchemaService {
 	public boolean canCreate(AaaContext context, Persistable obj) throws MException {
 		if (obj == null) return false;
 		if (context.isAdminMode()) return true;
-		if (obj instanceof FoundationRelated) {
-			UUID fId = ((FoundationRelated)obj).getFoundation();
-			SopFoundation f = getManager().getObject(SopFoundation.class, fId);
-			if (f == null) return false;
-			{
-				SopAcl aclObject = MApi.lookup(AdbApi.class).getManager().getObjectByQualification(Db.query(SopAcl.class).eq("target", fId + "_" + obj.getClass().getSimpleName() ));
-				if (aclObject != null) {
-					Ace ace = AaaUtil.getAccessAce(context, aclObject.getList());
-					return ace.canCreate();
-				}
-			}
-			{
-				SopAcl aclObject = MApi.lookup(AdbApi.class).getManager().getObjectByQualification(Db.query(SopAcl.class).eq("target", fId + "_" ));
-				if (aclObject != null) {
-					Ace ace = AaaUtil.getAccessAce(context, aclObject.getList());
-					return ace.canCreate();
-				}
-			}
-		}
 		return false;
 	}
 	

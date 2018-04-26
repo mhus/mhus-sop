@@ -179,6 +179,7 @@
     <modules>
       <module>mhu-sop-api</module>
       <module>mhu-sop-core</module>
+      <module>mhu-sop-foundation</module>
       <module>mhu-sop-jms</module>
       <module>mhu-sop-rest</module>
       <module>mhu-sop-vaadin-desktop</module>

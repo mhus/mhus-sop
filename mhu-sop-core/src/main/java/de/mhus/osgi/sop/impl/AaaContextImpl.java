@@ -79,13 +79,13 @@ public class AaaContextImpl implements AaaContext {
 	@Override
 	public <T> T getCached(String key) {
 		if (key == null) return null;
-		return ContextCacheService.get(this, key);
+		return CoreContextCacheService.get(this, key);
 	}
 	
 	@Override
 	public void setCached(String key, long ttl, Object item) {
 		if (key == null || item == null) return;
-		ContextCacheService.set(this, key, ttl, item);
+		CoreContextCacheService.set(this, key, ttl, item);
 	}
 	
 	@Override

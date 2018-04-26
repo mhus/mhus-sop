@@ -13,30 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.mhus.osgi.sop.api.model;
+package de.mhus.osgi.sop.foundation.rest;
 
-import de.mhus.lib.adb.DbMetadata;
-import de.mhus.lib.annotations.adb.DbPersistent;
-import de.mhus.lib.errors.MException;
+public class JournalQueue {
 
-public class SopFoundationGroup extends DbMetadata {
-
-	@DbPersistent
 	private String name;
 	
-	public SopFoundationGroup() {}
-	
-	public SopFoundationGroup(String name) {
+	public JournalQueue() {
+		
+	}
+	public JournalQueue(String name) {
 		this.name = name;
 	}
-	
-	@Override
-	public DbMetadata findParentObject() throws MException {
-		return null;
-	}
-
 	public String getName() {
 		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }

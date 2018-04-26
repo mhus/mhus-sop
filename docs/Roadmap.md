@@ -5,9 +5,13 @@
 
 == 1.3.2
 
-* Switch to mhu-lib-3.3.4: Migrate TmpMCrypt (MCrypt, MCast), Migrate QuotaFileOutputStream
+* Update to mhu-lib/3.3.4: Migrate TmpMCrypt (MCrypt, MCast), Migrate QuotaFileOutputStream
 * Modify tooling for Account, Trust and Authorization
 * Distributed File System
 * Distributed File Queue
 * Distributed Registry
 * Mail Queue
+
+== 1.3.1
+
+Fork from mhus-osgi-tools/1.3.1

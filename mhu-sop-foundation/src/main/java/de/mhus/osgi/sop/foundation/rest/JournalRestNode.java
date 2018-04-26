@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.mhus.osgi.sop.rest;
+package de.mhus.osgi.sop.foundation.rest;
 
 import java.util.List;
 
@@ -26,7 +26,8 @@ import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.pojo.MPojo;
 import de.mhus.lib.core.pojo.PojoModelFactory;
 import de.mhus.osgi.sop.api.SopApi;
-import de.mhus.osgi.sop.api.model.SopJournal;
+import de.mhus.osgi.sop.api.foundation.FoundationApi;
+import de.mhus.osgi.sop.api.foundation.model.SopJournal;
 import de.mhus.osgi.sop.api.rest.CallContext;
 import de.mhus.osgi.sop.api.rest.JsonNode;
 import de.mhus.osgi.sop.api.rest.JsonResult;
@@ -55,8 +56,9 @@ public class JournalRestNode extends JsonNode<JournalQueue>{
 		
 		long since = MCast.tolong( callContext.getParameter("_since"), 0);
 		
-		SopApi api = MApi.lookup(SopApi.class);
-		PojoModelFactory factory = api.getDataPojoModelFactory();
+		FoundationApi api = MApi.lookup(FoundationApi.class);
+		SopApi sop = MApi.lookup(SopApi.class);
+		PojoModelFactory factory = sop.getDataPojoModelFactory();
 		ArrayNode list = result.createArrayNode();
 		List<SopJournal> res = api.getJournalEntries(queue.getName(), since, 100);
 		for (SopJournal j : res) {
