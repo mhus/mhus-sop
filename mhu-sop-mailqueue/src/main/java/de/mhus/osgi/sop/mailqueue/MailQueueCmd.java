@@ -49,7 +49,7 @@ public class MailQueueCmd implements Action {
 	boolean force = false;
 	
 	@Option(name="-ct", aliases="--table", description="Table output",required=false)
-	String table;
+	String ct;
 	
 	@Override
 	public Object execute() throws Exception {
@@ -57,7 +57,7 @@ public class MailQueueCmd implements Action {
 		switch (cmd) {
 		case "list": {
 			
-			ConsoleTable table = new ConsoleTable(table);
+			ConsoleTable table = new ConsoleTable(ct);
 			table.setHeaderValues("id","source","status","next","to","subject");
 			
 			XdbService manager = MApi.lookup(SopApi.class).getManager();

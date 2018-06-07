@@ -25,6 +25,7 @@ import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MTimeInterval;
 import de.mhus.lib.core.cfg.CfgInt;
+import de.mhus.lib.core.cfg.CfgString;
 import de.mhus.lib.core.mail.MSendMail;
 import de.mhus.lib.core.mail.MailAttachment;
 import de.mhus.lib.core.util.MUri;
@@ -34,12 +35,12 @@ import de.mhus.osgi.services.scheduler.SchedulerServiceAdapter;
 import de.mhus.osgi.sop.api.SopApi;
 import de.mhus.osgi.sop.api.mailqueue.MailQueueOperation;
 
-@Component(provide=SchedulerService.class,immediate=true,properties="interval=*/15 * * * * *")
+@Component(provide=SchedulerService.class,immediate=true,properties="interval=*/5 * * * * *")
 public class MailQueueTimer extends SchedulerServiceAdapter {
 
 	private static final CfgInt CFG_MAX_ATTEMPTS = new CfgInt(MailQueueOperation.class, "maxAttempts", 10);
 	private static final CfgInt CFG_MAX_MAILS_PER_ROUND = new CfgInt(MailQueueOperation.class, "maxMailsPerRound", 30);
-
+	private static final CfgString CFG_NEXT_SEND_ATTEMPT_INTERVAL = new CfgString(MailQueueOperation.class, "nextSendAttemptInterval", "15m");
 	@Override
 	public void run(Object environment) {
 		try {
@@ -61,7 +62,7 @@ public class MailQueueTimer extends SchedulerServiceAdapter {
 					if (task.getSendAttempts() > CFG_MAX_ATTEMPTS.value()) {
 						task.setStatus(MailQueueOperation.STATUS.ERROR);
 					} else {
-						task.setNextSendAttempt(new Date(System.currentTimeMillis() + MTimeInterval.MINUTE_IN_MILLISECOUNDS * 15));
+						task.setNextSendAttempt(new Date(System.currentTimeMillis() + MTimeInterval.toTime(CFG_NEXT_SEND_ATTEMPT_INTERVAL.value(), MTimeInterval.MINUTE_IN_MILLISECOUNDS * 15)));
 					}
 					task.setLastError(t.toString());
 					task.save();
