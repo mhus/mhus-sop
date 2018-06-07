@@ -21,7 +21,7 @@ import de.mhus.lib.errors.MException;
 
 public interface MailQueueOperation {
 
-	enum STATUS {NEW, READY, SENT, ERROR, ERROR_PREPARE};
+	enum STATUS {NEW, READY, SENT, ERROR, ERROR_PREPARE, LOST};
 
 	/**
 	 * Will schedule the given mail content as html mail. And send a separate mail

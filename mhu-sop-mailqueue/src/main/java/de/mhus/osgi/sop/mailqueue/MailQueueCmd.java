@@ -23,7 +23,11 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
+import de.mhus.lib.adb.query.AQuery;
+import de.mhus.lib.adb.query.Db;
 import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.console.ConsoleTable;
+import de.mhus.lib.xdb.XdbService;
 import de.mhus.osgi.sop.api.SopApi;
 import de.mhus.osgi.sop.api.mailqueue.MailQueueOperation;
 import de.mhus.osgi.sop.api.mailqueue.MailQueueOperation.STATUS;
@@ -42,12 +46,29 @@ public class MailQueueCmd implements Action {
     String[] parameters;
 
 	@Option(name="-f", aliases="--full", description="Full output",required=false)
-	boolean full = false;
-
+	boolean force = false;
+	
+	@Option(name="-ct", aliases="--table", description="Table output",required=false)
+	String table;
+	
 	@Override
 	public Object execute() throws Exception {
 
 		switch (cmd) {
+		case "list": {
+			
+			ConsoleTable table = new ConsoleTable(table);
+			table.setHeaderValues("id","source","status","next","to","subject");
+			
+			XdbService manager = MApi.lookup(SopApi.class).getManager();
+			AQuery<SopMailTask> q = Db.query(SopMailTask.class);
+			q.eq(SopMailTask::getStatus, MailQueueOperation.STATUS.READY);
+			for (SopMailTask task : manager.getByQualification(q)) {
+				table.addRowValues(task.getId(),task.getSource(),task.getStatus(),task.getNextSendAttempt(),task.getTo(),task.getSubject());
+			}
+			
+			table.print(System.out);
+		} break;
 		case "send": {
 			MailQueueOperation mq = OperationUtil.getOperationIfc(MailQueueOperation.class);
 			String[] attachments = null;
@@ -66,13 +87,58 @@ public class MailQueueCmd implements Action {
 			System.out.println("Status: " + status);
 		} break;
 		case "retry": {
-			UUID id = UUID.fromString(parameters[0]);
-			SopApi api = MApi.lookup(SopApi.class);
-			SopMailTask task = api.getManager().getObject(SopMailTask.class, id);
-			if (task.getStatus() == STATUS.ERROR) {
-				task.setStatus(STATUS.READY);
-				task.save();
-				System.out.println("OK");
+			if (parameters == null || parameters.length == 0) {
+				// retry all
+				XdbService manager = MApi.lookup(SopApi.class).getManager();
+				for (SopMailTask task : manager.getByQualification(Db.query(SopMailTask.class).eq(SopMailTask::getStatus, MailQueueOperation.STATUS.ERROR))) {
+					System.out.println(task);
+					task.setStatus(STATUS.READY);
+					task.save();
+				}
+			} else {
+				UUID id = UUID.fromString(parameters[0]);
+				SopApi api = MApi.lookup(SopApi.class);
+				SopMailTask task = api.getManager().getObject(SopMailTask.class, id);
+				if (task.getStatus() == STATUS.ERROR) {
+					task.setStatus(STATUS.READY);
+					task.save();
+					System.out.println("OK");
+				} else {
+					System.out.println("Task is not in ERROR");
+				}
+			}
+		} break;
+		case "lost": {
+			if (parameters == null || parameters.length == 0) {
+				// retry all
+				XdbService manager = MApi.lookup(SopApi.class).getManager();
+				for (SopMailTask task : manager.getByQualification(Db.query(SopMailTask.class).eq(SopMailTask::getStatus, MailQueueOperation.STATUS.ERROR))) {
+					System.out.println(task);
+					task.setStatus(STATUS.LOST);
+					task.save();
+				}
+			} else {
+				UUID id = UUID.fromString(parameters[0]);
+				SopApi api = MApi.lookup(SopApi.class);
+				SopMailTask task = api.getManager().getObject(SopMailTask.class, id);
+				if (task.getStatus() == STATUS.ERROR) {
+					task.setStatus(STATUS.LOST);
+					task.save();
+					System.out.println("OK");
+				} else {
+					System.out.println("Task is not in ERROR");
+				}
+			}
+		} break;
+		case "cleanup": {
+			XdbService manager = MApi.lookup(SopApi.class).getManager();
+			for (SopMailTask task : manager.getByQualification(Db.query(SopMailTask.class).eq(SopMailTask::getStatus, MailQueueOperation.STATUS.ERROR))) {
+				if (task.getStatus() == STATUS.NEW || task.getStatus() == STATUS.READY || task.getStatus() == STATUS.ERROR) {
+					// ignore
+				} else {
+					System.out.println(task);
+					task.delete();
+				}
 			}
 		} break;
 		}

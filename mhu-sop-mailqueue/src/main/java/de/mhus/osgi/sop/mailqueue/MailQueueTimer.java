@@ -24,6 +24,7 @@ import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MTimeInterval;
+import de.mhus.lib.core.cfg.CfgInt;
 import de.mhus.lib.core.mail.MSendMail;
 import de.mhus.lib.core.mail.MailAttachment;
 import de.mhus.lib.core.util.MUri;
@@ -36,14 +37,20 @@ import de.mhus.osgi.sop.api.mailqueue.MailQueueOperation;
 @Component(provide=SchedulerService.class,immediate=true,properties="interval=*/15 * * * * *")
 public class MailQueueTimer extends SchedulerServiceAdapter {
 
-	private static final int MAX_ATTEMPTS = 10;
+	private static final CfgInt CFG_MAX_ATTEMPTS = new CfgInt(MailQueueOperation.class, "maxAttempts", 10);
+	private static final CfgInt CFG_MAX_MAILS_PER_ROUND = new CfgInt(MailQueueOperation.class, "maxMailsPerRound", 30);
 
 	@Override
 	public void run(Object environment) {
 		try {
 			Date now = new Date();
 			XdbService manager = MApi.lookup(SopApi.class).getManager();
+			int mailCnt = 0;
 			for (SopMailTask task : manager.getByQualification(Db.query(SopMailTask.class).eq(SopMailTask::getStatus, MailQueueOperation.STATUS.READY).le(SopMailTask::getNextSendAttempt, now))) {
+				
+				mailCnt++;
+				if (CFG_MAX_MAILS_PER_ROUND.value() > 0 && mailCnt > CFG_MAX_MAILS_PER_ROUND.value()) continue; // iterate all but do not send - this will close the db handle at the end
+				
 				try {
 					sendMail(task);
 					task.setStatus(MailQueueOperation.STATUS.SENT);
@@ -51,7 +58,7 @@ public class MailQueueTimer extends SchedulerServiceAdapter {
 				} catch (Throwable t) {
 					log().e(t);
 					task.setSendAttempts(task.getSendAttempts()+1);
-					if (task.getSendAttempts() > MAX_ATTEMPTS) {
+					if (task.getSendAttempts() > CFG_MAX_ATTEMPTS.value()) {
 						task.setStatus(MailQueueOperation.STATUS.ERROR);
 					} else {
 						task.setNextSendAttempt(new Date(System.currentTimeMillis() + MTimeInterval.MINUTE_IN_MILLISECOUNDS * 15));
