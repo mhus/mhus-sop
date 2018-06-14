@@ -194,4 +194,14 @@ public class AaaUtil {
 		return context.isAdminMode();
 	}
 
+	public static boolean isGuest(Account account) {
+		if (account == null) return true;
+		return account.isSynthetic() && AccessApi.GUEST_NAME.equals(account.getName());
+	}
+
+	public static boolean isRoot(Account account) {
+		if (account == null) return true;
+		return account.isSynthetic() && AccessApi.ROOT_NAME.equals(account.getName());
+	}
+
 }
