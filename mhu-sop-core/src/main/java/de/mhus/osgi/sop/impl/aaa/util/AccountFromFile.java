@@ -20,6 +20,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map.Entry;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -34,6 +35,7 @@ import de.mhus.lib.core.MDate;
 import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MPassword;
+import de.mhus.lib.core.MString;
 import de.mhus.lib.core.MXml;
 import de.mhus.lib.core.security.Account;
 import de.mhus.lib.core.security.AccountSource;
@@ -44,9 +46,11 @@ import de.mhus.osgi.sop.api.util.SopUtil;
 
 public class AccountFromFile extends MLog implements AccountSource, ModifyAccountApi {
 
+	private String path = "aaa/account/";
+	
 	@Override
 	public Account findAccount(String account) {
-		File file = SopUtil.getFile( "aaa/account/" + MFile.normalize(account.trim()).toLowerCase() + ".xml" );
+		File file = SopUtil.getFile( path + MFile.normalize(account.trim()).toLowerCase() + ".xml" );
 		if (!file.exists() || !file.isFile()) {
 			log().i("file not found", file);
 			return null;
@@ -75,7 +79,7 @@ public class AccountFromFile extends MLog implements AccountSource, ModifyAccoun
 	@Override
 	public void createAccount(String account, String password, IReadProperties properties) throws MException {
 
-		File file = SopUtil.getFile( "aaa/account/" + MFile.normalize(account.trim()).toLowerCase() + ".xml" );
+		File file = SopUtil.getFile( path + MFile.normalize(account.trim()).toLowerCase() + ".xml" );
 		if (!file.getParentFile().exists())
 			file.getParentFile().mkdirs();
 		if (file.exists()) throw new MException("Account already exists",account);
@@ -115,7 +119,7 @@ public class AccountFromFile extends MLog implements AccountSource, ModifyAccoun
 
 	@Override
 	public void deleteAccount(String account) throws MException {
-		File file = SopUtil.getFile( "aaa/account/" + MFile.normalize(account.trim()).toLowerCase() + ".xml" );
+		File file = SopUtil.getFile( path + MFile.normalize(account.trim()).toLowerCase() + ".xml" );
 		if (!file.exists()) throw new MException("Account not found",account);
 
 		file.delete();
@@ -123,7 +127,7 @@ public class AccountFromFile extends MLog implements AccountSource, ModifyAccoun
 
 	@Override
 	public void changePassword(String account, String newPassword) throws MException {
-		File file = SopUtil.getFile( "aaa/account/" + MFile.normalize(account.trim()).toLowerCase() + ".xml" );
+		File file = SopUtil.getFile( path + MFile.normalize(account.trim()).toLowerCase() + ".xml" );
 		if (!file.exists()) throw new MException("Account not found",account);
 
 		try {
@@ -146,7 +150,7 @@ public class AccountFromFile extends MLog implements AccountSource, ModifyAccoun
 
 	@Override
 	public void changeAccount(String account, IReadProperties properties) throws MException {
-		File file = SopUtil.getFile( "aaa/account/" + MFile.normalize(account.trim()).toLowerCase() + ".xml" );
+		File file = SopUtil.getFile( path + MFile.normalize(account.trim()).toLowerCase() + ".xml" );
 		if (!file.exists()) throw new MException("Account not found",account);
 
 		try {
@@ -182,7 +186,7 @@ public class AccountFromFile extends MLog implements AccountSource, ModifyAccoun
 
 	@Override
 	public void appendGroups(String account, String... group) throws MException {
-		File file = SopUtil.getFile( "aaa/account/" + MFile.normalize(account.trim()).toLowerCase() + ".xml" );
+		File file = SopUtil.getFile( path + MFile.normalize(account.trim()).toLowerCase() + ".xml" );
 		if (!file.exists()) throw new MException("Account not found",account);
 
 		try {
@@ -222,7 +226,7 @@ public class AccountFromFile extends MLog implements AccountSource, ModifyAccoun
 
 	@Override
 	public void removeGroups(String account, String... group) throws MException {
-		File file = SopUtil.getFile( "aaa/account/" + MFile.normalize(account.trim()).toLowerCase() + ".xml" );
+		File file = SopUtil.getFile( path + MFile.normalize(account.trim()).toLowerCase() + ".xml" );
 		if (!file.exists()) throw new MException("Account not found",account);
 
 		try {
@@ -262,7 +266,7 @@ public class AccountFromFile extends MLog implements AccountSource, ModifyAccoun
 
 	@Override
 	public Collection<String> getGroups(String account) throws MException {
-		File file = SopUtil.getFile( "aaa/account/" + MFile.normalize(account.trim()).toLowerCase() + ".xml" );
+		File file = SopUtil.getFile( path + MFile.normalize(account.trim()).toLowerCase() + ".xml" );
 		if (!file.exists()) throw new MException("Account not found",account);
 
 		try {
@@ -291,6 +295,20 @@ public class AccountFromFile extends MLog implements AccountSource, ModifyAccoun
 	@Override
 	public ModifyAccountApi getModifyApi() {
 		return this;
+	}
+
+	@Override
+	public Collection<String> getAccountList(String filter) {
+		File dir = SopUtil.getFile( path );
+		LinkedList<String> out = new LinkedList<>();
+		for (String name : dir.list()) {
+			if (name.endsWith(".xml")) {
+				name = name.substring(0, name.length()-4);
+				if (filter == null || MString.compareFsLikePattern(name, filter))
+					out.add(name);
+			}
+		}
+		return out;
 	}
 
 }

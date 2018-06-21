@@ -15,17 +15,15 @@
  */
 package de.mhus.osgi.sop.api.rest;
 
-import java.util.List;
-
-import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
 
 import de.mhus.lib.core.pojo.MPojo;
 import de.mhus.lib.core.pojo.PojoModelFactory;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.errors.MException;
+import de.mhus.lib.errors.NotFoundException;
 
-public abstract class AbstractObjectListNode<T> extends JsonListNode<T> {
+public abstract class AbstractSingleObjectNode<T> extends JsonSingleNode<T> {
 
 	@Override
 	public void doRead(JsonResult result, CallContext callContext)
@@ -34,29 +32,19 @@ public abstract class AbstractObjectListNode<T> extends JsonListNode<T> {
 		PojoModelFactory schema = getPojoModelFactory();
 		
 		T obj = getObjectFromContext(callContext, getManagedClass());
-		if (obj != null) {
-			doPrepareForOutput(obj, callContext, false);
-			ObjectNode jRoot = result.createObjectNode();
-			MPojo.pojoToJson(obj, jRoot, schema);
-		} else {
-			ArrayNode jList = result.createArrayNode();
-			
-			for (T item : getObjectList(callContext) ) {
-				doPrepareForOutput(item, callContext, true);
-				ObjectNode jItem = jList.objectNode();
-				jList.add(jItem);
-				MPojo.pojoToJson(item, jItem, schema);
-			}
-			
-		}
+		if (obj == null)
+			throw new NotFoundException();
+		
+		doPrepareForOutput(obj, callContext, false);
+		ObjectNode jRoot = result.createObjectNode();
+		MPojo.pojoToJson(obj, jRoot, schema);
+
 		
 	}
 
 	protected PojoModelFactory getPojoModelFactory() {
 		return RestUtil.getPojoModelFactory();
 	}
-
-	protected abstract List<T> getObjectList(CallContext callContext) throws MException;
 
 	protected void doPrepareForOutput(T obj, CallContext context, boolean listMode) throws MException {
 	}

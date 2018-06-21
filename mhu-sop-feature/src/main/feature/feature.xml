@@ -42,7 +42,8 @@
 		<bundle>mvn:de.mhus.lib/mhu-lib-persistence/${mhulib.version}</bundle>
 		<bundle>mvn:de.mhus.lib/mhu-lib-j2ee/${mhulib.version}</bundle>
 
-		<bundle>mvn:de.mhus.osgi/mhu-osgi-commands/${osgitools.version}</bundle>
+		<bundle>mvn:de.mhus.osgi/mhu-osgi-services/${osgitools.version}</bundle>
+		<bundle>mvn:de.mhus.osgi/mhu-karaf-commands/${osgitools.version}</bundle>
 		<bundle>mvn:de.mhus.osgi/mhu-karaf-xdb/${osgitools.version}</bundle>
 
 		<bundle>mvn:javax.xml.rpc/javax.xml.rpc-api/1.1.1</bundle>

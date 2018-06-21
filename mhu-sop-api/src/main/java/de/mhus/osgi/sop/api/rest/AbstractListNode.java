@@ -17,7 +17,7 @@ package de.mhus.osgi.sop.api.rest;
 
 import java.util.List;
 
-public abstract class AbstractNode<T> implements RestNodeService {
+public abstract class AbstractListNode<T> implements RestNodeService {
 
 	public static final String ID 		= "_id";
 	public static final String OBJECT 	= "_obj";

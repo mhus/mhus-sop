@@ -30,6 +30,7 @@ import de.mhus.lib.core.MString;
 import de.mhus.lib.core.pojo.PojoAttribute;
 import de.mhus.lib.core.pojo.PojoModel;
 import de.mhus.lib.core.pojo.PojoModelFactory;
+import de.mhus.lib.core.pojo.PojoParser;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.xdb.XdbService;
 import de.mhus.osgi.sop.api.adb.AdbApi;
@@ -41,6 +42,15 @@ public class RestUtil {
 
 	public static final int MAX_RETURN_SIZE = 1000;
 	
+	private static final PojoModelFactory POJO_FACTORY = new PojoModelFactory() {
+		
+		@SuppressWarnings("unchecked")
+		@Override
+		public PojoModel createPojoModel(Class<?> clazz) {
+			return new PojoParser().parse(clazz, "_", new Class[] { Public.class }).filter(true,false,true,false,true).getModel();
+		}
+	};
+
 //	private static Log log = Log.getLog(RestUtil.class);
 
 	public static void updateObject(CallContext callContext, Object obj, boolean publicOnly) throws IOException {
@@ -124,6 +134,10 @@ public class RestUtil {
 		}
 		res.close();
 		return list;
+	}
+
+	public static PojoModelFactory getPojoModelFactory() {
+		return POJO_FACTORY;
 	}
 
 }

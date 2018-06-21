@@ -16,21 +16,19 @@
 package de.mhus.osgi.sop.rest;
 
 import java.lang.reflect.Method;
-import java.util.List;
 
 import org.codehaus.jackson.node.ObjectNode;
 
 import aQute.bnd.annotation.component.Component;
 import de.mhus.lib.core.pojo.MPojo;
-import de.mhus.lib.errors.MException;
-import de.mhus.osgi.sop.api.rest.AbstractObjectListNode;
+import de.mhus.osgi.sop.api.rest.AbstractSingleObjectNode;
 import de.mhus.osgi.sop.api.rest.CallContext;
 import de.mhus.osgi.sop.api.rest.JsonResult;
 import de.mhus.osgi.sop.api.rest.RestNodeService;
 import de.mhus.osgi.sop.api.rest.RestResult;
 
 @Component(immediate=true,provide=RestNodeService.class)
-public class PublicRestNode extends AbstractObjectListNode<Object> {
+public class PublicRestNode extends AbstractSingleObjectNode<Object> {
 	
 	@Override
 	public String[] getParentNodeIds() {
@@ -43,17 +41,12 @@ public class PublicRestNode extends AbstractObjectListNode<Object> {
 	}
 
 	@Override
-	protected List<Object> getObjectList(CallContext callContext) throws MException {
-		return null;
-	}
-
-	@Override
 	public Class<Object> getManagedClass() {
 		return Object.class;
 	}
 
 	@Override
-	protected Object getObjectForId(CallContext callContext, String id) throws Exception {
+	protected Object getObject(CallContext callContext) throws Exception {
 		return new Object();
 	}
 

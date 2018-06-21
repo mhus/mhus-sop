@@ -49,6 +49,7 @@ public class ModifyAccessCmd implements Action {
 			+ " user delete <name>\n"
 			+ " user add <name> <group>\n"
 			+ " user remove <name> <group>\n"
+			+ " user list <filter>"
 			+ " trust create <name> <password> *[key=value]\n"
 			+ " trust password <name> <newPassword>\n"
 			+ " trust set <name> *[key=value]\n"
@@ -103,6 +104,13 @@ public class ModifyAccessCmd implements Action {
 			ModifyAccountApi modify = api.getModifyAccountApi();
 			modify.removeGroups(name, parameters[0]);
 			System.out.println("OK");
+		} else
+		if (entity.equals("user") && action.equals("list")) {
+			ModifyAccountApi modify = api.getModifyAccountApi();
+			System.out.println(" Users");
+			System.out.println("-------");
+			for (String name  : modify.getAccountList(name))
+				System.out.println(name);
 		} else
 		if (entity.equals("trust") && action.equals("create")) {
 			ModifyTrustApi modify = api.getModifyTrustApi();

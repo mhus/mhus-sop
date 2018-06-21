@@ -29,12 +29,12 @@ import de.mhus.osgi.sop.api.SopApi;
 import de.mhus.osgi.sop.api.foundation.FoundationApi;
 import de.mhus.osgi.sop.api.foundation.model.SopJournal;
 import de.mhus.osgi.sop.api.rest.CallContext;
-import de.mhus.osgi.sop.api.rest.JsonNode;
+import de.mhus.osgi.sop.api.rest.JsonListNode;
 import de.mhus.osgi.sop.api.rest.JsonResult;
 import de.mhus.osgi.sop.api.rest.RestNodeService;
 
 @Component(immediate=true,provide=RestNodeService.class)
-public class JournalRestNode extends JsonNode<JournalQueue>{
+public class JournalRestNode extends JsonListNode<JournalQueue>{
 
 	@Override
 	public String[] getParentNodeIds() {

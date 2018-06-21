@@ -16,7 +16,6 @@
 package de.mhus.osgi.sop.api.aaa;
 
 import java.util.HashSet;
-import java.util.Set;
 
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.IReadProperties;
@@ -69,8 +68,9 @@ public class AccountGuest implements Account {
 		return groups.contains(group);
 	}
 
-	public Set<String> getGroups() {
-		return groups;
+	@Override
+	public String[] getGroups() {
+		return groups.toArray(new String[groups.size()]);
 	}
 
 	@Override

@@ -70,4 +70,9 @@ public class AccountRoot implements Account {
 		attributes.putReadProperties(properties);
 	}
 
+	@Override
+	public String[] getGroups() throws NotSupportedException {
+		throw new NotSupportedException();
+	}
+
 }

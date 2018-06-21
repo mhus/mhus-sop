@@ -177,4 +177,9 @@ public class AccountFile extends MLog implements Account {
 		}
 	}
 
+	@Override
+	public String[] getGroups() throws NotSupportedException {
+		return groups.toArray(new String[groups.size()]);
+	}
+
 }

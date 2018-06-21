@@ -54,6 +54,9 @@ import de.mhus.osgi.sop.api.rest.RestResult;
 import de.mhus.osgi.sop.api.util.SopFileLogger;
 import de.mhus.osgi.sop.api.util.TicketUtil;
 
+/*
+ * Test: http://localhost:8182/rest/public/?_action=ping&_method=POST
+ */
 @Component(immediate=true,name="RestServlet",provide=Servlet.class,properties="alias=/rest/*")
 public class RestServlet extends HttpServlet {
 
@@ -69,6 +72,8 @@ public class RestServlet extends HttpServlet {
 
     private static final String RESULT_TYPE_JSON = "json";
     private static final String RESULT_TYPE_HTTP = "http";
+    
+    private static final String PUBLIC_PATH = "/public/";
         
 	/**
 	 * 
@@ -115,7 +120,7 @@ public class RestServlet extends HttpServlet {
 	//    	parts.remove(0); // rest
 	    	
 	    	String ticket = req.getParameter("_ticket");
-	    	if (ticket == null) {
+	    	if (ticket == null && !path.startsWith(PUBLIC_PATH)) {
 		    	String auth = req.getHeader("Authorization");  
 		        // Do we allow that user?
 		    	ticket = getTicket(auth);
@@ -144,25 +149,28 @@ public class RestServlet extends HttpServlet {
 	        
 	        AccessApi access = MApi.lookup(AccessApi.class);
 	        AaaContext user = null;
-	        try {
-	        	String localeStr = req.getHeader("Accept-Language");
-	        	Locale locale = localeStr == null ? null : Locale.forLanguageTag(localeStr);
-	        	user = access.process(ticket, locale);
-	        } catch (AccessDeniedException e) {
-//	        	log.d("access denied",ticket,e);
-	            resp.setHeader("WWW-Authenticate", "BASIC realm=\"rest\"");  
-	            sendError(errorResultType, id, resp, HttpServletResponse.SC_UNAUTHORIZED,e.getMessage(), e, null);
-	            return;
-	        } catch (Throwable t) {
-	        	sendError(errorResultType, id, resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, t.getMessage(), t, null );
-	        	return;
+	        if (ticket == null && path.startsWith(PUBLIC_PATH)) {
+	        	user = access.getGuestContext();
+	        } else {
+		        try {
+		        	String localeStr = req.getHeader("Accept-Language");
+		        	Locale locale = localeStr == null ? null : Locale.forLanguageTag(localeStr);
+		        	user = access.process(ticket, locale);
+		        } catch (AccessDeniedException e) {
+	//	        	log.d("access denied",ticket,e);
+		            resp.setHeader("WWW-Authenticate", "BASIC realm=\"rest\"");  
+		            sendError(errorResultType, id, resp, HttpServletResponse.SC_UNAUTHORIZED,e.getMessage(), e, null);
+		            return;
+		        } catch (Throwable t) {
+		        	sendError(errorResultType, id, resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, t.getMessage(), t, null );
+		        	return;
+		        }
 	        }
 	        if (user == null) { // paranoia, should throw an exception in 'process()'
 	            resp.setHeader("WWW-Authenticate", "BASIC realm=\"rest\"");  
 	            sendError(errorResultType, id, resp, HttpServletResponse.SC_UNAUTHORIZED,"?", null, null);
 	            return;
 	        }
-	        
 	        if (user != null) {
 	        	Trust trust = user.getTrust();
 	        	if (trust != null) {
