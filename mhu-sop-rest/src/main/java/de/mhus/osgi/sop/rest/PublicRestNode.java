@@ -20,6 +20,8 @@ import java.lang.reflect.Method;
 import org.codehaus.jackson.node.ObjectNode;
 
 import aQute.bnd.annotation.component.Component;
+import de.mhus.lib.core.MCast;
+import de.mhus.lib.core.MThread;
 import de.mhus.lib.core.pojo.MPojo;
 import de.mhus.osgi.sop.api.rest.AbstractSingleObjectNode;
 import de.mhus.osgi.sop.api.rest.CallContext;
@@ -56,6 +58,12 @@ public class PublicRestNode extends AbstractSingleObjectNode<Object> {
 		o.put("msg", "pong");
 	}
 
+	public void onSleep(JsonResult result, CallContext callContext) throws Exception {
+		MThread.sleep( MCast.tolong(callContext.getParameter("sleep"), 0 ));
+		ObjectNode o = result.createObjectNode();
+		o.put("msg", "pong");
+	}
+	
 	@Override
 	public RestResult doAction(CallContext callContext) throws Exception {
 		String methodName = "on" + MPojo.toFunctionName(callContext.getAction(), true, null);

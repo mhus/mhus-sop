@@ -36,6 +36,7 @@ import org.codehaus.jackson.node.ObjectNode;
 import aQute.bnd.annotation.component.Component;
 import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.MString;
 import de.mhus.lib.core.logging.LevelMapper;
 import de.mhus.lib.core.logging.Log;
 import de.mhus.lib.core.logging.TrailLevelMapper;
@@ -88,7 +89,7 @@ public class RestServlet extends HttpServlet {
     @Override
 	protected void service(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-    	
+    	// System.out.println(">>> " + req.getPathInfo());    	
     	resp.setHeader("Access-Control-Allow-Origin", "*");
 
     	boolean isTrailEnabled = false;
@@ -120,11 +121,11 @@ public class RestServlet extends HttpServlet {
 	//    	parts.remove(0); // rest
 	    	
 	    	String ticket = req.getParameter("_ticket");
-	    	if (ticket == null && !path.startsWith(PUBLIC_PATH)) {
+	    	if (MString.isEmpty(ticket) && !path.startsWith(PUBLIC_PATH)) {
 		    	String auth = req.getHeader("Authorization");  
 		        // Do we allow that user?
 		    	ticket = getTicket(auth);
-		        if (ticket == null) {  
+		        if (MString.isEmpty(ticket)) {  
 		        	log.i("authorization required",id,auth,req.getRemoteAddr());
 		            // Not allowed, so report he's unauthorized  
 		            resp.setHeader("WWW-Authenticate", "BASIC realm=\"rest\"");  
@@ -149,7 +150,7 @@ public class RestServlet extends HttpServlet {
 	        
 	        AccessApi access = MApi.lookup(AccessApi.class);
 	        AaaContext user = null;
-	        if (ticket == null && path.startsWith(PUBLIC_PATH)) {
+	        if (MString.isEmpty(ticket) && path.startsWith(PUBLIC_PATH)) {
 	        	user = access.getGuestContext();
 	        } else {
 		        try {
