@@ -34,7 +34,6 @@ import de.mhus.lib.core.pojo.PojoParser;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.xdb.XdbService;
 import de.mhus.osgi.sop.api.adb.AdbApi;
-import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 
 public class RestUtil {
 	
@@ -99,10 +98,10 @@ public class RestUtil {
 		return callContext.getParameter(getObjectIdParameterName(clazz));
 	}
 
-	public static RestResult doExecuteRestAction(CallContext callContext, OperationDescriptor descriptor, String source) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//	public static RestResult doExecuteRestAction(CallContext callContext, OperationDescriptor descriptor, String source) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 	public static int getPageFromSearch(String search) {
 		if (MString.isEmpty(search) || !search.startsWith("page:"))

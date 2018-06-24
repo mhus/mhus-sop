@@ -17,7 +17,7 @@ package de.mhus.osgi.sop.api.rest;
 
 import java.util.List;
 
-public abstract class AbstractListNode<T> implements RestNodeService {
+public abstract class AbstractListNode<T> extends AbstractNode<T> {
 
 	public static final String ID 		= "_id";
 	public static final String OBJECT 	= "_obj";
@@ -69,40 +69,5 @@ public abstract class AbstractListNode<T> implements RestNodeService {
 	}
 	
 	protected abstract T getObjectForId(CallContext context, String id) throws Exception;
-
-	@Override
-	public RestResult doAction(CallContext callContext) throws Exception {
-/*
-		String methodName = "on" + MPojo.toFunctionName(callContext.getAction(), true, null);
-		Method method = getClass().getMethod(methodName, CallContext.class);
-		return (RestResult) method.invoke(this, callContext);
-*/
-		return RestUtil.doExecuteRestAction( callContext, null, getNodeId());
-	}
-
-//	@Override
-//	public RestResult doCreate(CallContext callContext) throws Exception {
-//		OperationDescriptor oper = getCreateAction();
-//		if (oper == null)
-//			throw new NotSupportedException();
-//		return RestUtil.doExecuteRestAction( callContext, oper, getNodeId());
-//	}
-//
-//	@Override
-//	public RestResult doUpdate(CallContext callContext) throws Exception {
-//		OperationDescriptor oper = getUpdateAction();
-//		if (oper == null)
-//			throw new NotSupportedException();
-//		return RestUtil.doExecuteRestAction( callContext, oper, getNodeId());
-//	}
-//
-//
-//	@Override
-//	public RestResult doDelete(CallContext callContext) throws Exception {
-//		OperationDescriptor oper = getDeleteAction();
-//		if (oper == null)
-//			throw new NotSupportedException();
-//		return RestUtil.doExecuteRestAction( callContext, oper, getNodeId());
-//	}
 
 }

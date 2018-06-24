@@ -15,19 +15,15 @@
  */
 package de.mhus.osgi.sop.rest;
 
-import java.lang.reflect.Method;
-
 import org.codehaus.jackson.node.ObjectNode;
 
 import aQute.bnd.annotation.component.Component;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MThread;
-import de.mhus.lib.core.pojo.MPojo;
 import de.mhus.osgi.sop.api.rest.AbstractSingleObjectNode;
 import de.mhus.osgi.sop.api.rest.CallContext;
 import de.mhus.osgi.sop.api.rest.JsonResult;
 import de.mhus.osgi.sop.api.rest.RestNodeService;
-import de.mhus.osgi.sop.api.rest.RestResult;
 
 @Component(immediate=true,provide=RestNodeService.class)
 public class PublicRestNode extends AbstractSingleObjectNode<Object> {
@@ -64,13 +60,4 @@ public class PublicRestNode extends AbstractSingleObjectNode<Object> {
 		o.put("msg", "pong");
 	}
 	
-	@Override
-	public RestResult doAction(CallContext callContext) throws Exception {
-		String methodName = "on" + MPojo.toFunctionName(callContext.getAction(), true, null);
-		JsonResult result = new JsonResult();
-		Method method = getClass().getMethod(methodName, JsonResult.class, CallContext.class);
-		method.invoke(this, result, callContext);
-		return result;
-	}
-
 }

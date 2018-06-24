@@ -17,7 +17,7 @@ package de.mhus.osgi.sop.api.rest;
 
 import java.util.List;
 
-public abstract class AbstractSingleNode<T> implements RestNodeService {
+public abstract class AbstractSingleNode<T> extends AbstractNode<T> {
 
 	public static final String ID 		= "_id";
 	public static final String OBJECT 	= "_obj";
@@ -56,10 +56,5 @@ public abstract class AbstractSingleNode<T> implements RestNodeService {
 	public abstract Class<T> getManagedClass();
 	
 	protected abstract T getObject(CallContext context) throws Exception;
-
-	@Override
-	public RestResult doAction(CallContext callContext) throws Exception {
-		return RestUtil.doExecuteRestAction( callContext, null, getNodeId());
-	}
-
+	
 }

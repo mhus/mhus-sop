@@ -58,5 +58,5 @@ public abstract class JsonSingleNode<T> extends AbstractSingleNode<T>{
 	protected void doDelete(JsonResult result, CallContext callContext) throws Exception {
 		throw new NotSupportedException();
 	}
-	
+
 }
