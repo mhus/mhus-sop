@@ -15,12 +15,12 @@
  */
 package de.mhus.osgi.sop.api.rest;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
+import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.MProperties;
 
 public class CallContext {
 
@@ -28,10 +28,10 @@ public class CallContext {
 
 	private HttpRequest req;
 	private String method;
-	private HashMap<String, Object> context;
+	private IProperties context;
 	
 	public CallContext(HttpRequest req,
-			String method, HashMap<String, Object> context) {
+			String method, IProperties context) {
 		this.req = req;
 		this.method = method;
 		this.context = context;
@@ -50,8 +50,8 @@ public class CallContext {
 		return val;
 	}
 
-	public Map<String,String> getParameters() {
-		HashMap<String,String> out = new HashMap<>();
+	public IProperties getParameters() {
+		MProperties out = new MProperties();
 		for (String n : getParameterNames())
 			out.put(n, getParameter(n));
 		return out;

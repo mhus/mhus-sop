@@ -18,7 +18,6 @@ package de.mhus.osgi.sop.rest;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -36,6 +35,7 @@ import org.codehaus.jackson.node.ObjectNode;
 import aQute.bnd.annotation.component.Component;
 import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
 import de.mhus.lib.core.logging.LevelMapper;
 import de.mhus.lib.core.logging.Log;
@@ -136,7 +136,7 @@ public class RestServlet extends HttpServlet {
 	        if ("true".equals(req.getParameter("_admin")))
 	        	ticket = ticket + TicketUtil.SEP + "admin";
 	        
-	        HashMap<String, Object> context = new HashMap<>();
+	        MProperties context = new MProperties();
 	        String method = req.getParameter("_method");
 	        if (method == null) method = req.getMethod();
 	
