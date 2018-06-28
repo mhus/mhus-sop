@@ -47,7 +47,7 @@ public class MailQueueDbImpl extends AbstractDbSchemaService {
 
 	@Override
 	public boolean canCreate(AaaContext context, Persistable obj) throws MException {
-		return false;
+		return true; // TODO can everybody create mail queue items?
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class MailQueueDbImpl extends AbstractDbSchemaService {
 
 	@Override
 	protected String getAcl(AaaContext context, Persistable obj) throws MException {
-		return AclControlled.ACL_ALL_RO;
+		return AclControlled.ACL_ALL_ALL;
 	}
 
 }

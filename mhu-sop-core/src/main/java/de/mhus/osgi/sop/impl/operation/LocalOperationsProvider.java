@@ -219,7 +219,9 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
 			try {
 				String acl = OperationUtil.getOption(desc.getTags(), OperationDescriptor.TAG_DEFAULT_ACL, "");
 				if (!aaa.hasResourceAccess(aaa.getCurrenAccount(), "local.operation", desc.getPath(), "execute", acl))
-					throw new AccessDeniedException("access denied");
+					throw new AccessDeniedException("access denied",desc.getPath());
+			} catch (AccessDeniedException e) {
+				throw e;
 			} catch (Throwable t) {
 				throw new AccessDeniedException("internal error", t);
 			}
