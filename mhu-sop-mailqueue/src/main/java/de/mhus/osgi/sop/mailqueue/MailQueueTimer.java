@@ -57,12 +57,22 @@ public class MailQueueTimer extends SchedulerServiceAdapter {
 					task.setStatus(MailQueueOperation.STATUS.SENT);
 					task.save();
 				} catch (Throwable t) {
-					log().e(t);
-					task.setSendAttempts(task.getSendAttempts()+1);
-					if (task.getSendAttempts() > CFG_MAX_ATTEMPTS.value()) {
-						task.setStatus(MailQueueOperation.STATUS.ERROR);
+					log().e("send error",t.getStackTrace()[0].getClassName(),t);
+					if (
+							t instanceof NullPointerException // any null pointer is not a connection error
+							||
+							"javax.mail.internet.InternetAddress".equals(t.getStackTrace()[0].getClassName()) // email address error
+						) {
+						// fatal prepare error
+						task.setStatus(MailQueueOperation.STATUS.ERROR_PREPARE);
 					} else {
-						task.setNextSendAttempt(new Date(System.currentTimeMillis() + MTimeInterval.toTime(CFG_NEXT_SEND_ATTEMPT_INTERVAL.value(), MTimeInterval.MINUTE_IN_MILLISECOUNDS * 15)));
+						// error to retry
+						task.setSendAttempts(task.getSendAttempts()+1);
+						if (task.getSendAttempts() > CFG_MAX_ATTEMPTS.value()) {
+							task.setStatus(MailQueueOperation.STATUS.ERROR);
+						} else {
+							task.setNextSendAttempt(new Date(System.currentTimeMillis() + MTimeInterval.toTime(CFG_NEXT_SEND_ATTEMPT_INTERVAL.value(), MTimeInterval.MINUTE_IN_MILLISECOUNDS * 15)));
+						}
 					}
 					task.setLastError(t.toString());
 					task.save();

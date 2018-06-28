@@ -58,13 +58,13 @@ public class MailQueueCmd implements Action {
 		case "list": {
 			
 			ConsoleTable table = new ConsoleTable(ct);
-			table.setHeaderValues("id","source","status","next","to","subject");
+			table.setHeaderValues("id","source","status","next","to","subject","attempts");
 			
 			XdbService manager = MApi.lookup(SopApi.class).getManager();
 			AQuery<SopMailTask> q = Db.query(SopMailTask.class);
 			q.eq(SopMailTask::getStatus, MailQueueOperation.STATUS.READY);
 			for (SopMailTask task : manager.getByQualification(q)) {
-				table.addRowValues(task.getId(),task.getSource(),task.getStatus(),task.getNextSendAttempt(),task.getTo(),task.getSubject());
+				table.addRowValues(task.getId(),task.getSource(),task.getStatus(),task.getNextSendAttempt(),task.getTo(),task.getSubject(),task.getSendAttempts());
 			}
 			
 			table.print(System.out);
