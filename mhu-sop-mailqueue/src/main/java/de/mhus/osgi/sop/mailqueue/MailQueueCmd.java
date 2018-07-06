@@ -39,13 +39,22 @@ public class MailQueueCmd implements Action {
 
 	@Argument(index=0, name="cmd", required=true, description=
 			"Command:\n"
-			+ " send <source> <from> <to> <subject> <content html> [attachments]")
+			+ " new <source> <from> <to> <subject> <content html> [attachments]\n"
+			+ " list\n"
+			+ " status <id>\n"
+			+ " retry [<id>]\n"
+			+ " lost [<id>]\n"
+			+ " clenanup\n"
+			+ " delete <id>")
 	String cmd;
 
 	@Argument(index=1, name="parameters", required=false, description="More Parameters", multiValued=true)
     String[] parameters;
 
-	@Option(name="-f", aliases="--full", description="Full output",required=false)
+	@Option(name="-a", aliases="--all", description="All",required=false)
+	boolean all = false;
+	
+	@Option(name="-f", aliases="--force", description="Force action",required=false)
 	boolean force = false;
 	
 	@Option(name="-ct", aliases="--table", description="Table output",required=false)
@@ -58,18 +67,28 @@ public class MailQueueCmd implements Action {
 		case "list": {
 			
 			ConsoleTable table = new ConsoleTable(ct);
-			table.setHeaderValues("id","source","status","next","to","subject","attempts");
+			table.setHeaderValues("id","source","status","next","to","subject","attempts", "created");
 			
 			XdbService manager = MApi.lookup(SopApi.class).getManager();
 			AQuery<SopMailTask> q = Db.query(SopMailTask.class);
-			q.eq(SopMailTask::getStatus, MailQueueOperation.STATUS.READY);
+			if (!all)
+				q.eq(SopMailTask::getStatus, MailQueueOperation.STATUS.READY);
 			for (SopMailTask task : manager.getByQualification(q)) {
-				table.addRowValues(task.getId(),task.getSource(),task.getStatus(),task.getNextSendAttempt(),task.getTo(),task.getSubject(),task.getSendAttempts());
+				table.addRowValues(
+						task.getId(),
+						task.getSource(),
+						task.getStatus(),
+						task.getNextSendAttempt(),
+						task.getTo(),
+						task.getSubject(),
+						task.getSendAttempts(),
+						task.getCreationDate()
+						);
 			}
 			
 			table.print(System.out);
 		} break;
-		case "send": {
+		case "new": {
 			MailQueueOperation mq = OperationUtil.getOperationIfc(MailQueueOperation.class);
 			String[] attachments = null;
 			if (parameters.length > 4) {
@@ -99,7 +118,7 @@ public class MailQueueCmd implements Action {
 				UUID id = UUID.fromString(parameters[0]);
 				SopApi api = MApi.lookup(SopApi.class);
 				SopMailTask task = api.getManager().getObject(SopMailTask.class, id);
-				if (task.getStatus() == STATUS.ERROR) {
+				if (force || task.getStatus() == STATUS.ERROR || task.getStatus() == STATUS.ERROR_PREPARE) {
 					task.setStatus(STATUS.READY);
 					task.save();
 					System.out.println("OK");
@@ -121,7 +140,7 @@ public class MailQueueCmd implements Action {
 				UUID id = UUID.fromString(parameters[0]);
 				SopApi api = MApi.lookup(SopApi.class);
 				SopMailTask task = api.getManager().getObject(SopMailTask.class, id);
-				if (task.getStatus() == STATUS.ERROR) {
+				if (force || task.getStatus() == STATUS.ERROR || task.getStatus() == STATUS.ERROR_PREPARE) {
 					task.setStatus(STATUS.LOST);
 					task.save();
 					System.out.println("OK");
@@ -140,6 +159,19 @@ public class MailQueueCmd implements Action {
 					task.delete();
 				}
 			}
+		} break;
+		case "delete": {
+			UUID id = UUID.fromString(parameters[0]);
+			SopApi api = MApi.lookup(SopApi.class);
+			SopMailTask task = api.getManager().getObject(SopMailTask.class, id);
+			if (force || task.getStatus() == STATUS.ERROR || task.getStatus() == STATUS.ERROR_PREPARE || task.getStatus() == STATUS.SENT || task.getStatus() == STATUS.LOST) {
+				task.setStatus(STATUS.LOST);
+				task.delete();
+				System.out.println("Deleted");
+			} else {
+				System.out.println("Task is not in ERROR");
+			}
+			
 		} break;
 		}
 		
