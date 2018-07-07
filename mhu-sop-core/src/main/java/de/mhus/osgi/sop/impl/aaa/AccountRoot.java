@@ -75,4 +75,9 @@ public class AccountRoot implements Account {
 		throw new NotSupportedException();
 	}
 
+	@Override
+	public boolean reload() {
+		return false;
+	}
+
 }

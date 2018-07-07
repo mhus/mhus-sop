@@ -59,7 +59,7 @@ public interface AccessApi extends SApi {
 	
 	AaaContext getCurrentOrGuest();
 	
-	Account getCurrenAccount() throws MException;
+	Account getCurrentAccount() throws MException;
 	
 	Account getAccount(String account) throws MException;
 	

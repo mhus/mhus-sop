@@ -329,7 +329,7 @@ public class AccessApiImpl extends MLog implements AccessApi {
 	}
 
 	@Override
-	public Account getCurrenAccount() throws MException {
+	public Account getCurrentAccount() throws MException {
 		return getCurrentOrGuest().getAccount();
 	}
 	
@@ -490,7 +490,7 @@ public class AccessApiImpl extends MLog implements AccessApi {
 	public ModifyCurrentAccountApi getModifyCurrentAccountApi() throws MException {
 		// do not check for admin, but set to current account
 		if (accountSource == null) return null;
-		Account current = getCurrenAccount();
+		Account current = getCurrentAccount();
 		if (current.isSynthetic() || !current.isValid()) return null; // not supported
 		return new ModifyCurrentAccount(current, accountSource);
 	}

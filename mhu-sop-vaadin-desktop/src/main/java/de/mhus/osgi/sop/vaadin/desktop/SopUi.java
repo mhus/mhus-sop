@@ -272,7 +272,7 @@ public class SopUi extends UI implements SopUiApi {
 
 		try {
 			AccessApi aaa = MApi.lookup(AccessApi.class);
-			Account account = aaa.getCurrenAccount();
+			Account account = aaa.getCurrentAccount();
 			return aaa.hasResourceAccess(account, GuiSpace.class.getCanonicalName(), MFile.normalize(role.trim()).toLowerCase(), "access", null);
 		} catch (Throwable t) {
 			log.d(role,t);
@@ -289,7 +289,7 @@ public class SopUi extends UI implements SopUiApi {
 		try {
 			try {
 				AccessApi aaa = MApi.lookup(AccessApi.class);
-				Account account = aaa.getCurrenAccount();
+				Account account = aaa.getCurrentAccount();
 				return aaa.hasResourceAccess(account, GuiSpace.class.getCanonicalName(), MFile.normalize(role.trim()).toLowerCase(), "write", null);
 			} catch (Throwable t) {
 				log.d(role,t);

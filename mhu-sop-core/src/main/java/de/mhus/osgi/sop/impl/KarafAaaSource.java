@@ -114,7 +114,6 @@ public class KarafAaaSource implements AccountSource {
 
 	private class KarafAccount implements Account {
 
-		@SuppressWarnings("unused")
 		private BackingEngine engine;
 		private UserPrincipal user;
 		private HashSet<String> groups = new HashSet<>();
@@ -122,9 +121,7 @@ public class KarafAaaSource implements AccountSource {
 		public KarafAccount(BackingEngine engine, UserPrincipal user) {
 			this.engine = engine;
 			this.user = user;
-			for (GroupPrincipal grp : engine.listGroups(user))
-				groups.add(grp.getName().trim().toLowerCase());
-			
+			reload();
 		}
 
 		@Override
@@ -183,6 +180,14 @@ public class KarafAaaSource implements AccountSource {
 		@Override
 		public String[] getGroups() throws NotSupportedException {
 			return groups.toArray(new String[groups.size()]);
+		}
+
+		@Override
+		public boolean reload() {
+			groups.clear();
+			for (GroupPrincipal grp : engine.listGroups(user))
+				groups.add(grp.getName().trim().toLowerCase());
+			return true;
 		}
 		
 	}

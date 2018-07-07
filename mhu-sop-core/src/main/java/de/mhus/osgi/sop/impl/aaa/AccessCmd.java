@@ -28,9 +28,12 @@ import org.osgi.framework.FrameworkUtil;
 
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MPassword;
+import de.mhus.lib.core.MProperties;
+import de.mhus.lib.core.console.Console;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.lib.core.security.Account;
 import de.mhus.lib.core.security.ModifyAccountApi;
+import de.mhus.lib.core.security.ModifyCurrentAccountApi;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
 import de.mhus.osgi.sop.api.aaa.Trust;
@@ -49,6 +52,8 @@ public class AccessCmd implements Action {
 			+ " admin            - login as admin\n"
 			+ " reset            - reset user context"
 			+ " id\n"
+			+ " reload           - reload current user context"
+			+ " info             - info about the current user"
 			+ " info user <account>\n"
 			+ " info trust <trust name>\n"
 			+ " info auth <name>\n"
@@ -58,7 +63,9 @@ public class AccessCmd implements Action {
 			+ " access <account> <name> [<action>]\n"
 			+ " reloadconfig\n"
 			+ " md5 <password>\n"
-			+ " idtree\n",
+			+ " idtree\n"
+			+ " passwd [<password>] - set password to current account\n"
+			+ " modify [key=value]* - set parameters to current account",
 			multiValued=false)
 	String cmd;
 	
@@ -106,6 +113,10 @@ public class AccessCmd implements Action {
 			if (cur.isAdminMode())
 				System.out.println("Admin mode");
 		} else
+		if (cmd.equals("reload")) {
+			Account ac = api.getCurrentAccount();
+			System.out.println("Reload: " + ac.reload());
+		} else
 		if (cmd.equals("idtree")) {
 			AaaContextImpl cur = (AaaContextImpl) api.getCurrentOrGuest();
 			while (cur != null) {
@@ -131,6 +142,19 @@ public class AccessCmd implements Action {
 				return api.hasGroupAccess(ac, parameters[1], null, null);
 		} else
 		if (cmd.equals("info")) {
+			if (parameters == null || parameters.length == 0) {
+				Account ac = api.getCurrentAccount();
+				System.out.println(ac);
+				for (Entry<String, Object> attr : ac.getAttributes().entrySet()) {
+					System.out.println(attr.getKey() + "=" + attr.getValue());
+				}
+				try {
+					ModifyAccountApi modify = api.getModifyAccountApi();
+					for (String group : modify.getGroups(parameters[1])) {
+						System.out.println("Group: " + group);
+					}
+				} catch (Throwable t) {}
+			} else
 			if (parameters[0].equals("user")) {
 				Account ac = api.getAccount(parameters[1]);
 				System.out.println(ac);
@@ -175,6 +199,46 @@ public class AccessCmd implements Action {
 		} else
 		if (cmd.equals("md5")) {
 			System.out.println( MPassword.encodePasswordMD5(parameters[0]) );
+		} else
+		if (cmd.equals("passwd")) {
+			Account current = api.getCurrentAccount();
+			ModifyCurrentAccountApi modify = api.getModifyCurrentAccountApi();
+			if (modify == null) {
+				System.out.println("Modify is not supported");
+				return null;
+			}
+			System.out.println("Change password for " + current.getName());
+			String newPw = null;
+			if (parameters != null && parameters.length > 0 && parameters[0] != null) {
+				newPw = parameters[0];
+			} else {
+				System.out.print("New Password: ");
+				System.out.flush();
+				newPw = Console.get().readPassword();
+				System.out.print("Again Password: ");
+				System.out.flush();
+				if (!newPw.equals(Console.get().readPassword())) {
+					System.out.println("Passwords do not equal");
+					return null;
+				}
+			}
+			modify.changePassword(newPw);
+			current.reload();
+			System.out.println("Changed");
+		} else
+		if (cmd.equals("modify")) {
+			Account current = api.getCurrentAccount();
+			ModifyCurrentAccountApi modify = api.getModifyCurrentAccountApi();
+			if (modify == null) {
+				System.out.println("Modify is not supported");
+				return null;
+			}
+			System.out.println("Modify account for " + current.getName());
+			MProperties p = MProperties.explodeToMProperties(parameters);
+			p.putReadProperties(current.getAttributes());
+			modify.changeAccount(p);
+			System.out.println("Changed, Current " + current.reload());
+			
 		} else
 			System.out.println("Command not found: " + cmd);
 			

@@ -125,7 +125,7 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
 			try {
 				AccessApi aaa = MApi.lookup(AccessApi.class);
 				if (aaa != null)
-					acl = aaa.getResourceAccessAcl(aaa.getCurrenAccount(), "local.operation", desc.getPath(), "execute", acl);
+					acl = aaa.getResourceAccessAcl(aaa.getCurrentAccount(), "local.operation", desc.getPath(), "execute", acl);
 				else
 					log().w("AccessApi not found",desc,acl);
 			} catch (Throwable t) {
@@ -218,7 +218,7 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
 		if (aaa != null) {
 			try {
 				String acl = OperationUtil.getOption(desc.getTags(), OperationDescriptor.TAG_DEFAULT_ACL, "");
-				if (!aaa.hasResourceAccess(aaa.getCurrenAccount(), "local.operation", desc.getPath(), "execute", acl))
+				if (!aaa.hasResourceAccess(aaa.getCurrentAccount(), "local.operation", desc.getPath(), "execute", acl))
 					throw new AccessDeniedException("access denied",desc.getPath());
 			} catch (AccessDeniedException e) {
 				throw e;

@@ -82,5 +82,10 @@ public class AccountGuest implements Account {
 	public void putAttributes(IReadProperties properties) throws NotSupportedException {
 		// Special behavior - attributes are read only
 	}
+
+	@Override
+	public boolean reload() {
+		return false;
+	}
 	
 }

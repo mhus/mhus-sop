@@ -55,34 +55,10 @@ public class AccountFile extends MLog implements Account {
 	private MProperties attributes = new MProperties();
 	
 	public AccountFile(File f, String account) throws ParserConfigurationException, SAXException, IOException {
-		FileInputStream is = new FileInputStream(f);
-		doc = MXml.loadXml(is);
-		is.close();
 		this.account = account;
 		valide = account != null;
 		file = f;
-		modified = f.lastModified();
-		
-		
-		Element pwE = MXml.getElementByPath(doc.getDocumentElement(),"password");
-		if (pwE != null)
-				passwordMd5 = MCrypt.md5WithSalt(MPassword.decode( pwE.getAttribute("plain") ));
-		name = MXml.getElementByPath(doc.getDocumentElement(),"information").getAttribute("name");
-		
-		timeout = MCast.tolong( doc.getDocumentElement().getAttribute("timeout"), 0);
-		
-		{
-			Element xmlAcl = MXml.getElementByPath(doc.getDocumentElement(), "groups");
-			for (Element xmlAce : MXml.getLocalElementIterator(xmlAcl,"group")) {
-				groups.add(xmlAce.getAttribute("name").trim().toLowerCase());
-			}
-		}
-		{
-			Element xmlAcl = MXml.getElementByPath(doc.getDocumentElement(), "attributes");
-			for (Element xmlAce : MXml.getLocalElementIterator(xmlAcl,"attribute")) {
-				attributes.setString(xmlAce.getAttribute("name"), xmlAce.getAttribute("value"));
-			}
-		}
+		reloadInternal();
 	}
 
 	@Override
@@ -180,6 +156,48 @@ public class AccountFile extends MLog implements Account {
 	@Override
 	public String[] getGroups() throws NotSupportedException {
 		return groups.toArray(new String[groups.size()]);
+	}
+
+	@Override
+	public boolean reload()  {
+		try {
+			reloadInternal();
+			return true;
+		} catch (ParserConfigurationException | SAXException | IOException e) {
+			log().d(name,e);
+		}
+		return false;
+	}
+	
+	public void reloadInternal() throws ParserConfigurationException, SAXException, IOException {
+		FileInputStream is = new FileInputStream(file);
+		doc = MXml.loadXml(is);
+		is.close();
+		
+		modified = file.lastModified();
+		
+		Element pwE = MXml.getElementByPath(doc.getDocumentElement(),"password");
+		if (pwE != null)
+				passwordMd5 = MCrypt.md5WithSalt(MPassword.decode( pwE.getAttribute("plain") ));
+		name = MXml.getElementByPath(doc.getDocumentElement(),"information").getAttribute("name");
+		
+		timeout = MCast.tolong( doc.getDocumentElement().getAttribute("timeout"), 0);
+		
+		{
+			Element xmlAcl = MXml.getElementByPath(doc.getDocumentElement(), "groups");
+			groups.clear();
+			for (Element xmlAce : MXml.getLocalElementIterator(xmlAcl,"group")) {
+				groups.add(xmlAce.getAttribute("name").trim().toLowerCase());
+			}
+		}
+		{
+			Element xmlAcl = MXml.getElementByPath(doc.getDocumentElement(), "attributes");
+			attributes.clear();
+			for (Element xmlAce : MXml.getLocalElementIterator(xmlAcl,"attribute")) {
+				attributes.setString(xmlAce.getAttribute("name"), xmlAce.getAttribute("value"));
+			}
+		}
+
 	}
 
 }
