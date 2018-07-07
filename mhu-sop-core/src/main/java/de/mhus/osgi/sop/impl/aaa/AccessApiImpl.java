@@ -30,6 +30,7 @@ import de.mhus.lib.core.security.AccountSource;
 import de.mhus.lib.core.security.AuthorizationSource;
 import de.mhus.lib.core.security.ModifyAccountApi;
 import de.mhus.lib.core.security.ModifyAuthorizationApi;
+import de.mhus.lib.core.security.ModifyCurrentAccountApi;
 import de.mhus.lib.core.util.SoftHashMap;
 import de.mhus.lib.errors.AccessDeniedException;
 import de.mhus.lib.errors.MException;
@@ -483,6 +484,15 @@ public class AccessApiImpl extends MLog implements AccessApi {
 		if (!AaaUtil.isCurrentAdmin()) throw new AccessDeniedException();
 		if (trustSource == null ) return null;
 		return trustSource.getModifyApi();
+	}
+
+	@Override
+	public ModifyCurrentAccountApi getModifyCurrentAccountApi() throws MException {
+		// do not check for admin, but set to current account
+		if (accountSource == null) return null;
+		Account current = getCurrenAccount();
+		if (current.isSynthetic() || !current.isValid()) return null; // not supported
+		return new ModifyCurrentAccount(current, accountSource);
 	}
 	
 }

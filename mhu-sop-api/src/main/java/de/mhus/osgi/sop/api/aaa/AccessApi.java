@@ -20,6 +20,7 @@ import java.util.Locale;
 import de.mhus.lib.core.security.Account;
 import de.mhus.lib.core.security.ModifyAccountApi;
 import de.mhus.lib.core.security.ModifyAuthorizationApi;
+import de.mhus.lib.core.security.ModifyCurrentAccountApi;
 import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.SApi;
 
@@ -175,6 +176,13 @@ public interface AccessApi extends SApi {
 	 */
 	AaaContext processUserSession(String user, Locale locale);
 
+	/**
+	 * Return a API to modify the current user.
+	 * @return The API or null if not supported
+	 * @throws MException if current user can't be located (see getCurrentAccount)
+	 */
+	ModifyCurrentAccountApi getModifyCurrentAccountApi() throws MException;
+	
 	/**
 	 * Return a API to modify Accounts. It's usually the AccountSource.
 	 * @return The API or null if not supported
