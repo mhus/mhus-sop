@@ -103,7 +103,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	@Activate
 	public void doActivate(ComponentContext ctx) {
 		MApi.get().getCfgManager().registerCfgProvider(RegistryApi.class.getCanonicalName(), this);
-		pathControllerTracker.start();
+		pathControllerTracker.start(ctx);
 		load(false);
 		MThread.asynchron(new Runnable() {
 			
