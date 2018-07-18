@@ -29,9 +29,11 @@ import aQute.bnd.annotation.component.Deactivate;
 import de.mhus.lib.adb.DbManager;
 import de.mhus.lib.adb.DbSchema;
 import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.cfg.CfgBoolean;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.sql.DataSourceProvider;
 import de.mhus.lib.sql.DbPool;
+import de.mhus.lib.sql.DefaultDbPool;
 import de.mhus.lib.sql.PseudoDbPool;
 import de.mhus.osgi.services.adb.DbManagerService;
 import de.mhus.osgi.services.adb.DbManagerServiceImpl;
@@ -39,6 +41,8 @@ import de.mhus.osgi.sop.api.adb.DbSchemaService;
 
 @Component(provide=DbManagerService.class,immediate=true)
 public class SopDbManagerService extends DbManagerServiceImpl {
+	
+	private static final CfgBoolean CFG_USE_PSEUDO = new CfgBoolean(DbSchemaService.class, "usePseudoPool", false);
 	
 	private ServiceTracker<DbSchemaService,DbSchemaService> tracker;
 	private TreeMap<String,DbSchemaService> schemaList = new TreeMap<>();
@@ -74,7 +78,10 @@ public class SopDbManagerService extends DbManagerServiceImpl {
 
 	@Override
 	protected DbPool doCreateDataPool() {
-		return new PseudoDbPool(new DataSourceProvider(getDataSource(), doCreateDialect(), doCreateConfig(), doCreateActivator() ));
+		if (CFG_USE_PSEUDO.value())
+			return new PseudoDbPool(new DataSourceProvider(getDataSource(), doCreateDialect(), doCreateConfig(), doCreateActivator() ));
+		else
+			return new DefaultDbPool(new DataSourceProvider(getDataSource(), doCreateDialect(), doCreateConfig(), doCreateActivator() ));
 	}
 	
 	private class MyTrackerCustomizer implements ServiceTrackerCustomizer<DbSchemaService, DbSchemaService> {
