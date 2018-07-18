@@ -15,6 +15,7 @@
  */
 package de.mhus.osgi.sop.api.mailqueue;
 
+import java.util.Date;
 import java.util.UUID;
 
 import de.mhus.lib.errors.MException;
@@ -45,5 +46,14 @@ public interface MailQueueOperation {
 	 * @throws MException
 	 */
 	STATUS getStatus(UUID id) throws MException;
+	
+	/**
+	 * Return the last send attempt. In case of success the time of
+	 * time of sent.
+	 * @param id 
+	 * @return The date or null if not set
+	 * @throws MException Throws if id is not found
+	 */
+	Date getLastSendAttempt(UUID id) throws MException;
 	
 }

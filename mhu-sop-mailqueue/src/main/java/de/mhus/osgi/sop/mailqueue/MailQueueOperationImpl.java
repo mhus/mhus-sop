@@ -16,6 +16,7 @@
 package de.mhus.osgi.sop.mailqueue;
 
 import java.io.File;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -134,6 +135,14 @@ public class MailQueueOperationImpl extends OperationToIfcProxy implements MailQ
 		SopMailTask task = api.getManager().getObject(SopMailTask.class, id);
 		if (task == null) throw new NotFoundException(id);
 		return task.getStatus();
+	}
+
+	@Override
+	public Date getLastSendAttempt(UUID id) throws MException {
+		SopApi api = MApi.lookup(SopApi.class);
+		SopMailTask task = api.getManager().getObject(SopMailTask.class, id);
+		if (task == null) throw new NotFoundException(id);
+		return task.getLastSendAttempt();
 	}
 
 }
