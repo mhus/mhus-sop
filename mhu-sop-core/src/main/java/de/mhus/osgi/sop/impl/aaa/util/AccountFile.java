@@ -30,6 +30,7 @@ import org.xml.sax.SAXException;
 import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCast;
+import de.mhus.lib.core.MConstants;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MPassword;
 import de.mhus.lib.core.MProperties;
@@ -107,7 +108,7 @@ public class AccountFile extends MLog implements Account {
 
 	@Override
 	public String getDisplayName() {
-		return name;
+		return attributes.getString(MConstants.ADDR_DISPLAY_NAME, name);
 	}
 	
 	public long getTimeout() {

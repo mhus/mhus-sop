@@ -14,6 +14,8 @@ import de.mhus.osgi.sop.api.foundation.model.SopJournal;
 
 public interface FoundationApi {
 
+	public static final String DEFAULT_GROUP = "";
+	
 	SopJournal appendJournalEntry(UUID foundation, String queue, String event, String ... data) throws MException;
 
 	List<SopJournal> getJournalEntries(String queue, long since, int max) throws MException;

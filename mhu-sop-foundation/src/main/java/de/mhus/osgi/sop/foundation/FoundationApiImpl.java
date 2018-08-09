@@ -53,7 +53,7 @@ import de.mhus.osgi.sop.api.foundation.model.SopFoundationGroup;
 import de.mhus.osgi.sop.api.foundation.model.SopJournal;
 import de.mhus.osgi.sop.api.rest.RestUtil;
 
-@Component(immediate=true,provide=SopApi.class,name="FoundationApi")
+@Component(immediate=true,name="FoundationApi")
 public class FoundationApiImpl extends MLog implements FoundationApi {
 
 	@SuppressWarnings("unused")

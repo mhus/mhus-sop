@@ -40,20 +40,20 @@ public class AaaUtil {
 			for (String line : acl) {
 				if (line == null) continue;
 				line = line.trim();
-				if (line.length() == 0 || line.startsWith("#")) continue;
-				if (line.startsWith("not:")) {
+				if (line.length() == 0 || line.startsWith(AccessApi.ACCESS_COMMENT)) continue;
+				if (line.startsWith(AccessApi.ACCESS_NOT)) {
 					line = line.substring(4);
 					if (accessControl.hasGroup(line)) return false;
 				} else
-				if (line.startsWith("notuser:")) {
+				if (line.startsWith(AccessApi.ACCESS_NOT_USER)) {
 					line = line.substring(8);
 					if (accessControl.getName().equals(line)) return false;
 				} else
-				if (line.startsWith("user:")) {
+				if (line.startsWith(AccessApi.ACCESS_USER)) {
 					line = line.substring(5);
 					if (accessControl.getName().equals(line)) return true;
 				} else
-				if (line.equals("*") || accessControl.hasGroup(line)) return true;
+				if (line.equals(AccessApi.ACCESS_ALL) || accessControl.hasGroup(line)) return true;
 			}
 		} catch (Throwable t) {
 			log.d(acl, accessControl, t);
@@ -70,20 +70,20 @@ public class AaaUtil {
 			for (String line : acl) {
 				if (line == null) continue;
 				line = line.trim();
-				if (line.length() == 0 || line.startsWith("#")) continue;
-				if (line.startsWith("not:")) {
+				if (line.length() == 0 || line.startsWith(AccessApi.ACCESS_COMMENT)) continue;
+				if (line.startsWith(AccessApi.ACCESS_NOT)) {
 					line = line.substring(4);
 					if (accessControl.hasGroup(line)) return false;
 				} else
-				if (line.startsWith("notuser:")) {
+				if (line.startsWith(AccessApi.ACCESS_NOT_USER)) {
 					line = line.substring(8);
 					if (accessControl.getName().equals(line)) return false;
 				} else
-				if (line.startsWith("user:")) {
+				if (line.startsWith(AccessApi.ACCESS_USER)) {
 					line = line.substring(5);
 					if (accessControl.getName().equals(line)) return true;
 				} else
-				if (line.equals("*") || accessControl.hasGroup(line)) return true;
+				if (line.equals(AccessApi.ACCESS_ALL) || accessControl.hasGroup(line)) return true;
 			}
 		} catch (Throwable t) {
 			log.d(acl, accessControl, t);
@@ -94,7 +94,7 @@ public class AaaUtil {
 
 	public static boolean hasAccess(Account account, String acl) {
 		if (acl == null) return false;
-		String[] parts = acl.split(",");
+		String[] parts = acl.split(AccessApi.ACCESS_SEPARATOR);
 		return hasAccess(account, parts);
 	}
 
@@ -109,8 +109,8 @@ public class AaaUtil {
 
 		try {
 			for (String line : acl) {
-				if (line == null || line.length() == 0 || line.startsWith("#")) continue;
-				int p = line.indexOf('=');
+				if (line == null || line.length() == 0 || line.startsWith(AccessApi.ACCESS_COMMENT)) continue;
+				int p = line.indexOf(AccessApi.ACCESS_IS);
 				String rule = line;
 				String ace = Ace.RIGHTS_NONE;
 				if (p >= 0) {
@@ -119,11 +119,11 @@ public class AaaUtil {
 				}
 				rule = rule.trim();
 				ace = ace.trim();
-				if (rule.startsWith("user:")) {
+				if (rule.startsWith(AccessApi.ACCESS_USER)) {
 					rule = rule.substring(5);
 					if (accessControl.getName().equals(rule)) return new Ace(ace);
 				} else
-				if (rule.equals("*") || accessControl.hasGroup(rule)) return new Ace(ace);
+				if (rule.equals(AccessApi.ACCESS_ALL) || accessControl.hasGroup(rule)) return new Ace(ace);
 			}
 		} catch (Throwable t) {
 			log.d(acl, accessControl, t);
@@ -134,7 +134,7 @@ public class AaaUtil {
 	
 	public static Ace getAccessAce(AaaContext context, String acl) {
 		if (context.isAdminMode()) return Ace.ACE_ALL;
-		return getAccessAce(context.getAccount(), acl.split(","));
+		return getAccessAce(context.getAccount(), acl.split(AccessApi.ACCESS_SEPARATOR));
 	}
 	
 	public static Ace getAccessAce(AaaContext context, String[] acl) {
@@ -148,8 +148,8 @@ public class AaaUtil {
 
 		try {
 			for (String line : acl) {
-				if (line == null || line.length() == 0 || line.startsWith("#")) continue;
-				int p = line.indexOf('=');
+				if (line == null || line.length() == 0 || line.startsWith(AccessApi.ACCESS_COMMENT)) continue;
+				int p = line.indexOf(AccessApi.ACCESS_IS);
 				String rule = line;
 				String ace = Ace.RIGHTS_NONE;
 				if (p >= 0) {
@@ -158,11 +158,11 @@ public class AaaUtil {
 				}
 				rule = rule.trim();
 				ace = ace.trim();
-				if (rule.startsWith("user:")) {
+				if (rule.startsWith(AccessApi.ACCESS_USER)) {
 					rule = rule.substring(5);
 					if (accessControl.getName().equals(rule)) return new Ace(ace);
 				} else
-				if (rule.equals("*") || accessControl.hasGroup(rule)) return new Ace(ace);
+				if (rule.equals(AccessApi.ACCESS_ALL) || accessControl.hasGroup(rule)) return new Ace(ace);
 			}
 		} catch (Throwable t) {
 			log.d(acl, accessControl, t);

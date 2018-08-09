@@ -49,6 +49,13 @@ public interface AccessApi extends SApi {
 	
 	public static final String ROOT_NAME = "root";
 	public static final String GUEST_NAME = "guest";
+	public static final String ACCESS_NOT = "not:";
+	public static final String ACCESS_NOT_USER = "notuser:";
+	public static final String ACCESS_USER = "user:";
+	public static final String ACCESS_SEPARATOR = ",";
+	public static final String ACCESS_ALL = "*";
+	public static final String ACCESS_COMMENT = "#";
+	public static final char ACCESS_IS = '=';
 	
 	AaaContext process(String ticket, Locale locale);
 	AaaContext release(String ticket);

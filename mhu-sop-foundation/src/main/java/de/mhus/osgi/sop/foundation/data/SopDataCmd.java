@@ -69,7 +69,10 @@ public class SopDataCmd implements Action {
 	public Object execute() throws Exception {
 		
 		FoundationApi api = MApi.lookup(FoundationApi.class);
-		
+		if (api == null) {
+			System.out.println("*** API not found");
+			return null;
+		}
 		if (cmd.equals("list")) {
 			SopFoundation found = api.getFoundation(params[0]);
 			

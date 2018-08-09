@@ -45,7 +45,7 @@ public class SopAcl extends DbMetadata implements AclControlled {
 
 	@Override
 	public String getAcl() {
-		return "*=" + Ace.RIGHTS_RO;
+		return "*=" + Ace.RIGHTS_RO; // this is the right to access THIS acl object
 	}
 
 	public String getList() {
