@@ -21,4 +21,9 @@ public abstract class AbstractNode<T> extends MLog implements RestNodeService {
 		}
 	}
 
+	@Override
+	public String getDefaultAcl() {
+		return null;
+	}
+
 }

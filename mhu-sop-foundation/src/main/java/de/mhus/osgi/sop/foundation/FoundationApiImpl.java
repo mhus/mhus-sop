@@ -198,6 +198,8 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 					String val = MString.afterIndex(part, ':');
 					
 					switch(key) {
+					case "value0":
+						query.eq("value0",val);break;
 					case "value1":
 						query.eq("value1",val);break;
 					case "value2":
@@ -208,6 +210,16 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 						query.eq("value4",val);break;
 					case "value5":
 						query.eq("value5",val);break;
+					case "value6":
+						query.eq("value6",val);break;
+					case "value7":
+						query.eq("value7",val);break;
+					case "value8":
+						query.eq("value8",val);break;
+					case "value9":
+						query.eq("value9",val);break;
+					case "*value0*":
+						query.like("value0","%"+val+"%");break;
 					case "*value1*":
 						query.like("value1","%"+val+"%");break;
 					case "*value2*":
@@ -218,6 +230,14 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 						query.like("value4","%"+val+"%");break;
 					case "*value5*":
 						query.like("value5","%"+val+"%");break;
+					case "*value6*":
+						query.like("value6","%"+val+"%");break;
+					case "*value7*":
+						query.like("value7","%"+val+"%");break;
+					case "*value8*":
+						query.like("value8","%"+val+"%");break;
+					case "*value9*":
+						query.like("value9","%"+val+"%");break;
 					case "writable":
 						query.eq("iswritable", MCast.toboolean(val, false));break;
 					case "archived":
@@ -233,7 +253,7 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 	//					query.eq("archived", true);
 						
 				} else {
-					query.or( Db.eq("foreignid", part), Db.like("value1", "%"+part+"%"),Db.like("value2", "%"+part+"%"),Db.like("value3", "%"+part+"%"),Db.like("value4", "%"+part+"%"),Db.like("value5", "%"+part+"%")  );
+					query.or( Db.eq("foreignid", part), Db.like("value0", "%"+part+"%"), Db.like("value1", "%"+part+"%"),Db.like("value2", "%"+part+"%"),Db.like("value3", "%"+part+"%"),Db.like("value4", "%"+part+"%"),Db.like("value5", "%"+part+"%"),Db.like("value6", "%"+part+"%") ,Db.like("value7", "%"+part+"%"),Db.like("value8", "%"+part+"%"),Db.like("value9", "%"+part+"%") );
 				}
 			}
 		}
@@ -285,7 +305,6 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 		return out;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public SopData getSopDataByForeignId(UUID orgaId, String type, String id) throws MException {
 		return getManager().getObjectByQualification(Db.query(SopData.class)

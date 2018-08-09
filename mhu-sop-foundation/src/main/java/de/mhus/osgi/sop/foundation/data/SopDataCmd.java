@@ -46,7 +46,7 @@ public class SopDataCmd implements Action {
 			+ " list <foundId> [<type>] [<search>]\n"
 			+ " set <id> [<data>]* (data:=)\n"
 			+ " get <id>\n"
-			+ " create <found> <type> [<data>]* (data:=_value1..5=value|_foreignid=value|public|rw|ro|key=value)\n"
+			+ " create <found> <type> [<data>]* (data:=_value0..9=value|_foreignid=value|public|rw|ro|key=value)\n"
 			+ " touch [found|id] [found:<type>]\n"
 			+ " delete <id>\n"
 			+ " ro/rw/public/private/sync/archive/unarchive <id>\n"
@@ -74,10 +74,46 @@ public class SopDataCmd implements Action {
 			SopFoundation found = api.getFoundation(params[0]);
 			
 			ConsoleTable out = new ConsoleTable();
-			out.setHeaderValues("id","type","public","writable","foreignid","archived","value1","value2","value3","value4","value5","ForeignDate");
+			out.setHeaderValues(
+					"id",
+					"type",
+					"public",
+					"writable",
+					"foreignid",
+					"archived",
+					"v0",
+					"v1",
+					"v2",
+					"v3",
+					"v4",
+					"v5",
+					"v6",
+					"v7",
+					"v8",
+					"v9",
+					"ForeignDate"
+				);
 			List<SopData> res = api.getSopData(found.getId(), params.length > 1 ? params[1] : null, params.length > 2 ? params[2] : null, false, all ? null : false, null);
 			for (SopData d : res) {
-				out.addRowValues(d.getId(),d.getType(),d.isIsPublic(),d.isIsWritable(),d.getForeignId(),d.isArchived(),d.getValue1(),d.getValue2(),d.getValue3(),d.getValue4(),d.getValue5(),d.getForeignDate());
+				out.addRowValues(
+						d.getId(),
+						d.getType(),
+						d.isIsPublic(),
+						d.isIsWritable(),
+						d.getForeignId(),
+						d.isArchived(),
+						d.getValue0(),
+						d.getValue1(),
+						d.getValue2(),
+						d.getValue3(),
+						d.getValue4(),
+						d.getValue5(),
+						d.getValue6(),
+						d.getValue7(),
+						d.getValue8(),
+						d.getValue9(),
+						d.getForeignDate()
+					);
 			}
 			out.print(System.out);
 		} else
@@ -96,11 +132,16 @@ public class SopDataCmd implements Action {
 			System.out.println("Archived    : " + d.isArchived());
 			System.out.println("ForeignId   : " + d.getForeignId());
 			System.out.println("ForeignDate : " + d.getForeignDate());
+			System.out.println("Value0      : " + d.getValue0());
 			System.out.println("Value1      : " + d.getValue1());
 			System.out.println("Value2      : " + d.getValue2());
 			System.out.println("Value3      : " + d.getValue3());
 			System.out.println("Value4      : " + d.getValue4());
 			System.out.println("Value5      : " + d.getValue5());
+			System.out.println("Value6      : " + d.getValue6());
+			System.out.println("Value7      : " + d.getValue7());
+			System.out.println("Value8      : " + d.getValue8());
+			System.out.println("Value9      : " + d.getValue9());
 			System.out.println("--- Technical");
 			System.out.println("LastSync    : " + d.getLastSync());
 			System.out.println("LastSyncTry : " + d.getLastSyncTry());
@@ -131,6 +172,9 @@ public class SopDataCmd implements Action {
 				if (key.equals("_due")) {
 					d.setDue(MDate.toDate(val, null));
 				} else
+				if (key.equals("_value0")) {
+					d.setValue0(val);
+				} else
 				if (key.equals("_value1")) {
 					d.setValue1(val);
 				} else
@@ -145,6 +189,18 @@ public class SopDataCmd implements Action {
 				} else
 				if (key.equals("_value5")) {
 					d.setValue5(val);
+				} else
+				if (key.equals("_value6")) {
+					d.setValue6(val);
+				} else
+				if (key.equals("_value7")) {
+					d.setValue7(val);
+				} else
+				if (key.equals("_value8")) {
+					d.setValue8(val);
+				} else
+				if (key.equals("_value9")) {
+					d.setValue9(val);
 				} else {
 					d.getData().setString(key, val);
 				}
@@ -202,6 +258,9 @@ public class SopDataCmd implements Action {
 					if (key.equals("_due")) {
 						d.setDue(MDate.toDate(val, null));
 					} else
+					if (key.equals("_value0")) {
+						d.setValue0(val);
+					} else
 					if (key.equals("_value1")) {
 						d.setValue1(val);
 					} else
@@ -216,6 +275,18 @@ public class SopDataCmd implements Action {
 					} else
 					if (key.equals("_value5")) {
 						d.setValue5(val);
+					} else
+					if (key.equals("_value6")) {
+						d.setValue6(val);
+					} else
+					if (key.equals("_value7")) {
+						d.setValue7(val);
+					} else
+					if (key.equals("_value8")) {
+						d.setValue8(val);
+					} else
+					if (key.equals("_value9")) {
+						d.setValue9(val);
 					} else
 					if (key.equals("_writable")) {
 						d.setWritable(MCast.toboolean(val, false));

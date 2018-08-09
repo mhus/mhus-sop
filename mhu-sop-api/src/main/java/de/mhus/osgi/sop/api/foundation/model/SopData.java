@@ -45,32 +45,59 @@ public class SopData extends DbMetadata implements FoundationRelated {
 	
 	@DbPersistent(ro=true)
 	@Public
-	@DbIndex({"t1","t2"})
+	@DbIndex({"t3","t1","v0","v1","v2","v3","v4","v5","v6","v7","v8","v9"})
 	private String type;
 	@DbPersistent
 	@Public
-	@DbIndex({"t2"})
+	@DbIndex({"v0"})
+	private String value0;
+	@DbPersistent
+	@Public
+	@DbIndex({"v1"})
 	private String value1;
 	@DbPersistent
 	@Public
+	@DbIndex({"v2"})
 	private String value2;
 	@DbPersistent
 	@Public
+	@DbIndex({"v3"})
 	private String value3;
 	@DbPersistent
 	@Public
+	@DbIndex({"v4"})
 	private String value4;
 	@DbPersistent
 	@Public
+	@DbIndex({"v5"})
 	private String value5;
 	@DbPersistent
 	@Public
+	@DbIndex({"v6"})
+	private String value6;
+	@DbPersistent
+	@Public
+	@DbIndex({"v7"})
+	private String value7;
+	@DbPersistent
+	@Public
+	@DbIndex({"v8"})
+	private String value8;
+	@DbPersistent
+	@Public
+	@DbIndex({"v9"})
+	private String value9;
+	@DbPersistent
+	@Public
+	@DbIndex({"t2"})
 	private Date due;
 	@DbPersistent
 	@Public
+	@DbIndex({"t1","v0","v1","v2","v3","v4","v5","v6","v7","v8","v9"})
 	private boolean archived;
 	@DbPersistent
 	@Public
+	@DbIndex({"t4"})
 	private String foreignId;
 	@DbPersistent
 	@Public
@@ -252,7 +279,7 @@ public class SopData extends DbMetadata implements FoundationRelated {
 	
 	@Override
 	public String toString() {
-		return MSystem.toString(this, getId(), type, value1, value2,value3,value4,value5,archived,foreignId,status);
+		return MSystem.toString(this, getId(), type, value0, value1, value2,value3,value4,value5,value6,value7,value8,value9,archived,foreignId,status);
 	}
 
 	public Date getForeignDate() {
@@ -261,6 +288,46 @@ public class SopData extends DbMetadata implements FoundationRelated {
 
 	public void setForeignDate(Date foreignDate) {
 		this.foreignDate = foreignDate;
+	}
+
+	public String getValue6() {
+		return value6;
+	}
+
+	public void setValue6(String value6) {
+		this.value6 = value6;
+	}
+
+	public String getValue7() {
+		return value7;
+	}
+
+	public void setValue7(String value7) {
+		this.value7 = value7;
+	}
+
+	public String getValue8() {
+		return value8;
+	}
+
+	public void setValue8(String value8) {
+		this.value8 = value8;
+	}
+
+	public String getValue9() {
+		return value9;
+	}
+
+	public void setValue9(String value9) {
+		this.value9 = value9;
+	}
+
+	public String getValue0() {
+		return value0;
+	}
+
+	public void setValue0(String value0) {
+		this.value0 = value0;
 	}
 
 }
