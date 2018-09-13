@@ -129,7 +129,7 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 		AQuery<SopJournal> query = Db.query(SopJournal.class).eq("queue", queue).eq("foundation", foundation);
 		if (since > 0)
 			query.gt(Db.attr("order"), Db.value(since));
-		query.asc("order");
+		query.desc("order");
 		DbCollection<SopJournal> res = getManager().getByQualification(query);
 		int cnt = 0;
 		LinkedList<SopJournal> out = new LinkedList<SopJournal>();
