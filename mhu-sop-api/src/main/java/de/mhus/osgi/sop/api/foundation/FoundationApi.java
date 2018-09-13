@@ -18,7 +18,7 @@ public interface FoundationApi {
 	
 	SopJournal appendJournalEntry(UUID foundation, String queue, String event, String ... data) throws MException;
 
-	List<SopJournal> getJournalEntries(String queue, long since, int max) throws MException;
+	List<SopJournal> getJournalEntries(UUID foundation, String queue, long since, int max) throws MException;
 
 	SopJournal getJournalEntry(String id) throws MException;
 

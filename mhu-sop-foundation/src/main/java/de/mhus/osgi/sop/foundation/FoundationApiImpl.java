@@ -125,8 +125,8 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 	}
 
 	@Override
-	public List<SopJournal> getJournalEntries(String queue, long since, int max) throws MException {
-		AQuery<SopJournal> query = Db.query(SopJournal.class).eq("queue", queue);
+	public List<SopJournal> getJournalEntries(UUID foundation, String queue, long since, int max) throws MException {
+		AQuery<SopJournal> query = Db.query(SopJournal.class).eq("queue", queue).eq("foundation", foundation);
 		if (since > 0)
 			query.gt(Db.attr("order"), Db.value(since));
 		query.asc("order");
@@ -136,8 +136,10 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 		for (SopJournal j : res) {
 			out.add(j);
 			cnt++;
-			if (cnt > 100)
+			if (cnt >= max) {
 				res.close();
+				break;
+			}
 		}
 		return out;
 	}

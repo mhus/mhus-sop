@@ -16,6 +16,7 @@
 package de.mhus.osgi.sop.foundation.rest;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
@@ -27,6 +28,7 @@ import de.mhus.lib.core.pojo.MPojo;
 import de.mhus.lib.core.pojo.PojoModelFactory;
 import de.mhus.osgi.sop.api.SopApi;
 import de.mhus.osgi.sop.api.foundation.FoundationApi;
+import de.mhus.osgi.sop.api.foundation.model.SopFoundation;
 import de.mhus.osgi.sop.api.foundation.model.SopJournal;
 import de.mhus.osgi.sop.api.rest.CallContext;
 import de.mhus.osgi.sop.api.rest.JsonListNode;
@@ -38,7 +40,7 @@ public class JournalRestNode extends JsonListNode<JournalQueue>{
 
 	@Override
 	public String[] getParentNodeIds() {
-		return new String[] {ROOT_ID};
+		return new String[] {ROOT_ID, FOUNDATION_ID};
 	}
 
 	@Override
@@ -55,12 +57,16 @@ public class JournalRestNode extends JsonListNode<JournalQueue>{
 		if (queue == null) return;
 		
 		long since = MCast.tolong( callContext.getParameter("_since"), 0);
+		int max = MCast.toint( callContext.getParameter("_max"), 100);
+		if (max < 1 || max > 100) max = 100;
+		
+		UUID foundationId = getObjectFromContext(callContext, SopFoundation.class).getId();
 		
 		FoundationApi api = MApi.lookup(FoundationApi.class);
 		SopApi sop = MApi.lookup(SopApi.class);
 		PojoModelFactory factory = sop.getDataPojoModelFactory();
 		ArrayNode list = result.createArrayNode();
-		List<SopJournal> res = api.getJournalEntries(queue.getName(), since, 100);
+		List<SopJournal> res = api.getJournalEntries(foundationId, queue.getName(), since, max);
 		for (SopJournal j : res) {
 			ObjectNode obj = list.addObject();
 			MPojo.pojoToJson(j, obj, factory);
