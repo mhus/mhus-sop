@@ -34,6 +34,7 @@ import de.mhus.lib.core.security.ModifyCurrentAccountApi;
 import de.mhus.lib.core.util.SoftHashMap;
 import de.mhus.lib.errors.AccessDeniedException;
 import de.mhus.lib.errors.MException;
+import de.mhus.lib.errors.NotFoundException;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AaaUtil;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
@@ -250,7 +251,7 @@ public class AccessApiImpl extends MLog implements AccessApi {
 		if (out != null)
 			return out;
 		
-		throw new AccessDeniedException("account not found",account);
+		throw new NotFoundException("account not found",account);
 	}
 
 	@Override
