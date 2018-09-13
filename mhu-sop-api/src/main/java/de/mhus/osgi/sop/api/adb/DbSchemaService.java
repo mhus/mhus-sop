@@ -44,5 +44,7 @@ public interface DbSchemaService {
 	void doCleanup();
 
 	void doPostInitialize(XdbService manager) throws Exception;
+
+	String getAcl(AaaContext context, Persistable obj) throws MException;
 	
 }

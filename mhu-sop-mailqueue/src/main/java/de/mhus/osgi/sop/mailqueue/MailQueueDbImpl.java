@@ -66,7 +66,7 @@ public class MailQueueDbImpl extends AbstractDbSchemaService {
 	}
 
 	@Override
-	protected String getAcl(AaaContext context, Persistable obj) throws MException {
+	public String getAcl(AaaContext context, Persistable obj) throws MException {
 		return AclControlled.ACL_ALL_ALL;
 	}
 

@@ -20,6 +20,7 @@ import java.util.UUID;
 
 import aQute.bnd.annotation.component.Component;
 import de.mhus.lib.adb.Persistable;
+import de.mhus.lib.basics.Ace;
 import de.mhus.lib.basics.UuidIdentificable;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.errors.MException;
@@ -217,8 +218,21 @@ public class SopDbImpl extends AbstractDbSchemaService {
 	}
 
 	@Override
-	protected String getAcl(AaaContext context, Persistable obj) throws MException {
-		
+	public String getAcl(AaaContext context, Persistable obj) throws MException {
+		if (obj == null) return null;
+		if (obj instanceof SopObjectParameter) {
+			SopObjectParameter o = (SopObjectParameter)obj;
+			if (o.getKey() == null || o.getKey().startsWith("private.")) return null;
+			if (o.getKey().startsWith("ro.")) return Ace.RIGHTS_RO;
+			
+			String type = o.getObjectType();
+			if (type == null) return null;
+			if (type.equals(SopObjectParameter.class.getCanonicalName())) return Ace.RIGHTS_ALL;
+			
+			DbSchemaService controller = MApi.lookup(AdbApi.class).getController(type);
+			Persistable parentObj = controller.getObject(type, o.getObjectId());
+			return controller.getAcl(context, parentObj);
+		}
 		return null;
 	}
 

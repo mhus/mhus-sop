@@ -94,4 +94,6 @@ public interface AdbApi extends SApi {
 
 	void collectRefereces(Persistable object, ReferenceCollector collector);
 
+	DbSchemaService getController(String type) throws MException;
+
 }

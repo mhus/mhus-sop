@@ -325,8 +325,9 @@ public class AdbApiImpl extends MLog implements AdbApi {
 		return out;
 	}
 
-
-	protected DbSchemaService getController(String type) throws MException {
+	@Override
+	public DbSchemaService 
+	getController(String type) throws MException {
 		init();
 		if (type == null) throw new MException("type is null");
 		DbSchemaService ret = controllers.get(type);

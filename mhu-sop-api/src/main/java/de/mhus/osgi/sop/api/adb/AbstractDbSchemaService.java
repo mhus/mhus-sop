@@ -102,10 +102,11 @@ public abstract class AbstractDbSchemaService extends MLog implements DbSchemaSe
 	/**
 	 * Return a corresponding acl to access the object.
 	 * @param obj
-	 * @return
+	 * @return The ACL
 	 * @throws MException 
 	 */
-	protected abstract String getAcl(AaaContext context, Persistable obj) throws MException;
+	@Override
+	public abstract String getAcl(AaaContext context, Persistable obj) throws MException;
 
 	@Override
 	public Persistable getObject(String type, UUID id) throws MException {

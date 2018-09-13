@@ -143,7 +143,7 @@ public class FoundationDbImpl extends AbstractDbSchemaService {
 	}
 
 	@Override
-	protected String getAcl(AaaContext context, Persistable obj) throws MException {
+	public String getAcl(AaaContext context, Persistable obj) throws MException {
 		
 		if (obj instanceof SopFoundationGroup) {
 			return Ace.RIGHTS_RO;

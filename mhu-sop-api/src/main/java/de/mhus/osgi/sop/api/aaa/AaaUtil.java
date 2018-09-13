@@ -155,6 +155,10 @@ public class AaaUtil {
 				if (p >= 0) {
 					rule = line.substring(0, p);
 					ace = line.substring(p+1);
+				} else {
+					// allow single access definitions like "r" for all
+					rule = AccessApi.ACCESS_ALL;
+					ace = line;
 				}
 				rule = rule.trim();
 				ace = ace.trim();
