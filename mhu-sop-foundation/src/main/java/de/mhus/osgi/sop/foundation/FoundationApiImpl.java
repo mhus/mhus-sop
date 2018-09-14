@@ -175,7 +175,7 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 
 	@Override
 	public List<SopData> getSopData(UUID foundId, String type, String search, boolean publicAccess, Boolean archived,
-	        Date due) throws MException {
+	        Date due, String order, int size) throws MException {
 		int 	page 	= RestUtil.getPageFromSearch(search);
 		String filter 	= RestUtil.getFilterFromSearch(search);
 		
@@ -264,9 +264,23 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 			if (archived != null)
 				query.eq(Db.attr("archived"), Db.value(archived.booleanValue()));
 
-		query.desc("foreignid");
-		
-		LinkedList<SopData> out = RestUtil.collectResults(getManager(),query,page);
+		if (order == null)
+			query.desc("foreignid");
+		else {
+			boolean asc = true;
+			if (order.endsWith(" desc")) {
+				asc = false;
+				order = MString.beforeLastIndex(order, ' ');
+			} else
+			if (order.endsWith(" asc")) {
+				order = MString.beforeLastIndex(order, ' ');
+			}
+			if (asc)
+				query.asc(order);
+			else
+				query.desc(order);
+		}
+		LinkedList<SopData> out = RestUtil.collectResults(getManager(),query,page, size);
 		return out;
 	}
 
@@ -383,7 +397,8 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 					SEARCH_HELPER_FOUNDATION
 				)
 				,
-				page
+				page,
+				0
 				);
 		
 		if (!context.isAdminMode() && out.size() < RestUtil.MAX_RETURN_SIZE ) {

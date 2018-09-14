@@ -123,13 +123,17 @@ public class RestUtil {
 		return search;
 	}
 
-	public static <T> LinkedList<T> collectResults(XdbService service, AQuery<T> query, int page) throws MException {
+	public static <T> LinkedList<T> collectResults(XdbService service, AQuery<T> query, int page, int size) throws MException {
 		LinkedList<T> list = new LinkedList<T>();
 		DbCollection<T> res = service.getByQualification(query);
-		if (!res.skip(page * PAGE_SIZE)) return list;
+		if (size <= 0)
+			size = PAGE_SIZE;
+		else
+			size = Math.min(PAGE_SIZE, size);
+		if (!res.skip(page * size)) return list;
 		while (res.hasNext()) {
 			list.add(res.next());
-			if (list.size() >= PAGE_SIZE) break;
+			if (list.size() >= size) break;
 		}
 		res.close();
 		return list;

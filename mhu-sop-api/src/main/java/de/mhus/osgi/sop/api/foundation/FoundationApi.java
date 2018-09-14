@@ -30,7 +30,7 @@ public interface FoundationApi {
 
 	SopDataController getDataSyncControllerForType(String type);
 
-	List<SopData> getSopData(UUID orgaId, String type, String search, boolean publicAccess, Boolean archived, Date due) throws MException;
+	List<SopData> getSopData(UUID orgaId, String type, String search, boolean publicAccess, Boolean archived, Date due, String order, int size) throws MException;
 
 	SopData getSopData(UUID orgaId, String id, boolean sync) throws MException;
 

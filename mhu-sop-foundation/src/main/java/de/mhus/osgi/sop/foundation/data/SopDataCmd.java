@@ -64,6 +64,12 @@ public class SopDataCmd implements Action {
 	
 	@Option(name="-s", aliases="--sync", description="Use build in sync mechanism while loading dataobject",required=false)
 	boolean sync = false;
+
+	@Option(name="-o", aliases="--order", description="Order",required=false)
+	String order = null;
+
+	@Option(name="-z", aliases="--size", description="Size per page",required=false)
+	int size = 0;
 	
 	@Override
 	public Object execute() throws Exception {
@@ -96,7 +102,16 @@ public class SopDataCmd implements Action {
 					"v9",
 					"ForeignDate"
 				);
-			List<SopData> res = api.getSopData(found.getId(), params.length > 1 ? params[1] : null, params.length > 2 ? params[2] : null, false, all ? null : false, null);
+			List<SopData> res = api.getSopData(
+					found.getId(), 
+					params.length > 1 ? params[1] : null, 
+					params.length > 2 ? params[2] : null, 
+					false, 
+					all ? null : false, 
+					null,
+					order,
+					size
+				);
 			for (SopData d : res) {
 				out.addRowValues(
 						d.getId(),
@@ -394,7 +409,13 @@ public class SopDataCmd implements Action {
 			} else {
 				SopFoundation found = api.getFoundation(params[0]);
 				System.out.println("foundnization: " + found);
-				List<SopData> res = api.getSopData(found.getId(), params.length > 1 ? params[1] : null, params.length > 2 ? params[2] : null, false, all ? null : false, null);
+				List<SopData> res = api.getSopData(
+						found.getId(), 
+						params.length > 1 ? params[1] : null, 
+						params.length > 2 ? params[2] : null, 
+						false, 
+						all ? null : false, 
+						null, order, size);
 				for (SopData d : res) {
 					SopDataController xcontroller = api.getDataSyncControllerForType(d.getType());
 					if (xcontroller != null) {
@@ -416,7 +437,13 @@ public class SopDataCmd implements Action {
 			} else {
 				SopFoundation found = api.getFoundation(params[0]);
 				System.out.println("foundnization: " + found);
-				List<SopData> res = api.getSopData(found.getId(), params.length > 1 ? params[1] : null, params.length > 2 ? params[2] : null, false, all ? null : false, null);
+				List<SopData> res = api.getSopData(
+						found.getId(), 
+						params.length > 1 ? params[1] : null, 
+						params.length > 2 ? params[2] : null, 
+						false, 
+						all ? null : false, 
+						null, order, size);
 				for (SopData d : res) {
 					api.syncSopData(d, true, true);
 					System.out.println("SYNCED " + d);
@@ -434,7 +461,7 @@ public class SopDataCmd implements Action {
 			
 			SopDataController xcontroller = api.getDataSyncControllerForType(type);
 			
-			List<SopData> list = api.getSopData(found.getId(), type, search, true, archived, due);
+			List<SopData> list = api.getSopData(found.getId(), type, search, true, archived, due, order, size);
 			
 			xcontroller.syncListBeforeLoad(found, type, search, archived, due, list);
 		}

@@ -68,6 +68,8 @@ public class DataNode extends AbstractObjectListNode<SopData>{
 		Boolean archived = false;
 		Date due = null;
 		String type = null;
+		int size = 0;
+		String order = null;
 		String search = callContext.getParameter(Node.SEARCH);
 		{
 			String v = callContext.getParameter("_archived");
@@ -82,6 +84,13 @@ public class DataNode extends AbstractObjectListNode<SopData>{
 			type = callContext.getParameter("_type");
 		}
 		{
+			String v = callContext.getParameter("_size");
+			if (v != null) size = MCast.toint(v, 0);
+		}
+		{
+			order = callContext.getParameter("_order");
+		}
+		{
 			if (search == null) search = "";
 			for (String name : callContext.getParameterNames()) {
 				if (name.startsWith("__") || !name.startsWith("_")) {
@@ -93,7 +102,7 @@ public class DataNode extends AbstractObjectListNode<SopData>{
 		if (type == null && !AaaUtil.isCurrentAdmin()) {
 			throw new RestException(OperationResult.USAGE, "no type specified");
 		}
-		List<SopData> ret = api.getSopData(orga.getId(), type, search, true, archived, due);
+		List<SopData> ret = api.getSopData(orga.getId(), type, search, true, archived, due, order, size);
 		
 		if (type != null) {
 			SopDataController control = api.getDataSyncControllerForType(type);
