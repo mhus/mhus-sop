@@ -223,6 +223,7 @@ public class SopDbImpl extends AbstractDbSchemaService {
 		if (obj instanceof SopObjectParameter) {
 			SopObjectParameter o = (SopObjectParameter)obj;
 			if (o.getKey() == null || o.getKey().startsWith("private.")) return null;
+			if (o.getKey() == null || o.getKey().startsWith("pub.")) return Ace.RIGHTS_ALL;
 			if (o.getKey().startsWith("ro.")) return Ace.RIGHTS_RO;
 			
 			String type = o.getObjectType();
@@ -232,6 +233,14 @@ public class SopDbImpl extends AbstractDbSchemaService {
 			DbSchemaService controller = MApi.lookup(AdbApi.class).getController(type);
 			Persistable parentObj = controller.getObject(type, o.getObjectId());
 			return controller.getAcl(context, parentObj);
+		}
+		if (obj instanceof SopRegister) {
+			SopRegister o = (SopRegister)obj;
+			String key = o.getKey1();
+			if (key == null) return Ace.RIGHTS_NONE;
+			if (key.startsWith("pub.")) return Ace.RIGHTS_ALL;
+			if (key.startsWith("ro.")) return Ace.RIGHTS_RO;
+			return Ace.RIGHTS_NONE;
 		}
 		return null;
 	}
