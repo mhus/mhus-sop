@@ -1,5 +1,9 @@
 package de.mhus.osgi.sop.api.mailqueue;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
+
 public class MailMessage {
 
 	private String source;
@@ -11,6 +15,7 @@ public class MailMessage {
 	private String content;
 	String[] attachments;
 	private boolean individual = true;
+	private List<UUID> tasks;
 	
 	public MailMessage(String source, String from, String to, String cc, String bcc, String subject,
 	        String content, String[] attachments, boolean individual) {
@@ -65,6 +70,16 @@ public class MailMessage {
 		for (int i = 0; i < out.length; i++)
 			out[i] = new MailMessage(source, from, toList[i], cc, bcc, subject, content, toList, individual);
 		return out;
+	}
+	
+	public void addTaskId(UUID id) {
+		if (tasks == null) tasks = new LinkedList<>();
+		tasks.add(id);
+	}
+	
+	public UUID[] getTasks() {
+		if (tasks == null) return new UUID[0];
+		return tasks.toArray(new UUID[tasks.size()]);
 	}
 	
 }

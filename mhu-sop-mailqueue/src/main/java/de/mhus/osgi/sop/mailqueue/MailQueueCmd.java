@@ -15,6 +15,7 @@
  */
 package de.mhus.osgi.sop.mailqueue;
 
+import java.util.Arrays;
 import java.util.UUID;
 
 import org.apache.karaf.shell.api.action.Action;
@@ -29,6 +30,7 @@ import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.lib.xdb.XdbService;
 import de.mhus.osgi.sop.api.SopApi;
+import de.mhus.osgi.sop.api.mailqueue.MailMessage;
 import de.mhus.osgi.sop.api.mailqueue.MailQueueOperation;
 import de.mhus.osgi.sop.api.mailqueue.MailQueueOperation.STATUS;
 import de.mhus.osgi.sop.api.mailqueue.MutableMailMessage;
@@ -115,8 +117,9 @@ public class MailQueueCmd implements Action {
 			msg.setCc(cc);
 			msg.setBcc(bcc);
 			msg.setIndividual(individual);
-			UUID id = mq.scheduleHtmlMail(msg.toMessage());
-			System.out.println("Scheduled as " + id);
+			MailMessage m = msg.toMessage();
+			mq.scheduleHtmlMail(m);
+			System.out.println("Scheduled as " + Arrays.toString(m.getTasks()));
 		} break;
 		case "status":{
 			MailQueueOperation mq = OperationUtil.getOperationIfc(MailQueueOperation.class);

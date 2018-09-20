@@ -42,24 +42,15 @@ import de.mhus.osgi.sop.api.util.SopUtil;
 public class MailQueueOperationImpl extends OperationToIfcProxy implements MailQueueOperation {
 
 	@Override
-	public UUID scheduleHtmlMail(String source, String from, String[] to, String subject, String content, String ... attachments) throws MException {
-		UUID res = null;
-		for (String t : to) {
-			UUID r = scheduleHtmlMail(source, from, t, subject, content, attachments);
-			if (res == null) res = r;
-		}
-		
-		return res;
-	}
-
-	public UUID scheduleHtmlMail(String source, String from, String to, String subject, String content, String ... attachments) throws MException {
-		return scheduleHtmlMail(new MailMessage(source, from, to, null, null, subject, content, attachments, false));
+	public UUID[] scheduleHtmlMail(String source, String from, String to, String subject, String content, String ... attachments) throws MException {
+		MailMessage msg = new MailMessage(source, from, to, null, null, subject, content, attachments, false);
+		scheduleHtmlMail(msg);
+		return msg.getTasks();
 	}
 	
 	@Override
-	public UUID scheduleHtmlMail(MailMessage mails) throws MException {
+	public void scheduleHtmlMail(MailMessage mails) throws MException {
 		SopApi api = MApi.lookup(SopApi.class);
-		UUID result = null;
 		// create task
 		for (MailMessage mail : mails.getSeparateMails()) {
 			SopMailTask task = api.getManager().inject(new SopMailTask(mail));
@@ -95,16 +86,15 @@ public class MailQueueOperationImpl extends OperationToIfcProxy implements MailQ
 				// set state of task
 				task.setStatus(STATUS.READY);
 				task.save();
-				result = task.getId();
+				mails.addTaskId(task.getId());
 			} catch (Throwable t) {
 				log().w(t);
 				task.setStatus(STATUS.ERROR_PREPARE);
 				task.setLastError(t.toString());
 				task.save();
-				return null;
+				return;
 			}
 		}
-		return result;
 	}
 
 	public static File getMailFolder(SopMailTask task) {

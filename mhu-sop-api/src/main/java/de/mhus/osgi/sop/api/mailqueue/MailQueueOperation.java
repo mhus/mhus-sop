@@ -34,19 +34,18 @@ public interface MailQueueOperation {
 	 * @param subject The subject as string
 	 * @param content The content as string or the File Queue uri starting with "dfq:"
 	 * @param attachments List of File Queue URIs to load the attachments
-	 * @return The first task id of the created tasks
+	 * @return The task ids of the created tasks
 	 * @throws MException 
 	 */
-	UUID scheduleHtmlMail(String source, String from, String[] to, String subject, String content, String ... attachments ) throws MException;
+	UUID[] scheduleHtmlMail(String source, String from, String to, String subject, String content, String ... attachments ) throws MException;
 
 	/**
 	 * Schedule the mail described in the mail message object.
 	 * 
 	 * @param message
-	 * @return The first task id of the created tasks
 	 * @throws MException
 	 */
-	UUID scheduleHtmlMail(MailMessage message) throws MException;
+	void scheduleHtmlMail(MailMessage message) throws MException;
 	
 	/**
 	 * Return the send status of the mail
