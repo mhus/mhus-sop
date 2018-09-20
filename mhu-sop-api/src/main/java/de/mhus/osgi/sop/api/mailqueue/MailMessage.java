@@ -1,10 +1,14 @@
 package de.mhus.osgi.sop.api.mailqueue;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-public class MailMessage {
+public class MailMessage implements Externalizable {
 
 	private String source;
 	private String from;
@@ -16,6 +20,8 @@ public class MailMessage {
 	String[] attachments;
 	private boolean individual = true;
 	private List<UUID> tasks;
+	
+	public MailMessage() {}
 	
 	public MailMessage(String source, String from, String to, String cc, String bcc, String subject,
 	        String content, String[] attachments, boolean individual) {
@@ -80,6 +86,35 @@ public class MailMessage {
 	public UUID[] getTasks() {
 		if (tasks == null) return new UUID[0];
 		return tasks.toArray(new UUID[tasks.size()]);
+	}
+
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeObject(source);
+		out.writeObject(from);
+		out.writeObject(to);
+		out.writeObject(cc);
+		out.writeObject(bcc);
+		out.writeObject(subject);
+		out.writeObject(content);
+		out.writeObject(attachments);
+		out.writeBoolean(individual);
+		out.writeObject(tasks);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+		source = (String) in.readObject();
+		from = (String) in.readObject();
+		to = (String) in.readObject();
+		cc = (String) in.readObject();
+		bcc = (String) in.readObject();
+		subject = (String) in.readObject();
+		content = (String) in.readObject();
+		attachments = (String[]) in.readObject();
+		individual = in.readBoolean();
+		tasks = (List<UUID>) in.readObject();
 	}
 	
 }
