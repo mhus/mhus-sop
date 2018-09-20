@@ -89,7 +89,7 @@ public class MailQueueCmd implements Action {
 						task.getSource(),
 						task.getStatus(),
 						task.getNextSendAttempt(),
-						task.getTo(),
+						task.getTo() + (task.getCc() != null ? "\nCC:" + task.getCc() : "") + (task.getBcc() != null ? "\nBCC:" + task.getBcc() : ""),
 						task.getSubject(),
 						task.getSendAttempts(),
 						task.getCreationDate()
