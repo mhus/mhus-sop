@@ -34,6 +34,7 @@ import de.mhus.osgi.services.MOsgi;
 import de.mhus.osgi.sop.api.SopApi;
 import de.mhus.osgi.sop.api.dfs.DfsApi;
 import de.mhus.osgi.sop.api.dfs.FileQueueApi;
+import de.mhus.osgi.sop.api.mailqueue.MailMessage;
 import de.mhus.osgi.sop.api.mailqueue.MailQueueOperation;
 import de.mhus.osgi.sop.api.util.SopUtil;
 
@@ -52,49 +53,58 @@ public class MailQueueOperationImpl extends OperationToIfcProxy implements MailQ
 	}
 
 	public UUID scheduleHtmlMail(String source, String from, String to, String subject, String content, String ... attachments) throws MException {
+		return scheduleHtmlMail(new MailMessage(source, from, to, null, null, subject, content, attachments, false));
+	}
+	
+	@Override
+	public UUID scheduleHtmlMail(MailMessage mails) throws MException {
 		SopApi api = MApi.lookup(SopApi.class);
+		UUID result = null;
 		// create task
-		SopMailTask task = api.getManager().inject(new SopMailTask(source, from, to, subject));
-		task.save();
-		try {
-			// create folder
-			File dir = getMailFolder(task);
-			
-			if (content.startsWith(DfsApi.SCHEME_DFQ + ":")) {
-				FileQueueApi dfq = MApi.lookup(FileQueueApi.class);
-				File contentFrom = dfq.loadFile(MUri.toUri(content));
-				MFile.copyFile(contentFrom, new File(dir,"content.html"));
-			} else {
-				MFile.writeFile(new File(dir,"content.html"), content);
-			}
-			MProperties prop = new MProperties();
-			
-			if (attachments != null && attachments.length > 0) {
-				FileQueueApi dfq = MApi.lookup(FileQueueApi.class);
-				int cnt = 0;
-				for (String atta : attachments) {
-					File file = dfq.loadFile(MUri.toUri(atta));
-					File dest = new File(dir,"attachment" + cnt);
-					MFile.copyFile(file, dest);
-					prop.setString("attachment" + cnt, atta);
-					cnt++;
+		for (MailMessage mail : mails.getSeparateMails()) {
+			SopMailTask task = api.getManager().inject(new SopMailTask(mail));
+			task.save();
+			try {
+				// create folder
+				File dir = getMailFolder(task);
+				
+				if (mail.getContent().startsWith(DfsApi.SCHEME_DFQ + ":")) {
+					FileQueueApi dfq = MApi.lookup(FileQueueApi.class);
+					File contentFrom = dfq.loadFile(MUri.toUri(mail.getContent()));
+					MFile.copyFile(contentFrom, new File(dir,"content.html"));
+				} else {
+					MFile.writeFile(new File(dir,"content.html"), mail.getContent());
 				}
-				prop.setInt("attachments", cnt);
+				MProperties prop = new MProperties();
+				
+				if (mail.getAttachments() != null && mail.getAttachments().length > 0) {
+					FileQueueApi dfq = MApi.lookup(FileQueueApi.class);
+					int cnt = 0;
+					for (String atta : mail.getAttachments()) {
+						File file = dfq.loadFile(MUri.toUri(atta));
+						File dest = new File(dir,"attachment" + cnt);
+						MFile.copyFile(file, dest);
+						prop.setString("attachment" + cnt, atta);
+						cnt++;
+					}
+					prop.setInt("attachments", cnt);
+				}
+				
+				prop.save(new File(dir,"config.properties"));
+				
+				// set state of task
+				task.setStatus(STATUS.READY);
+				task.save();
+				result = task.getId();
+			} catch (Throwable t) {
+				log().w(t);
+				task.setStatus(STATUS.ERROR_PREPARE);
+				task.setLastError(t.toString());
+				task.save();
+				return null;
 			}
-			
-			prop.save(new File(dir,"config.properties"));
-			
-			// set state of task
-			task.setStatus(STATUS.READY);
-			task.save();
-			return task.getId();
-		} catch (Throwable t) {
-			log().w(t);
-			task.setStatus(STATUS.ERROR_PREPARE);
-			task.setLastError(t.toString());
-			task.save();
-			return null;
 		}
+		return result;
 	}
 
 	public static File getMailFolder(SopMailTask task) {

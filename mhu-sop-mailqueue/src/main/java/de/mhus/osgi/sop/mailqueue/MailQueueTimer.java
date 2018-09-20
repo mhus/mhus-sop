@@ -104,16 +104,20 @@ public class MailQueueTimer extends SchedulerServiceAdapter {
 		String html = MFile.readFile(new File(dir,"content.html"));
 		log().d("send",task);
 		String to = source.getString("to", task.getTo() );
-		String cc = source.getString("cc", null);
-		String bcc = source.getString("bcc", null);
+		String cc = source.getString("cc", task.getCc());
+		String bcc = source.getString("bcc", task.getBcc());
 		
-		MApi.lookup(MSendMail.class).sendHtmlMail(task.getFrom(), new String[] {to}, new String[] {cc}, new String[] {bcc}, task.getSubject(), html, attachments);
+		MApi.lookup(MSendMail.class).sendHtmlMail(task.getFrom(), toMailArray(to), toMailArray(cc), toMailArray(bcc), task.getSubject(), html, attachments);
 		
 		if (source.getBoolean("cleanupAfterSent", true)) {
 			log().d("cleanup",task,dir);
 			MFile.deleteDir(dir);
 		}
 		
+	}
+
+	private String[] toMailArray(String to) {
+		return to.split(";");
 	}
 	
 }

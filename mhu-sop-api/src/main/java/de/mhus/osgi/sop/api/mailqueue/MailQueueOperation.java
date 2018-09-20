@@ -25,7 +25,7 @@ public interface MailQueueOperation {
 	enum STATUS {NEW, READY, SENT, ERROR, ERROR_PREPARE, LOST};
 
 	/**
-	 * Will schedule the given mail content as html mail. And send a separate mail
+	 * Schedule the given mail content as html mail. And send a separate mail
 	 * to every recipient.
 	 * @param source 
 	 * 
@@ -39,6 +39,15 @@ public interface MailQueueOperation {
 	 */
 	UUID scheduleHtmlMail(String source, String from, String[] to, String subject, String content, String ... attachments ) throws MException;
 
+	/**
+	 * Schedule the mail described in the mail message object.
+	 * 
+	 * @param message
+	 * @return The first task id of the created tasks
+	 * @throws MException
+	 */
+	UUID scheduleHtmlMail(MailMessage message) throws MException;
+	
 	/**
 	 * Return the send status of the mail
 	 * @param id

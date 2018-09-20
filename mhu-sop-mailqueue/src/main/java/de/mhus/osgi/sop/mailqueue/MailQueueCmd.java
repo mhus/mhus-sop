@@ -31,6 +31,7 @@ import de.mhus.lib.xdb.XdbService;
 import de.mhus.osgi.sop.api.SopApi;
 import de.mhus.osgi.sop.api.mailqueue.MailQueueOperation;
 import de.mhus.osgi.sop.api.mailqueue.MailQueueOperation.STATUS;
+import de.mhus.osgi.sop.api.mailqueue.MutableMailMessage;
 import de.mhus.osgi.sop.api.operation.OperationUtil;
 
 @Command(scope = "sop", name = "mailqueue", description = "Main queue actions")
@@ -60,6 +61,15 @@ public class MailQueueCmd implements Action {
 	@Option(name="-ct", aliases="--table", description="Table output",required=false)
 	String ct;
 	
+	@Option(name="-cc", description="CC",required=false, multiValued=true)
+	String[] cc;
+	
+	@Option(name="-bcc", description="BCC",required=false, multiValued=true)
+	String[] bcc;
+	
+	@Option(name="-i", aliases="--individual", description="Individual Mails for each recipient",required=false)
+	boolean individual = false;
+
 	@Override
 	public Object execute() throws Exception {
 
@@ -96,7 +106,16 @@ public class MailQueueCmd implements Action {
 				for (int i = 5; i < parameters.length; i++)
 					attachments[i-5] = parameters[i];
 			}
-			UUID id = mq.scheduleHtmlMail(parameters[0], parameters[1], parameters[2].split(";"), parameters[3], parameters[4], attachments);
+			MutableMailMessage msg = new MutableMailMessage();
+			msg.setSource(parameters[0]);
+			msg.setFrom(parameters[1]);
+			msg.setTo(parameters[2]);
+			msg.setSubject(parameters[3]);
+			msg.setContent(parameters[4]);
+			msg.setCc(cc);
+			msg.setBcc(bcc);
+			msg.setIndividual(individual);
+			UUID id = mq.scheduleHtmlMail(msg.toMessage());
 			System.out.println("Scheduled as " + id);
 		} break;
 		case "status":{

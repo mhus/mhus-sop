@@ -23,6 +23,7 @@ import de.mhus.lib.annotations.adb.DbType;
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MSystem;
 import de.mhus.lib.errors.MException;
+import de.mhus.osgi.sop.api.mailqueue.MailMessage;
 import de.mhus.osgi.sop.api.mailqueue.MailQueueOperation;
 
 public class SopMailTask extends DbMetadata {
@@ -33,6 +34,10 @@ public class SopMailTask extends DbMetadata {
 	private String from;
 	@DbPersistent
 	private String to;
+	@DbPersistent
+	private String cc;
+	@DbPersistent
+	private String bcc;
 	@DbPersistent
 	private String subject;
 	@DbPersistent
@@ -48,10 +53,16 @@ public class SopMailTask extends DbMetadata {
 
 	public SopMailTask() {}
 	
-	public SopMailTask(String source, String from, String to, String subject) {
+	public SopMailTask(MailMessage mail) {
+		this(mail.getSource(), mail.getFrom(), mail.getTo(), mail.getCc(), mail.getBcc(), mail.getSubject());
+	}
+	
+	public SopMailTask(String source, String from, String to, String cc, String bcc, String subject) {
 		this.source = source;
 		this.from = from;
 		this.to = to;
+		this.cc = cc;
+		this.bcc = bcc;
 		this.subject = M.trunc(subject, 200);
 	}
 
@@ -98,6 +109,14 @@ public class SopMailTask extends DbMetadata {
 
 	public String getTo() {
 		return to;
+	}
+
+	public String getCc() {
+		return cc;
+	}
+
+	public String getBcc() {
+		return bcc;
 	}
 
 	public String getSubject() {
