@@ -117,6 +117,7 @@ public class MailQueueTimer extends SchedulerServiceAdapter {
 	}
 
 	private String[] toMailArray(String to) {
+		if (to == null) return null;
 		return to.split(";");
 	}
 	
