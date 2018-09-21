@@ -32,7 +32,7 @@ import de.mhus.osgi.sop.api.model.SopAcl;
 public class AclCmd implements Action {
 
 	@Argument(index=0, name="cmd", required=true, description=
-			"Command list <id>, get <id>, create <id> <acl>, set <id> <acl>", multiValued=false)
+			"Command list <id>, get <id>, create <id> <acl>, set <id> <acl>, delete <id>", multiValued=false)
 	String cmd;
 	
 	@Argument(index=1, name="parameters", required=false, description="More Parameters", multiValued=true)
@@ -54,11 +54,15 @@ public class AclCmd implements Action {
 		} break;
 		case "get": {
 			SopAcl acl = api.getAcl(parameters[0]);
-			System.out.println("Id      : " + acl.getId() );
-			System.out.println("Created : " + acl.getCreationDate());
-			System.out.println("Modified: " + acl.getModifyDate());
-			System.out.println("Target  : " + acl.getTarget());
-			System.out.println("ACL     : " + acl.getList());
+			if (acl == null)
+				System.out.println("ACL not found");
+			else {
+				System.out.println("Id      : " + acl.getId() );
+				System.out.println("Created : " + acl.getCreationDate());
+				System.out.println("Modified: " + acl.getModifyDate());
+				System.out.println("Target  : " + acl.getTarget());
+				System.out.println("ACL     : " + acl.getList());
+			}
 		} break;
 		case "create": {
 			AaaUtil.enterRoot();
@@ -77,13 +81,31 @@ public class AclCmd implements Action {
 			AaaUtil.enterRoot();
 			try {
 				SopAcl acl = api.getAcl(parameters[0]);
-				acl.setList(parameters[1]);
-				acl.save();
-				System.out.println("Id      : " + acl.getId() );
-				System.out.println("Created : " + acl.getCreationDate());
-				System.out.println("Modified: " + acl.getModifyDate());
-				System.out.println("Target  : " + acl.getTarget());
-				System.out.println("ACL     : " + acl.getList());
+				if (acl == null)
+					System.out.println("ACL not found");
+				else {
+					acl.setList(parameters[1]);
+					acl.save();
+					System.out.println("Id      : " + acl.getId() );
+					System.out.println("Created : " + acl.getCreationDate());
+					System.out.println("Modified: " + acl.getModifyDate());
+					System.out.println("Target  : " + acl.getTarget());
+					System.out.println("ACL     : " + acl.getList());
+				}
+			} finally {
+				AaaUtil.leaveRoot();
+			}
+		} break;
+		case "delete": {
+			AaaUtil.enterRoot();
+			try {
+				SopAcl acl = api.getAcl(parameters[0]);
+				if (acl == null)
+					System.out.println("ACL not found");
+				else {
+					acl.delete();
+					System.out.println("Deleted");
+				}
 			} finally {
 				AaaUtil.leaveRoot();
 			}
