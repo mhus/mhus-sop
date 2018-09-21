@@ -23,6 +23,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
+import de.mhus.lib.core.security.Account;
 import de.mhus.lib.core.security.ModifyAccountApi;
 import de.mhus.lib.core.security.ModifyAuthorizationApi;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
@@ -45,7 +46,8 @@ public class ModifyAccessCmd implements Action {
 			"Command:\n"
 			+ " user create <name> <password> *[key=value]\n"
 			+ " user password <name> <newPassword>\n"
-			+ " user set <name> *[key=value]\n"
+			+ " user set <name> *[key=value] - will remove all other keys\n"
+			+ " user add <name> *[key=value]\n"
 			+ " user delete <name>\n"
 			+ " user add <name> <group>\n"
 			+ " user remove <name> <group>\n"
@@ -85,6 +87,15 @@ public class ModifyAccessCmd implements Action {
 		if (entity.equals("user") && action.equals("set")) {
 			ModifyAccountApi modify = api.getModifyAccountApi();
 			MProperties properties = new MProperties();
+			for (int i = 0; i < parameters.length; i++)
+				properties.setString(MString.beforeIndex(parameters[i], '='), MString.afterIndex(parameters[i], '='));
+			modify.changeAccount(name, properties);
+			System.out.println("OK");
+		} else
+		if (entity.equals("user") && action.equals("add")) {
+			ModifyAccountApi modify = api.getModifyAccountApi();
+			Account acc = api.getAccount(name);
+			MProperties properties = new MProperties(acc.getAttributes());
 			for (int i = 0; i < parameters.length; i++)
 				properties.setString(MString.beforeIndex(parameters[i], '='), MString.afterIndex(parameters[i], '='));
 			modify.changeAccount(name, properties);

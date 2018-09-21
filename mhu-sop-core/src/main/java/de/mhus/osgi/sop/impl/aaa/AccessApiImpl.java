@@ -58,6 +58,7 @@ public class AccessApiImpl extends MLog implements AccessApi {
 	private AccountSource accountSource;
 	private TrustSource trustSource;
 	private AuthorizationSource authorizationSource;
+	private boolean fallbackToGuest;
 	protected static AccessApiImpl instance;
 
     @Activate
@@ -250,6 +251,9 @@ public class AccessApiImpl extends MLog implements AccessApi {
 		}
 		if (out != null)
 			return out;
+		
+		if (isFallbackToGuest())
+			return GUEST_CONTEXT.getAccount();
 		
 		throw new NotFoundException("account not found",account);
 	}
@@ -494,6 +498,14 @@ public class AccessApiImpl extends MLog implements AccessApi {
 		Account current = getCurrentAccount();
 		if (current.isSynthetic() || !current.isValid()) return null; // not supported
 		return new ModifyCurrentAccount(current, accountSource);
+	}
+
+	public boolean isFallbackToGuest() {
+		return fallbackToGuest;
+	}
+
+	public void setFallbackToGuest(boolean fallbackToGuest) {
+		this.fallbackToGuest = fallbackToGuest;
 	}
 	
 }
