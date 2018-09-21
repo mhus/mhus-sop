@@ -121,12 +121,12 @@ public class RestServlet extends HttpServlet {
 	//    	parts.remove(0); // rest
 	    	
 	    	String ticket = req.getParameter("_ticket");
-	    	if (MString.isEmpty(ticket) && !path.startsWith(PUBLIC_PATH)) {
+	    	if (MString.isEmpty(ticket)) {
 		    	String auth = req.getHeader("Authorization");  
 		        // Do we allow that user?
 		    	ticket = getTicket(auth);
-		        if (MString.isEmpty(ticket)) {  
-		        	log.i("authorization required",id,auth,req.getRemoteAddr());
+		        if (!path.startsWith(PUBLIC_PATH) && MString.isEmpty(ticket)) {  
+		        		log.i("authorization required",id,auth,req.getRemoteAddr());
 		            // Not allowed, so report he's unauthorized  
 		            resp.setHeader("WWW-Authenticate", "BASIC realm=\"rest\"");  
 		            sendError(errorResultType, id, resp, HttpServletResponse.SC_UNAUTHORIZED,"", null, null);
@@ -151,20 +151,20 @@ public class RestServlet extends HttpServlet {
 	        AccessApi access = MApi.lookup(AccessApi.class);
 	        AaaContext user = null;
 	        if (MString.isEmpty(ticket) && path.startsWith(PUBLIC_PATH)) {
-	        	user = access.getGuestContext();
+	        		user = access.getGuestContext();
 	        } else {
 		        try {
-		        	String localeStr = req.getHeader("Accept-Language");
-		        	Locale locale = localeStr == null ? null : Locale.forLanguageTag(localeStr);
-		        	user = access.process(ticket, locale);
+			        	String localeStr = req.getHeader("Accept-Language");
+			        	Locale locale = localeStr == null ? null : Locale.forLanguageTag(localeStr);
+			        	user = access.process(ticket, locale);
 		        } catch (AccessDeniedException e) {
-	//	        	log.d("access denied",ticket,e);
+		//	        	log.d("access denied",ticket,e);
 		            resp.setHeader("WWW-Authenticate", "BASIC realm=\"rest\"");  
 		            sendError(errorResultType, id, resp, HttpServletResponse.SC_UNAUTHORIZED,e.getMessage(), e, null);
 		            return;
 		        } catch (Throwable t) {
-		        	sendError(errorResultType, id, resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, t.getMessage(), t, null );
-		        	return;
+			        	sendError(errorResultType, id, resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, t.getMessage(), t, null );
+			        	return;
 		        }
 	        }
 	        if (user == null) { // paranoia, should throw an exception in 'process()'
