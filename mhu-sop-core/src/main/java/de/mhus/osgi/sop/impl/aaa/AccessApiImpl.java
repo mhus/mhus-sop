@@ -34,6 +34,7 @@ import de.mhus.lib.core.security.ModifyCurrentAccountApi;
 import de.mhus.lib.core.util.SoftHashMap;
 import de.mhus.lib.errors.AccessDeniedException;
 import de.mhus.lib.errors.MException;
+import de.mhus.lib.errors.MRuntimeException;
 import de.mhus.lib.errors.NotFoundException;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AaaUtil;
@@ -281,10 +282,9 @@ public class AccessApiImpl extends MLog implements AccessApi {
 		
 		Account info = null;
 		try {
-			info = getAccount(account);
+			info = getAccountUnsecure(account);
 		} catch (MException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new MRuntimeException("can't get account to release",account,e);
 		}
 		return release(info);
 	}
