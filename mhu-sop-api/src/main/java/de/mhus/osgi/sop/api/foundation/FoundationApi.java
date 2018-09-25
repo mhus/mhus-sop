@@ -19,7 +19,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.data.SopDataController;
 import de.mhus.osgi.sop.api.foundation.model.SopData;
@@ -39,7 +38,7 @@ public interface FoundationApi {
 
 	SopFoundationGroup getFoundationGroup(String group) throws MException;
 
-	DbMetadata getFoundation(UUID id) throws MException;
+	SopFoundation getFoundation(UUID id) throws MException;
 
 	UUID getDefaultFoundationId();
 

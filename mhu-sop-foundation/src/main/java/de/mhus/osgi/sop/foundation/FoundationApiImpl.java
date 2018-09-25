@@ -27,7 +27,6 @@ import aQute.bnd.annotation.component.Activate;
 import aQute.bnd.annotation.component.Component;
 import aQute.bnd.annotation.component.Deactivate;
 import de.mhus.lib.adb.DbCollection;
-import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.adb.query.AQuery;
 import de.mhus.lib.adb.query.Db;
 import de.mhus.lib.adb.query.SearchHelper;
@@ -150,7 +149,7 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 	}
 
 	@Override
-	public DbMetadata getFoundation(UUID id) throws MException {
+	public SopFoundation getFoundation(UUID id) throws MException {
 		return getManager().getObject(SopFoundation.class, id);
 	}
 
