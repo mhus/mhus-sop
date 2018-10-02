@@ -2,7 +2,6 @@ package de.mhus.osgi.sop.vault;
 
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 import aQute.bnd.annotation.component.Component;
@@ -31,7 +30,7 @@ public class SopVaultSource extends MLog implements MutableVaultSource {
 	}
 
 	@Override
-	public Set<UUID> getEntryIds() {
+	public Iterable<UUID> getEntryIds() {
 		XdbService db = MApi.lookup(SopApi.class).getManager();
 		HashSet<UUID> out = new HashSet<>();
 		// TODO use a database source set for huge lists?
