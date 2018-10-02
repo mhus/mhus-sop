@@ -61,6 +61,16 @@
 		<bundle>mvn:de.mhus.osgi/mhu-sop-rest/${project.version}</bundle>
 	</feature>
 	
+	<feature name='mhu-sop-vault' description='mhu-sop-vault' version='${project.version}'>
+		<feature>mhu-sop-base</feature>
+		<bundle>mvn:de.mhus.osgi/mhu-sop-vault/${project.version}</bundle>
+	</feature>
+	
+	<feature name='mhu-sop-foundation' description='mhu-sop-vault' version='${project.version}'>
+		<feature>mhu-sop-base</feature>
+		<bundle>mvn:de.mhus.osgi/mhu-sop-foundation/${project.version}</bundle>
+	</feature>
+	
 	<feature name='mhu-sop-mailqueue' description='mhu-sop-mailqueue' version='${project.version}'>
 		<feature>mhu-sop-base</feature>
 		
@@ -106,10 +116,13 @@
 	</feature>
 	
 	<feature name='mhu-sop-full' description='mhu-sop-full' version='${project.version}'>
-		<feature>mhu-osgi-base</feature>
-		<feature>mhu-osgi-mailer</feature>
+		<feature>mhu-sop-base</feature>
+		<feature>mhu-sop-mailqueue</feature>
+		<feature>mhu-sop-rest</feature>
+		<feature>mhu-sop-vault</feature>
 		<feature>mhu-osgi-jms</feature>
+		<feature>mhu-osgi-foundation</feature>
 		<feature>mhu-osgi-vaadin</feature>
 	</feature>
-			
+
 </features>
