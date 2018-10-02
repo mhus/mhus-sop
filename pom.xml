@@ -182,6 +182,7 @@
       <module>mhu-sop-foundation</module>
       <module>mhu-sop-jms</module>
       <module>mhu-sop-rest</module>
+      <module>mhu-sop-vault</module>
       <module>mhu-sop-vaadin-desktop</module>
       <module>mhu-sop-vaadin-theme</module>
       <module>mhu-sop-mailqueue</module>
