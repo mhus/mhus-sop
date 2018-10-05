@@ -46,6 +46,10 @@ public class MailQueueTimer extends SchedulerServiceAdapter {
 		try {
 			Date now = new Date();
 			XdbService manager = MApi.lookup(SopApi.class).getManager();
+			if (manager == null) {
+				log().w("XdbService is null");
+				return;
+			}
 			int mailCnt = 0;
 			for (SopMailTask task : manager.getByQualification(Db.query(SopMailTask.class).eq(SopMailTask::getStatus, MailQueueOperation.STATUS.READY).le(SopMailTask::getNextSendAttempt, now))) {
 				
