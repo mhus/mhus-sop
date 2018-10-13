@@ -121,7 +121,7 @@ public class KarafAaaSource implements AccountSource {
 		public KarafAccount(BackingEngine engine, UserPrincipal user) {
 			this.engine = engine;
 			this.user = user;
-			reload();
+			reloadAccount();
 		}
 
 		@Override
@@ -183,7 +183,7 @@ public class KarafAaaSource implements AccountSource {
 		}
 
 		@Override
-		public boolean reload() {
+		public boolean reloadAccount() {
 			groups.clear();
 			for (GroupPrincipal grp : engine.listGroups(user))
 				groups.add(grp.getName().trim().toLowerCase());

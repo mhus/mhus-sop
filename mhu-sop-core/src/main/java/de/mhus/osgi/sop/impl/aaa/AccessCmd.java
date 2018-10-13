@@ -115,7 +115,7 @@ public class AccessCmd implements Action {
 		} else
 		if (cmd.equals("reload")) {
 			Account ac = api.getCurrentAccount();
-			System.out.println("Reload: " + ac.reload());
+			System.out.println("Reload: " + ac.reloadAccount());
 		} else
 		if (cmd.equals("idtree")) {
 			AaaContextImpl cur = (AaaContextImpl) api.getCurrentOrGuest();
@@ -223,7 +223,7 @@ public class AccessCmd implements Action {
 				}
 			}
 			modify.changePassword(newPw);
-			current.reload();
+			current.reloadAccount();
 			System.out.println("Changed");
 		} else
 		if (cmd.equals("modify")) {
@@ -237,7 +237,7 @@ public class AccessCmd implements Action {
 			MProperties p = MProperties.explodeToMProperties(parameters);
 			p.putReadProperties(current.getAttributes());
 			modify.changeAccount(p);
-			System.out.println("Changed, Current " + current.reload());
+			System.out.println("Changed, Current " + current.reloadAccount());
 			
 		} else
 			System.out.println("Command not found: " + cmd);

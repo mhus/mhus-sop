@@ -36,6 +36,7 @@ import de.mhus.osgi.sop.api.model.SopAcl;
 import de.mhus.osgi.sop.api.model.SopActionTask;
 import de.mhus.osgi.sop.api.model.SopObjectParameter;
 import de.mhus.osgi.sop.api.model.SopRegister;
+import de.mhus.osgi.sop.api.model.SopAccount;
 
 @Component(provide=DbSchemaService.class,immediate=true)
 public class SopDbImpl extends AbstractDbSchemaService {
@@ -54,6 +55,7 @@ public class SopDbImpl extends AbstractDbSchemaService {
 		list.add(SopActionTask.class);
 		list.add(SopRegister.class);
 		list.add(SopAcl.class);
+		list.add(SopAccount.class);
 	}
 
 	@Override
@@ -241,6 +243,9 @@ public class SopDbImpl extends AbstractDbSchemaService {
 			if (key.startsWith("pub.")) return Ace.RIGHTS_ALL;
 			if (key.startsWith("ro.")) return Ace.RIGHTS_RO;
 			return Ace.RIGHTS_NONE;
+		}
+		if (obj instanceof SopAccount) {
+			return Ace.RIGHTS_RO;
 		}
 		return null;
 	}

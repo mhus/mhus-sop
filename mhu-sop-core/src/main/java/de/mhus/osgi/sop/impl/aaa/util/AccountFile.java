@@ -160,7 +160,7 @@ public class AccountFile extends MLog implements Account {
 	}
 
 	@Override
-	public boolean reload()  {
+	public boolean reloadAccount()  {
 		try {
 			reloadInternal();
 			return true;

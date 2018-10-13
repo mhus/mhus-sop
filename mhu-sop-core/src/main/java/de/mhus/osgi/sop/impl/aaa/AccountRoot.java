@@ -76,7 +76,7 @@ public class AccountRoot implements Account {
 	}
 
 	@Override
-	public boolean reload() {
+	public boolean reloadAccount() {
 		return false;
 	}
 
