@@ -115,6 +115,9 @@ public class OperationUtil {
 //					properties.put(OperationToIfcProxy.TYPE + i, method.getParameters()[i].getType().getCanonicalName() );
 					properties.put(OperationToIfcProxy.TYPE + i, OperationToIfcProxy.SERIALISED );
 					properties.put(OperationToIfcProxy.PARAMETERTYPE + i, args[i].getClass().getCanonicalName() );
+				} else {
+					properties.put(OperationToIfcProxy.TYPE + i, OperationToIfcProxy.NULL);
+					properties.put(OperationToIfcProxy.PARAMETERTYPE + i, method.getParameters()[i].getType().getCanonicalName() );
 				}
 			}
 			
