@@ -30,6 +30,7 @@ import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.core.strategy.OperationToIfcProxy;
 import de.mhus.lib.core.util.VersionRange;
 import de.mhus.lib.errors.MException;
+import de.mhus.lib.errors.MRuntimeException;
 
 public class OperationUtil {
 
@@ -123,7 +124,7 @@ public class OperationUtil {
 				throw new NullPointerException();
 			
 			if (!res.isSuccessful())
-				throw new MException(res.getMsg());
+				throw new MRuntimeException(res.getMsg());
 			
 			return res.getResult();
 		}
