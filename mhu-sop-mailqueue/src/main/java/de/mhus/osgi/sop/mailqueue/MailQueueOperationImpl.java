@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import aQute.bnd.annotation.component.Component;
+import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MProperties;
@@ -42,18 +43,20 @@ import de.mhus.osgi.sop.api.util.SopUtil;
 public class MailQueueOperationImpl extends OperationToIfcProxy implements MailQueueOperation {
 
 	@Override
-	public UUID[] scheduleHtmlMail(String source, String from, String to, String subject, String content, String ... attachments) throws MException {
+	public UUID[] scheduleHtmlMail(String source, String from, String to, String subject, String content, IReadProperties properties, String ... attachments) throws MException {
 		MailMessage msg = new MailMessage(source, from, to, null, null, subject, content, attachments, false);
-		scheduleHtmlMail(msg);
+		scheduleHtmlMail(msg, properties);
 		return msg.getTasks();
 	}
 	
 	@Override
-	public void scheduleHtmlMail(MailMessage mails) throws MException {
+	public void scheduleHtmlMail(MailMessage mails, IReadProperties properties) throws MException {
 		SopApi api = MApi.lookup(SopApi.class);
 		// create task
 		for (MailMessage mail : mails.getSeparateMails()) {
 			SopMailTask task = api.getManager().inject(new SopMailTask(mail));
+			if (properties != null)
+				task.getProperties().putReadProperties(properties);
 			task.save();
 			try {
 				// create folder
@@ -87,6 +90,10 @@ public class MailQueueOperationImpl extends OperationToIfcProxy implements MailQ
 				task.setStatus(STATUS.READY);
 				task.save();
 				mails.addTaskId(task.getId());
+				
+				if (task.getProperties().getBoolean(MailQueueOperation.SEND_IMMEDIATELY, true))
+					MailQueueTimer.instance().sendMail(task);
+				
 			} catch (Throwable t) {
 				log().w(t);
 				task.setStatus(STATUS.ERROR_PREPARE);

@@ -27,6 +27,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import de.mhus.lib.adb.query.AQuery;
 import de.mhus.lib.adb.query.Db;
 import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.lib.xdb.XdbService;
 import de.mhus.osgi.sop.api.SopApi;
@@ -68,6 +69,9 @@ public class MailQueueCmd implements Action {
 	
 	@Option(name="-bcc", description="BCC",required=false, multiValued=true)
 	String[] bcc;
+	
+	@Option(name="-p", aliases="--property", description="Additional send properties: sendImmediately=false",required=false, multiValued=true)
+	String[] p;
 	
 	@Option(name="-i", aliases="--individual", description="Individual Mails for each recipient",required=false)
 	boolean individual = false;
@@ -117,8 +121,11 @@ public class MailQueueCmd implements Action {
 			msg.setCc(cc);
 			msg.setBcc(bcc);
 			msg.setIndividual(individual);
+			MProperties prop = null;
+			if (p != null)
+				prop = MProperties.explodeToMProperties(p);
 			MailMessage m = msg.toMessage();
-			mq.scheduleHtmlMail(m);
+			mq.scheduleHtmlMail(m, prop);
 			System.out.println("Scheduled as " + Arrays.toString(m.getTasks()));
 		} break;
 		case "status":{

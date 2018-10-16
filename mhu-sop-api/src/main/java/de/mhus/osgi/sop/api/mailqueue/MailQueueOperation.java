@@ -18,11 +18,14 @@ package de.mhus.osgi.sop.api.mailqueue;
 import java.util.Date;
 import java.util.UUID;
 
+import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.errors.MException;
 
 public interface MailQueueOperation {
 
-	enum STATUS {NEW, READY, SENT, ERROR, ERROR_PREPARE, LOST};
+	enum STATUS {NEW, READY, SENT, ERROR, ERROR_PREPARE, LOST}
+
+	String SEND_IMMEDIATELY = "sendImmediately";
 
 	/**
 	 * Schedule the given mail content as html mail. And send a separate mail
@@ -33,19 +36,21 @@ public interface MailQueueOperation {
 	 * @param to Minimum set one recipient address.
 	 * @param subject The subject as string
 	 * @param content The content as string or the File Queue uri starting with "dfq:"
+	 * @param properties 
 	 * @param attachments List of File Queue URIs to load the attachments
 	 * @return The task ids of the created tasks
 	 * @throws MException 
 	 */
-	UUID[] scheduleHtmlMail(String source, String from, String to, String subject, String content, String ... attachments ) throws MException;
+	UUID[] scheduleHtmlMail(String source, String from, String to, String subject, String content, IReadProperties properties, String ... attachments ) throws MException;
 
 	/**
 	 * Schedule the mail described in the mail message object.
 	 * 
 	 * @param message
+	 * @param properties 
 	 * @throws MException
 	 */
-	void scheduleHtmlMail(MailMessage message) throws MException;
+	void scheduleHtmlMail(MailMessage message, IReadProperties properties) throws MException;
 	
 	/**
 	 * Return the send status of the mail

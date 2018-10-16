@@ -18,7 +18,11 @@ package de.mhus.osgi.sop.mailqueue;
 import java.io.File;
 import java.util.Date;
 
+import org.osgi.service.component.ComponentContext;
+
+import aQute.bnd.annotation.component.Activate;
 import aQute.bnd.annotation.component.Component;
+import aQute.bnd.annotation.component.Deactivate;
 import de.mhus.lib.adb.query.Db;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MFile;
@@ -26,6 +30,7 @@ import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MTimeInterval;
 import de.mhus.lib.core.cfg.CfgInt;
 import de.mhus.lib.core.cfg.CfgString;
+import de.mhus.lib.core.concurrent.Lock;
 import de.mhus.lib.core.mail.MSendMail;
 import de.mhus.lib.core.mail.MailAttachment;
 import de.mhus.lib.core.util.MUri;
@@ -41,6 +46,25 @@ public class MailQueueTimer extends SchedulerServiceAdapter {
 	private static final CfgInt CFG_MAX_ATTEMPTS = new CfgInt(MailQueueOperation.class, "maxAttempts", 10);
 	private static final CfgInt CFG_MAX_MAILS_PER_ROUND = new CfgInt(MailQueueOperation.class, "maxMailsPerRound", 30);
 	private static final CfgString CFG_NEXT_SEND_ATTEMPT_INTERVAL = new CfgString(MailQueueOperation.class, "nextSendAttemptInterval", "15m");
+	private static final long LOCK_TIMEOUT = MTimeInterval.MINUTE_IN_MILLISECOUNDS;
+	private static MailQueueTimer instance;
+	private Lock lock = new Lock("MailQueueLock");
+	
+	@Activate
+	public void doActivate(ComponentContext ctx) {
+		System.out.println("Start CryptaDbSchema");
+		instance = this;
+	}
+	
+	@Deactivate
+	public void doDeactivate(ComponentContext ctx) {
+		instance = null;
+	}
+	
+	static MailQueueTimer instance() {
+		return instance;
+	}
+	
 	@Override
 	public void run(Object environment) {
 		try {
@@ -56,39 +80,59 @@ public class MailQueueTimer extends SchedulerServiceAdapter {
 				mailCnt++;
 				if (CFG_MAX_MAILS_PER_ROUND.value() > 0 && mailCnt > CFG_MAX_MAILS_PER_ROUND.value()) continue; // iterate all but do not send - this will close the db handle at the end
 				
-				try {
-					sendMail(task);
-					task.setStatus(MailQueueOperation.STATUS.SENT);
-					task.save();
-				} catch (Throwable t) {
-					if (
-							t instanceof NullPointerException // any null pointer is not a connection error
-							||
-							"javax.mail.internet.InternetAddress".equals(t.getStackTrace()[0].getClassName()) // email address error
-						) {
-						log().e("prepare error",t.getStackTrace()[0].getClassName(),task,t);
-						// fatal prepare error
-						task.setStatus(MailQueueOperation.STATUS.ERROR_PREPARE);
-					} else {
-						log().e("send error",t.getStackTrace()[0].getClassName(),t);
-						// error to retry
-						task.setSendAttempts(task.getSendAttempts()+1);
-						if (task.getSendAttempts() > CFG_MAX_ATTEMPTS.value()) {
-							task.setStatus(MailQueueOperation.STATUS.ERROR);
-						} else {
-							task.setNextSendAttempt(new Date(System.currentTimeMillis() + MTimeInterval.toTime(CFG_NEXT_SEND_ATTEMPT_INTERVAL.value(), MTimeInterval.MINUTE_IN_MILLISECOUNDS * 15)));
-						}
-					}
-					task.setLastError(t.toString());
-					task.save();
-				}
+				sendMail(task);
+				
 			}
 		} catch (Throwable t) {
 			log().e(t);
 		}
 	}
 
-	private void sendMail(SopMailTask task) throws Exception {
+	boolean sendMail(SopMailTask task) throws Exception {
+		if (!lock.lock(LOCK_TIMEOUT)) {
+			log().w("can't obtain lock",lock);
+			return false;
+		}
+		try {
+			task.reload();
+			if (task.getStatus() != MailQueueOperation.STATUS.READY) {
+				log().d("Ignore Mail: wrong status",task);
+				return false;
+			}
+			try {
+				sendMailInternal(task);
+				task.setStatus(MailQueueOperation.STATUS.SENT);
+				task.save();
+				return true;
+			} catch (Throwable t) {
+				if (
+						t instanceof NullPointerException // any null pointer is not a connection error
+						||
+						"javax.mail.internet.InternetAddress".equals(t.getStackTrace()[0].getClassName()) // email address error
+					) {
+					log().e("prepare error",t.getStackTrace()[0].getClassName(),task,t);
+					// fatal prepare error
+					task.setStatus(MailQueueOperation.STATUS.ERROR_PREPARE);
+				} else {
+					log().e("send error",t.getStackTrace()[0].getClassName(),t);
+					// error to retry
+					task.setSendAttempts(task.getSendAttempts()+1);
+					if (task.getSendAttempts() > CFG_MAX_ATTEMPTS.value()) {
+						task.setStatus(MailQueueOperation.STATUS.ERROR);
+					} else {
+						task.setNextSendAttempt(new Date(System.currentTimeMillis() + MTimeInterval.toTime(CFG_NEXT_SEND_ATTEMPT_INTERVAL.value(), MTimeInterval.MINUTE_IN_MILLISECOUNDS * 15)));
+					}
+				}
+				task.setLastError(t.toString());
+				task.save();
+				return false;
+			}
+		} finally {
+			lock.release();
+		}
+	}
+	
+	private void sendMailInternal(SopMailTask task) throws Exception {
 		
 		MProperties source = MailQueueOperationImpl.getSourceConfig(task);
 		

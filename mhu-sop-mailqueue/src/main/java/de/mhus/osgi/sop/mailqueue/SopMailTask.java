@@ -21,6 +21,7 @@ import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.annotations.adb.DbPersistent;
 import de.mhus.lib.annotations.adb.DbType;
 import de.mhus.lib.core.M;
+import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MSystem;
 import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.mailqueue.MailMessage;
@@ -50,6 +51,8 @@ public class SopMailTask extends DbMetadata {
 	private String lastError;
 	@DbPersistent
 	private int sendAttempts = 0;
+	@DbPersistent
+	private MProperties properties;
 
 	public SopMailTask() {}
 	
@@ -64,6 +67,7 @@ public class SopMailTask extends DbMetadata {
 		this.cc = cc;
 		this.bcc = bcc;
 		this.subject = M.trunc(subject, 200);
+		this.properties = new MProperties();
 	}
 
 	@Override
@@ -140,4 +144,8 @@ public class SopMailTask extends DbMetadata {
 		return MSystem.toString(this, getId(), source, to, subject);
 	}
 
+	public MProperties getProperties() {
+		return properties;
+	}
+	
 }
