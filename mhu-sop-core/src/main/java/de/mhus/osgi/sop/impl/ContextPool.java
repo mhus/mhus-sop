@@ -33,11 +33,12 @@ public class ContextPool {
 		}
 	}
 	
-	public void set(AaaContextImpl context) {
+	public void set(AaaContextImpl context, boolean forward) {
 		synchronized (pool) {
 			AaaContextImpl parent = pool.get();
 			if (context != null) {
-				context.setParent(parent);
+				if (forward)
+					context.setParent(parent);
 				pool.set(context);
 			} else {
 				pool.remove();

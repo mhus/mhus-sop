@@ -75,7 +75,7 @@ public class AccessApiImpl extends MLog implements AccessApi {
 	@Override
 	public void process(AaaContext context) {
 		if (context == null) return;
-		ContextPool.getInstance().set((AaaContextImpl) context);
+		ContextPool.getInstance().set((AaaContextImpl) context, true);
 	}
 
 	@Override
@@ -187,7 +187,7 @@ public class AccessApiImpl extends MLog implements AccessApi {
 		}
 		if (c == null) 
 			throw new AccessDeniedException("null");
-		ContextPool.getInstance().set(c);
+		ContextPool.getInstance().set(c, true);
 		return c;
 	}
 
@@ -303,7 +303,7 @@ public class AccessApiImpl extends MLog implements AccessApi {
 				return current;
 			}
 			AaaContextImpl parent = current.getParent();
-			pool.set(parent);
+			pool.set(parent, false);
 			return parent;
 		}
 	}
@@ -314,7 +314,7 @@ public class AccessApiImpl extends MLog implements AccessApi {
 		ContextPool pool = ContextPool.getInstance();
 		synchronized (pool) {
 			AaaContextImpl parent = ((AaaContextImpl)context).getParent();
-			pool.set(parent);
+			pool.set(parent, false);
 			return parent;
 		}
 	}
@@ -323,7 +323,7 @@ public class AccessApiImpl extends MLog implements AccessApi {
 	public void resetContext() {
 		ContextPool pool = ContextPool.getInstance();
 		synchronized (pool) {
-			pool.set(null);
+			pool.set(null, false);
 		}
 	}
 	
@@ -342,7 +342,7 @@ public class AccessApiImpl extends MLog implements AccessApi {
 	public AaaContext processAdminSession() {
 		
 //		String ticket = TicketUtil.ACCOUNT + TicketUtil.SEP + ROOT_CONTEXT.getAccountId() + TicketUtil.SEP + TicketUtil.SEP + TicketUtil.ADMIN;
-		ContextPool.getInstance().set(ROOT_CONTEXT);
+		ContextPool.getInstance().set(ROOT_CONTEXT, true);
 		
 		return ROOT_CONTEXT;
 	}
