@@ -48,6 +48,7 @@ public class MailQueueCmd implements Action {
 			+ " status <id>\n"
 			+ " retry [<id>]\n"
 			+ " lost [<id>]\n"
+			+ " send <id>\n"
 			+ " clenanup\n"
 			+ " delete <id>")
 	String cmd;
@@ -155,6 +156,22 @@ public class MailQueueCmd implements Action {
 					System.out.println("Task is not in ERROR");
 				}
 			}
+		} break;
+		case "send": {
+			UUID id = UUID.fromString(parameters[0]);
+			SopApi api = MApi.lookup(SopApi.class);
+			SopMailTask task = api.getManager().getObject(SopMailTask.class, id);
+			if (task == null) {
+				System.out.println("Task not found");
+				return null;
+			}
+			if (force || task.getStatus() == STATUS.READY) {
+				MailQueueTimer.instance().sendMail(task);
+				System.out.println("OK " + task);
+			} else {
+				System.out.println("Task is not ready");
+			}
+			
 		} break;
 		case "lost": {
 			if (parameters == null || parameters.length == 0) {
