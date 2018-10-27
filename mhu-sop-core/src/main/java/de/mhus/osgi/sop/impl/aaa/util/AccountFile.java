@@ -28,17 +28,16 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import de.mhus.lib.core.IReadProperties;
-import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MConstants;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MPassword;
 import de.mhus.lib.core.MProperties;
+import de.mhus.lib.core.MString;
 import de.mhus.lib.core.MXml;
 import de.mhus.lib.core.crypt.MCrypt;
 import de.mhus.lib.core.security.Account;
 import de.mhus.lib.errors.NotSupportedException;
-import de.mhus.osgi.sop.api.aaa.AccessApi;
 
 public class AccountFile extends MLog implements Account {
 	
@@ -76,14 +75,8 @@ public class AccountFile extends MLog implements Account {
 	public synchronized boolean validatePassword(String password) {
 		if (isPasswordValidated == null) {
 			try {
-				if (password != null) {
-					boolean out = validatePasswordInternal(password);
-					if (out) {
-						isPasswordValidated = true;
-						return true;
-					}
-				}
-				isPasswordValidated = MApi.lookup(AccessApi.class).validatePassword(this, password);
+				if (MString.isSet(password))
+					isPasswordValidated = validatePasswordInternal(password);
 			} catch (Throwable t) {
 				log().w("validatePassword",account,t);
 			}
@@ -116,7 +109,7 @@ public class AccountFile extends MLog implements Account {
 	}
 
 	public boolean validatePasswordInternal(String password) {
-		return MCrypt.validateMd5WithSalt(passwordMd5, password);
+		return MPassword.validatePasswordMD5(password, passwordMd5);
 	}
 
 	@Override
