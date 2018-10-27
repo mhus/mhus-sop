@@ -89,9 +89,9 @@ public class AccountFromFile extends MLog implements AccountSource, ModifyAccoun
 			Element rootE = doc.createElement("user");
 			doc.appendChild(rootE);
 			rootE.setAttribute("created", MDate.toIsoDateTime(System.currentTimeMillis()));
-			Element passE = doc.createElement("password");
-			rootE.appendChild(passE);
-			passE.setAttribute("plain", MPassword.encode(password));
+			//Element passE = doc.createElement("password");
+			//rootE.appendChild(passE);
+			rootE.setAttribute("password", MPassword.encodePasswordMD5(password));
 			Element infoE = doc.createElement("information");
 			rootE.appendChild(infoE);
 			infoE.setAttribute("name", properties.getString(AccessApi.DISPLAY_NAME, account));
@@ -135,8 +135,8 @@ public class AccountFromFile extends MLog implements AccountSource, ModifyAccoun
 			
 			Element rootE = doc.getDocumentElement();
 			rootE.setAttribute("modified", MDate.toIsoDateTime(System.currentTimeMillis()));
-			Element passE = MXml.getElementByPath(rootE, "password");
-			passE.setAttribute("plain", MPassword.encode(newPassword));
+			//Element passE = MXml.getElementByPath(rootE, "password");
+			rootE.setAttribute("password", MPassword.encodePasswordMD5(newPassword));
 
 			FileWriter os = new FileWriter(file);
 			MXml.saveXml(rootE, os, true);

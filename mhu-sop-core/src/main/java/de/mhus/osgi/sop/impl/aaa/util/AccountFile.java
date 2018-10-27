@@ -166,32 +166,38 @@ public class AccountFile extends MLog implements Account {
 	public void reloadInternal() throws ParserConfigurationException, SAXException, IOException {
 		FileInputStream is = new FileInputStream(file);
 		doc = MXml.loadXml(is);
+		Element userE = doc.getDocumentElement();
 		is.close();
 		
 		modified = file.lastModified();
-		
-		Element pwE = MXml.getElementByPath(doc.getDocumentElement(),"password");
-		if (pwE != null)
-				passwordMd5 = MCrypt.md5WithSalt(MPassword.decode( pwE.getAttribute("plain") ));
+				
 		name = MXml.getElementByPath(doc.getDocumentElement(),"information").getAttribute("name");
 		
-		timeout = MCast.tolong( doc.getDocumentElement().getAttribute("timeout"), 0);
+		timeout = MCast.tolong( userE.getAttribute("timeout"), 0);
 		
 		{
-			Element xmlAcl = MXml.getElementByPath(doc.getDocumentElement(), "groups");
+			Element xmlAcl = MXml.getElementByPath(userE, "groups");
 			groups.clear();
 			for (Element xmlAce : MXml.getLocalElementIterator(xmlAcl,"group")) {
 				groups.add(xmlAce.getAttribute("name").trim().toLowerCase());
 			}
 		}
 		{
-			Element xmlAcl = MXml.getElementByPath(doc.getDocumentElement(), "attributes");
+			Element xmlAcl = MXml.getElementByPath(userE, "attributes");
 			attributes.clear();
 			for (Element xmlAce : MXml.getLocalElementIterator(xmlAcl,"attribute")) {
 				attributes.setString(xmlAce.getAttribute("name"), xmlAce.getAttribute("value"));
 			}
 		}
+		
+		Element pwE = MXml.getElementByPath(userE,"password");
+		if (pwE != null)
+			passwordMd5 = MCrypt.md5WithSalt(MPassword.decode( pwE.getAttribute("plain") ));
+		else
+			passwordMd5 = userE.getAttribute("password");
 
+		attributes.put("ro.created", userE.getAttribute("created"));
+		
 	}
 
 }
