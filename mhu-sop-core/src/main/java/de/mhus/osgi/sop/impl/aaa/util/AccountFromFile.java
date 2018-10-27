@@ -135,9 +135,12 @@ public class AccountFromFile extends MLog implements AccountSource, ModifyAccoun
 			
 			Element rootE = doc.getDocumentElement();
 			rootE.setAttribute("modified", MDate.toIsoDateTime(System.currentTimeMillis()));
-			//Element passE = MXml.getElementByPath(rootE, "password");
 			rootE.setAttribute("password", MPassword.encodePasswordMD5(newPassword));
-
+			
+			Element passE = MXml.getElementByPath(rootE, "password");
+			if (passE != null)
+				rootE.removeChild(passE); // password node overrides root password
+			
 			FileWriter os = new FileWriter(file);
 			MXml.saveXml(rootE, os, true);
 			os.close();
