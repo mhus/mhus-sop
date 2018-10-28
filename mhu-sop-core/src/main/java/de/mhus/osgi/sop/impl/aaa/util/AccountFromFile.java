@@ -129,13 +129,14 @@ public class AccountFromFile extends MLog implements AccountSource, ModifyAccoun
 	public void changePassword(String account, String newPassword) throws MException {
 		File file = SopUtil.getFile( path + MFile.normalize(account.trim()).toLowerCase() + ".xml" );
 		if (!file.exists()) throw new MException("Account not found",account);
-
+		newPassword = MPassword.encodePasswordMD5(newPassword);
+		
 		try {
 			Document doc = MXml.loadXml(file);
 			
 			Element rootE = doc.getDocumentElement();
 			rootE.setAttribute("modified", MDate.toIsoDateTime(System.currentTimeMillis()));
-			rootE.setAttribute("password", MPassword.encodePasswordMD5(newPassword));
+			rootE.setAttribute("password", newPassword);
 			
 			Element passE = MXml.getElementByPath(rootE, "password");
 			if (passE != null)
