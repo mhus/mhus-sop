@@ -15,8 +15,10 @@
  */
 package de.mhus.osgi.sop.impl.aaa;
 
+import java.io.File;
 import java.util.Locale;
 import java.util.Map.Entry;
+import java.util.UUID;
 
 import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Argument;
@@ -27,6 +29,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
 import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MPassword;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.console.Console;
@@ -39,7 +42,9 @@ import de.mhus.osgi.sop.api.aaa.AccessApi;
 import de.mhus.osgi.sop.api.aaa.Trust;
 import de.mhus.osgi.sop.api.adb.AdbApi;
 import de.mhus.osgi.sop.api.adb.DbSchemaService;
+import de.mhus.osgi.sop.api.util.SopUtil;
 import de.mhus.osgi.sop.impl.AaaContextImpl;
+import de.mhus.osgi.sop.impl.aaa.util.AccountFile;
 
 @Command(scope = "sop", name = "access", description = "Access actions")
 @Service
@@ -238,7 +243,24 @@ public class AccessCmd implements Action {
 			p.putReadProperties(current.getAttributes());
 			modify.changeAccount(p);
 			System.out.println("Changed, Current " + current.reloadAccount());
-			
+		} else
+		if (cmd.equals("migrateFilesToCurrent")) {
+			String path = "aaa/account/";
+			File dir = SopUtil.getFile( path );
+			for (File file : dir.listFiles()) {
+				System.out.println(">>> Migrate " + file.getName());
+				try {
+					if (file.isFile() && file.getName().endsWith(".xml")) {
+						AccountFile from = new AccountFile(file,MFile.getFileNameOnly(file.getName()));
+						ModifyAccountApi mod = api.getModifyAccountApi();
+						mod.createAccount(from.getName(), UUID.randomUUID().toString(), from.getAttributes());
+						mod.appendGroups(from.getName(), from.getGroups());
+						mod.changePasswordInternal(from.getName(), from.getMd5Password());
+					}
+				} catch (Throwable t) {
+					t.printStackTrace();
+				}
+			}
 		} else
 			System.out.println("Command not found: " + cmd);
 			

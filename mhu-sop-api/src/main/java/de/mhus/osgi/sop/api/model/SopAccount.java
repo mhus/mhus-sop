@@ -109,4 +109,8 @@ public class SopAccount extends DbMetadata implements Account {
 		password = MPassword.encodePasswordMD5(newPassword);
 	}
 	
+	public void setPasswordInternal(String newPassword) {
+		password = newPassword;
+	}
+	
 }

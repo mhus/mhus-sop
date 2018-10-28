@@ -200,4 +200,8 @@ public class AccountFile extends MLog implements Account {
 		
 	}
 
+	public String getMd5Password() {
+		return passwordMd5;
+	}
+
 }

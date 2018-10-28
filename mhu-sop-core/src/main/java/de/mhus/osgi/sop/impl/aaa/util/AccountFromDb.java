@@ -37,6 +37,14 @@ public class AccountFromDb extends MLog implements AccountSource, ModifyAccountA
 	}
 
 	@Override
+	public void changePasswordInternal(String username, String newPassword) throws MException {
+		Account acc = findAccount(username);
+		if (acc == null) throw new MException("Account not found",username);
+		((SopAccount)acc).setPasswordInternal(newPassword);
+		((SopAccount)acc).save();
+	}
+	
+	@Override
 	public void changePassword(String username, String newPassword) throws MException {
 		Account acc = findAccount(username);
 		if (acc == null) throw new MException("Account not found",username);

@@ -126,6 +126,31 @@ public class AccountFromFile extends MLog implements AccountSource, ModifyAccoun
 	}
 
 	@Override
+	public void changePasswordInternal(String account, String newPassword) throws MException {
+		File file = SopUtil.getFile( path + MFile.normalize(account.trim()).toLowerCase() + ".xml" );
+		if (!file.exists()) throw new MException("Account not found",account);
+		
+		try {
+			Document doc = MXml.loadXml(file);
+			
+			Element rootE = doc.getDocumentElement();
+			rootE.setAttribute("modified", MDate.toIsoDateTime(System.currentTimeMillis()));
+			rootE.setAttribute("password", newPassword);
+			
+			Element passE = MXml.getElementByPath(rootE, "password");
+			if (passE != null)
+				rootE.removeChild(passE); // password node overrides root password
+			
+			FileWriter os = new FileWriter(file);
+			MXml.saveXml(rootE, os, true);
+			os.close();
+
+		} catch (Exception e) {
+			throw new MException(e);
+		}
+	}
+	
+	@Override
 	public void changePassword(String account, String newPassword) throws MException {
 		File file = SopUtil.getFile( path + MFile.normalize(account.trim()).toLowerCase() + ".xml" );
 		if (!file.exists()) throw new MException("Account not found",account);
