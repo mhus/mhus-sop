@@ -27,6 +27,7 @@ public class AccountFromDb extends MLog implements AccountSource, ModifyAccountA
 		if (acc != null) throw new MException("Account already exists",username);
 		XdbService db = MApi.lookup(SopApi.class).getManager();
 		acc = db.inject(new SopAccount(username, password, properties)); 
+		((SopAccount)acc).save();
 	}
 
 	@Override
