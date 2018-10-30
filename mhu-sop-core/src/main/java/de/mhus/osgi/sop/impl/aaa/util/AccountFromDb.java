@@ -10,7 +10,6 @@ import de.mhus.lib.adb.query.Db;
 import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MLog;
-import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.security.Account;
 import de.mhus.lib.core.security.AccountSource;
 import de.mhus.lib.core.security.ModifyAccountApi;
@@ -57,8 +56,8 @@ public class AccountFromDb extends MLog implements AccountSource, ModifyAccountA
 	public void changeAccount(String username, IReadProperties properties) throws MException {
 		Account acc = findAccount(username);
 		if (acc == null) throw new MException("Account not found",username);
-		((MProperties)((SopAccount)acc).getAttributes()).clear();
-		((MProperties)((SopAccount)acc).getAttributes()).putReadProperties(properties);;
+		((SopAccount)acc).clearAttributes();
+		((SopAccount)acc).putAttributes(properties);
 		((SopAccount)acc).save();
 	}
 

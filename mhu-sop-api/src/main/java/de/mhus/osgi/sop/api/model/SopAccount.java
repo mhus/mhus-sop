@@ -1,11 +1,13 @@
 package de.mhus.osgi.sop.api.model;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.annotations.adb.DbIndex;
 import de.mhus.lib.annotations.adb.DbPersistent;
+import de.mhus.lib.basics.IsNull;
 import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.MConstants;
 import de.mhus.lib.core.MPassword;
@@ -76,12 +78,26 @@ public class SopAccount extends DbMetadata implements Account {
 
 	@Override
 	public IReadProperties getAttributes() {
+		MProperties out = new MProperties(attributes);
+		out.put("ro.created", getCreationDate());
+		out.put("ro.modified", getModifyDate());
+		out.put("ro.uuid", getId());
 		return attributes;
 	}
 
+	public void clearAttributes() {
+		attributes.clear();
+	}
+	
 	@Override
 	public void putAttributes(IReadProperties properties) throws NotSupportedException {
-		attributes.putReadProperties(properties);
+		for (Map.Entry<? extends String, ? extends Object> e : properties.entrySet())
+			if (!e.getKey().startsWith("ro.")) {
+				if (e.getValue() instanceof IsNull)
+					attributes.remove(e.getKey());
+				else
+					attributes.put(e.getKey(),e.getValue());
+			}
 	}
 
 	@Override
