@@ -18,6 +18,9 @@ package de.mhus.osgi.sop.impl.aaa.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Map.Entry;
 
@@ -53,6 +56,7 @@ public class AccountFile extends MLog implements Account {
 	private Boolean isPasswordValidated = null;
 	private HashSet<String> groups = new HashSet<>();
 	private MProperties attributes = new MProperties();
+	private long created;
 	
 	public AccountFile(File f, String account) throws ParserConfigurationException, SAXException, IOException {
 		this.account = account;
@@ -169,6 +173,8 @@ public class AccountFile extends MLog implements Account {
 		Element userE = doc.getDocumentElement();
 		is.close();
 		
+		BasicFileAttributes fileAttr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+		created = fileAttr.creationTime().toMillis();
 		modified = file.lastModified();
 				
 		name = MXml.getElementByPath(doc.getDocumentElement(),"information").getAttribute("name");
@@ -202,6 +208,16 @@ public class AccountFile extends MLog implements Account {
 
 	public String getMd5Password() {
 		return passwordMd5;
+	}
+
+	@Override
+	public Date getCreationDate() {
+		return new Date(created);
+	}
+
+	@Override
+	public Date getModifyDate() {
+		return new Date(modified);
 	}
 
 }

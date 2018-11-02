@@ -15,6 +15,7 @@
  */
 package de.mhus.osgi.sop.rest;
 
+import java.util.Date;
 import java.util.Locale;
 
 import de.mhus.lib.annotations.generic.Public;
@@ -36,12 +37,16 @@ public class UserInformation {
 	private Locale locale;
 	private boolean adminMode;
 	private String[] groups;
+	private Date created;
+	private Date modified;
 
 	public UserInformation(AaaContext context) {
 		Account acc = context.getAccount();
 		name = acc.getName();
 		displayName = acc.getDisplayName();
 		attributes = acc.getAttributes();
+		created = acc.getCreationDate();
+		modified = acc.getModifyDate();
 		syntetic = acc.isSynthetic();
 		valid = acc.isValid();
 		
@@ -109,5 +114,15 @@ public class UserInformation {
 	public String[] getGroups() {
 		return groups;
 	}
+	
+	@Public
+	public Date getCreationDate() {
+		return created;
+	}
 
+	@Public
+	public Date getModifyDate() {
+		return modified;
+	}
+	
 }

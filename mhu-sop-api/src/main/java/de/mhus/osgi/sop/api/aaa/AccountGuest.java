@@ -15,6 +15,7 @@
  */
 package de.mhus.osgi.sop.api.aaa;
 
+import java.util.Date;
 import java.util.HashSet;
 
 import de.mhus.lib.core.IProperties;
@@ -86,6 +87,16 @@ public class AccountGuest implements Account {
 	@Override
 	public boolean reloadAccount() {
 		return false;
+	}
+
+	@Override
+	public Date getCreationDate() {
+		return null;
+	}
+
+	@Override
+	public Date getModifyDate() {
+		return null;
 	}
 	
 }

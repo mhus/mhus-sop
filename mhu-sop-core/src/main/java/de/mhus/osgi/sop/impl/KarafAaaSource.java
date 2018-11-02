@@ -15,6 +15,7 @@
  */
 package de.mhus.osgi.sop.impl;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -188,6 +189,16 @@ public class KarafAaaSource implements AccountSource {
 			for (GroupPrincipal grp : engine.listGroups(user))
 				groups.add(grp.getName().trim().toLowerCase());
 			return true;
+		}
+
+		@Override
+		public Date getCreationDate() {
+			return null;
+		}
+
+		@Override
+		public Date getModifyDate() {
+			return null;
 		}
 		
 	}

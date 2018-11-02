@@ -15,6 +15,8 @@
  */
 package de.mhus.osgi.sop.impl.aaa;
 
+import java.util.Date;
+
 import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.security.Account;
@@ -78,6 +80,16 @@ public class AccountRoot implements Account {
 	@Override
 	public boolean reloadAccount() {
 		return false;
+	}
+
+	@Override
+	public Date getCreationDate() {
+		return null;
+	}
+
+	@Override
+	public Date getModifyDate() {
+		return null;
 	}
 
 }
