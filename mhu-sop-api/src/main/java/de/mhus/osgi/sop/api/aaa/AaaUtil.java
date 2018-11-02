@@ -190,6 +190,20 @@ public class AaaUtil {
 		api.release(context);
 	}
 
+	public static Account currentAccount() {
+		AccessApi api = MApi.lookup(AccessApi.class);
+		if (api == null) return null;
+		AaaContext context = api.getCurrent();
+		return context.getAccount();
+	}
+	
+	public static AaaContext currentContext() {
+		AccessApi api = MApi.lookup(AccessApi.class);
+		if (api == null) return null;
+		AaaContext context = api.getCurrent();
+		return context;
+	}
+	
 	public static boolean isCurrentAdmin() {
 		AccessApi api = MApi.lookup(AccessApi.class);
 		if (api == null) return false;

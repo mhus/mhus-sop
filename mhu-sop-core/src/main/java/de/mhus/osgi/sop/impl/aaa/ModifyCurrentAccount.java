@@ -19,7 +19,9 @@ import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.security.Account;
 import de.mhus.lib.core.security.AccountSource;
 import de.mhus.lib.core.security.ModifyCurrentAccountApi;
+import de.mhus.lib.errors.AccessDeniedException;
 import de.mhus.lib.errors.MException;
+import de.mhus.osgi.sop.api.aaa.AaaUtil;
 
 public class ModifyCurrentAccount implements ModifyCurrentAccountApi {
 
@@ -38,12 +40,26 @@ public class ModifyCurrentAccount implements ModifyCurrentAccountApi {
 
 	@Override
 	public void changePassword(String newPassword) throws MException {
-		source.getModifyApi().changePassword(account.getName(), newPassword);
+		if (!account.getName().equals(AaaUtil.currentAccount().getName()))
+				throw new AccessDeniedException(account);
+		AaaUtil.enterRoot();
+		try {
+			source.getModifyApi().changePassword(account.getName(), newPassword);
+		} finally {
+			AaaUtil.leaveRoot();
+		}
 	}
 
 	@Override
 	public void changeAccount(IReadProperties properties) throws MException {
-		source.getModifyApi().changeAccount(account.getName(), properties);
+		if (!account.getName().equals(AaaUtil.currentAccount().getName()))
+				throw new AccessDeniedException(account);
+		AaaUtil.enterRoot();
+		try {
+			source.getModifyApi().changeAccount(account.getName(), properties);
+		} finally {
+			AaaUtil.leaveRoot();
+		}
 	}
 
 }
