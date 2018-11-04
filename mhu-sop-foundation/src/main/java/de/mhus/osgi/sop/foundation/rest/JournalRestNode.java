@@ -59,6 +59,7 @@ public class JournalRestNode extends JsonListNode<JournalQueue>{
 		long since = MCast.tolong( callContext.getParameter("_since"), 0);
 		int max = MCast.toint( callContext.getParameter("_max"), 100);
 		if (max < 1 || max > 100) max = 100;
+		String search = callContext.getParameter("_search");
 		
 		UUID foundationId = getObjectFromContext(callContext, SopFoundation.class).getId();
 		
@@ -66,7 +67,7 @@ public class JournalRestNode extends JsonListNode<JournalQueue>{
 		SopApi sop = MApi.lookup(SopApi.class);
 		PojoModelFactory factory = sop.getDataPojoModelFactory();
 		ArrayNode list = result.createArrayNode();
-		List<SopJournal> res = api.getJournalEntries(foundationId, queue.getName(), since, max);
+		List<SopJournal> res = api.getJournalEntries(foundationId, queue.getName(), since, max, search);
 		for (SopJournal j : res) {
 			ObjectNode obj = list.addObject();
 			MPojo.pojoToJson(j, obj, factory);

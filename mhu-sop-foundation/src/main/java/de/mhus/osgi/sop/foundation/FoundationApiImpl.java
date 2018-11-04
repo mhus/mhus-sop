@@ -124,12 +124,26 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 	}
 
 	@Override
-	public List<SopJournal> getJournalEntries(UUID foundation, String queue, long since, int max) throws MException {
+	public List<SopJournal> getJournalEntries(UUID foundation, String queue, long since, int max, String search) throws MException {
+		
+		int  page = 0;
+		String filter = null;
+		if (MString.isSet(search)) {
+			page 	= RestUtil.getPageFromSearch(search);
+			filter 	= RestUtil.getFilterFromSearch(search);
+		}
+		
 		AQuery<SopJournal> query = Db.query(SopJournal.class).eq("queue", queue).eq("foundation", foundation);
 		if (since > 0)
 			query.gt(Db.attr("order"), Db.value(since));
+		if (MString.isSet(filter))
+			query.or(Db.like("event", "%" + filter + "%"),Db.like("data", "%" + filter + "%"));
 		query.desc("order");
+		
+		
 		DbCollection<SopJournal> res = getManager().getByQualification(query);
+		res.skip(page * max);
+		
 		int cnt = 0;
 		LinkedList<SopJournal> out = new LinkedList<SopJournal>();
 		for (SopJournal j : res) {
