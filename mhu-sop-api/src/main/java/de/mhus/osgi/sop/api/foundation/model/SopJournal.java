@@ -17,6 +17,7 @@ package de.mhus.osgi.sop.api.foundation.model;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import de.mhus.lib.adb.DbMetadata;
@@ -57,6 +58,15 @@ public class SopJournal extends DbMetadata implements FoundationRelated {
 		if (data != null)
 			for (int i = 0; i < data.length-1; i+=2)
 				this.data.put(data[i], data[i+1]);
+	}
+	
+	public SopJournal(UUID foundation, String queue, String event, long order, Map<String, Object> data) {
+		this(foundation, queue, event, order);
+		this.data = new HashMap<>();
+		for (Entry<String, Object> entry : data.entrySet())
+			try {
+				this.data.put(entry.getKey(), String.valueOf(entry.getValue()));
+			} catch (Throwable t) {log().e(t);}
 	}
 	
 	public String getQueue() {

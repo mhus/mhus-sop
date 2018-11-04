@@ -17,6 +17,7 @@ package de.mhus.osgi.sop.api.foundation;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import de.mhus.lib.errors.MException;
@@ -29,6 +30,8 @@ import de.mhus.osgi.sop.api.foundation.model.SopJournal;
 public interface FoundationApi {
 
 	public static final String DEFAULT_GROUP = "";
+	
+	SopJournal appendJournalEntry(UUID foundation, String queue, String event, Map<String, Object> data) throws MException;
 	
 	SopJournal appendJournalEntry(UUID foundation, String queue, String event, String ... data) throws MException;
 

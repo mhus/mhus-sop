@@ -18,6 +18,7 @@ package de.mhus.osgi.sop.foundation;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.osgi.framework.BundleContext;
@@ -97,6 +98,13 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 		return item;
 	}
 
+	@Override
+	public SopJournal appendJournalEntry(UUID foundation, String queue, String event, Map<String, Object> data) throws MException {
+		SopJournal item = getManager().inject(new SopJournal(foundation, queue,event,getJournalOrder(),data));
+		item.save();
+		return item;
+	}
+	
 	private synchronized long getJournalOrder() {
 		long cur = System.currentTimeMillis();
 		if (cur != lastOrderTime) {
