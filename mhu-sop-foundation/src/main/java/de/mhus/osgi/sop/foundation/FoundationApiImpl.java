@@ -413,7 +413,7 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 		LinkedList<SopFoundation> out = RestUtil.collectResults(
 				getManager(),
 				Db.extendObjectQueryFromSearch(
-					Db.query(SopFoundation.class),
+					Db.query(SopFoundation.class).eq(SopFoundation::isActive, true),
 					filter,
 					SEARCH_HELPER_FOUNDATION
 				)
