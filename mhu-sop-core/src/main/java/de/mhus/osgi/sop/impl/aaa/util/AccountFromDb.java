@@ -144,4 +144,12 @@ public class AccountFromDb extends MLog implements AccountSource, ModifyAccountA
 		return this;
 	}
 
+	@Override
+	public void activateAccount(String username, boolean active) throws MException {
+		Account acc = findAccount(username);
+		if (acc == null) throw new MException("Account not found",username);
+		((SopAccount)acc).setActive(active);
+		((SopAccount)acc).save();
+	}
+
 }

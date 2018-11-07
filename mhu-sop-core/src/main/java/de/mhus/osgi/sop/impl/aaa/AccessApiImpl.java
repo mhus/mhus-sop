@@ -132,10 +132,12 @@ public class AccessApiImpl extends MLog implements AccessApi {
 			}
 			if (info == null)
 				throw new AccessDeniedException("null",account);
-			if (!info.validatePassword(MPassword.decode(pass)))
-				throw new AccessDeniedException("password",account);
+			if (!info.isActive())
+				throw new AccessDeniedException("disabled",account);
 			if (!info.isValid())
 				throw new AccessDeniedException("invalid",account);
+			if (!info.validatePassword(MPassword.decode(pass)))
+				throw new AccessDeniedException("password",account);
 			
 		} else
 		if (parts.length > 0 && parts[0].equals(TicketUtil.TRUST)) {
@@ -169,6 +171,8 @@ public class AccessApiImpl extends MLog implements AccessApi {
 				throw new AccessDeniedException("null",account);
 			if (!info.isValid())
 				throw new AccessDeniedException("invalid",account);
+			if (!info.isActive())
+				throw new AccessDeniedException("disabled",account);
 			
 		} else
 			throw new AccessDeniedException("unknown ticket type",parts[0]);

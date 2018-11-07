@@ -18,6 +18,7 @@ package de.mhus.osgi.sop.impl;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 
 import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.LoginContext;
@@ -199,6 +200,16 @@ public class KarafAaaSource implements AccountSource {
 		@Override
 		public Date getModifyDate() {
 			return null;
+		}
+
+		@Override
+		public UUID getUUID() {
+			return null;
+		}
+
+		@Override
+		public boolean isActive() {
+			return true;
 		}
 		
 	}

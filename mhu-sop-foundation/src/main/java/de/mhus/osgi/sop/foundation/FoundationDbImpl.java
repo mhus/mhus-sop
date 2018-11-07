@@ -152,10 +152,17 @@ public class FoundationDbImpl extends AbstractDbSchemaService {
 			UUID fId = ((FoundationRelated)obj).getFoundation();
 			SopFoundation f = getManager().getObject(SopFoundation.class, fId);
 			if (f == null) return Ace.RIGHTS_NONE;
-			SopAcl aclObject = MApi.lookup(AdbApi.class).getManager().getObjectByQualification(Db.query(SopAcl.class).eq("target", fId + "_" ));
-			if (aclObject == null)
-				return getAce(context,f).getRights();
-			return aclObject.getList();
+			{
+				SopAcl aclObject = MApi.lookup(AdbApi.class).getManager().getObjectByQualification(Db.query(SopAcl.class).eq("target", fId + "_"+obj.getClass().getSimpleName() ));
+				if (aclObject != null)
+					return aclObject.getList();
+			}
+			{
+				SopAcl aclObject = MApi.lookup(AdbApi.class).getManager().getObjectByQualification(Db.query(SopAcl.class).eq("target", fId + "_" ));
+				if (aclObject != null)
+					return aclObject.getList();
+			}
+			return getAce(context,f).getRights();
 		}
 		
 		return null;

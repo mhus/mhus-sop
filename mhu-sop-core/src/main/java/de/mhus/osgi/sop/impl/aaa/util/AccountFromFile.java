@@ -340,4 +340,24 @@ public class AccountFromFile extends MLog implements AccountSource, ModifyAccoun
 		return out;
 	}
 
+	@Override
+	public void activateAccount(String account, boolean active) throws MException {
+		File file = SopUtil.getFile( path + MFile.normalize(account.trim()).toLowerCase() + ".xml" );
+		if (!file.exists()) throw new MException("Account not found",account);
+
+		try {
+			Document doc = MXml.loadXml(file);
+			
+			Element rootE = doc.getDocumentElement();
+			rootE.setAttribute("active", String.valueOf(active));
+			
+			FileWriter os = new FileWriter(file);
+			MXml.saveXml(rootE, os, true);
+			os.close();
+
+		} catch (Exception e) {
+			throw new MException(e);
+		}
+	}
+
 }

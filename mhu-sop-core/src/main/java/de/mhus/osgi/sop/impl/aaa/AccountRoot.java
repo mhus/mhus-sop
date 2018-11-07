@@ -16,6 +16,7 @@
 package de.mhus.osgi.sop.impl.aaa;
 
 import java.util.Date;
+import java.util.UUID;
 
 import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.MProperties;
@@ -90,6 +91,16 @@ public class AccountRoot implements Account {
 	@Override
 	public Date getModifyDate() {
 		return null;
+	}
+
+	@Override
+	public UUID getUUID() {
+		return null;
+	}
+
+	@Override
+	public boolean isActive() {
+		return false;
 	}
 
 }

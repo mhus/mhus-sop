@@ -23,6 +23,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Map.Entry;
+import java.util.UUID;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -37,6 +38,7 @@ import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MPassword;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
+import de.mhus.lib.core.MValidator;
 import de.mhus.lib.core.MXml;
 import de.mhus.lib.core.crypt.MCrypt;
 import de.mhus.lib.core.security.Account;
@@ -50,6 +52,8 @@ public class AccountFile extends MLog implements Account {
 	private File file;
 	private long modified;
 	private String name;
+	private boolean active;
+	private UUID uuid;
 	
 	private String passwordMd5 = null;
 	private long timeout;
@@ -135,6 +139,7 @@ public class AccountFile extends MLog implements Account {
 
 	protected void doSave() {
 		Element xml = MXml.getElementByPath(doc.getDocumentElement(), "attributes");
+		doc.getDocumentElement().setAttribute("active", String.valueOf(active));
 		for (Element elem : MXml.getLocalElementIterator(xml))
 			xml.removeChild(elem);
 		for (Entry<String, Object> item : attributes.entrySet()) {
@@ -204,6 +209,16 @@ public class AccountFile extends MLog implements Account {
 
 		attributes.put("ro.created", userE.getAttribute("created"));
 		
+		active = MCast.toboolean(userE.getAttribute("active"), true);
+		
+		// as last - may need to save if not exists, this means all data must be read
+		String uuidStr = userE.getAttribute("uuid");
+		if (!MValidator.isUUID(uuidStr)) {
+			uuid = UUID.randomUUID();
+			userE.setAttribute("uuid", uuid.toString());
+			doSave();
+		}
+		
 	}
 
 	public String getMd5Password() {
@@ -218,6 +233,16 @@ public class AccountFile extends MLog implements Account {
 	@Override
 	public Date getModifyDate() {
 		return new Date(modified);
+	}
+
+	@Override
+	public UUID getUUID() {
+		return uuid;
+	}
+
+	@Override
+	public boolean isActive() {
+		return active;
 	}
 
 }

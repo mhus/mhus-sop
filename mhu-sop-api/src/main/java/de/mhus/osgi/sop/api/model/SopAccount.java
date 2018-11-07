@@ -3,6 +3,7 @@ package de.mhus.osgi.sop.api.model;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.annotations.adb.DbIndex;
@@ -28,6 +29,8 @@ public class SopAccount extends DbMetadata implements Account {
 	private HashSet<String> groups;
 	@DbPersistent
 	private MProperties attributes;
+	@DbPersistent
+	private boolean active;
 	
 	public SopAccount() {}
 	
@@ -118,7 +121,7 @@ public class SopAccount extends DbMetadata implements Account {
 
 	@Override
 	public String toString() {
-		return MSystem.toString(this, name);
+		return MSystem.toString(this, name, active);
 	}
 
 	public void setPassword(String newPassword) {
@@ -127,6 +130,20 @@ public class SopAccount extends DbMetadata implements Account {
 	
 	public void setPasswordInternal(String newPassword) {
 		password = newPassword;
+	}
+
+	@Override
+	public UUID getUUID() {
+		return getId();
+	}
+
+	@Override
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 	
 }

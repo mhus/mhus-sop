@@ -21,6 +21,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
 import de.mhus.lib.core.security.Account;
@@ -51,7 +52,8 @@ public class ModifyAccessCmd implements Action {
 			+ " user delete <name>\n"
 			+ " user add <name> <group>\n"
 			+ " user remove <name> <group>\n"
-			+ " user list <filter>"
+			+ " user list <filter>\n"
+			+ " user active <name> <active> - activate or deactivate user\n"
 			+ " trust create <name> <password> *[key=value]\n"
 			+ " trust password <name> <newPassword>\n"
 			+ " trust set <name> *[key=value]\n"
@@ -120,8 +122,14 @@ public class ModifyAccessCmd implements Action {
 			ModifyAccountApi modify = api.getModifyAccountApi();
 			System.out.println(" Users");
 			System.out.println("-------");
-			for (String name  : modify.getAccountList(name))
-				System.out.println(name);
+			for (String n  : modify.getAccountList(name))
+				System.out.println(n);
+		} else
+		if (entity.equals("user") && action.equals("active")) {
+			ModifyAccountApi modify = api.getModifyAccountApi();
+			boolean active = MCast.toboolean(parameters[0], false);
+			modify.activateAccount(name, active);
+			System.out.println("OK");
 		} else
 		if (entity.equals("trust") && action.equals("create")) {
 			ModifyTrustApi modify = api.getModifyTrustApi();

@@ -17,6 +17,7 @@ package de.mhus.osgi.sop.api.aaa;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.UUID;
 
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.IReadProperties;
@@ -97,6 +98,16 @@ public class AccountGuest implements Account {
 	@Override
 	public Date getModifyDate() {
 		return null;
+	}
+
+	@Override
+	public UUID getUUID() {
+		return null;
+	}
+
+	@Override
+	public boolean isActive() {
+		return false;
 	}
 	
 }

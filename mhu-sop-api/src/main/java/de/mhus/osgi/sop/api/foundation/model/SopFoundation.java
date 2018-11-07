@@ -29,6 +29,8 @@ public class SopFoundation extends DbMetadata {
 	@DbPersistent
 	@Public
 	private String ident;
+	@DbPersistent
+	private boolean active;
 	
 	public SopFoundation() {}
 	
@@ -49,6 +51,14 @@ public class SopFoundation extends DbMetadata {
 
 	public String getIdent() {
 		return ident;
+	}
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 
 }
