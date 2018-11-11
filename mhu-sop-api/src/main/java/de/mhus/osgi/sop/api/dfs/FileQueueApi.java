@@ -18,6 +18,7 @@ package de.mhus.osgi.sop.api.dfs;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
@@ -55,6 +56,19 @@ public interface FileQueueApi {
 	 * @throws IOException 
 	 */
 	UUID takeFile(File file, boolean copy, long ttl) throws IOException;
+	
+	/**
+	 * Take file from input stream. Reads the full stream in the new file content.
+	 * Will not close the stream.
+	 * 
+	 * @param is Input Stream with data
+	 * @param ttl
+	 * @param modified 
+	 * @param name 
+	 * @return created id
+	 * @throws IOException
+	 */
+	UUID takeFile(InputStream is, long ttl, long modified, String name) throws IOException;
 	
 	/**
 	 * Close a queued file and change state to stored.

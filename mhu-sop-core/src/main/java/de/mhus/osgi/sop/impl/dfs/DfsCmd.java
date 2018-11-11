@@ -17,6 +17,7 @@ package de.mhus.osgi.sop.impl.dfs;
 
 import java.io.File;
 import java.util.Date;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.karaf.shell.api.action.Action;
@@ -120,10 +121,25 @@ public class DfsCmd implements Action {
 			api.createDirecories(uri);
 			System.out.println("OK");
 		} break;
+		case "test": {
+			testProvider(api);
+		}
 		default:
 			System.out.println("Unknown command");
 		}
 		return null;
+	}
+
+	private void testProvider(DfsApi api) {
+		String providerName = parameters[0];
+		System.out.println(">>> Root directory index");
+		{
+			MUri uri = MUri.toUri(providerName + ":/");
+			Map<String, MUri> list = api.getDirectoryList(uri);
+			for (Entry<String, MUri> entry : list.entrySet()) {
+				System.out.println(entry.getKey() + ": " + entry.getValue());
+			}
+		}
 	}
 
 	

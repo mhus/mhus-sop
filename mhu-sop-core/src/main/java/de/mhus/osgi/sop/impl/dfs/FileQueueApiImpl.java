@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -119,6 +120,40 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 			
 			return id;
 		}
+	}
+
+	@Override
+	public UUID takeFile(InputStream is, long ttl, long modified, String name) throws IOException {
+		checkFileQueueSize();
+
+		if (ttl <= 0) ttl = DEFAULT_TTL;
+
+		MProperties prop = new MProperties();
+		prop.setString("name", name);
+		prop.setLong("modified", modified);
+		
+		UUID id = UUID.randomUUID();
+		File dir = getUploadDir();
+		File pFile = new File(dir, id + ".properties");
+		File dFile = new File(dir, id + ".data");
+		
+		FileOutputStream os = new FileOutputStream(dFile);
+		MFile.copyFile(is, os);
+		os.close();
+		
+		dFile.setWritable(false, false);
+
+		synchronized (this) {
+			prop.setLong("created", System.currentTimeMillis());
+			prop.setLong("accessed", System.currentTimeMillis());
+			prop.setLong("expires", System.currentTimeMillis() + ttl);
+			prop.setLong("ttl", ttl);
+
+			prop.save(pFile);
+			
+			queueFileCnt++;
+		}
+		return id;
 	}
 
 	@Override
@@ -517,4 +552,5 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 		FileQueueOperation operation = OperationUtil.createOpertionProxy(FileQueueOperation.class, desc);
 		return operation;
 	}
+
 }
