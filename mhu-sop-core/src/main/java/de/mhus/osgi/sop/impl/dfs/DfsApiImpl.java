@@ -164,7 +164,7 @@ public class DfsApiImpl extends MLog implements DfsApi {
 	}
 
 	@Override
-	public void createDirecories(MUri uri) throws IOException {
+	public void createDirectories(MUri uri) throws IOException {
 		if ( DfsApi.SCHEME_DFQ.equals(uri.getScheme())) 
 			return;
 		OperationApi api = MApi.lookup(OperationApi.class);

@@ -17,6 +17,7 @@ package de.mhus.osgi.sop.api.operation;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.Proxy;
 import java.util.Collection;
 import java.util.Map;
@@ -108,17 +109,17 @@ public class OperationUtil {
 
 			MProperties properties = new MProperties();
 			properties.setString(OperationToIfcProxy.METHOD, method.getName());
-			int pcount = method.getParameterCount();
-			for (int i = 0; i < pcount; i++) {
+			Parameter[] parameters = method.getParameters();;
+			for (int i = 0; i < parameters.length; i++) {
 				if (args[i] != null) {
 					properties.put(OperationToIfcProxy.PARAMETER + i, MCast.serializeToString(args[i]));
 //					properties.put(OperationToIfcProxy.TYPE + i, method.getParameters()[i].getType().getCanonicalName() );
 					properties.put(OperationToIfcProxy.TYPE + i, OperationToIfcProxy.SERIALISED );
-					properties.put(OperationToIfcProxy.PARAMETERTYPE + i, args[i].getClass().getCanonicalName() );
+					properties.put(OperationToIfcProxy.PARAMETERORGTYPE + i, args[i].getClass().getCanonicalName() );
 				} else {
 					properties.put(OperationToIfcProxy.TYPE + i, OperationToIfcProxy.NULL);
-					properties.put(OperationToIfcProxy.PARAMETERTYPE + i, method.getParameters()[i].getType().getCanonicalName() );
 				}
+				properties.put(OperationToIfcProxy.PARAMETERTYPE + i, parameters[i].getType().getCanonicalName() );
 			}
 			
 			OperationResult res = api.doExecute(desc, properties);

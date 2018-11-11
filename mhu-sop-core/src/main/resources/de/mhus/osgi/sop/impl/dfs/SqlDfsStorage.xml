@@ -1,10 +1,10 @@
 <config>
-	<table name="$/prefix$_entry" primary_key="id">
+	<table name="$/prefix$_entry" primary_key="path">
 	  <field name="content" type="blob" />
 	  <field name="created" type="DATETIME" />
 	  <field name="modified" type="DATETIME" />
 	  <field name="name" type="string" size="700" />
-	  <field name="path" type="string" size="700" />
+	  <field name="path" type="string" size="191" />
 	  <field name="pathlevel" type="int" />
 	  <field name="type" type="int" />
 	  <field name="size" type="long" />

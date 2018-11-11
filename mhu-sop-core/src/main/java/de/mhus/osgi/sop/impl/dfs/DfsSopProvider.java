@@ -145,6 +145,10 @@ public class DfsSopProvider extends OperationToIfcProxy implements DfsProviderOp
 		dir = file.getParentFile();
 		if (!dir.exists() || !dir.isDirectory())
 			throw new IOException("Directory not found");
+
+		synchronized (queueCache) {
+			queueCache.remove(file.getCanonicalPath());
+		}
 		
 		FileQueueApi api = MApi.lookup(FileQueueApi.class);
 		File fromFile;
@@ -163,6 +167,10 @@ public class DfsSopProvider extends OperationToIfcProxy implements DfsProviderOp
 		
 		File dir = getDirectory();
 		File file = new File (dir, MFile.normalizePath(uri.getPath()) );
+
+		synchronized (queueCache) {
+			queueCache.remove(file.getCanonicalPath()); // TODO all deep pathes too
+		}
 
 		MFile.deleteDir(file);
 	}

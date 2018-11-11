@@ -64,6 +64,6 @@ public interface DfsApi {
 
 	void deleteFile(MUri uri) throws IOException;
 
-	void createDirecories(MUri uri) throws IOException;
+	void createDirectories(MUri uri) throws IOException;
 
 }

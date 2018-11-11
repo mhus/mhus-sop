@@ -16,9 +16,11 @@
 package de.mhus.osgi.sop.impl.dfs;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.UUID;
 
 import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Argument;
@@ -32,6 +34,7 @@ import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MString;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.lib.core.util.MUri;
+import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.dfs.DfsApi;
 import de.mhus.osgi.sop.api.dfs.FileInfo;
 import de.mhus.osgi.sop.api.dfs.FileQueueApi;
@@ -118,19 +121,22 @@ public class DfsCmd implements Action {
 		} break;
 		case "mkdir": {
 			MUri uri = api.exportFile(MUri.toUri(parameters[0]));
-			api.createDirecories(uri);
+			api.createDirectories(uri);
 			System.out.println("OK");
 		} break;
 		case "test": {
 			testProvider(api);
-		}
+		} break;
 		default:
 			System.out.println("Unknown command");
 		}
 		return null;
 	}
 
-	private void testProvider(DfsApi api) {
+	private void testProvider(DfsApi api) throws IOException, MException {
+		
+		FileQueueApi queueApi = MApi.lookup(FileQueueApi.class);
+		
 		String providerName = parameters[0];
 		System.out.println(">>> Root directory index");
 		{
@@ -140,6 +146,86 @@ public class DfsCmd implements Action {
 				System.out.println(entry.getKey() + ": " + entry.getValue());
 			}
 		}
+		System.out.println(">>> Create Dir");
+		{
+			MUri uri = MUri.toUri(providerName + ":/_dfstest/test");
+			api.createDirectories(uri);
+		}
+		System.out.println(">>> Root directory index");
+		{
+			MUri uri = MUri.toUri(providerName + ":/");
+			Map<String, MUri> list = api.getDirectoryList(uri);
+			for (Entry<String, MUri> entry : list.entrySet()) {
+				System.out.println(entry.getKey() + ": " + entry.getValue());
+			}
+		}
+		System.out.println(">>> Import File");
+		{
+			// create file in file queue
+			UUID id = queueApi.createQueueFile("text.txt", 0);
+			queueApi.appendQueueFileContent(id, "This is a test!".getBytes());
+			queueApi.closeQueueFile(id);
+			MUri queueUri = queueApi.getUri(id);
+			
+			// transfer into DFS
+			MUri targetUri = MUri.toUri(providerName + ":/_dfstest/test/text.txt");
+			api.importFile(queueUri, targetUri);
+		}
+		System.out.println(">>> Test directory index");
+		{
+			MUri uri = MUri.toUri(providerName + ":/_dfstest/test");
+			Map<String, MUri> list = api.getDirectoryList(uri);
+			for (Entry<String, MUri> entry : list.entrySet()) {
+				System.out.println(entry.getKey() + ": " + entry.getValue());
+			}
+		}
+		System.out.println(">>> Read File");
+		{
+			MUri uri = MUri.toUri(providerName + ":/_dfstest/test/text.txt");
+			MUri queueUri = api.exportFile(uri);
+			File file = queueApi.loadFile(queueUri);
+			String content = MFile.readFile(file);
+			System.out.println("Content: " + content);
+		}
+		System.out.println(">>> Update File");
+		{
+			// create file in file queue
+			UUID id = queueApi.createQueueFile("text.txt", 0);
+			queueApi.appendQueueFileContent(id, "This is another test!".getBytes());
+			queueApi.closeQueueFile(id);
+			MUri queueUri = queueApi.getUri(id);
+			
+			// transfer into DFS
+			MUri targetUri = MUri.toUri(providerName + ":/_dfstest/test/text.txt");
+			api.importFile(queueUri, targetUri);
+		}
+		System.out.println(">>> Read File");
+		{
+			MUri uri = MUri.toUri(providerName + ":/_dfstest/test/text.txt");
+			MUri queueUri = api.exportFile(uri);
+			File file = queueApi.loadFile(queueUri);
+			String content = MFile.readFile(file);
+			System.out.println("Content: " + content);
+		}
+		System.out.println(">>> Delete File");
+		{
+			MUri uri = MUri.toUri(providerName + ":/_dfstest/test/text.txt");
+			api.deleteFile(uri);
+		}
+		System.out.println(">>> Delete Test Folder");
+		{
+			MUri uri = MUri.toUri(providerName + ":/_dfstest/");
+			api.deleteFile(uri);
+		}
+		System.out.println(">>> Root directory index");
+		{
+			MUri uri = MUri.toUri(providerName + ":/");
+			Map<String, MUri> list = api.getDirectoryList(uri);
+			for (Entry<String, MUri> entry : list.entrySet()) {
+				System.out.println(entry.getKey() + ": " + entry.getValue());
+			}
+		}
+		
 	}
 
 	

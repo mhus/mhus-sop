@@ -86,7 +86,7 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 		DbResult res = null;
 		try {
 			con = pool.getConnection();
-			DbStatement sth = con.createStatement("SELECT id,name,path,created,modified,pathlevel,size FROM " + prefix + "_entry WHERE path = $path$");
+			DbStatement sth = con.createStatement("SELECT name_,path_,created_,modified_,pathlevel_,size_ FROM " + prefix + "_entry_ WHERE path_ = $path$");
 			MProperties prop = new MProperties();
 			prop.setString("path", path);
 			res = sth.executeQuery(prop);
@@ -95,8 +95,10 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 				if (res.next()) {
 					log().w("more then one entry for",path);
 				}
+				sth.close();
 				return entry;
 			}
+			sth.close();
 			return null;
 		} catch (Exception e) {
 			log().e(path,e);
@@ -139,7 +141,7 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 		DbResult res = null;
 		try {
 			con = pool.getConnection();
-			DbStatement sth = con.createStatement("SELECT name,path,content,modified FROM " + prefix + "_entry WHERE path = $path$");
+			DbStatement sth = con.createStatement("SELECT name_,path_,content_,modified_ FROM " + prefix + "_entry_ WHERE path_ = $path$");
 			MProperties prop = new MProperties();
 			prop.setString("path", path);
 			res = sth.executeQuery(prop);
@@ -147,9 +149,9 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 
 				// found
 				
-				InputStream is = res.getBinaryStream("content");
-				Date modify = res.getDate("modified");
-				String name = res.getString("name");
+				InputStream is = res.getBinaryStream("content_");
+				Date modify = res.getDate("modified_");
+				String name = res.getString("name_");
 //				String path2 = res.getString("path");
 				id = api.takeFile(is, 0, modify.getTime(), name);
 				synchronized (queueCache) {
@@ -161,9 +163,11 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 					log().w("more then one entry for",path);
 				}
 				
+				sth.close();
 				return api.getUri(id);
 
 			}
+			sth.close();
 			return null;
 		} catch (Exception e) {
 			throw new IOException(uri.toString(),e);
@@ -186,11 +190,24 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 		DbResult res = null;
 		try {
 			con = pool.getConnection();
-			DbStatement sth = con.createStatement("SELECT name,path,content,modified FROM " + prefix + "_entry WHERE path like $path$ AND pathlevel = $pathlevel$ order by name");
+			DbStatement sth = con.createStatement("SELECT name_,path_,content_,modified_ FROM " + prefix + "_entry_ WHERE path_ like $path$ AND pathlevel_ = $pathlevel$");
 			MProperties prop = new MProperties();
 			prop.setString("path", path + "%");
 			prop.setInt("pathlevel", pathLevel);
 			res = sth.executeQuery(prop);
+			while(res.next()) {
+				String name2 = res.getString("name_");
+				String path2 = res.getString("path_");
+				
+				MutableUri u = new MutableUri(null);
+				u.setScheme(uri.getScheme());
+				u.setLocation(uri.getLocation());
+				u.setPath(path2);
+
+				out.put(name2, u);
+			}
+			sth.close();
+			return out;
 		} catch (Exception e) {
 			log().e(uri,e);
 			return out;
@@ -198,8 +215,6 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 			if (res != null) try {res.close();} catch (Throwable t) {log().e(t);};
 			if (con != null) con.close();
 		}
-
-		return null;
 	}
 
 	private String normalizePath(String path) {
@@ -230,14 +245,18 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 				if (dirEntry == null)
 					throw new IOException("Directory not found " + dirPath);
 			}
-			
+
+			synchronized (queueCache) {
+				queueCache.remove(targetPath);
+			}
+
 			Date now = new Date();
 			
 			EntryData entry = getEntry(target);
 			con = pool.getConnection();
 			if (entry != null) {
 				// update
-				DbStatement sth = con.createStatement("UPDATE " + prefix + "_entry SET modified=$modified$, content=$content$ WHERE path=$path$");
+				DbStatement sth = con.createStatement("UPDATE " + prefix + "_entry_ SET modified_=$modified$, content_=$content$ WHERE path_=$path$");
 				MProperties prop = new MProperties();
 				prop.setString("path", targetPath);
 				prop.setDate("modified", now);
@@ -246,13 +265,14 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 				if (res != 1) {
 					throw new IOException("Can't update entry " + target);
 				}
-				
+				sth.close();
+				con.commit();
 			} else {
 				// create
 				String targetName = MFile.getFileName(targetPath);
 				int pathLevel = MString.countCharacters(targetPath, '/');
 				
-				DbStatement sth = con.createStatement("INSERT INTO " + prefix + "_entry (name,path,pathlevel,created,modified,type,content) "
+				DbStatement sth = con.createStatement("INSERT INTO " + prefix + "_entry_ (name_,path_,pathlevel_,created_,modified_,type_,content_) "
 						+ "VALUES ($name$,$path$,$pathlevel$,$created$,$modified$,0,$content$)");
 				MProperties prop = new MProperties();
 				prop.setString("name", targetName);
@@ -265,6 +285,8 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 				if (res != 1) {
 					throw new IOException("Can't insert entry " + target);
 				}
+				sth.close();
+				con.commit();
 			}
 			
 		} catch (IOException e) {
@@ -288,22 +310,31 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 			con = pool.getConnection();
 			if (path.endsWith("/")) {
 				// is directory
-				DbStatement sth = con.createStatement("DELETE FROM " + prefix + "_entry WHERE path like $path$");
+				DbStatement sth = con.createStatement("DELETE FROM " + prefix + "_entry_ WHERE path_ like $path$");
 				MProperties prop = new MProperties();
 				prop.setString("path", path + "%");
 				int res = sth.executeUpdate(prop);
 				if (res == 0) {
 					throw new IOException("File not found: " + path);
 				}
+				sth.close();
+				con.commit();
 			} else {
+				
+				synchronized (queueCache) {
+					queueCache.remove(path);
+				}
+				
 				// is file
-				DbStatement sth = con.createStatement("DELETE FROM " + prefix + "_entry WHERE path = $path$");
+				DbStatement sth = con.createStatement("DELETE FROM " + prefix + "_entry_ WHERE path_ = $path$");
 				MProperties prop = new MProperties();
 				prop.setString("path", path);
 				int res = sth.executeUpdate(prop);
 				if (res == 0) {
 					throw new IOException("File not found: " + path);
 				}
+				sth.close();
+				con.commit();
 			}
 		} catch (IOException e) {
 			throw e;
@@ -323,7 +354,7 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 				throw new IOException("Not supported"); // TODO use ACL!!!!
 	
 			con = pool.getConnection();
-			DbStatement sth = con.createStatement("INSERT INTO " + prefix + "_entry (name,path,pathlevel,created,modified,type) "
+			DbStatement sth = con.createStatement("INSERT INTO " + prefix + "_entry_ (name_,path_,pathlevel_,created_,modified_,type_) "
 					+ "VALUES ($name$,$path$,$pathlevel$,$created$,$modified$,1)");
 			
 			while (path.endsWith("/")) path = path.substring(0, path.length()-1);
@@ -331,12 +362,13 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 			
 			Date now = new Date();
 			StringBuilder cur = new StringBuilder().append('/');
+			path = path.substring(1); // remove first /
 			for (String part : path.split("/")) {
 				cur.append(part).append('/');
 				String curStr = cur.toString();
 				EntryData entry = getEntry(curStr);
 				if (entry == null) {
-					int pathLevel = MString.countCharacters(curStr, '/');
+					int pathLevel = MString.countCharacters(curStr, '/')-1;
 					MProperties prop = new MProperties();
 					prop.setString("name", part);
 					prop.setString("path", curStr);
@@ -349,6 +381,8 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 					}
 				}
 			}
+			sth.close();
+			con.commit();
 			
 		} catch (IOException e) {
 			throw e;
@@ -433,11 +467,11 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 		private Date modified;
 
 		public EntryData(DbResult res) throws Exception {
-			this.name = res.getString("name");
-			this.size = res.getLong("size");
-			this.path = res.getString("path");
-			this.created = res.getDate("created");
-			this.modified = res.getDate("modified");
+			this.name = res.getString("name_");
+			this.size = res.getLong("size_");
+			this.path = res.getString("path_");
+			this.created = res.getDate("created_");
+			this.modified = res.getDate("modified_");
 		}
 		
 	}
