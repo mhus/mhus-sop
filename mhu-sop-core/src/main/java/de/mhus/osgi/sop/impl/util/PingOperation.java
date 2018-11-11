@@ -54,7 +54,7 @@ public class PingOperation extends AbstractOperation {
 
 	@Override
 	protected OperationDescription createDescription() {
-		return new OperationDescription(PingOperation.class, this, "Ping");
+		return new OperationDescription(getUuid(),PingOperation.class, this, "Ping");
 	}
 
 

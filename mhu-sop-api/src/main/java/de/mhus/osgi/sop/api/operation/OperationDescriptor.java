@@ -17,6 +17,7 @@ package de.mhus.osgi.sop.api.operation;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.UUID;
 
 import de.mhus.lib.basics.Named;
 import de.mhus.lib.basics.Versioned;
@@ -42,19 +43,22 @@ public class OperationDescriptor implements MNlsProvider, Nls, Named, Versioned 
 	private OperationAddress address;
 	private OperationDescription description;
 	private String acl;
+	private UUID uuid;
 
 	public OperationDescriptor(
+			UUID uuid,
 			String address,
 			OperationDescription description,
 			Collection<String> tags,
 			String acl
 		) {
-		this(new OperationAddress(address), description, tags, acl);
+		this(uuid, new OperationAddress(address), description, tags, acl);
 		
 	}
 	
-	public OperationDescriptor(OperationAddress address, OperationDescription description,
+	public OperationDescriptor(UUID uuid, OperationAddress address, OperationDescription description,
 			Collection<String> tags, String acl) {
+		this.uuid = uuid;
 		this.address = address;
 		this.description = description;
 		this.tags = tags;
@@ -188,4 +192,7 @@ public class OperationDescriptor implements MNlsProvider, Nls, Named, Versioned 
 		return acl;
 	}
 		
+	public UUID getUuid() {
+		return uuid;
+	}
 }

@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.UUID;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -33,6 +34,7 @@ import aQute.bnd.annotation.component.Reference;
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MLog;
+import de.mhus.lib.core.MValidator;
 import de.mhus.lib.core.strategy.DefaultTaskContext;
 import de.mhus.lib.core.strategy.NotSuccessful;
 import de.mhus.lib.core.strategy.Operation;
@@ -56,7 +58,7 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
 
 	private BundleContext context;
 	private ServiceTracker<Operation,Operation> nodeTracker;
-	private HashMap<String, LocalOperationDescriptor> register = new HashMap<>();
+	private HashMap<UUID, LocalOperationDescriptor> register = new HashMap<>();
 	public static LocalOperationsProvider instance;
 
 	@Activate
@@ -89,7 +91,7 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
 					log().i("register",desc);
 					synchronized (register) {
 						LocalOperationDescriptor descriptor = createDescriptor(reference, service);
-						if (register.put(desc.getPath() + ":" + desc.getVersionString(), descriptor ) != null)
+						if (register.put(desc.getUuid(), descriptor ) != null)
 							log().w("Operation already defined",desc.getPath());
 					}
 				} else {
@@ -131,7 +133,7 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
 			} catch (Throwable t) {
 				log().i(t);
 			}
-			return new LocalOperationDescriptor(OperationAddress.create(PROVIDER_NAME,desc), desc,tags, acl, service);
+			return new LocalOperationDescriptor(service.getUuid(), OperationAddress.create(PROVIDER_NAME,desc), desc,tags, acl, service);
 		}
 
 		@Override
@@ -145,7 +147,7 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
 					log().i("modified",desc);
 					synchronized (register) {
 						LocalOperationDescriptor descriptor = createDescriptor(reference, service);
-						register.put(desc.getPath() + ":" + desc.getVersionString(), descriptor);
+						register.put(desc.getUuid(), descriptor);
 					}
 				}
 			}
@@ -162,7 +164,7 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
 				if (desc != null && desc.getPath() != null) {
 					log().i("unregister",desc);
 					synchronized (register) {
-						register.remove(desc.getPath() + ":" + desc.getVersionString());
+						register.remove(desc.getUuid());
 					}
 				}
 			}			
@@ -206,7 +208,7 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
 			if (!PROVIDER_NAME.equals(desc.getProvider()))
 				throw new NotFoundException("description is from another provider",desc);
 			synchronized (register) {
-				LocalOperationDescriptor local = register.get(desc.getPath() + ":" + desc.getVersionString());
+				LocalOperationDescriptor local = findOperation(desc);
 				if (local != null)
 					operation = local.operation;
 			}
@@ -241,13 +243,31 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
 		}
 	}
 
+	private LocalOperationDescriptor findOperation(OperationDescriptor desc) {
+		if (MValidator.isUUID(desc.getPath()))
+			return register.get(UUID.fromString(desc.getPath()));
+		
+		for (LocalOperationDescriptor value : register.values())
+			if (desc.getPath().equals(value.getPath()) && desc.getVersionString().equals(value.getVersionString())) {
+				return value;
+			}
+		return null;
+	}
+	private LocalOperationDescriptor findOperation(OperationAddress desc) {
+		for (LocalOperationDescriptor value : register.values())
+			if (value.operation.getUuid().toString().equals(desc.getPath()) || desc.getPath().equals(value.getPath()) && desc.getVersionString().equals(value.getVersionString())) {
+				return value;
+			}
+		return null;
+	}
+
 	private class LocalOperationDescriptor extends OperationDescriptor {
 
 		private Operation operation;
 
-		public LocalOperationDescriptor(OperationAddress address, OperationDescription description,
+		public LocalOperationDescriptor(UUID uuid, OperationAddress address, OperationDescription description,
 				Collection<String> tags, String acl, Operation operation) {
-			super(address, description, tags, acl);
+			super(uuid, address, description, tags, acl);
 			this.operation = operation;
 		}
 		
@@ -257,14 +277,13 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
 			if (ifc == Operation.class) return (T) operation;
 			return super.adaptTo(ifc);
 		}
-
 		
 	}
 
 	@Override
 	public OperationDescriptor getOperation(OperationAddress addr) throws NotFoundException {
 		synchronized (register) {
-			LocalOperationDescriptor ret = register.get(addr.getPath() + ":" + addr.getVersionString());
+			LocalOperationDescriptor ret = findOperation(addr);
 			if (ret == null) throw new NotFoundException("operation not found", addr);
 			return ret;
 		}

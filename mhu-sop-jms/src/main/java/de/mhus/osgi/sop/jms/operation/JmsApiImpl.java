@@ -17,6 +17,7 @@ package de.mhus.osgi.sop.jms.operation;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.UUID;
 
 import javax.jms.MapMessage;
 
@@ -84,6 +85,7 @@ public class JmsApiImpl extends MLog implements JmsApi {
 					msg.setString("tags" + cnt, tags );
 					msg.setString("acl" + cnt, desc.getAcl() );
 					msg.setString("title" + cnt, desc.getTitle());
+					msg.setString("uuid" + cnt, desc.getUuid().toString());
 					for (String key : desc.getParameterKeys()) {
 						msg.setString("param" + cnt + "." + key, desc.getParameter(key) );
 					}
@@ -146,9 +148,9 @@ public class JmsApiImpl extends MLog implements JmsApi {
 
 		private long lastUpdated;
 
-		public JmsOperationDescriptor(OperationAddress address, OperationDescription description,
+		public JmsOperationDescriptor(UUID uuid, OperationAddress address, OperationDescription description,
 				Collection<String> tags, String acl) {
-			super(address, description, tags, acl);
+			super(uuid, address, description, tags, acl);
 		}
 
 		public long getLastUpdated() {
@@ -177,7 +179,6 @@ public class JmsApiImpl extends MLog implements JmsApi {
 			msg.setLong("timeout0", entry.getTimeout());
 			msg.setBoolean("readOnly0", entry.isReadOnly());
 			msg.setBoolean("persistent0", entry.isPersistent());
-			
 			registerClient.sendJms(msg);
 			return true;
 		} catch (Throwable t) {

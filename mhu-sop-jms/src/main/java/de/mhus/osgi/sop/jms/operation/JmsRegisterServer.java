@@ -17,6 +17,7 @@ package de.mhus.osgi.sop.jms.operation;
 
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.UUID;
 
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
@@ -96,6 +97,7 @@ public class JmsRegisterServer extends AbstractJmsDataChannel {
 								String title = m.getString("title" + cnt);
 								String form = m.getString("form" + cnt);
 								String acl = m.getString("acl" + cnt);
+								UUID uuid = UUID.fromString(m.getString("uuid" + cnt));
 								DefRoot model = null;
 								if (form != null) {
 									try {
@@ -119,10 +121,10 @@ public class JmsRegisterServer extends AbstractJmsDataChannel {
 								JmsOperationDescriptor desc = JmsApiImpl.instance.register.get(ident);
 								if (desc == null) {
 									OperationAddress a = new OperationAddress(JmsOperationProvider.PROVIDER_NAME + "://" + path + ":" + version + "/" + queue + "/" + connection);
-									OperationDescription d = new OperationDescription(a.getGroup(),a.getName(),a.getVersion(),null,title);
+									OperationDescription d = new OperationDescription(uuid, a.getGroup(),a.getName(),a.getVersion(),null,title);
 									d.setForm(model);
 									d.setParameters(parameters);
-									desc = new JmsOperationDescriptor(a,d,tags == null ? null : MCollection.toTreeSet(tags.split(";")), acl );
+									desc = new JmsOperationDescriptor(uuid,a,d,tags == null ? null : MCollection.toTreeSet(tags.split(";")), acl );
 									JmsApiImpl.instance.register.put(ident, desc);
 								}
 								desc.setLastUpdated();
