@@ -138,15 +138,19 @@ public class AccountFile extends MLog implements Account {
 	}
 
 	protected void doSave() {
-		Element xml = MXml.getElementByPath(doc.getDocumentElement(), "attributes");
+		Element xmlAttr = MXml.getElementByPath(doc.getDocumentElement(), "attributes");
+		if (xmlAttr == null) {
+			xmlAttr = doc.createElement("attributes");
+			doc.getDocumentElement().appendChild(xmlAttr);
+		}
 		doc.getDocumentElement().setAttribute("active", String.valueOf(active));
-		for (Element elem : MXml.getLocalElementIterator(xml))
-			xml.removeChild(elem);
+		for (Element elem : MXml.getLocalElementIterator(xmlAttr))
+			xmlAttr.removeChild(elem);
 		for (Entry<String, Object> item : attributes.entrySet()) {
 			Element attr = doc.createElement("attribute");
 			attr.setAttribute("name", item.getKey());
 			attr.setAttribute("value", String.valueOf(item.getValue()));
-			xml.appendChild(attr);
+			xmlAttr.appendChild(attr);
 		}
 		try {
 			MXml.saveXml(doc, file);
@@ -187,16 +191,16 @@ public class AccountFile extends MLog implements Account {
 		timeout = MCast.tolong( userE.getAttribute("timeout"), 0);
 		
 		{
-			Element xmlAcl = MXml.getElementByPath(userE, "groups");
+			Element xmlGroups = MXml.getElementByPath(userE, "groups");
 			groups.clear();
-			for (Element xmlAce : MXml.getLocalElementIterator(xmlAcl,"group")) {
+			for (Element xmlAce : MXml.getLocalElementIterator(xmlGroups,"group")) {
 				groups.add(xmlAce.getAttribute("name").trim().toLowerCase());
 			}
 		}
 		{
-			Element xmlAcl = MXml.getElementByPath(userE, "attributes");
+			Element xmlAttr = MXml.getElementByPath(userE, "attributes");
 			attributes.clear();
-			for (Element xmlAce : MXml.getLocalElementIterator(xmlAcl,"attribute")) {
+			for (Element xmlAce : MXml.getLocalElementIterator(xmlAttr,"attribute")) {
 				attributes.setString(xmlAce.getAttribute("name"), xmlAce.getAttribute("value"));
 			}
 		}
