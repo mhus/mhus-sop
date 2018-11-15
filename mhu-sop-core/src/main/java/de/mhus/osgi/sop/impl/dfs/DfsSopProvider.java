@@ -176,7 +176,7 @@ public class DfsSopProvider extends OperationToIfcProxy implements DfsProviderOp
 	}
 
 	@Override
-	public void createDirecories(MUri uri) throws IOException {
+	public void createDirectories(MUri uri) throws IOException {
 		if (!AaaUtil.isCurrentAdmin())
 			throw new IOException("Not supported");
 		

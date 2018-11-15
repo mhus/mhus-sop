@@ -70,7 +70,7 @@ public class JournalRestNode extends JsonListNode<JournalQueue>{
 		List<SopJournal> res = api.getJournalEntries(foundationId, queue.getName(), since, max, search);
 		for (SopJournal j : res) {
 			ObjectNode obj = list.addObject();
-			MPojo.pojoToJson(j, obj, factory);
+			MPojo.pojoToJson(j, obj, factory, true);
 		}
 		
 	}

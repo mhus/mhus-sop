@@ -1,0 +1,15 @@
+<config>
+	<table name="$/prefix$_entry" primary_key="parent,name">
+	  <field name="id" type="string" size="36"/>
+	  <field name="parent" type="string" size="36"/>
+	  <field name="content" type="blob" />
+	  <field name="created" type="DATETIME" />
+	  <field name="modified" type="DATETIME" />
+	  <field name="name" type="string" size="155" />
+	  <field name="type" type="int" />
+	  <field name="size" type="long" />
+	</table>
+	<index name="$/prefix$_entryid" table="$/prefix$_entry" fields="id" unique="true" />
+	<index name="$/prefix$_entrypa" table="$/prefix$_entry" fields="parent" unique="false" />
+	
+</config>

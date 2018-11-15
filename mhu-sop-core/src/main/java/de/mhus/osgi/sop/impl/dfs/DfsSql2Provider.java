@@ -9,14 +9,15 @@ import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.UUID;
 
 import javax.sql.DataSource;
 
 import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.MConstants;
 import de.mhus.lib.core.MProperties;
-import de.mhus.lib.core.MString;
 import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.config.XmlConfigFile;
 import de.mhus.lib.core.strategy.OperationDescription;
@@ -26,6 +27,7 @@ import de.mhus.lib.core.util.MutableUri;
 import de.mhus.lib.core.util.SoftHashMap;
 import de.mhus.lib.core.util.Version;
 import de.mhus.lib.errors.MRuntimeException;
+import de.mhus.lib.errors.NotFoundException;
 import de.mhus.lib.sql.DataSourceProvider;
 import de.mhus.lib.sql.DbConnection;
 import de.mhus.lib.sql.DbPool;
@@ -39,8 +41,10 @@ import de.mhus.osgi.sop.api.dfs.DfsProviderOperation;
 import de.mhus.osgi.sop.api.dfs.FileInfo;
 import de.mhus.osgi.sop.api.dfs.FileQueueApi;
 
-public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOperation {
+public class DfsSql2Provider extends OperationToIfcProxy implements DfsProviderOperation {
 	
+	private static final UUID ROOT_ID = MConstants.EMPTY_UUID;
+	private static final EntryData rootEntry = new EntryData();
 	private String scheme = "sql";
 	private String prefix = "sop_dfs";
 	private String acl = "*";
@@ -50,7 +54,7 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 	private DataSource dataSource;
 	private DataSourceProvider dsProvider;
 
-	public DfsSqlProvider(String dataSource, String scheme, String prefix, String acl) {
+	public DfsSql2Provider(String dataSource, String scheme, String prefix, String acl) {
 		this.dataSourceName = dataSource;
 		this.scheme = scheme;
 		this.prefix = prefix;
@@ -76,23 +80,45 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 
 	private EntryData getEntry(MUri uri) {
 		String path = normalizePath(uri.getPath());
+		if (path.endsWith("/")) path = path.substring(0, path.length()-1);
 		return getEntry(path);
 	}
 	
+	
 	private EntryData getEntry(String path) {
+		if (path == null || path.equals("/") || path.equals("")) {
+			return rootEntry;
+		}
+		UUID parent = ROOT_ID;
+		EntryData current = null;
+		for (String name : path.split("/")) {
+			if (name.length() == 0) continue;
+			if (current != null && current.type == 0) {
+				return null; // file is not a directory entry
+			}
+			current = getEntry(parent, name);
+			if (current == null) return null;
+			parent = current.id;
+		}
+		return current;
+	}
+	
+	private EntryData getEntry(UUID parent, String name) {
+		name = normalizeName(name);
 		init();
 		DbConnection con = null;
 		DbResult res = null;
 		try {
 			con = pool.getConnection();
-			DbStatement sth = con.createStatement("SELECT name_,path_,created_,modified_,pathlevel_,size_ FROM " + prefix + "_entry_ WHERE path_ = $path$");
+			DbStatement sth = con.createStatement("SELECT id_,name_,created_,modified_,size_,parent_,type_ FROM " + prefix + "_entry_ WHERE parent_ = $parent$ AND name_ = $name$");
 			MProperties prop = new MProperties();
-			prop.setString("path", path);
+			prop.setString("name", name);
+			prop.setString("parent", parent.toString());
 			res = sth.executeQuery(prop);
 			if (res.next()) {
 				EntryData entry = new EntryData(res);
 				if (res.next()) {
-					log().w("more then one entry for",path);
+					log().w("more then one entry for",parent,name);
 				}
 				sth.close();
 				return entry;
@@ -100,12 +126,17 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 			sth.close();
 			return null;
 		} catch (Exception e) {
-			log().e(path,e);
+			log().e(parent,name,e);
 			return null;
 		} finally {
 			if (res != null) try {res.close();} catch (Throwable t) {log().e(t);};
 			if (con != null) con.close();
 		}
+	}
+
+	private String normalizeName(String name) {
+		if (name == null) return null;
+		return name.replace('/', '_').replace('%', '_');
 	}
 
 	@Override
@@ -136,23 +167,26 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 			}
 		}
 
+		EntryData entry = getEntry(uri);
+		if (entry == null ) {
+			log().d("entry not found",uri);
+			return null;
+		}
+
 		DbConnection con = null;
 		DbResult res = null;
 		try {
 			con = pool.getConnection();
-			DbStatement sth = con.createStatement("SELECT name_,path_,content_,modified_ FROM " + prefix + "_entry_ WHERE path_ = $path$");
+			DbStatement sth = con.createStatement("SELECT content_ FROM " + prefix + "_entry_ WHERE id_ = $id$");
 			MProperties prop = new MProperties();
-			prop.setString("path", path);
+			prop.setString("id", entry.id.toString());
 			res = sth.executeQuery(prop);
 			if (res.next()) {
 
 				// found
 				
 				InputStream is = res.getBinaryStream("content_");
-				Date modify = res.getDate("modified_");
-				String name = res.getString("name_");
-//				String path2 = res.getString("path");
-				id = api.takeFile(is, 0, modify.getTime(), name);
+				id = api.takeFile(is, 0, entry.modified.getTime(), entry.name);
 				synchronized (queueCache) {
 					queueCache.put(path, id);
 				}
@@ -181,27 +215,31 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 		init();
 
 		TreeMap<String,MUri> out = new TreeMap<>();
-		String path = normalizePath(uri.getPath());
+		
+		EntryData entry = getEntry(uri);
+		String path = uri.getPath();
 		if (!path.endsWith("/")) path = path +"/";
-		int pathLevel = MString.countCharacters(path, '/'); //TODO -1 ?
+
+		if (entry == null) {
+			log().d("entry not found",uri);
+			return out;
+		}
 		
 		DbConnection con = null;
 		DbResult res = null;
 		try {
 			con = pool.getConnection();
-			DbStatement sth = con.createStatement("SELECT name_,path_,modified_ FROM " + prefix + "_entry_ WHERE path_ like $path$ AND pathlevel_ = $pathlevel$");
+			DbStatement sth = con.createStatement("SELECT name_ FROM " + prefix + "_entry_ WHERE parent_ = $parent$");
 			MProperties prop = new MProperties();
-			prop.setString("path", path + "%");
-			prop.setInt("pathlevel", pathLevel);
+			prop.setString("parent", entry.id.toString());
 			res = sth.executeQuery(prop);
 			while(res.next()) {
 				String name2 = res.getString("name_");
-				String path2 = res.getString("path_");
 				
 				MutableUri u = new MutableUri(null);
 				u.setScheme(uri.getScheme());
 				u.setLocation(uri.getLocation());
-				u.setPath(path2);
+				u.setPath(path + name2);
 
 				out.put(name2, u);
 			}
@@ -217,6 +255,7 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 	}
 
 	private String normalizePath(String path) {
+		if (path == null) return null;
 		return path.trim().replace('%', '_');
 	}
 
@@ -236,14 +275,6 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 			String targetPath = normalizePath(target.getPath());
 			if (targetPath.endsWith("/"))
 				throw new IOException("Target is a directory " + targetPath);
-			// test for directory
-			String dirPath = MUri.getFileDirectory(targetPath);
-			if (dirPath != null) {
-				dirPath = dirPath + "/";
-				EntryData dirEntry = getEntry(dirPath);
-				if (dirEntry == null)
-					throw new IOException("Directory not found " + dirPath);
-			}
 
 			synchronized (queueCache) {
 				queueCache.remove(targetPath);
@@ -254,10 +285,13 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 			EntryData entry = getEntry(target);
 			con = pool.getConnection();
 			if (entry != null) {
+				if (entry.type != 0)
+					throw new IOException("Entry is not a file " + targetPath);
+				
 				// update
-				DbStatement sth = con.createStatement("UPDATE " + prefix + "_entry_ SET modified_=$modified$, content_=$content$ WHERE path_=$path$");
+				DbStatement sth = con.createStatement("UPDATE " + prefix + "_entry_ SET modified_=$modified$, content_=$content$ WHERE id_=$id$");
 				MProperties prop = new MProperties();
-				prop.setString("path", targetPath);
+				prop.setString("id", entry.id.toString());
 				prop.setDate("modified", now);
 				prop.put("content", new FileInputStream(fromFile));
 				int res = sth.executeUpdate(prop);
@@ -268,15 +302,19 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 				con.commit();
 			} else {
 				// create
-				String targetName = MUri.getFileName(targetPath);
-				int pathLevel = MString.countCharacters(targetPath, '/');
 				
-				DbStatement sth = con.createStatement("INSERT INTO " + prefix + "_entry_ (name_,path_,pathlevel_,created_,modified_,type_,content_) "
-						+ "VALUES ($name$,$path$,$pathlevel$,$created$,$modified$,0,$content$)");
+				EntryData parent = getEntry(MUri.getFileDirectory(targetPath));
+				if (parent == null)
+					throw new NotFoundException("Parent directory not found",targetPath);
+				
+				String targetName = MUri.getFileName(targetPath);
+
+				DbStatement sth = con.createStatement("INSERT INTO " + prefix + "_entry_ (name_,id_,parent_,created_,modified_,type_,content_) "
+						+ "VALUES ($name$,$id$,$parent$,$created$,$modified$,0,$content$)");
 				MProperties prop = new MProperties();
 				prop.setString("name", targetName);
-				prop.setString("path", targetPath);
-				prop.setInt("pathlevel", pathLevel);
+				prop.setString("id", UUID.randomUUID().toString());
+				prop.setString("parent", parent.id.toString());
 				prop.setDate("created", now);
 				prop.setDate("modified", now);
 				prop.put("content", new FileInputStream(fromFile));
@@ -300,6 +338,11 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 
 	@Override
 	public void deleteFile(MUri uri) throws IOException {
+		
+		EntryData entry = getEntry(uri);
+		if (entry == null)
+			throw new IOException("Entry not found " + uri);
+		
 		String path = normalizePath(uri.getPath());
 		DbConnection con = null;
 		try {
@@ -307,34 +350,28 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 				throw new IOException("Not supported"); // TODO use ACL!!!!
 	
 			con = pool.getConnection();
-			if (path.endsWith("/")) {
+			if (entry.type == 1 ) {
 				// is directory
-				DbStatement sth = con.createStatement("DELETE FROM " + prefix + "_entry_ WHERE path_ like $path$");
-				MProperties prop = new MProperties();
-				prop.setString("path", path + "%");
-				int res = sth.executeUpdate(prop);
-				if (res == 0) {
-					throw new IOException("File not found: " + path);
+				for (Entry<String, MUri> sub : getDirectoryList(uri).entrySet()) {
+					deleteFile(sub.getValue());
 				}
-				sth.close();
-				con.commit();
-			} else {
-				
-				synchronized (queueCache) {
-					queueCache.remove(path);
-				}
-				
-				// is file
-				DbStatement sth = con.createStatement("DELETE FROM " + prefix + "_entry_ WHERE path_ = $path$");
-				MProperties prop = new MProperties();
-				prop.setString("path", path);
-				int res = sth.executeUpdate(prop);
-				if (res == 0) {
-					throw new IOException("File not found: " + path);
-				}
-				sth.close();
-				con.commit();
 			}
+			
+			synchronized (queueCache) {
+				queueCache.remove(path);
+			}
+			
+			// is file
+			DbStatement sth = con.createStatement("DELETE FROM " + prefix + "_entry_ WHERE id_ = $id$");
+			MProperties prop = new MProperties();
+			prop.setString("id", entry.id.toString());
+			int res = sth.executeUpdate(prop);
+			if (res == 0) {
+				throw new IOException("File not found: " + path);
+			}
+			sth.close();
+			con.commit();
+			
 		} catch (IOException e) {
 			throw e;
 		} catch (Exception e) {
@@ -346,39 +383,34 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 
 	@Override
 	public void createDirectories(MUri uri) throws IOException {
-		String path = normalizePath(uri.getPath());
 		DbConnection con = null;
 		try {
 			if (!AaaUtil.isCurrentAdmin())
 				throw new IOException("Not supported"); // TODO use ACL!!!!
 	
+			String parentPath = normalizePath(MUri.getFileDirectory(uri.getPath()));
+			String name = normalizeName(MUri.getFileName(uri.getPath()));
+			EntryData parent = getEntry(parentPath);
+			if (parent == null) {
+				createDirectories(MUri.toUri("sql:" + parentPath));
+				parent = getEntry(parentPath);
+				if (parent == null)
+					throw new IOException("can't create " + parentPath );
+			}
 			con = pool.getConnection();
-			DbStatement sth = con.createStatement("INSERT INTO " + prefix + "_entry_ (name_,path_,pathlevel_,created_,modified_,type_) "
-					+ "VALUES ($name$,$path$,$pathlevel$,$created$,$modified$,1)");
-			
-			while (path.endsWith("/")) path = path.substring(0, path.length()-1);
-			if (path.length() == 0) return;
-			
+			DbStatement sth = con.createStatement("INSERT INTO " + prefix + "_entry_ (name_,id_,parent_,created_,modified_,type_) "
+					+ "VALUES ($name$,$id$,$parent$,$created$,$modified$,1)");
+						
 			Date now = new Date();
-			StringBuilder cur = new StringBuilder().append('/');
-			path = path.substring(1); // remove first /
-			for (String part : path.split("/")) {
-				cur.append(part).append('/');
-				String curStr = cur.toString();
-				EntryData entry = getEntry(curStr);
-				if (entry == null) {
-					int pathLevel = MString.countCharacters(curStr, '/')-1;
-					MProperties prop = new MProperties();
-					prop.setString("name", part);
-					prop.setString("path", curStr);
-					prop.setInt("pathlevel", pathLevel);
-					prop.setDate("created", now);
-					prop.setDate("modified", now);
-					int res = sth.executeUpdate(prop);
-					if (res != 1) {
-						throw new IOException("Can't insert entry " + curStr);
-					}
-				}
+			MProperties prop = new MProperties();
+			prop.setString("name", name);
+			prop.setString("id", UUID.randomUUID().toString());
+			prop.setString("parent", parent.id.toString());
+			prop.setDate("created", now);
+			prop.setDate("modified", now);
+			int res = sth.executeUpdate(prop);
+			if (res != 1) {
+				throw new IOException("Can't insert entry " + uri);
 			}
 			sth.close();
 			con.commit();
@@ -427,7 +459,7 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 		dsProvider.setDataSource(dataSource);
 		pool = new DefaultDbPool(dsProvider);
 		try {
-			URL url = MSystem.locateResource(this, "SqlDfsStorage.xml");
+			URL url = MSystem.locateResource(this, "Sql2DfsStorage.xml");
 			DbConnection con = pool.getConnection();
 			XmlConfigFile data = new XmlConfigFile(url.openStream());
 			data.setString("prefix", prefix);
@@ -456,21 +488,31 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 
 	private static class EntryData {
 
+		UUID id;
 		@SuppressWarnings("unused")
+		UUID parent;
 		private String name;
 		private long size;
 		@SuppressWarnings("unused")
-		private String path;
-		@SuppressWarnings("unused")
 		private Date created;
 		private Date modified;
+		private int type;
 
+		public EntryData() {
+			id = ROOT_ID;
+			parent = null;
+			name = "";
+			type = 1;
+		}
+		
 		public EntryData(DbResult res) throws Exception {
+			this.id = UUID.fromString(res.getString("id_"));
+			this.parent = UUID.fromString(res.getString("parent_"));
 			this.name = res.getString("name_");
 			this.size = res.getLong("size_");
-			this.path = res.getString("path_");
 			this.created = res.getDate("created_");
 			this.modified = res.getDate("modified_");
+			this.type = res.getInt("type_");
 		}
 		
 	}

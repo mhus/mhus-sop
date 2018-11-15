@@ -37,7 +37,7 @@ public abstract class AbstractSingleObjectNode<T> extends JsonSingleNode<T> {
 		
 		doPrepareForOutput(obj, callContext, false);
 		ObjectNode jRoot = result.createObjectNode();
-		MPojo.pojoToJson(obj, jRoot, schema);
+		MPojo.pojoToJson(obj, jRoot, schema, true);
 
 		
 	}

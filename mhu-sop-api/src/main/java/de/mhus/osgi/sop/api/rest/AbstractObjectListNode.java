@@ -37,7 +37,7 @@ public abstract class AbstractObjectListNode<T> extends JsonListNode<T> {
 		if (obj != null) {
 			doPrepareForOutput(obj, callContext, false);
 			ObjectNode jRoot = result.createObjectNode();
-			MPojo.pojoToJson(obj, jRoot, schema);
+			MPojo.pojoToJson(obj, jRoot, schema, true);
 		} else {
 			ArrayNode jList = result.createArrayNode();
 			
@@ -45,7 +45,7 @@ public abstract class AbstractObjectListNode<T> extends JsonListNode<T> {
 				doPrepareForOutput(item, callContext, true);
 				ObjectNode jItem = jList.objectNode();
 				jList.add(jItem);
-				MPojo.pojoToJson(item, jItem, schema);
+				MPojo.pojoToJson(item, jItem, schema, true);
 			}
 			
 		}

@@ -46,6 +46,6 @@ public interface DfsProviderOperation {
 	 * @param uri
 	 * @throws IOException
 	 */
-	void createDirecories(MUri uri) throws IOException;
+	void createDirectories(MUri uri) throws IOException;
 	
 }

@@ -175,7 +175,7 @@ public class DfsApiImpl extends MLog implements DfsApi {
 			if (uri.getScheme().equals(desc.getParameter(DfsProviderOperation.PARAM_SCHEME))) {
 				try {
 					DfsProviderOperation provider = OperationUtil.createOpertionProxy(DfsProviderOperation.class, desc);
-					provider.createDirecories(uri);
+					provider.createDirectories(uri);
 					return;
 				} catch (Throwable t) {
 					log().w(desc,t);

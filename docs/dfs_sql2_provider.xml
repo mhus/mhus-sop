@@ -17,10 +17,10 @@
     -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-    <bean id="sqlprovider" class="de.mhus.osgi.sop.impl.dfs.DfsSqlProvider">
+    <bean id="sqlprovider" class="de.mhus.osgi.sop.impl.dfs.DfsSql2Provider">
 		<!-- dataSource --><argument value="db_sop"/>
-    		<!-- scheme --><argument value="sql"/>
-		<!-- prefix --><argument value="sop_dfs"/>
+    		<!-- scheme --><argument value="sql2"/>
+		<!-- prefix --><argument value="sop_dfs2"/>
 		<!-- acl --><argument value="*"/>
     </bean>
 <!-- 
