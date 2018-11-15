@@ -75,7 +75,7 @@ public class MailQueueTimer extends SchedulerServiceAdapter {
 				return;
 			}
 			int mailCnt = 0;
-			for (SopMailTask task : manager.getByQualification(Db.query(SopMailTask.class).eq(SopMailTask_.STATUS, MailQueueOperation.STATUS.READY).le(SopMailTask_.NEXTSENDATTEMPT, now))) {
+			for (SopMailTask task : manager.getByQualification(Db.query(SopMailTask.class).eq(SopMailTask_.STATUS, MailQueueOperation.STATUS.READY).le(SopMailTask_.NEXT_SEND_ATTEMPT, now))) {
 				
 				mailCnt++;
 				if (CFG_MAX_MAILS_PER_ROUND.value() > 0 && mailCnt > CFG_MAX_MAILS_PER_ROUND.value()) continue; // iterate all but do not send - this will close the db handle at the end

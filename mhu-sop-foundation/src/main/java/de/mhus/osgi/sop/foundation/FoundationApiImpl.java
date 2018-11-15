@@ -349,7 +349,7 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 		return getManager().getObjectByQualification(Db.query(SopData.class)
 				.eq(M.n(SopData_.FOUNDATION), orgaId)
 				.eq(M.n(SopData_.TYPE), type)
-				.eq(M.n(SopData_.FOREIGNID), id));
+				.eq(M.n(SopData_.FOREIGN_ID), id));
 	}
 
 	@Override
