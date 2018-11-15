@@ -21,8 +21,10 @@ import de.mhus.lib.annotations.adb.DbPersistent;
 import de.mhus.lib.annotations.adb.DbType.TYPE;
 import de.mhus.lib.basics.Ace;
 import de.mhus.lib.basics.AclControlled;
+import de.mhus.lib.basics.consts.GenerateConst;
 import de.mhus.lib.errors.MException;
 
+@GenerateConst
 public class SopAcl extends DbMetadata implements AclControlled {
 	
 	@DbPersistent(type=TYPE.BLOB)

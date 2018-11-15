@@ -20,9 +20,11 @@ import java.util.UUID;
 import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.annotations.adb.DbIndex;
 import de.mhus.lib.annotations.adb.DbPersistent;
+import de.mhus.lib.basics.consts.GenerateConst;
 import de.mhus.lib.core.MSystem;
 import de.mhus.lib.errors.MException;
 
+@GenerateConst
 public class SopObjectParameter extends DbMetadata {
 
 	public static final String TYPE_GLOBAL = "_global";

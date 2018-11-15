@@ -22,7 +22,9 @@ import de.mhus.lib.annotations.adb.DbIndex;
 import de.mhus.lib.annotations.adb.DbPersistent;
 import de.mhus.lib.annotations.adb.DbPrimaryKey;
 import de.mhus.lib.basics.UuidIdentificable;
+import de.mhus.lib.basics.consts.GenerateConst;
 
+@GenerateConst
 public class SopRegister extends DbComfortableObject implements UuidIdentificable {
 
 	@DbPrimaryKey

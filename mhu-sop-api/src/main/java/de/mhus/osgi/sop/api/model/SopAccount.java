@@ -9,6 +9,7 @@ import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.annotations.adb.DbIndex;
 import de.mhus.lib.annotations.adb.DbPersistent;
 import de.mhus.lib.basics.IsNull;
+import de.mhus.lib.basics.consts.GenerateConst;
 import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.MConstants;
 import de.mhus.lib.core.MPassword;
@@ -18,6 +19,7 @@ import de.mhus.lib.core.security.Account;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.errors.NotSupportedException;
 
+@GenerateConst
 public class SopAccount extends DbMetadata implements Account {
 
 	@DbIndex("u1")

@@ -18,9 +18,11 @@ package de.mhus.osgi.sop.api.model;
 import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.annotations.adb.DbIndex;
 import de.mhus.lib.annotations.adb.DbPersistent;
+import de.mhus.lib.basics.consts.GenerateConst;
 import de.mhus.lib.core.MSystem;
 import de.mhus.lib.errors.MException;
 
+@GenerateConst
 public class SopActionTask extends DbMetadata {
 	
 	@DbPersistent(ro=true)

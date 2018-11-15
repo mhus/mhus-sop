@@ -18,10 +18,12 @@ package de.mhus.osgi.sop.api.foundation.model;
 import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.annotations.adb.DbPersistent;
 import de.mhus.lib.annotations.generic.Public;
+import de.mhus.lib.basics.consts.GenerateConst;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.foundation.FoundationApi;
 
+@GenerateConst
 public class SopFoundation extends DbMetadata {
 
 	@DbPersistent

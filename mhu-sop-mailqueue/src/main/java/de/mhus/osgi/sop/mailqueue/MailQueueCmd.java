@@ -89,7 +89,7 @@ public class MailQueueCmd implements Action {
 			XdbService manager = MApi.lookup(SopApi.class).getManager();
 			AQuery<SopMailTask> q = Db.query(SopMailTask.class);
 			if (!all)
-				q.eq(SopMailTask::getStatus, MailQueueOperation.STATUS.READY);
+				q.eq(SopMailTask_.STATUS, MailQueueOperation.STATUS.READY);
 			for (SopMailTask task : manager.getByQualification(q)) {
 				table.addRowValues(
 						task.getId(),
@@ -139,7 +139,7 @@ public class MailQueueCmd implements Action {
 			if (parameters == null || parameters.length == 0) {
 				// retry all
 				XdbService manager = MApi.lookup(SopApi.class).getManager();
-				for (SopMailTask task : manager.getByQualification(Db.query(SopMailTask.class).eq(SopMailTask::getStatus, MailQueueOperation.STATUS.ERROR))) {
+				for (SopMailTask task : manager.getByQualification(Db.query(SopMailTask.class).eq(SopMailTask_.STATUS, MailQueueOperation.STATUS.ERROR))) {
 					System.out.println(task);
 					task.setStatus(STATUS.READY);
 					task.save();
@@ -177,7 +177,7 @@ public class MailQueueCmd implements Action {
 			if (parameters == null || parameters.length == 0) {
 				// retry all
 				XdbService manager = MApi.lookup(SopApi.class).getManager();
-				for (SopMailTask task : manager.getByQualification(Db.query(SopMailTask.class).eq(SopMailTask::getStatus, MailQueueOperation.STATUS.ERROR))) {
+				for (SopMailTask task : manager.getByQualification(Db.query(SopMailTask.class).eq(SopMailTask_.STATUS, MailQueueOperation.STATUS.ERROR))) {
 					System.out.println(task);
 					task.setStatus(STATUS.LOST);
 					task.save();
@@ -197,7 +197,7 @@ public class MailQueueCmd implements Action {
 		} break;
 		case "cleanup": {
 			XdbService manager = MApi.lookup(SopApi.class).getManager();
-			for (SopMailTask task : manager.getByQualification(Db.query(SopMailTask.class).eq(SopMailTask::getStatus, MailQueueOperation.STATUS.ERROR))) {
+			for (SopMailTask task : manager.getByQualification(Db.query(SopMailTask.class).eq(SopMailTask_.STATUS, MailQueueOperation.STATUS.ERROR))) {
 				if (task.getStatus() == STATUS.NEW || task.getStatus() == STATUS.READY || task.getStatus() == STATUS.ERROR) {
 					// ignore
 				} else {

@@ -20,6 +20,7 @@ import java.util.Date;
 import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.annotations.adb.DbPersistent;
 import de.mhus.lib.annotations.adb.DbType;
+import de.mhus.lib.basics.consts.GenerateConst;
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MSystem;
@@ -27,6 +28,7 @@ import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.mailqueue.MailMessage;
 import de.mhus.osgi.sop.api.mailqueue.MailQueueOperation;
 
+@GenerateConst
 public class SopMailTask extends DbMetadata {
 
 	@DbPersistent
