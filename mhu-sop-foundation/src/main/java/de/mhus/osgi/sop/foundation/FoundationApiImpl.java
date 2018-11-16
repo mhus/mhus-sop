@@ -48,11 +48,11 @@ import de.mhus.osgi.sop.api.aaa.AccessApi;
 import de.mhus.osgi.sop.api.data.SopDataController;
 import de.mhus.osgi.sop.api.foundation.FoundationApi;
 import de.mhus.osgi.sop.api.foundation.model.SopData;
-import de.mhus.osgi.sop.api.foundation.model.SopData_;
 import de.mhus.osgi.sop.api.foundation.model.SopFoundation;
 import de.mhus.osgi.sop.api.foundation.model.SopFoundationGroup;
-import de.mhus.osgi.sop.api.foundation.model.SopFoundation_;
 import de.mhus.osgi.sop.api.foundation.model.SopJournal;
+import de.mhus.osgi.sop.api.foundation.model._SopData;
+import de.mhus.osgi.sop.api.foundation.model._SopFoundation;
 import de.mhus.osgi.sop.api.rest.RestUtil;
 
 @Component(immediate=true,name="FoundationApi")
@@ -347,9 +347,9 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 	@Override
 	public SopData getSopDataByForeignId(UUID orgaId, String type, String id) throws MException {
 		return getManager().getObjectByQualification(Db.query(SopData.class)
-				.eq(M.n(SopData_.FOUNDATION), orgaId)
-				.eq(M.n(SopData_.TYPE), type)
-				.eq(M.n(SopData_.FOREIGN_ID), id));
+				.eq(M.n(_SopData._FOUNDATION), orgaId)
+				.eq(M.n(_SopData._TYPE), type)
+				.eq(M.n(_SopData._FOREIGN_ID), id));
 	}
 
 	@Override
@@ -415,7 +415,7 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 		LinkedList<SopFoundation> out = RestUtil.collectResults(
 				getManager(),
 				Db.extendObjectQueryFromSearch(
-					Db.query(SopFoundation.class).eq(SopFoundation_.ACTIVE, true),
+					Db.query(SopFoundation.class).eq(_SopFoundation._ACTIVE, true),
 					filter,
 					SEARCH_HELPER_FOUNDATION
 				)

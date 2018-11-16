@@ -42,13 +42,11 @@
 		            </goals>
 		          </execution>
 		        </executions>
-		          <dependencies>
-			        <dependency>
-				        	<groupId>de.mhus.lib</groupId>
-				        	<artifactId>mhu-lib-annotations</artifactId>
-				        	<version>${mhulib.version}</version>
-			        </dependency>
-		          </dependencies>
+		        <configuration>
+		        <!-- 
+		          <force>true</force>
+		         -->
+		        </configuration>
 	    		</plugin>
 			<plugin>
 				<groupId>org.apache.felix</groupId>
