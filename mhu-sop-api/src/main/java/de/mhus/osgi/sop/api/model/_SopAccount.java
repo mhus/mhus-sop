@@ -5,7 +5,7 @@ import de.mhus.lib.basics.consts.ConstBase;
 
 /**
  * File created by mhu const generator. Changes will be overwritten.
- * 16.11.2018
+ * 17.11.2018
  **/
 
 public class _SopAccount extends ConstBase {
@@ -16,13 +16,6 @@ public class _SopAccount extends ConstBase {
   public static final Identifier METHOD_CLEAR_ATTRIBUTES = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"clearAttributes");
   public static final Identifier METHOD_CREATE = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"create");
   public static final Identifier METHOD_DELETE = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"delete");
-  public static final Identifier METHOD_DO_INIT = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"doInit");
-  public static final Identifier METHOD_DO_POST_CREATE = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"doPostCreate");
-  public static final Identifier METHOD_DO_POST_DELETE = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"doPostDelete");
-  public static final Identifier METHOD_DO_POST_LOAD = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"doPostLoad");
-  public static final Identifier METHOD_DO_PRE_CREATE = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"doPreCreate");
-  public static final Identifier METHOD_DO_PRE_DELETE = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"doPreDelete");
-  public static final Identifier METHOD_DO_PRE_SAVE = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"doPreSave");
   public static final Identifier METHOD_FIND_PARENT_OBJECT = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"findParentObject");
   public static final Identifier METHOD_GET_ATTRIBUTES = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"getAttributes");
   public static final Identifier METHOD_GET_CREATION_DATE = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"getCreationDate");
@@ -49,7 +42,6 @@ public class _SopAccount extends ConstBase {
   public static final Identifier METHOD_SAVE = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"save");
   public static final Identifier METHOD_SAVE_CHANGED = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"saveChanged");
   public static final Identifier METHOD_SET_ACTIVE = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"setActive");
-  public static final Identifier METHOD_SET_DB_HANDLER = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"setDbHandler");
   public static final Identifier METHOD_SET_PASSWORD = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"setPassword");
   public static final Identifier METHOD_SET_PASSWORD_INTERNAL = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"setPasswordInternal");
   public static final Identifier METHOD_VALIDATE_PASSWORD = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"validatePassword");
@@ -69,13 +61,6 @@ public class _SopAccount extends ConstBase {
   public static final Identifier _DB_HANDLER = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"DbHandler");
   public static final Identifier _DELETE = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"delete");
   public static final Identifier _DISPLAY_NAME = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"DisplayName");
-  public static final Identifier _DO_INIT = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"doInit");
-  public static final Identifier _DO_POST_CREATE = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"doPostCreate");
-  public static final Identifier _DO_POST_DELETE = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"doPostDelete");
-  public static final Identifier _DO_POST_LOAD = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"doPostLoad");
-  public static final Identifier _DO_PRE_CREATE = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"doPreCreate");
-  public static final Identifier _DO_PRE_DELETE = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"doPreDelete");
-  public static final Identifier _DO_PRE_SAVE = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"doPreSave");
   public static final Identifier _FIND_PARENT_OBJECT = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"findParentObject");
   public static final Identifier _GROUPS = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"Groups");
   public static final Identifier _HAS_GROUP = new Identifier(de.mhus.osgi.sop.api.model.SopAccount.class,"hasGroup");

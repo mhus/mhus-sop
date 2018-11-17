@@ -5,7 +5,7 @@ import de.mhus.lib.basics.consts.ConstBase;
 
 /**
  * File created by mhu const generator. Changes will be overwritten.
- * 16.11.2018
+ * 17.11.2018
  **/
 
 public class _SopData extends ConstBase {
@@ -15,13 +15,6 @@ public class _SopData extends ConstBase {
   public static final Identifier CLASS_PATH = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"de.mhus.osgi.sop.api.foundation.model.SopData");
   public static final Identifier METHOD_CREATE = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"create");
   public static final Identifier METHOD_DELETE = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"delete");
-  public static final Identifier METHOD_DO_INIT = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"doInit");
-  public static final Identifier METHOD_DO_POST_CREATE = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"doPostCreate");
-  public static final Identifier METHOD_DO_POST_DELETE = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"doPostDelete");
-  public static final Identifier METHOD_DO_POST_LOAD = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"doPostLoad");
-  public static final Identifier METHOD_DO_PRE_CREATE = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"doPreCreate");
-  public static final Identifier METHOD_DO_PRE_DELETE = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"doPreDelete");
-  public static final Identifier METHOD_DO_PRE_SAVE = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"doPreSave");
   public static final Identifier METHOD_FIND_PARENT_OBJECT = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"findParentObject");
   public static final Identifier METHOD_GET_CREATION_DATE = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"getCreationDate");
   public static final Identifier METHOD_GET_DATA = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"getData");
@@ -59,7 +52,6 @@ public class _SopData extends ConstBase {
   public static final Identifier METHOD_SAVE = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"save");
   public static final Identifier METHOD_SAVE_CHANGED = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"saveChanged");
   public static final Identifier METHOD_SET_ARCHIVED = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"setArchived");
-  public static final Identifier METHOD_SET_DB_HANDLER = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"setDbHandler");
   public static final Identifier METHOD_SET_DUE = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"setDue");
   public static final Identifier METHOD_SET_FOREIGN_DATE = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"setForeignDate");
   public static final Identifier METHOD_SET_FOREIGN_ID = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"setForeignId");

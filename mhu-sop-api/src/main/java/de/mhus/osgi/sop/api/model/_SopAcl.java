@@ -5,7 +5,7 @@ import de.mhus.lib.basics.consts.ConstBase;
 
 /**
  * File created by mhu const generator. Changes will be overwritten.
- * 16.11.2018
+ * 17.11.2018
  **/
 
 public class _SopAcl extends ConstBase {
@@ -15,13 +15,6 @@ public class _SopAcl extends ConstBase {
   public static final Identifier CLASS_PATH = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"de.mhus.osgi.sop.api.model.SopAcl");
   public static final Identifier METHOD_CREATE = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"create");
   public static final Identifier METHOD_DELETE = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"delete");
-  public static final Identifier METHOD_DO_INIT = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"doInit");
-  public static final Identifier METHOD_DO_POST_CREATE = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"doPostCreate");
-  public static final Identifier METHOD_DO_POST_DELETE = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"doPostDelete");
-  public static final Identifier METHOD_DO_POST_LOAD = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"doPostLoad");
-  public static final Identifier METHOD_DO_PRE_CREATE = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"doPreCreate");
-  public static final Identifier METHOD_DO_PRE_DELETE = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"doPreDelete");
-  public static final Identifier METHOD_DO_PRE_SAVE = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"doPreSave");
   public static final Identifier METHOD_FIND_PARENT_OBJECT = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"findParentObject");
   public static final Identifier METHOD_GET_ACL = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"getAcl");
   public static final Identifier METHOD_GET_CREATION_DATE = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"getCreationDate");
@@ -38,7 +31,6 @@ public class _SopAcl extends ConstBase {
   public static final Identifier METHOD_RELOAD = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"reload");
   public static final Identifier METHOD_SAVE = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"save");
   public static final Identifier METHOD_SAVE_CHANGED = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"saveChanged");
-  public static final Identifier METHOD_SET_DB_HANDLER = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"setDbHandler");
   public static final Identifier METHOD_SET_LIST = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"setList");
   public static final Identifier PROJECT_ARTIFACT = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"mhu-sop-api");
   public static final Identifier PROJECT_DESCRIPTION = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"A set of tools to improve OSGi frameworks and karaf");
@@ -53,13 +45,6 @@ public class _SopAcl extends ConstBase {
   public static final Identifier _CREATION_DATE = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"CreationDate");
   public static final Identifier _DB_HANDLER = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"DbHandler");
   public static final Identifier _DELETE = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"delete");
-  public static final Identifier _DO_INIT = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"doInit");
-  public static final Identifier _DO_POST_CREATE = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"doPostCreate");
-  public static final Identifier _DO_POST_DELETE = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"doPostDelete");
-  public static final Identifier _DO_POST_LOAD = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"doPostLoad");
-  public static final Identifier _DO_PRE_CREATE = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"doPreCreate");
-  public static final Identifier _DO_PRE_DELETE = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"doPreDelete");
-  public static final Identifier _DO_PRE_SAVE = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"doPreSave");
   public static final Identifier _FIND_PARENT_OBJECT = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"findParentObject");
   public static final Identifier _ID = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"Id");
   public static final Identifier _LIST = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"List");

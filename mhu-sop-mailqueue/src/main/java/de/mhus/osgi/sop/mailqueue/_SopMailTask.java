@@ -5,7 +5,7 @@ import de.mhus.lib.basics.consts.ConstBase;
 
 /**
  * File created by mhu const generator. Changes will be overwritten.
- * 16.11.2018
+ * 17.11.2018
  **/
 
 public class _SopMailTask extends ConstBase {
@@ -15,13 +15,6 @@ public class _SopMailTask extends ConstBase {
   public static final Identifier CLASS_PATH = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"de.mhus.osgi.sop.mailqueue.SopMailTask");
   public static final Identifier METHOD_CREATE = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"create");
   public static final Identifier METHOD_DELETE = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"delete");
-  public static final Identifier METHOD_DO_INIT = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"doInit");
-  public static final Identifier METHOD_DO_POST_CREATE = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"doPostCreate");
-  public static final Identifier METHOD_DO_POST_DELETE = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"doPostDelete");
-  public static final Identifier METHOD_DO_POST_LOAD = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"doPostLoad");
-  public static final Identifier METHOD_DO_PRE_CREATE = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"doPreCreate");
-  public static final Identifier METHOD_DO_PRE_DELETE = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"doPreDelete");
-  public static final Identifier METHOD_DO_PRE_SAVE = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"doPreSave");
   public static final Identifier METHOD_FIND_PARENT_OBJECT = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"findParentObject");
   public static final Identifier METHOD_GET_BCC = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"getBcc");
   public static final Identifier METHOD_GET_CC = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"getCc");
@@ -47,7 +40,6 @@ public class _SopMailTask extends ConstBase {
   public static final Identifier METHOD_RELOAD = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"reload");
   public static final Identifier METHOD_SAVE = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"save");
   public static final Identifier METHOD_SAVE_CHANGED = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"saveChanged");
-  public static final Identifier METHOD_SET_DB_HANDLER = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"setDbHandler");
   public static final Identifier METHOD_SET_LAST_ERROR = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"setLastError");
   public static final Identifier METHOD_SET_LAST_SEND_ATTEMPT = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"setLastSendAttempt");
   public static final Identifier METHOD_SET_NEXT_SEND_ATTEMPT = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"setNextSendAttempt");
@@ -67,13 +59,6 @@ public class _SopMailTask extends ConstBase {
   public static final Identifier _CREATION_DATE = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"CreationDate");
   public static final Identifier _DB_HANDLER = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"DbHandler");
   public static final Identifier _DELETE = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"delete");
-  public static final Identifier _DO_INIT = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"doInit");
-  public static final Identifier _DO_POST_CREATE = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"doPostCreate");
-  public static final Identifier _DO_POST_DELETE = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"doPostDelete");
-  public static final Identifier _DO_POST_LOAD = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"doPostLoad");
-  public static final Identifier _DO_PRE_CREATE = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"doPreCreate");
-  public static final Identifier _DO_PRE_DELETE = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"doPreDelete");
-  public static final Identifier _DO_PRE_SAVE = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"doPreSave");
   public static final Identifier _FIND_PARENT_OBJECT = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"findParentObject");
   public static final Identifier _FROM = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"From");
   public static final Identifier _ID = new Identifier(de.mhus.osgi.sop.mailqueue.SopMailTask.class,"Id");

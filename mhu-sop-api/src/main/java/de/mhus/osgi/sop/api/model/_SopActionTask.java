@@ -5,7 +5,7 @@ import de.mhus.lib.basics.consts.ConstBase;
 
 /**
  * File created by mhu const generator. Changes will be overwritten.
- * 16.11.2018
+ * 17.11.2018
  **/
 
 public class _SopActionTask extends ConstBase {
@@ -15,13 +15,6 @@ public class _SopActionTask extends ConstBase {
   public static final Identifier CLASS_PATH = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"de.mhus.osgi.sop.api.model.SopActionTask");
   public static final Identifier METHOD_CREATE = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"create");
   public static final Identifier METHOD_DELETE = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"delete");
-  public static final Identifier METHOD_DO_INIT = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"doInit");
-  public static final Identifier METHOD_DO_POST_CREATE = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"doPostCreate");
-  public static final Identifier METHOD_DO_POST_DELETE = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"doPostDelete");
-  public static final Identifier METHOD_DO_POST_LOAD = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"doPostLoad");
-  public static final Identifier METHOD_DO_PRE_CREATE = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"doPreCreate");
-  public static final Identifier METHOD_DO_PRE_DELETE = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"doPreDelete");
-  public static final Identifier METHOD_DO_PRE_SAVE = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"doPreSave");
   public static final Identifier METHOD_FIND_PARENT_OBJECT = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"findParentObject");
   public static final Identifier METHOD_GET_ACTION = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"getAction");
   public static final Identifier METHOD_GET_CREATION_DATE = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"getCreationDate");
@@ -40,7 +33,6 @@ public class _SopActionTask extends ConstBase {
   public static final Identifier METHOD_SAVE = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"save");
   public static final Identifier METHOD_SAVE_CHANGED = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"saveChanged");
   public static final Identifier METHOD_SET_ACTION = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"setAction");
-  public static final Identifier METHOD_SET_DB_HANDLER = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"setDbHandler");
   public static final Identifier METHOD_SET_PROPERTIES = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"setProperties");
   public static final Identifier METHOD_SET_QUEUE = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"setQueue");
   public static final Identifier METHOD_SET_TARGET = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"setTarget");
@@ -57,13 +49,6 @@ public class _SopActionTask extends ConstBase {
   public static final Identifier _CREATION_DATE = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"CreationDate");
   public static final Identifier _DB_HANDLER = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"DbHandler");
   public static final Identifier _DELETE = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"delete");
-  public static final Identifier _DO_INIT = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"doInit");
-  public static final Identifier _DO_POST_CREATE = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"doPostCreate");
-  public static final Identifier _DO_POST_DELETE = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"doPostDelete");
-  public static final Identifier _DO_POST_LOAD = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"doPostLoad");
-  public static final Identifier _DO_PRE_CREATE = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"doPreCreate");
-  public static final Identifier _DO_PRE_DELETE = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"doPreDelete");
-  public static final Identifier _DO_PRE_SAVE = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"doPreSave");
   public static final Identifier _FIND_PARENT_OBJECT = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"findParentObject");
   public static final Identifier _ID = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"Id");
   public static final Identifier _LOG = new Identifier(de.mhus.osgi.sop.api.model.SopActionTask.class,"log");
