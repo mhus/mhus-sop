@@ -148,6 +148,15 @@ public class FoundationDbImpl extends AbstractDbSchemaService {
 		if (obj instanceof SopFoundationGroup) {
 			return Ace.RIGHTS_RO;
 		}
+		if (obj instanceof SopJournal) {
+			UUID fId = ((FoundationRelated)obj).getFoundation();
+			SopFoundation f = getManager().getObject(SopFoundation.class, fId);
+			if (f == null) return Ace.RIGHTS_NONE;
+			Ace fAce = getAce(context,f);
+			if (fAce.canUpdate()) return "rc"; // not update or delete
+			if (fAce.canRead()) return Ace.RIGHTS_RO;
+			return Ace.RIGHTS_NONE;
+		}
 		if (obj instanceof FoundationRelated) {
 			UUID fId = ((FoundationRelated)obj).getFoundation();
 			SopFoundation f = getManager().getObject(SopFoundation.class, fId);
