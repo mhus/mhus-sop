@@ -92,6 +92,8 @@
 	<feature name='mhu-sop-vaadin' description='mhu-sop-vaadin' version='${project.version}'>
 		<feature>mhu-sop-base</feature>
 		
+        <bundle><![CDATA[wrap:mvn:com.googlecode.gentyref/gentyref/1.2.0/$Bundle-SymbolicName=gentyref&Bundle-Version=1.2.0&Export-Package=com.googlecode.gentyref;version="1.2.0",!*]]></bundle>
+        <bundle>mvn:org.jsoup/jsoup/1.11.3</bundle>
 		<bundle>mvn:de.mhus.ports/vaadin-shared-deps/${ports.vaadin.version}</bundle>
 		<bundle>mvn:com.vaadin/vaadin-compatibility-shared/${vaadin.version}</bundle>
         <bundle>mvn:com.vaadin/vaadin-shared/${vaadin.version}</bundle>
