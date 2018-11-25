@@ -93,22 +93,26 @@
 		<feature>mhu-sop-base</feature>
 		
 		<bundle>mvn:de.mhus.ports/vaadin-shared-deps/${ports.vaadin.version}</bundle>
-		<bundle>mvn:com.vaadin/vaadin-shared/${vaadin.version}</bundle>
-		<bundle>mvn:com.vaadin/vaadin-themes/${vaadin.version}</bundle>
+		<bundle>mvn:com.vaadin/vaadin-compatibility-shared/${vaadin.version}</bundle>
+        <bundle>mvn:com.vaadin/vaadin-shared/${vaadin.version}</bundle>
+		<bundle>mvn:com.vaadin/vaadin-compatibility-themes/${vaadin.version}</bundle>
+        <bundle>mvn:com.vaadin/vaadin-themes/${vaadin.version}</bundle>
 <!-- 
 		<bundle>mvn:com.vaadin.external.slf4j/vaadin-slf4j-jdk14/1.6.1</bundle>
 		<bundle>mvn:com.vaadin.external.atmosphere/atmosphere-runtime/2.2.9.vaadin2</bundle>
 		<bundle>mvn:com.vaadin/vaadin-push/${vaadin.version}</bundle>
 -->		
 		
-		<bundle>mvn:com.vaadin/vaadin-server/${vaadin.version}</bundle>
-		<bundle>mvn:com.vaadin/vaadin-client-compiled/${vaadin.version}</bundle>
+		<bundle>mvn:com.vaadin/vaadin-compatibility-server/${vaadin.version}</bundle>
+        <bundle>mvn:com.vaadin/vaadin-server/${vaadin.version}</bundle>
+		<bundle>mvn:com.vaadin/vaadin-compatibility-client-compiled/${vaadin.version}</bundle>
+        <bundle>mvn:com.vaadin/vaadin-client-compiled/${vaadin.version}</bundle>
 
 		<bundle>mvn:de.mhus.lib/mhu-lib-vaadin/${mhulib.version}</bundle>
-		<bundle>mvn:de.mhus.osgi/mhu-osgi-vaadinbridge/${osgitools.version}</bundle>
-		<bundle>mvn:de.mhus.osgi/mhu-karaf-vaadinbridge/${osgitools.version}</bundle>
+		<bundle>mvn:de.mhus.osgi/mhu-osgi-vaadinbridge/${osgiservlets.version}</bundle>
+		<bundle>mvn:de.mhus.osgi/mhu-karaf-vaadinbridge/${osgiservlets.version}</bundle>
 
-		<bundle>mvn:de.mhus.ports/vaadin-refresher/{ports.vaadin.version}</bundle>
+		<bundle>mvn:de.mhus.ports/vaadin-refresher/${ports.vaadin.version}</bundle>
 		
 		<bundle>mvn:de.mhus.osgi/mhu-sop-vaadin-theme/${project.version}</bundle>
 		<bundle>mvn:de.mhus.osgi/mhu-sop-vaadin-desktop/${project.version}</bundle>

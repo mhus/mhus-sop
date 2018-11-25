@@ -24,7 +24,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-import com.github.wolfie.refresher.Refresher;
+//XXX import com.github.wolfie.refresher.Refresher;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Widgetset;
 import com.vaadin.server.VaadinRequest;
@@ -50,7 +50,8 @@ import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
 
 @Theme("soptheme")
-@Widgetset("de.mhus.osgi.sop.vaadin.theme.SopWidgetset")
+//@Widgetset("de.mhus.osgi.sop.vaadin.theme.SopWidgetset")
+@Widgetset(value = "com.vaadin.v7.Vaadin7WidgetSet")
 public class SopUi extends UI implements SopUiApi {
 	
 	private static CfgBoolean CFG_GEEK_MODE = new CfgBoolean(SopUiApi.class, "geek", false);
@@ -79,7 +80,7 @@ public class SopUi extends UI implements SopUiApi {
         desktop = new Desktop(this) {
 			private static final long serialVersionUID = 1L;
 			private MenuItem menuTrace;
-			private Refresher refresher;
+//XXX			private Refresher refresher;
         	
         	@SuppressWarnings("deprecation")
 			@Override
@@ -100,7 +101,7 @@ public class SopUi extends UI implements SopUiApi {
 	        		if ("geek_suit".equals(part) || now.getMonth() == 9 && now.getDate() == 13)
 	        			addStyleName("desktop-suit");
         		}
-
+/* XXX
         		refresher = new Refresher();
         		refresher.setRefreshInterval(1000);
         		refresher.addListener(new Refresher.RefreshListener() {
@@ -111,7 +112,7 @@ public class SopUi extends UI implements SopUiApi {
         			}
         		});
         		addExtension(refresher);
-
+*/
         		menuTrace = menuUser.addItem("Trace An", new MenuBar.Command() {
 					private static final long serialVersionUID = 1L;
 					@Override
@@ -129,7 +130,7 @@ public class SopUi extends UI implements SopUiApi {
         	}
         	
         	protected void doTick() {
-        		
+
         	}
         };
         

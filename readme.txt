@@ -16,7 +16,7 @@
 
 feature:repo-add activemq 5.12.1
 feature:repo-add cxf 3.1.5
-feature:repo-add mvn:de.mhus.osgi/mhu-sop-feature/1.3.3-SNAPSHOT/xml/features
+feature:repo-add mvn:de.mhus.osgi/mhu-sop-feature/1.3.4-SNAPSHOT/xml/features
 
 feature:install mhu-sop-base
 
