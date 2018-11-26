@@ -24,7 +24,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-//XXX import com.github.wolfie.refresher.Refresher;
+import com.github.wolfie.refresher.Refresher;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Widgetset;
 import com.vaadin.server.VaadinRequest;
@@ -80,7 +80,7 @@ public class SopUi extends UI implements SopUiApi {
         desktop = new Desktop(this) {
 			private static final long serialVersionUID = 1L;
 			private MenuItem menuTrace;
-//XXX			private Refresher refresher;
+			private Refresher refresher;
         	
         	@SuppressWarnings("deprecation")
 			@Override
@@ -101,7 +101,7 @@ public class SopUi extends UI implements SopUiApi {
 	        		if ("geek_suit".equals(part) || now.getMonth() == 9 && now.getDate() == 13)
 	        			addStyleName("desktop-suit");
         		}
-/* XXX
+
         		refresher = new Refresher();
         		refresher.setRefreshInterval(1000);
         		refresher.addListener(new Refresher.RefreshListener() {
@@ -112,7 +112,7 @@ public class SopUi extends UI implements SopUiApi {
         			}
         		});
         		addExtension(refresher);
-*/
+
         		menuTrace = menuUser.addItem("Trace An", new MenuBar.Command() {
 					private static final long serialVersionUID = 1L;
 					@Override

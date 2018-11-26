@@ -96,13 +96,12 @@
 			<artifactId>javax.servlet-api</artifactId>
 			<version>${servlet.version}</version>
 		</dependency>
-		<!-- 
+
 		<dependency>
 			<groupId>de.mhus.ports</groupId>
 			<artifactId>vaadin-refresher</artifactId>
 			<version>${ports.vaadin.version}</version>
         </dependency>
-		 -->
 		
 		<dependency>
 			<groupId>de.mhus.osgi</groupId>
