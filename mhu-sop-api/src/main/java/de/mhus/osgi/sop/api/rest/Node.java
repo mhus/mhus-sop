@@ -20,6 +20,7 @@ import java.util.List;
 public interface Node {
 
 	String SEARCH = "_search";
+	String ACTION = "_action";
 
 	Node lookup(List<String> parts, CallContext callContext) throws Exception;
 

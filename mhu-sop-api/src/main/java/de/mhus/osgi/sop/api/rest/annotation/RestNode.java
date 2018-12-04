@@ -1,4 +1,4 @@
-package de.mhus.osgi.sop.api.rest.anno;
+package de.mhus.osgi.sop.api.rest.annotation;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -11,5 +11,5 @@ public @interface RestNode {
 
 	String acl() default "*";
 
-	String parent() default RestNodeService.ROOT_ID;
+	String[] parent() default RestNodeService.ROOT_ID;
 }

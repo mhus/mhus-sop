@@ -21,17 +21,18 @@ import java.util.Set;
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MProperties;
+import de.mhus.lib.core.io.http.MHttp;
 
 public class CallContext {
 
 	public static final String ACTION_PARAMETER = "_action";
 
 	private HttpRequest req;
-	private String method;
+	private MHttp.METHOD method;
 	private IProperties context;
 	
 	public CallContext(HttpRequest req,
-			String method, IProperties context) {
+			MHttp.METHOD method, IProperties context) {
 		this.req = req;
 		this.method = method;
 		this.context = context;
@@ -77,7 +78,7 @@ public class CallContext {
 		return req.getParameterNames();
 	}
 
-	public String getMethod() {
+	public MHttp.METHOD getMethod() {
 		return method;
 	}
 

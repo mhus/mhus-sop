@@ -15,30 +15,100 @@
  */
 package de.mhus.osgi.sop.api.rest;
 
+import java.io.InputStream;
+import java.io.Reader;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.List;
 
 import de.mhus.lib.core.MLog;
+import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.pojo.MPojo;
+import de.mhus.lib.errors.UsageException;
+import de.mhus.osgi.sop.api.rest.annotation.RestAction;
+import de.mhus.osgi.sop.api.rest.annotation.RestNode;
 
 public abstract class AbstractNode<T> extends MLog implements RestNodeService {
 
+	private RestNode nodeDef;
+	private HashMap<String, Method> actions = null;
+
+	@Override
+	public Node lookup(List<String> parts, CallContext callContext) throws Exception {
+		return this;
+	}
+
+	public AbstractNode() {
+		nodeDef = getClass().getAnnotation(RestNode.class);
+		for (Method method : MSystem.getMethods(getClass())) {
+			RestAction action = method.getAnnotation(RestAction.class);
+			if (actions == null)
+				actions = new HashMap<>();
+			actions.put(action.name(), method);
+		}
+	}
+	
 	@Override
 	public RestResult doAction(CallContext callContext) throws Exception {
-		String methodName = "on" + MPojo.toFunctionName(callContext.getAction(), true, null);
-		try {
-			JsonResult result = new JsonResult();
-			Method method = getClass().getMethod(methodName, JsonResult.class, CallContext.class);
-			method.invoke(this, result, callContext);
-			return result;
-		} catch (Throwable t) {
-			log().d(methodName,callContext,t);
-			return null;
+		if (actions != null) {
+			String actionName = callContext.getAction();
+			try {
+				Method action = actions.get(actionName);
+				if (action != null) {
+					Object res = action.invoke(this, callContext);
+					if (res == null) 
+						return null;
+					if (res instanceof RestResult)
+						return (RestResult)res;
+					if (res instanceof InputStream)
+						return new BinaryResult((InputStream)res, action.getAnnotation(RestAction.class).contentType());
+					if (res instanceof Reader)
+						return new BinaryResult((Reader)res, action.getAnnotation(RestAction.class).contentType());
+					if (res instanceof String)
+						return new PlainTextResult((String)res, action.getAnnotation(RestAction.class).contentType());
+					return new PojoResult(res, action.getAnnotation(RestAction.class).contentType());
+				} else {
+					log().d("action unknown",actionName);
+				}
+			} catch (Throwable t) {
+				log().d(actionName,callContext,t);
+			}
+		} else {
+			String methodName = "on" + MPojo.toFunctionName(callContext.getAction(), true, null);
+			try {
+				JsonResult result = new JsonResult();
+				Method method = getClass().getMethod(methodName, JsonResult.class, CallContext.class);
+				method.invoke(this, result, callContext);
+				return result;
+			} catch (java.lang.NoSuchMethodException e) {
+				log().d("action method not found",methodName);
+			} catch (Throwable t) {
+				log().d(methodName,callContext,t);
+			}
 		}
+		return null;
+	}
+
+	// root by default
+	@Override
+	public String[] getParentNodeIds() {
+		if (nodeDef == null)
+			throw new UsageException("parent node not defined");
+		return nodeDef.parent();
+	}
+
+	@Override
+	public String getNodeId() {
+		if (nodeDef == null)
+			throw new UsageException("parent node not defined");
+		return nodeDef.name();
 	}
 
 	@Override
 	public String getDefaultAcl() {
-		return null;
+		if (nodeDef == null)
+			return null;
+		return nodeDef.acl();
 	}
 
 }

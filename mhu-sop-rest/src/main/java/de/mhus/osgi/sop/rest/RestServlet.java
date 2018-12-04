@@ -54,6 +54,7 @@ import de.mhus.osgi.sop.api.rest.RestApi;
 import de.mhus.osgi.sop.api.rest.RestResult;
 import de.mhus.osgi.sop.api.util.SopFileLogger;
 import de.mhus.osgi.sop.api.util.TicketUtil;
+import de.mhus.lib.core.io.http.MHttp;
 
 /*
  * Test: http://localhost:8182/rest/public/?_action=ping&_method=POST
@@ -142,7 +143,7 @@ public class RestServlet extends HttpServlet {
 	
 	        logAccess(id,req.getRemoteAddr(),req.getRemotePort(),ticket,method,req.getPathInfo(),req.getParameterMap());
 	
-			CallContext callContext = new CallContext(new HttpRequest(req.getParameterMap()), method, context);
+			CallContext callContext = new CallContext(new HttpRequest(req.getParameterMap()), MHttp.toMethod(method), context);
 	        
 	        RestApi restService = MApi.lookup(RestApi.class);
 	        
