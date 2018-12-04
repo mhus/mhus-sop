@@ -6,6 +6,7 @@ import java.util.List;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MSystem;
 import de.mhus.lib.errors.MException;
+import de.mhus.osgi.sop.api.rest.anno.RestGet;
 import de.mhus.osgi.sop.api.rest.anno.RestNode;
 
 public class RoutingNode extends MLog implements RestNodeService {
@@ -18,7 +19,11 @@ public class RoutingNode extends MLog implements RestNodeService {
 		if (nodeDef == null)
 			throw new MException("Not a RestNode",getClass());
 		for (Method method : MSystem.getMethods(getClass())) {
-			
+			RestGet getNode = method.getAnnotation(RestGet.class);
+			if (getNode != null) {
+				String[] path = getNode.path().split("/");
+				
+			}
 		}
 	}
 	
