@@ -22,13 +22,13 @@ import de.mhus.lib.core.MApi;
 import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.foundation.FoundationApi;
 import de.mhus.osgi.sop.api.foundation.model.SopFoundation;
-import de.mhus.osgi.sop.api.rest.AbstractObjectListNode;
+import de.mhus.osgi.sop.api.rest.ObjectListNode;
 import de.mhus.osgi.sop.api.rest.CallContext;
 import de.mhus.osgi.sop.api.rest.Node;
 import de.mhus.osgi.sop.api.rest.RestNodeService;
 
 @Component(immediate=true,provide=RestNodeService.class)
-public class FoundationNode extends AbstractObjectListNode<SopFoundation> {
+public class FoundationNode extends ObjectListNode<SopFoundation> {
 
 	@Override
 	public String[] getParentNodeIds() {

@@ -22,6 +22,11 @@ public interface Node {
 	String SEARCH = "_search";
 	String ACTION = "_action";
 
+	String ROOT_ID = "";
+	String FOUNDATION_ID = "foundation";
+	String PUBLIC_ID = "public";
+	String GENERAL_ID = "general";
+
 	Node lookup(List<String> parts, CallContext callContext) throws Exception;
 
 	RestResult doRead(CallContext callContext) throws Exception;

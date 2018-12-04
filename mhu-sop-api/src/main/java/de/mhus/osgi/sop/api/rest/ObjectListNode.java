@@ -25,7 +25,7 @@ import de.mhus.lib.core.pojo.PojoModelFactory;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.errors.MException;
 
-public abstract class AbstractObjectListNode<T> extends JsonListNode<T> {
+public abstract class ObjectListNode<T> extends JsonListNode<T> {
 
 	@Override
 	public void doRead(JsonResult result, CallContext callContext)

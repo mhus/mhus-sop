@@ -24,7 +24,7 @@ import java.util.List;
  * @author mikehummel
  *
  */
-public abstract class AbstractVoidNode extends AbstractSingleObjectNode<Void>  {
+public abstract class VoidNode extends SingleObjectNode<Void>  {
 
 	@Override
 	public Node lookup(List<String> parts, CallContext callContext)

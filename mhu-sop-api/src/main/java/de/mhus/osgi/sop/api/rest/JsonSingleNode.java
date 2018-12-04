@@ -17,7 +17,7 @@ package de.mhus.osgi.sop.api.rest;
 
 import de.mhus.lib.errors.NotSupportedException;
 
-public abstract class JsonSingleNode<T> extends AbstractSingleNode<T>{
+public abstract class JsonSingleNode<T> extends SingleNode<T>{
 
 	@Override
 	public RestResult doRead(CallContext callContext) throws Exception {

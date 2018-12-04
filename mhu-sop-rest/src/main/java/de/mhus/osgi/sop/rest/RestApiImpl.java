@@ -71,9 +71,11 @@ public class RestApiImpl extends MLog implements RestApi {
 			RestNodeService service = context.getService(reference);
 			if (service != null) {
 				for (String x : service.getParentNodeIds()) {
-					String key = x + "-" + service.getNodeId();
-					log().i("register",key,service.getClass().getCanonicalName());
-					register.put(key,service);
+					if (x != null) {
+						String key = x + "-" + service.getNodeId();
+						log().i("register",key,service.getClass().getCanonicalName());
+						register.put(key,service);
+					}
 				}
 			}
 			
@@ -93,9 +95,11 @@ public class RestApiImpl extends MLog implements RestApi {
 			
 			if (service != null) {
 				for (String x : service.getParentNodeIds()) {
-					String key = x + "-" + service.getNodeId();
-					log().i("unregister",key,service.getClass().getCanonicalName());
-					register.remove(key);
+					if (x != null) {
+						String key = x + "-" + service.getNodeId();
+						log().i("unregister",key,service.getClass().getCanonicalName());
+						register.remove(key);
+					}
 				}
 			}
 

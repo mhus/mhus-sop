@@ -28,7 +28,7 @@ import de.mhus.lib.errors.UsageException;
 import de.mhus.osgi.sop.api.rest.annotation.RestAction;
 import de.mhus.osgi.sop.api.rest.annotation.RestNode;
 
-public abstract class AbstractNode<T> extends MLog implements RestNodeService {
+public abstract class AbstractNode extends MLog implements RestNodeService {
 
 	private RestNode nodeDef;
 	private HashMap<String, Method> actions = null;
@@ -36,6 +36,22 @@ public abstract class AbstractNode<T> extends MLog implements RestNodeService {
 	@Override
 	public Node lookup(List<String> parts, CallContext callContext) throws Exception {
 		return this;
+	}
+
+
+	@Override
+	public RestResult doCreate(CallContext arg0) throws Exception {
+		return null;
+	}
+
+	@Override
+	public RestResult doDelete(CallContext arg0) throws Exception {
+		return null;
+	}
+	
+	@Override
+	public RestResult doUpdate(CallContext call) throws Exception {
+		return null;
 	}
 
 	public AbstractNode() {
@@ -94,6 +110,15 @@ public abstract class AbstractNode<T> extends MLog implements RestNodeService {
 	public String[] getParentNodeIds() {
 		if (nodeDef == null)
 			throw new UsageException("parent node not defined");
+		if (nodeDef.parentNode().length != 0) {
+			String[] out = new String[nodeDef.parentNode().length];
+			for (int i = 0; i < out.length; i++) {
+				RestNode parentNodeDef = nodeDef.parentNode()[i].getAnnotation(RestNode.class);
+				if (parentNodeDef != null)
+					out[i] = parentNodeDef.name();
+			}
+			return out;
+		}
 		return nodeDef.parent();
 	}
 

@@ -17,7 +17,7 @@ package de.mhus.osgi.sop.api.rest;
 
 import java.util.List;
 
-public abstract class AbstractSingleNode<T> extends AbstractNode<T> {
+public abstract class SingleNode<T> extends AbstractNode {
 
 	public static final String ID 		= "_id";
 	public static final String OBJECT 	= "_obj";

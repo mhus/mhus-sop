@@ -20,12 +20,12 @@ import de.mhus.lib.core.MApi;
 import de.mhus.lib.errors.NotFoundException;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
-import de.mhus.osgi.sop.api.rest.AbstractSingleObjectNode;
+import de.mhus.osgi.sop.api.rest.SingleObjectNode;
 import de.mhus.osgi.sop.api.rest.CallContext;
 import de.mhus.osgi.sop.api.rest.RestNodeService;
 
 @Component(immediate=true,provide=RestNodeService.class)
-public class UserInformationRestNode extends AbstractSingleObjectNode<UserInformation>{
+public class UserInformationRestNode extends SingleObjectNode<UserInformation>{
 
 	@Override
 	public String[] getParentNodeIds() {

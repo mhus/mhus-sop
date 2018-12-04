@@ -23,7 +23,7 @@ import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.errors.NotFoundException;
 
-public abstract class AbstractSingleObjectNode<T> extends JsonSingleNode<T> {
+public abstract class SingleObjectNode<T> extends JsonSingleNode<T> {
 
 	@Override
 	public void doRead(JsonResult result, CallContext callContext)

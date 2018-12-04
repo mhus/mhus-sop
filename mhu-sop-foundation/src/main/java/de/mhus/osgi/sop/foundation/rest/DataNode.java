@@ -37,7 +37,7 @@ import de.mhus.osgi.sop.api.data.SopDataController;
 import de.mhus.osgi.sop.api.foundation.FoundationApi;
 import de.mhus.osgi.sop.api.foundation.model.SopData;
 import de.mhus.osgi.sop.api.foundation.model.SopFoundation;
-import de.mhus.osgi.sop.api.rest.AbstractObjectListNode;
+import de.mhus.osgi.sop.api.rest.ObjectListNode;
 import de.mhus.osgi.sop.api.rest.CallContext;
 import de.mhus.osgi.sop.api.rest.JsonResult;
 import de.mhus.osgi.sop.api.rest.Node;
@@ -46,7 +46,7 @@ import de.mhus.osgi.sop.api.rest.RestNodeService;
 import de.mhus.osgi.sop.api.rest.RestResult;
 
 @Component(immediate=true,provide=RestNodeService.class)
-public class DataNode extends AbstractObjectListNode<SopData>{
+public class DataNode extends ObjectListNode<SopData>{
 
 	Log log = Log.getLog(DataNode.class);
 	
