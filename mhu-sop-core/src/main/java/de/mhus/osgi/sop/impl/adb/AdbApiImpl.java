@@ -51,6 +51,8 @@ import de.mhus.osgi.sop.api.adb.Reference.TYPE;
 import de.mhus.osgi.sop.api.adb.ReferenceCollector;
 import de.mhus.osgi.sop.api.model.SopActionTask;
 import de.mhus.osgi.sop.api.model.SopObjectParameter;
+import de.mhus.osgi.sop.api.model._SopActionTask;
+import de.mhus.osgi.sop.api.model._SopObjectParameter;
 import de.mhus.osgi.sop.impl.AaaContextImpl;
 
 //@Component(immediate=true) done by blueprint
@@ -116,7 +118,7 @@ public class AdbApiImpl extends MLog implements AdbApi {
 		LinkedList<SopActionTask> out = new LinkedList<SopActionTask>();
 		XdbService manager = getManager();	
 		
-		DbCollection<SopActionTask> res = manager.getByQualification(Db.query(SopActionTask.class).eq(Db.attr("queue"), Db.value(queue)));
+		DbCollection<SopActionTask> res = manager.getByQualification(Db.query(SopActionTask.class).eq(_SopActionTask._QUEUE, queue));
 		for (SopActionTask task : res) {
 			out.add(task);
 			if (max > 0 && out.size() >= max) break;
@@ -137,8 +139,8 @@ public class AdbApiImpl extends MLog implements AdbApi {
 		XdbService manager = getManager();
 		List<SopObjectParameter> out = manager.getByQualification(
 				Db.query(SopObjectParameter.class)
-				.eq(Db.attr("objecttype"), Db.value(type))
-				.eq(Db.attr("objectid"),Db.value(id))
+				.eq(_SopObjectParameter._OBJECT_TYPE, type)
+				.eq(_SopObjectParameter._OBJECT_ID,id)
 				).toCacheAndClose();
 		
 		return out;
@@ -225,9 +227,9 @@ public class AdbApiImpl extends MLog implements AdbApi {
 		XdbService manager = getManager();
 		SopObjectParameter out = manager.getByQualification(
 				Db.query(SopObjectParameter.class)
-				.eq(Db.attr("objecttype"), Db.value(type))
-				.eq(Db.attr("objectid"),Db.value(id))
-				.eq(Db.attr("key"), Db.value(key))
+				.eq(_SopObjectParameter._OBJECT_TYPE, type)
+				.eq(_SopObjectParameter._OBJECT_ID,id)
+				.eq(_SopObjectParameter._KEY, key)
 				).getNextAndClose();
 		return out;
 	}
@@ -251,9 +253,9 @@ public class AdbApiImpl extends MLog implements AdbApi {
 		XdbService manager = getManager();
 		for ( SopObjectParameter p : manager.getByQualification(
 				Db.query(SopObjectParameter.class)
-				.eq(Db.attr("objecttype"), Db.value(type))
-				.eq(Db.attr("key"),Db.value(key))
-				.eq(Db.attr("value"), Db.value(value))
+				.eq(_SopObjectParameter._OBJECT_TYPE, type)
+				.eq(_SopObjectParameter._KEY,key)
+				.eq(_SopObjectParameter._VALUE, value)
 				)) {
 				out.add(p.getObjectId());
 		}
@@ -286,9 +288,9 @@ public class AdbApiImpl extends MLog implements AdbApi {
 		XdbService manager = SopDbImpl.getManager();
 		for ( SopObjectParameter p : manager.getByQualification(
 				Db.query(SopObjectParameter.class)
-				.eq(Db.attr("objecttype"), Db.value(type.getCanonicalName()))
-				.eq(Db.attr("key"),Db.value(key))
-				.eq(Db.attr("value"), Db.value(value))
+				.eq(_SopObjectParameter._OBJECT_TYPE, type.getCanonicalName())
+				.eq(_SopObjectParameter._KEY,key)
+				.eq(_SopObjectParameter._VALUE, value)
 				)) {
 			out.add(p);
 		}

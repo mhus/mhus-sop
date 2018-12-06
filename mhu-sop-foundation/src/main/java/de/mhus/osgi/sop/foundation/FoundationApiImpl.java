@@ -53,6 +53,7 @@ import de.mhus.osgi.sop.api.foundation.model.SopFoundationGroup;
 import de.mhus.osgi.sop.api.foundation.model.SopJournal;
 import de.mhus.osgi.sop.api.foundation.model._SopData;
 import de.mhus.osgi.sop.api.foundation.model._SopFoundation;
+import de.mhus.osgi.sop.api.foundation.model._SopJournal;
 import de.mhus.osgi.sop.api.rest.RestUtil;
 
 @Component(immediate=true,name="FoundationApi")
@@ -145,7 +146,7 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 		
 		AQuery<SopJournal> query = Db.query(SopJournal.class).eq("queue", queue).eq("foundation", foundation);
 		if (since > 0)
-			query.gt(Db.attr("order"), Db.value(since));
+			query.gt(_SopJournal._ORDER, since);
 		if (MString.isSet(filter))
 			query.or(Db.like("event", "%" + filter + "%"),Db.like("data", "%" + filter + "%"));
 		query.desc("order");
@@ -204,14 +205,14 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 		
 		AQuery<SopData> query = Db.query(SopData.class);
 		if (type != null)
-			query.eq(Db.attr("type"), Db.value(type));
+			query.eq(_SopData._TYPE, type);
 		if (foundId != null)
-			query.eq(Db.attr("foundation"), Db.value(foundId));
+			query.eq(_SopData._FOUNDATION, foundId);
 		if (publicAccess)
 //			query.eq(Db.attr("ispublic"), Db.value(true));
-			query.eq("ispublic", true);
+			query.eq(_SopData._IS_PUBLIC, true);
 		if (due != null)
-			query.lt(Db.attr("due"), Db.value(due));
+			query.lt(_SopData._DUE, due);
 
 		boolean isArchived = false;
 		
@@ -224,51 +225,51 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 					
 					switch(key) {
 					case "value0":
-						query.eq("value0",val);break;
+						query.eq(_SopData._VALUE0,val);break;
 					case "value1":
-						query.eq("value1",val);break;
+						query.eq(_SopData._VALUE1,val);break;
 					case "value2":
-						query.eq("value2",val);break;
+						query.eq(_SopData._VALUE2,val);break;
 					case "value3":
-						query.eq("value3",val);break;
+						query.eq(_SopData._VALUE3,val);break;
 					case "value4":
-						query.eq("value4",val);break;
+						query.eq(_SopData._VALUE4,val);break;
 					case "value5":
-						query.eq("value5",val);break;
+						query.eq(_SopData._VALUE5,val);break;
 					case "value6":
-						query.eq("value6",val);break;
+						query.eq(_SopData._VALUE6,val);break;
 					case "value7":
-						query.eq("value7",val);break;
+						query.eq(_SopData._VALUE7,val);break;
 					case "value8":
-						query.eq("value8",val);break;
+						query.eq(_SopData._VALUE8,val);break;
 					case "value9":
-						query.eq("value9",val);break;
+						query.eq(_SopData._VALUE9,val);break;
 					case "*value0*":
-						query.like("value0","%"+val+"%");break;
+						query.like(_SopData._VALUE0,"%"+val+"%");break;
 					case "*value1*":
-						query.like("value1","%"+val+"%");break;
+						query.like(_SopData._VALUE1,"%"+val+"%");break;
 					case "*value2*":
-						query.like("value2","%"+val+"%");break;
+						query.like(_SopData._VALUE2,"%"+val+"%");break;
 					case "*value3*":
-						query.like("value3","%"+val+"%");break;
+						query.like(_SopData._VALUE3,"%"+val+"%");break;
 					case "*value4*":
-						query.like("value4","%"+val+"%");break;
+						query.like(_SopData._VALUE4,"%"+val+"%");break;
 					case "*value5*":
-						query.like("value5","%"+val+"%");break;
+						query.like(_SopData._VALUE5,"%"+val+"%");break;
 					case "*value6*":
-						query.like("value6","%"+val+"%");break;
+						query.like(_SopData._VALUE6,"%"+val+"%");break;
 					case "*value7*":
-						query.like("value7","%"+val+"%");break;
+						query.like(_SopData._VALUE7,"%"+val+"%");break;
 					case "*value8*":
-						query.like("value8","%"+val+"%");break;
+						query.like(_SopData._VALUE8,"%"+val+"%");break;
 					case "*value9*":
-						query.like("value9","%"+val+"%");break;
+						query.like(_SopData._VALUE9,"%"+val+"%");break;
 					case "writable":
-						query.eq("iswritable", MCast.toboolean(val, false));break;
+						query.eq(_SopData._IS_WRITABLE, MCast.toboolean(val, false));break;
 					case "archived":
 						isArchived = true;
 						if (!"all".equals(val))
-							query.eq("archived", MCast.toboolean(val, false));
+							query.eq(_SopData._ARCHIVED, MCast.toboolean(val, false));
 						break;
 					case "status":
 						query.eq("status", val); break;
@@ -278,14 +279,25 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 	//					query.eq("archived", true);
 						
 				} else {
-					query.or( Db.eq("foreignid", part), Db.like("value0", "%"+part+"%"), Db.like("value1", "%"+part+"%"),Db.like("value2", "%"+part+"%"),Db.like("value3", "%"+part+"%"),Db.like("value4", "%"+part+"%"),Db.like("value5", "%"+part+"%"),Db.like("value6", "%"+part+"%") ,Db.like("value7", "%"+part+"%"),Db.like("value8", "%"+part+"%"),Db.like("value9", "%"+part+"%") );
+					query.or( 
+							Db.eq(_SopData._FOREIGN_ID, part), 
+							Db.like(_SopData._VALUE0, "%"+part+"%"), 
+							Db.like(_SopData._VALUE1, "%"+part+"%"),
+							Db.like(_SopData._VALUE2, "%"+part+"%"),
+							Db.like(_SopData._VALUE3, "%"+part+"%"),
+							Db.like(_SopData._VALUE4, "%"+part+"%"),
+							Db.like(_SopData._VALUE5, "%"+part+"%"),
+							Db.like(_SopData._VALUE6, "%"+part+"%") ,
+							Db.like(_SopData._VALUE7, "%"+part+"%"),
+							Db.like(_SopData._VALUE8, "%"+part+"%"),
+							Db.like(_SopData._VALUE9, "%"+part+"%") );
 				}
 			}
 		}
 
 		if (!isArchived)
 			if (archived != null)
-				query.eq(Db.attr("archived"), Db.value(archived.booleanValue()));
+				query.eq(_SopData._ARCHIVED, archived.booleanValue());
 
 		if (order == null)
 			query.desc("foreignid");

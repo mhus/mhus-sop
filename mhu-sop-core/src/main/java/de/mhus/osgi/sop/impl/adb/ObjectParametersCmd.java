@@ -31,6 +31,7 @@ import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.lib.xdb.XdbService;
 import de.mhus.osgi.sop.api.adb.AdbApi;
 import de.mhus.osgi.sop.api.model.SopObjectParameter;
+import de.mhus.osgi.sop.api.model._SopObjectParameter;
 import de.mhus.osgi.sop.api.util.ObjectUtil;
 
 @Command(scope = "sop", name = "parameter", description = "Handle object parameters")
@@ -62,7 +63,7 @@ public class ObjectParametersCmd implements Action {
 				ConsoleTable out = new ConsoleTable();
 				out.setHeaderValues("Key","Type","Object","Value","Id");
 				
-				for (SopObjectParameter p : manager.getByQualification(Db.query(SopObjectParameter.class).eq(Db.attr("key"), Db.value(id))))
+				for (SopObjectParameter p : manager.getByQualification(Db.query(SopObjectParameter.class).eq(_SopObjectParameter._KEY, id)))
 					out.addRowValues( p.getKey(), p.getObjectType(), p.getObjectId(), p.getValue(), p.getId() );
 				
 				out.print(System.out);
