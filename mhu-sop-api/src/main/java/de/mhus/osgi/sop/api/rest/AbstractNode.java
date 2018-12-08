@@ -38,19 +38,43 @@ public abstract class AbstractNode extends MLog implements RestNodeService {
 		return this;
 	}
 
-
 	@Override
-	public RestResult doCreate(CallContext arg0) throws Exception {
-		return null;
+	public RestResult doRead(CallContext context) throws Exception {
+		Object ret = doReadObject(context);
+		return doTransform(new Object(){}.getClass().getEnclosingMethod(), ret);
 	}
 
-	@Override
-	public RestResult doDelete(CallContext arg0) throws Exception {
+	public Object doReadObject(CallContext context) throws Exception {
 		return null;
 	}
 	
 	@Override
-	public RestResult doUpdate(CallContext call) throws Exception {
+	public RestResult doCreate(CallContext context) throws Exception {
+		Object ret = doCreateObject(context);
+		return doTransform(new Object(){}.getClass().getEnclosingMethod(), ret);
+	}
+
+	public Object doCreateObject(CallContext context) throws Exception {
+		return null;
+	}
+	
+	@Override
+	public RestResult doDelete(CallContext context) throws Exception {
+		Object ret = doDeleteObject(context);
+		return doTransform(new Object(){}.getClass().getEnclosingMethod(), ret);
+	}
+
+	public Object doDeleteObject(CallContext context) throws Exception {
+		return null;
+	}
+
+	@Override
+	public RestResult doUpdate(CallContext context) throws Exception {
+		Object ret = doUpdateObject(context);
+		return doTransform(new Object(){}.getClass().getEnclosingMethod(), ret);
+	}
+
+	public Object doUpdateObject(CallContext context) throws Exception {
 		return null;
 	}
 
@@ -72,17 +96,7 @@ public abstract class AbstractNode extends MLog implements RestNodeService {
 				Method action = actions.get(actionName);
 				if (action != null) {
 					Object res = action.invoke(this, callContext);
-					if (res == null) 
-						return null;
-					if (res instanceof RestResult)
-						return (RestResult)res;
-					if (res instanceof InputStream)
-						return new BinaryResult((InputStream)res, action.getAnnotation(RestAction.class).contentType());
-					if (res instanceof Reader)
-						return new BinaryResult((Reader)res, action.getAnnotation(RestAction.class).contentType());
-					if (res instanceof String)
-						return new PlainTextResult((String)res, action.getAnnotation(RestAction.class).contentType());
-					return new PojoResult(res, action.getAnnotation(RestAction.class).contentType());
+					return doTransform(action, res);
 				} else {
 					log().d("action unknown",actionName);
 				}
@@ -105,6 +119,20 @@ public abstract class AbstractNode extends MLog implements RestNodeService {
 		return null;
 	}
 
+	public RestResult doTransform(Method action, Object res) {
+		if (res == null) 
+			return null;
+		if (res instanceof RestResult)
+			return (RestResult)res;
+		if (res instanceof InputStream)
+			return new BinaryResult((InputStream)res, action.getAnnotation(RestAction.class).contentType());
+		if (res instanceof Reader)
+			return new BinaryResult((Reader)res, action.getAnnotation(RestAction.class).contentType());
+		if (res instanceof String)
+			return new PlainTextResult((String)res, action.getAnnotation(RestAction.class).contentType());
+		return new PojoResult(res, action.getAnnotation(RestAction.class).contentType());
+	}
+	
 	// root by default
 	@Override
 	public String[] getParentNodeIds() {
