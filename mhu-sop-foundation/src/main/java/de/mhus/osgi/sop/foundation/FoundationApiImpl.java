@@ -38,7 +38,6 @@ import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MString;
 import de.mhus.lib.core.MTimeInterval;
 import de.mhus.lib.core.MValidator;
-import de.mhus.lib.core.util.FilterRequest;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.errors.NotFoundException;
 import de.mhus.lib.xdb.XdbService;
@@ -136,18 +135,20 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 	}
 
 	@Override
-	public List<SopJournal> getJournalEntries(UUID foundation, String queue, String search) throws MException {
+	public List<SopJournal> getJournalEntries(UUID foundation, String queue, long since, int max, String search) throws MException {
 		
-		FilterRequest filter = new FilterRequest(search);
-		int page = filter.getFacet("page", 0);
-		long since = filter.getFacet("since", 0);
-		int max = filter.getFacet("max", 100);
+		int  page = 0;
+		String filter = null;
+		if (MString.isSet(search)) {
+			page 	= RestUtil.getPageFromSearch(search);
+			filter 	= RestUtil.getFilterFromSearch(search);
+		}
 		
 		AQuery<SopJournal> query = Db.query(SopJournal.class).eq("queue", queue).eq("foundation", foundation);
 		if (since > 0)
 			query.gt(_SopJournal._ORDER, since);
-		if (filter != null && filter.isText())
-			query.or(Db.like("event", "%" + filter.getText() + "%"),Db.like("data", "%" + filter.getText() + "%"));
+		if (MString.isSet(filter))
+			query.or(Db.like("event", "%" + filter + "%"),Db.like("data", "%" + filter + "%"));
 		query.desc("order");
 		
 		
@@ -197,10 +198,10 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 	}
 
 	@Override
-	public List<SopData> getSopData(UUID foundId, String type, String search, boolean publicAccess) throws MException {
-		
-		FilterRequest filter = new FilterRequest(search);
-		int 	page 	= filter.getFacet("page", 0);
+	public List<SopData> getSopData(UUID foundId, String type, String search, boolean publicAccess, Boolean archived,
+	        Date due, String order, int size) throws MException {
+		int 	page 	= RestUtil.getPageFromSearch(search);
+		String filter 	= RestUtil.getFilterFromSearch(search);
 		
 		AQuery<SopData> query = Db.query(SopData.class);
 		if (type != null)
@@ -210,92 +211,97 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 		if (publicAccess)
 //			query.eq(Db.attr("ispublic"), Db.value(true));
 			query.eq(_SopData._IS_PUBLIC, true);
-		Date due = filter.getFacet("due", (Date)null);
 		if (due != null)
 			query.lt(_SopData._DUE, due);
 
-		boolean isArchived = filter.getFacet("archived", false);
+		boolean isArchived = false;
 		
-		for (String key : filter.getFacetKeys()) {
-			String val = filter.getFacet(key);
-			
-			switch(key) {
-			case "value0":
-				query.eq(_SopData._VALUE0,val);break;
-			case "value1":
-				query.eq(_SopData._VALUE1,val);break;
-			case "value2":
-				query.eq(_SopData._VALUE2,val);break;
-			case "value3":
-				query.eq(_SopData._VALUE3,val);break;
-			case "value4":
-				query.eq(_SopData._VALUE4,val);break;
-			case "value5":
-				query.eq(_SopData._VALUE5,val);break;
-			case "value6":
-				query.eq(_SopData._VALUE6,val);break;
-			case "value7":
-				query.eq(_SopData._VALUE7,val);break;
-			case "value8":
-				query.eq(_SopData._VALUE8,val);break;
-			case "value9":
-				query.eq(_SopData._VALUE9,val);break;
-			case "*value0*":
-				query.like(_SopData._VALUE0,"%"+val+"%");break;
-			case "*value1*":
-				query.like(_SopData._VALUE1,"%"+val+"%");break;
-			case "*value2*":
-				query.like(_SopData._VALUE2,"%"+val+"%");break;
-			case "*value3*":
-				query.like(_SopData._VALUE3,"%"+val+"%");break;
-			case "*value4*":
-				query.like(_SopData._VALUE4,"%"+val+"%");break;
-			case "*value5*":
-				query.like(_SopData._VALUE5,"%"+val+"%");break;
-			case "*value6*":
-				query.like(_SopData._VALUE6,"%"+val+"%");break;
-			case "*value7*":
-				query.like(_SopData._VALUE7,"%"+val+"%");break;
-			case "*value8*":
-				query.like(_SopData._VALUE8,"%"+val+"%");break;
-			case "*value9*":
-				query.like(_SopData._VALUE9,"%"+val+"%");break;
-			case "writable":
-				query.eq(_SopData._IS_WRITABLE, MCast.toboolean(val, false));break;
-			case "archived":
-				isArchived = true;
-				if (!"all".equals(val))
-					query.eq(_SopData._ARCHIVED, MCast.toboolean(val, false));
-				break;
-			case "status":
-				query.eq("status", val); break;
-			default:
+		if (MString.isSet(filter)) {
+			for (String part : filter.split(" ")) {
+				part = part.trim();
+				if (MString.isIndex(part, ':')) {
+					String key = MString.beforeIndex(part, ':');
+					String val = MString.afterIndex(part, ':');
+					
+					switch(key) {
+					case "value0":
+						query.eq(_SopData._VALUE0,val);break;
+					case "value1":
+						query.eq(_SopData._VALUE1,val);break;
+					case "value2":
+						query.eq(_SopData._VALUE2,val);break;
+					case "value3":
+						query.eq(_SopData._VALUE3,val);break;
+					case "value4":
+						query.eq(_SopData._VALUE4,val);break;
+					case "value5":
+						query.eq(_SopData._VALUE5,val);break;
+					case "value6":
+						query.eq(_SopData._VALUE6,val);break;
+					case "value7":
+						query.eq(_SopData._VALUE7,val);break;
+					case "value8":
+						query.eq(_SopData._VALUE8,val);break;
+					case "value9":
+						query.eq(_SopData._VALUE9,val);break;
+					case "*value0*":
+						query.like(_SopData._VALUE0,"%"+val+"%");break;
+					case "*value1*":
+						query.like(_SopData._VALUE1,"%"+val+"%");break;
+					case "*value2*":
+						query.like(_SopData._VALUE2,"%"+val+"%");break;
+					case "*value3*":
+						query.like(_SopData._VALUE3,"%"+val+"%");break;
+					case "*value4*":
+						query.like(_SopData._VALUE4,"%"+val+"%");break;
+					case "*value5*":
+						query.like(_SopData._VALUE5,"%"+val+"%");break;
+					case "*value6*":
+						query.like(_SopData._VALUE6,"%"+val+"%");break;
+					case "*value7*":
+						query.like(_SopData._VALUE7,"%"+val+"%");break;
+					case "*value8*":
+						query.like(_SopData._VALUE8,"%"+val+"%");break;
+					case "*value9*":
+						query.like(_SopData._VALUE9,"%"+val+"%");break;
+					case "writable":
+						query.eq(_SopData._IS_WRITABLE, MCast.toboolean(val, false));break;
+					case "archived":
+						isArchived = true;
+						if (!"all".equals(val))
+							query.eq(_SopData._ARCHIVED, MCast.toboolean(val, false));
+						break;
+					case "status":
+						query.eq("status", val); break;
+					}
+					
+	//				if (key.equals("archive") && MCast.toboolean(val, false))
+	//					query.eq("archived", true);
+						
+				} else {
+					query.or( 
+							Db.eq(_SopData._FOREIGN_ID, part), 
+							Db.like(_SopData._VALUE0, "%"+part+"%"), 
+							Db.like(_SopData._VALUE1, "%"+part+"%"),
+							Db.like(_SopData._VALUE2, "%"+part+"%"),
+							Db.like(_SopData._VALUE3, "%"+part+"%"),
+							Db.like(_SopData._VALUE4, "%"+part+"%"),
+							Db.like(_SopData._VALUE5, "%"+part+"%"),
+							Db.like(_SopData._VALUE6, "%"+part+"%") ,
+							Db.like(_SopData._VALUE7, "%"+part+"%"),
+							Db.like(_SopData._VALUE8, "%"+part+"%"),
+							Db.like(_SopData._VALUE9, "%"+part+"%") );
+				}
 			}
-//				if (key.equals("archive") && MCast.toboolean(val, false))
-//					query.eq("archived", true);
-			for (String part : filter.getText())
-				query.or( 
-						Db.eq(_SopData._FOREIGN_ID, part), 
-						Db.like(_SopData._VALUE0, "%"+part+"%"), 
-						Db.like(_SopData._VALUE1, "%"+part+"%"),
-						Db.like(_SopData._VALUE2, "%"+part+"%"),
-						Db.like(_SopData._VALUE3, "%"+part+"%"),
-						Db.like(_SopData._VALUE4, "%"+part+"%"),
-						Db.like(_SopData._VALUE5, "%"+part+"%"),
-						Db.like(_SopData._VALUE6, "%"+part+"%") ,
-						Db.like(_SopData._VALUE7, "%"+part+"%"),
-						Db.like(_SopData._VALUE8, "%"+part+"%"),
-						Db.like(_SopData._VALUE9, "%"+part+"%") );
-			}
+		}
 
 		if (!isArchived)
-			if (filter.isFacet("archived"))
-				query.eq(_SopData._ARCHIVED, filter.getFacet("archived", true));
+			if (archived != null)
+				query.eq(_SopData._ARCHIVED, archived.booleanValue());
 
-		if (!filter.isFacet("order"))
+		if (order == null)
 			query.desc("foreignid");
 		else {
-			String order = filter.getFacet("order");
 			boolean asc = true;
 			if (order.endsWith(" desc")) {
 				asc = false;
@@ -309,7 +315,6 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 			else
 				query.desc(order);
 		}
-		int size = filter.getFacet("size", 100);
 		LinkedList<SopData> out = RestUtil.collectResults(getManager(),query,page, size);
 		return out;
 	}

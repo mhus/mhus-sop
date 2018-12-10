@@ -15,6 +15,7 @@
  */
 package de.mhus.osgi.sop.foundation.data;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -105,7 +106,11 @@ public class SopDataCmd implements Action {
 					found.getId(), 
 					params.length > 1 ? params[1] : null, 
 					params.length > 2 ? params[2] : null, 
-					false
+					false, 
+					all ? null : false, 
+					null,
+					order,
+					size
 				);
 			for (SopData d : res) {
 				out.addRowValues(
@@ -408,8 +413,9 @@ public class SopDataCmd implements Action {
 						found.getId(), 
 						params.length > 1 ? params[1] : null, 
 						params.length > 2 ? params[2] : null, 
-						false
-						);
+						false, 
+						all ? null : false, 
+						null, order, size);
 				for (SopData d : res) {
 					SopDataController xcontroller = api.getDataSyncControllerForType(d.getType());
 					if (xcontroller != null) {
@@ -435,8 +441,9 @@ public class SopDataCmd implements Action {
 						found.getId(), 
 						params.length > 1 ? params[1] : null, 
 						params.length > 2 ? params[2] : null, 
-						false
-						);
+						false, 
+						all ? null : false, 
+						null, order, size);
 				for (SopData d : res) {
 					api.syncSopData(d, true, true);
 					System.out.println("SYNCED " + d);
@@ -449,12 +456,14 @@ public class SopDataCmd implements Action {
 			SopFoundation found = api.getFoundation(params[0]);
 			String type = params[1];
 			String search = params.length > 2 ? params[2] : null;
+			Boolean archived = params.length > 3 && !params[3].equals("?") ? MCast.toboolean(params[3], false) : null;
+			Date due = params.length > 4 && !params[4].equals("?") ? MCast.toDate(params[4], null) : null;
 			
 			SopDataController xcontroller = api.getDataSyncControllerForType(type);
 			
-			List<SopData> list = api.getSopData(found.getId(), type, search, true);
+			List<SopData> list = api.getSopData(found.getId(), type, search, true, archived, due, order, size);
 			
-			xcontroller.syncListBeforeLoad(found, type, search, list);
+			xcontroller.syncListBeforeLoad(found, type, search, archived, due, list);
 		}
 		return null;
 	}

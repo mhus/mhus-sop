@@ -78,7 +78,7 @@ public abstract class AbstractSopDataController extends MLog implements SopDataC
 	}
 	
 	@Override
-	public void syncListBeforeLoad(SopFoundation found, String type, String search, List<SopData> list) {
+	public void syncListBeforeLoad(SopFoundation found, String type, String search, Boolean archived, Date due, List<SopData> list) {
 		
 	}
 
