@@ -15,7 +15,6 @@
  */
 package de.mhus.osgi.sop.api.foundation;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -35,7 +34,7 @@ public interface FoundationApi {
 	
 	SopJournal appendJournalEntry(UUID foundation, String queue, String event, String ... data) throws MException;
 
-	List<SopJournal> getJournalEntries(UUID foundation, String queue, long since, int max, String search) throws MException;
+	List<SopJournal> getJournalEntries(UUID foundation, String queue, String search) throws MException;
 
 	SopJournal getJournalEntry(String id) throws MException;
 
@@ -47,7 +46,7 @@ public interface FoundationApi {
 
 	SopDataController getDataSyncControllerForType(String type);
 
-	List<SopData> getSopData(UUID orgaId, String type, String search, boolean publicAccess, Boolean archived, Date due, String order, int size) throws MException;
+	List<SopData> getSopData(UUID orgaId, String type, String search, boolean publicAccess) throws MException;
 
 	SopData getSopData(UUID orgaId, String id, boolean sync) throws MException;
 

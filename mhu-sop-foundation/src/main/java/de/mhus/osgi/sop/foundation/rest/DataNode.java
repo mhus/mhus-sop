@@ -16,7 +16,6 @@
 package de.mhus.osgi.sop.foundation.rest;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,10 +36,10 @@ import de.mhus.osgi.sop.api.data.SopDataController;
 import de.mhus.osgi.sop.api.foundation.FoundationApi;
 import de.mhus.osgi.sop.api.foundation.model.SopData;
 import de.mhus.osgi.sop.api.foundation.model.SopFoundation;
-import de.mhus.osgi.sop.api.rest.ObjectListNode;
 import de.mhus.osgi.sop.api.rest.CallContext;
 import de.mhus.osgi.sop.api.rest.JsonResult;
 import de.mhus.osgi.sop.api.rest.Node;
+import de.mhus.osgi.sop.api.rest.ObjectListNode;
 import de.mhus.osgi.sop.api.rest.RestException;
 import de.mhus.osgi.sop.api.rest.RestNodeService;
 import de.mhus.osgi.sop.api.rest.RestResult;
@@ -66,10 +65,7 @@ public class DataNode extends ObjectListNode<SopData>{
 		
 		SopFoundation orga = getObjectFromContext(callContext, SopFoundation.class);
 		Boolean archived = false;
-		Date due = null;
 		String type = null;
-		int size = 0;
-		String order = null;
 		String search = callContext.getParameter(Node.SEARCH);
 		{
 			String v = callContext.getParameter("_archived");
@@ -77,18 +73,7 @@ public class DataNode extends ObjectListNode<SopData>{
 			if (archived == true) archived = null;
 		}
 		{
-			String v = callContext.getParameter("_due");
-			if (v != null) due = MCast.toDate(v, null);
-		}
-		{
 			type = callContext.getParameter("_type");
-		}
-		{
-			String v = callContext.getParameter("_size");
-			if (v != null) size = MCast.toint(v, 0);
-		}
-		{
-			order = callContext.getParameter("_order");
 		}
 		{
 			if (search == null) search = "";
@@ -102,13 +87,13 @@ public class DataNode extends ObjectListNode<SopData>{
 		if (type == null && !AaaUtil.isCurrentAdmin()) {
 			throw new RestException(OperationResult.USAGE, "no type specified");
 		}
-		List<SopData> ret = api.getSopData(orga.getId(), type, search, true, archived, due, order, size);
+		List<SopData> ret = api.getSopData(orga.getId(), type, search, true);
 		
 		if (type != null) {
 			SopDataController control = api.getDataSyncControllerForType(type);
 			if (control == null)
 				throw new RestException(OperationResult.NOT_SUPPORTED, "Unknown type " + type );
-			control.syncListBeforeLoad(orga, type, search, archived, due, ret);
+			control.syncListBeforeLoad(orga, type, search, ret);
 		}
 		
 		

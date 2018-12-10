@@ -15,7 +15,6 @@
  */
 package de.mhus.osgi.sop.api.data;
 
-import java.util.Date;
 import java.util.List;
 
 import de.mhus.lib.core.IProperties;
@@ -77,7 +76,7 @@ public interface SopDataController {
 	 * @param list 
 	 * @param ret 
 	 */
-	void syncListBeforeLoad(SopFoundation found, String type, String search, Boolean archived, Date due, List<SopData> list);
+	void syncListBeforeLoad(SopFoundation found, String type, String search, List<SopData> list);
 
 	void deleteSopData(SopData data) throws Exception;
 
