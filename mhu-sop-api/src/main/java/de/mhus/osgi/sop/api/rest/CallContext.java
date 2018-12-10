@@ -15,11 +15,13 @@
  */
 package de.mhus.osgi.sop.api.rest;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.io.http.MHttp;
 
@@ -48,6 +50,32 @@ public class CallContext {
 	
 	public String getParameter(String key) {
 		String val = req.getParameter(key);
+		return val;
+	}
+
+	public int getParameter(String key, int def) {
+		String val = req.getParameter(key);
+		return MCast.toint(val, def);
+	}
+	
+	public long getParameter(String key, long def) {
+		String val = req.getParameter(key);
+		return MCast.tolong(val, def);
+	}
+
+	public boolean getParameter(String key, boolean def) {
+		String val = req.getParameter(key);
+		return MCast.toboolean(val, def);
+	}
+
+	public Date getParameterDate(String key, Date def) {
+		String val = req.getParameter(key);
+		return MCast.toDate(val, def);
+	}
+
+	public String getParameter(String key, String def) {
+		String val = req.getParameter(key);
+		if (val == null) return def;
 		return val;
 	}
 

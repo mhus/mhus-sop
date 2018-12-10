@@ -25,8 +25,6 @@ import de.mhus.lib.adb.query.AQuery;
 import de.mhus.lib.annotations.generic.Public;
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MApi;
-import de.mhus.lib.core.MCast;
-import de.mhus.lib.core.MString;
 import de.mhus.lib.core.pojo.PojoAttribute;
 import de.mhus.lib.core.pojo.PojoModel;
 import de.mhus.lib.core.pojo.PojoModelFactory;
@@ -103,25 +101,25 @@ public class RestUtil {
 //		return null;
 //	}
 
-	public static int getPageFromSearch(String search) {
-		if (MString.isEmpty(search) || !search.startsWith("page:"))
-			return 0;
-		search = search.substring(5);
-		if (search.indexOf(',') >= 0)
-			return MCast.toint(MString.beforeIndex(search, ','), 0);
-		return MCast.toint(search, 0);
-	}
-
-	public static String getFilterFromSearch(String search) {
-		if (MString.isEmpty(search))
-			return null;
-		if (search.startsWith("page:")) {
-			if (search.indexOf(',') >= 0)
-				return MString.afterIndex(search, ',');
-			return null;
-		}
-		return search;
-	}
+//	public static int getPageFromSearch(String search) {
+//		if (MString.isEmpty(search) || !search.startsWith("page:"))
+//			return 0;
+//		search = search.substring(5);
+//		if (search.indexOf(',') >= 0)
+//			return MCast.toint(MString.beforeIndex(search, ','), 0);
+//		return MCast.toint(search, 0);
+//	}
+//
+//	public static String getFilterFromSearch(String search) {
+//		if (MString.isEmpty(search))
+//			return null;
+//		if (search.startsWith("page:")) {
+//			if (search.indexOf(',') >= 0)
+//				return MString.afterIndex(search, ',');
+//			return null;
+//		}
+//		return search;
+//	}
 
 	public static <T> LinkedList<T> collectResults(XdbService service, AQuery<T> query, int page, int size) throws MException {
 		LinkedList<T> list = new LinkedList<T>();

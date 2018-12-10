@@ -69,6 +69,7 @@ public class DataNode extends ObjectListNode<SopData>{
 		Date due = null;
 		String type = null;
 		int size = 0;
+		int page = 0;
 		String order = null;
 		String search = callContext.getParameter(Node.SEARCH);
 		{
@@ -83,13 +84,9 @@ public class DataNode extends ObjectListNode<SopData>{
 		{
 			type = callContext.getParameter("_type");
 		}
-		{
-			String v = callContext.getParameter("_size");
-			if (v != null) size = MCast.toint(v, 0);
-		}
-		{
-			order = callContext.getParameter("_order");
-		}
+		size = callContext.getParameter("_size", size);
+		page = callContext.getParameter("_page", page);
+		order = callContext.getParameter("_order");
 		{
 			if (search == null) search = "";
 			for (String name : callContext.getParameterNames()) {
@@ -102,7 +99,7 @@ public class DataNode extends ObjectListNode<SopData>{
 		if (type == null && !AaaUtil.isCurrentAdmin()) {
 			throw new RestException(OperationResult.USAGE, "no type specified");
 		}
-		List<SopData> ret = api.getSopData(orga.getId(), type, search, true, archived, due, order, size);
+		List<SopData> ret = api.getSopData(orga.getId(), type, search, true, archived, due, order, size, page);
 		
 		if (type != null) {
 			SopDataController control = api.getDataSyncControllerForType(type);

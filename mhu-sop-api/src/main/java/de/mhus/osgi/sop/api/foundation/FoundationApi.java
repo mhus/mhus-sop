@@ -35,7 +35,7 @@ public interface FoundationApi {
 	
 	SopJournal appendJournalEntry(UUID foundation, String queue, String event, String ... data) throws MException;
 
-	List<SopJournal> getJournalEntries(UUID foundation, String queue, long since, int max, String search) throws MException;
+	List<SopJournal> getJournalEntries(UUID foundation, String queue, long since, int max, int page, String search) throws MException;
 
 	SopJournal getJournalEntry(String id) throws MException;
 
@@ -47,7 +47,7 @@ public interface FoundationApi {
 
 	SopDataController getDataSyncControllerForType(String type);
 
-	List<SopData> getSopData(UUID orgaId, String type, String search, boolean publicAccess, Boolean archived, Date due, String order, int size) throws MException;
+	List<SopData> getSopData(UUID orgaId, String type, String search, boolean publicAccess, Boolean archived, Date due, String order, int size, int page) throws MException;
 
 	SopData getSopData(UUID orgaId, String id, boolean sync) throws MException;
 
@@ -57,7 +57,7 @@ public interface FoundationApi {
 
 	boolean syncSopData(SopData obj, boolean forced, boolean save);
 
-	List<SopFoundation> searchFoundations(String search) throws MException;
+	List<SopFoundation> searchFoundations(String search, int page) throws MException;
 
 	SopFoundation getFoundation(String id) throws MException;
 

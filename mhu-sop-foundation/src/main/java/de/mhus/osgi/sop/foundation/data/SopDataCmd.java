@@ -110,7 +110,8 @@ public class SopDataCmd implements Action {
 					all ? null : false, 
 					null,
 					order,
-					size
+					size,
+					0
 				);
 			for (SopData d : res) {
 				out.addRowValues(
@@ -415,7 +416,7 @@ public class SopDataCmd implements Action {
 						params.length > 2 ? params[2] : null, 
 						false, 
 						all ? null : false, 
-						null, order, size);
+						null, order, size, 0);
 				for (SopData d : res) {
 					SopDataController xcontroller = api.getDataSyncControllerForType(d.getType());
 					if (xcontroller != null) {
@@ -443,7 +444,7 @@ public class SopDataCmd implements Action {
 						params.length > 2 ? params[2] : null, 
 						false, 
 						all ? null : false, 
-						null, order, size);
+						null, order, size, 0);
 				for (SopData d : res) {
 					api.syncSopData(d, true, true);
 					System.out.println("SYNCED " + d);
@@ -461,7 +462,7 @@ public class SopDataCmd implements Action {
 			
 			SopDataController xcontroller = api.getDataSyncControllerForType(type);
 			
-			List<SopData> list = api.getSopData(found.getId(), type, search, true, archived, due, order, size);
+			List<SopData> list = api.getSopData(found.getId(), type, search, true, archived, due, order, size, 0);
 			
 			xcontroller.syncListBeforeLoad(found, type, search, archived, due, list);
 		}

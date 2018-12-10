@@ -135,20 +135,13 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 	}
 
 	@Override
-	public List<SopJournal> getJournalEntries(UUID foundation, String queue, long since, int max, String search) throws MException {
-		
-		int  page = 0;
-		String filter = null;
-		if (MString.isSet(search)) {
-			page 	= RestUtil.getPageFromSearch(search);
-			filter 	= RestUtil.getFilterFromSearch(search);
-		}
+	public List<SopJournal> getJournalEntries(UUID foundation, String queue, long since, int max, int page, String search) throws MException {
 		
 		AQuery<SopJournal> query = Db.query(SopJournal.class).eq("queue", queue).eq("foundation", foundation);
 		if (since > 0)
 			query.gt(_SopJournal._ORDER, since);
-		if (MString.isSet(filter))
-			query.or(Db.like("event", "%" + filter + "%"),Db.like("data", "%" + filter + "%"));
+		if (MString.isSet(search))
+			query.or(Db.like("event", "%" + search + "%"),Db.like("data", "%" + search + "%"));
 		query.desc("order");
 		
 		
@@ -199,9 +192,7 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 
 	@Override
 	public List<SopData> getSopData(UUID foundId, String type, String search, boolean publicAccess, Boolean archived,
-	        Date due, String order, int size) throws MException {
-		int 	page 	= RestUtil.getPageFromSearch(search);
-		String filter 	= RestUtil.getFilterFromSearch(search);
+	        Date due, String order, int size, int page) throws MException {
 		
 		AQuery<SopData> query = Db.query(SopData.class);
 		if (type != null)
@@ -216,8 +207,8 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 
 		boolean isArchived = false;
 		
-		if (MString.isSet(filter)) {
-			for (String part : filter.split(" ")) {
+		if (MString.isSet(search)) {
+			for (String part : search.split(" ")) {
 				part = part.trim();
 				if (MString.isIndex(part, ':')) {
 					String key = MString.beforeIndex(part, ':');
@@ -404,9 +395,7 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 	}
 
 	@Override
-	public List<SopFoundation> searchFoundations(String search) throws MException {
-		int 	page 	= RestUtil.getPageFromSearch(search);
-		String	filter 	= RestUtil.getFilterFromSearch(search);
+	public List<SopFoundation> searchFoundations(String search, int page) throws MException {
 
 		AaaContext context = MApi.lookup(AccessApi.class).getCurrent();
 		
@@ -428,7 +417,7 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 				getManager(),
 				Db.extendObjectQueryFromSearch(
 					Db.query(SopFoundation.class).eq(_SopFoundation._ACTIVE, true),
-					filter,
+					search,
 					SEARCH_HELPER_FOUNDATION
 				)
 				,

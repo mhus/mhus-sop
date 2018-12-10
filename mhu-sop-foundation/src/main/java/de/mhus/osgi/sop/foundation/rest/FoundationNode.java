@@ -43,7 +43,8 @@ public class FoundationNode extends ObjectListNode<SopFoundation> {
 	@Override
 	protected List<SopFoundation> getObjectList(CallContext callContext) throws MException {
 		FoundationApi api = MApi.lookup(FoundationApi.class);
-		return api.searchFoundations(callContext.getParameter(Node.SEARCH));
+		int page = callContext.getParameter("_page", 0);
+		return api.searchFoundations(callContext.getParameter(Node.SEARCH), page);
 	}
 
 	@Override
