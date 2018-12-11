@@ -19,7 +19,6 @@ import java.util.List;
 
 public interface Node {
 
-	String SEARCH = "_search";
 	String ACTION = "_action";
 
 	String ROOT_ID = "";

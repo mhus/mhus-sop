@@ -56,15 +56,15 @@ public class JournalRestNode extends JsonListNode<JournalQueue>{
 		JournalQueue queue = getObjectFromContext(callContext);
 		if (queue == null) return;
 		
-		long since = MCast.tolong( callContext.getParameter("_since"), 0);
-		int max = MCast.toint( callContext.getParameter("_max"), 0);
+		long since = MCast.tolong( callContext.getParameter("since"), 0);
+		int max = MCast.toint( callContext.getParameter("size"), 0);
 		if (since == 0) {
 			if (max < 1 || max > 100) max = 100;
 		} else {
 			if (max < 1 || max > 100000) max = 100000;
 		}
-		int page = callContext.getParameter("_page", 0);
-		String search = callContext.getParameter("_search");
+		int page = callContext.getParameter("page", 0);
+		String search = callContext.getParameter("search");
 		
 		UUID foundationId = getObjectFromContext(callContext, SopFoundation.class).getId();
 		

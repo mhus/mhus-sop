@@ -37,10 +37,9 @@ import de.mhus.osgi.sop.api.data.SopDataController;
 import de.mhus.osgi.sop.api.foundation.FoundationApi;
 import de.mhus.osgi.sop.api.foundation.model.SopData;
 import de.mhus.osgi.sop.api.foundation.model.SopFoundation;
-import de.mhus.osgi.sop.api.rest.ObjectListNode;
 import de.mhus.osgi.sop.api.rest.CallContext;
 import de.mhus.osgi.sop.api.rest.JsonResult;
-import de.mhus.osgi.sop.api.rest.Node;
+import de.mhus.osgi.sop.api.rest.ObjectListNode;
 import de.mhus.osgi.sop.api.rest.RestException;
 import de.mhus.osgi.sop.api.rest.RestNodeService;
 import de.mhus.osgi.sop.api.rest.RestResult;
@@ -71,22 +70,22 @@ public class DataNode extends ObjectListNode<SopData>{
 		int size = 0;
 		int page = 0;
 		String order = null;
-		String search = callContext.getParameter(Node.SEARCH);
+		String search = callContext.getParameter("search");
 		{
-			String v = callContext.getParameter("_archived");
+			String v = callContext.getParameter("archived");
 			if (v != null) archived = MCast.toboolean(v, false);
 			if (archived == true) archived = null;
 		}
 		{
-			String v = callContext.getParameter("_due");
+			String v = callContext.getParameter("due");
 			if (v != null) due = MCast.toDate(v, null);
 		}
 		{
-			type = callContext.getParameter("_type");
+			type = callContext.getParameter("type");
 		}
-		size = callContext.getParameter("_size", size);
-		page = callContext.getParameter("_page", page);
-		order = callContext.getParameter("_order");
+		size = callContext.getParameter("size", size);
+		page = callContext.getParameter("page", page);
+		order = callContext.getParameter("order");
 		{
 			if (search == null) search = "";
 			for (String name : callContext.getParameterNames()) {
