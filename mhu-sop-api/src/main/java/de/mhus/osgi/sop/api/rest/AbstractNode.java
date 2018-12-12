@@ -82,6 +82,7 @@ public abstract class AbstractNode extends MLog implements RestNodeService {
 		nodeDef = getClass().getAnnotation(RestNode.class);
 		for (Method method : MSystem.getMethods(getClass())) {
 			RestAction action = method.getAnnotation(RestAction.class);
+			if (action == null) continue;
 			if (actions == null)
 				actions = new HashMap<>();
 			actions.put(action.name(), method);
