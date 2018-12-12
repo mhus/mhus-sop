@@ -56,13 +56,9 @@ public class JournalRestNode extends JsonListNode<JournalQueue>{
 		JournalQueue queue = getObjectFromContext(callContext);
 		if (queue == null) return;
 		
-		long since = MCast.tolong( callContext.getParameter("since"), 0);
+		long since = MCast.tolong( callContext.getParameter("since"), -1);
 		int max = MCast.toint( callContext.getParameter("size"), 0);
-		if (since == 0) {
-			if (max < 1 || max > 100) max = 100;
-		} else {
-			if (max < 1 || max > 100000) max = 100000;
-		}
+		if (max < 1 || max > 1000) max = 1000;
 		int page = callContext.getParameter("page", 0);
 		String search = callContext.getParameter("search");
 		
