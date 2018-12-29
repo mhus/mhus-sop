@@ -125,13 +125,17 @@ public abstract class AbstractNode extends MLog implements RestNodeService {
 			return null;
 		if (res instanceof RestResult)
 			return (RestResult)res;
+		
+		RestAction actionAnno = action.getAnnotation(RestAction.class);
+		String type = actionAnno == null ? "text/plain" : actionAnno.contentType();
+		
 		if (res instanceof InputStream)
-			return new BinaryResult((InputStream)res, action.getAnnotation(RestAction.class).contentType());
+			return new BinaryResult((InputStream)res, type);
 		if (res instanceof Reader)
-			return new BinaryResult((Reader)res, action.getAnnotation(RestAction.class).contentType());
+			return new BinaryResult((Reader)res, type);
 		if (res instanceof String)
-			return new PlainTextResult((String)res, action.getAnnotation(RestAction.class).contentType());
-		return new PojoResult(res, action.getAnnotation(RestAction.class).contentType());
+			return new PlainTextResult((String)res, type);
+		return new PojoResult(res, type);
 	}
 	
 	// root by default

@@ -152,7 +152,8 @@ public class RestServlet extends HttpServlet {
 	        AccessApi access = MApi.lookup(AccessApi.class);
 	        AaaContext user = null;
 	        if (MString.isEmpty(ticket) && path.startsWith(PUBLIC_PATH)) {
-	        		user = access.getGuestContext();
+	        		if (access != null)
+	        			user = access.getGuestContext();
 	        } else {
 		        try {
 			        	String localeStr = req.getHeader("Accept-Language");
@@ -167,44 +168,45 @@ public class RestServlet extends HttpServlet {
 			        	sendError(errorResultType, id, resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, t.getMessage(), t, null );
 			        	return;
 		        }
-	        }
-	        if (user == null) { // paranoia, should throw an exception in 'process()'
-	            resp.setHeader("WWW-Authenticate", "BASIC realm=\"rest\"");  
-	            sendError(errorResultType, id, resp, HttpServletResponse.SC_UNAUTHORIZED,"?", null, null);
-	            return;
+		        
+		        if (user == null) { // paranoia, should throw an exception in 'process()'
+			        	resp.setHeader("WWW-Authenticate", "BASIC realm=\"rest\"");  
+			        	sendError(errorResultType, id, resp, HttpServletResponse.SC_UNAUTHORIZED,"?", null, null);
+			        	return;
+		        }
 	        }
 	        if (user != null) {
-	        	Trust trust = user.getTrust();
-	        	if (trust != null) {
-	        		IReadProperties trustProp = trust.getProperties();
-	        		if (user.isAdminMode() && !trustProp.getBoolean("allowAdmin", true)) {
-	    	            sendError(errorResultType, id, resp, HttpServletResponse.SC_UNAUTHORIZED,"admin", null, null);
-	    	            return;
-	        		}
-	        		String hostsStr = trustProp.getString("allowedHosts",null);
-	        		if (hostsStr != null) {
-	        			String[] hosts = hostsStr.split(",");
-	        			String remote = req.getRemoteHost();
-	        			boolean allowed = false;
-	        			for (String pattern : hosts) {
-	        				if (pattern.matches(remote)) {
-	        					allowed = true;
-	        					break;
-	        				}
-	        			}
-	        			if (!allowed) {
-	        	            sendError(errorResultType, id, resp, HttpServletResponse.SC_UNAUTHORIZED,"Host " + remote, null, null);
-	        	            return;
-	        			}
-	        		}
-	        	}
+		        	Trust trust = user.getTrust();
+		        	if (trust != null) {
+		        		IReadProperties trustProp = trust.getProperties();
+		        		if (user.isAdminMode() && !trustProp.getBoolean("allowAdmin", true)) {
+		    	            sendError(errorResultType, id, resp, HttpServletResponse.SC_UNAUTHORIZED,"admin", null, null);
+		    	            return;
+		        		}
+		        		String hostsStr = trustProp.getString("allowedHosts",null);
+		        		if (hostsStr != null) {
+		        			String[] hosts = hostsStr.split(",");
+		        			String remote = req.getRemoteHost();
+		        			boolean allowed = false;
+		        			for (String pattern : hosts) {
+		        				if (pattern.matches(remote)) {
+		        					allowed = true;
+		        					break;
+		        				}
+		        			}
+		        			if (!allowed) {
+		        	            sendError(errorResultType, id, resp, HttpServletResponse.SC_UNAUTHORIZED,"Host " + remote, null, null);
+		        	            return;
+		        			}
+		        		}
+		        	}
 	        }
 	        
 	        try {
 		        Node item = restService.lookup(parts, null, callContext);
 		        
 		    	if (item == null) {
-		            sendError(errorResultType, id, resp, HttpServletResponse.SC_NOT_FOUND,"Resource Not Found", null, user.getAccountId());
+		            sendError(errorResultType, id, resp, HttpServletResponse.SC_NOT_FOUND,"Resource Not Found", null, user == null ? "?" : user.getAccountId());
 		    		return;
 		    	}
 		    	
@@ -229,7 +231,7 @@ public class RestServlet extends HttpServlet {
 		        }
 	        
 	        if (res == null) {
-	            sendError(errorResultType, id, resp, HttpServletResponse.SC_NOT_IMPLEMENTED, null, null, user.getAccountId() );
+	            sendError(errorResultType, id, resp, HttpServletResponse.SC_NOT_IMPLEMENTED, null, null, user == null ? "?" : user.getAccountId() );
 	            return;
 	        }
 	        
@@ -242,16 +244,17 @@ public class RestServlet extends HttpServlet {
 		        }
 	        } catch (Throwable t) {
 	        	log.d(t);
-	            sendError(errorResultType, id, resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, t.getMessage(), t, user.getAccountId() );
+	            sendError(errorResultType, id, resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, t.getMessage(), t, user == null ? "?" : user.getAccountId() );
 	        	return;
 	        }
 	        
 	        } catch (Throwable t) {
 	        	log.d(t);
-	        	sendError(errorResultType, id, resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, t.getMessage(), t, user.getAccountId() );
+	        	sendError(errorResultType, id, resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, t.getMessage(), t, user == null ? "?" : user.getAccountId() );
 	        	return;
 	        } finally {
-	        	access.release(ticket);
+	        	if (access != null)
+	        		access.release(ticket);
 	        }
 	        
     	} finally {

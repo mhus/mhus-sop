@@ -8,6 +8,6 @@ public @interface RestAction {
 
 	String name();
 
-	String contentType() default "";
+	String contentType() default "text/plain";
 
 }
