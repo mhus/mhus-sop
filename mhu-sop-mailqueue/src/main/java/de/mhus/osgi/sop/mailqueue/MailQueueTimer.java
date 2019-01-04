@@ -24,10 +24,11 @@ import aQute.bnd.annotation.component.Activate;
 import aQute.bnd.annotation.component.Component;
 import aQute.bnd.annotation.component.Deactivate;
 import de.mhus.lib.adb.query.Db;
+import de.mhus.lib.annotations.util.Interval;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MProperties;
-import de.mhus.lib.core.MTimeInterval;
+import de.mhus.lib.core.MPeriod;
 import de.mhus.lib.core.cfg.CfgInt;
 import de.mhus.lib.core.cfg.CfgString;
 import de.mhus.lib.core.concurrent.Lock;
@@ -40,13 +41,14 @@ import de.mhus.osgi.services.scheduler.SchedulerServiceAdapter;
 import de.mhus.osgi.sop.api.SopApi;
 import de.mhus.osgi.sop.api.mailqueue.MailQueueOperation;
 
-@Component(provide=SchedulerService.class,immediate=true,properties="interval=*/5 * * * * *")
+@Component(provide=SchedulerService.class,immediate=true)
+@Interval("interval=*/5 * * * * *")
 public class MailQueueTimer extends SchedulerServiceAdapter {
 
 	private static final CfgInt CFG_MAX_ATTEMPTS = new CfgInt(MailQueueOperation.class, "maxAttempts", 10);
 	private static final CfgInt CFG_MAX_MAILS_PER_ROUND = new CfgInt(MailQueueOperation.class, "maxMailsPerRound", 30);
 	private static final CfgString CFG_NEXT_SEND_ATTEMPT_INTERVAL = new CfgString(MailQueueOperation.class, "nextSendAttemptInterval", "15m");
-	private static final long LOCK_TIMEOUT = MTimeInterval.MINUTE_IN_MILLISECOUNDS;
+	private static final long LOCK_TIMEOUT = MPeriod.MINUTE_IN_MILLISECOUNDS;
 	private static MailQueueTimer instance;
 	private Lock lock = new Lock("MailQueueLock");
 	
@@ -120,7 +122,7 @@ public class MailQueueTimer extends SchedulerServiceAdapter {
 					if (task.getSendAttempts() > CFG_MAX_ATTEMPTS.value()) {
 						task.setStatus(MailQueueOperation.STATUS.ERROR);
 					} else {
-						task.setNextSendAttempt(new Date(System.currentTimeMillis() + MTimeInterval.toTime(CFG_NEXT_SEND_ATTEMPT_INTERVAL.value(), MTimeInterval.MINUTE_IN_MILLISECOUNDS * 15)));
+						task.setNextSendAttempt(new Date(System.currentTimeMillis() + MPeriod.toTime(CFG_NEXT_SEND_ATTEMPT_INTERVAL.value(), MPeriod.MINUTE_IN_MILLISECOUNDS * 15)));
 					}
 				}
 				task.setLastError(t.toString());

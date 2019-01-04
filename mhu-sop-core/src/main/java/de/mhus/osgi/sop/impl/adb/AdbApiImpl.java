@@ -38,7 +38,7 @@ import de.mhus.lib.basics.UuidIdentificable;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MConstants;
 import de.mhus.lib.core.MLog;
-import de.mhus.lib.core.MTimeInterval;
+import de.mhus.lib.core.MPeriod;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.xdb.XdbService;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
@@ -349,7 +349,7 @@ public class AdbApiImpl extends MLog implements AdbApi {
 
 		ContextCachedItem ret = new ContextCachedItem();
 		ret.bool = controller.canRead(c,obj);
-		((AaaContextImpl)c).setCached("ace_read|" + obj.getId(), MTimeInterval.MINUTE_IN_MILLISECOUNDS * 5, ret);
+		((AaaContextImpl)c).setCached("ace_read|" + obj.getId(), MPeriod.MINUTE_IN_MILLISECOUNDS * 5, ret);
 		return ret.bool;
 	}
 
@@ -365,7 +365,7 @@ public class AdbApiImpl extends MLog implements AdbApi {
 		
 		ContextCachedItem ret = new ContextCachedItem();
 		ret.bool = controller.canUpdate(c,obj);
-		((AaaContextImpl)c).setCached("ace_update|" + obj.getId(),MTimeInterval.MINUTE_IN_MILLISECOUNDS * 5, ret);
+		((AaaContextImpl)c).setCached("ace_update|" + obj.getId(),MPeriod.MINUTE_IN_MILLISECOUNDS * 5, ret);
 		return ret.bool;
 	}
 
@@ -381,7 +381,7 @@ public class AdbApiImpl extends MLog implements AdbApi {
 
 		ContextCachedItem ret = new ContextCachedItem();
 		ret.bool = controller.canDelete(c,obj);
-		((AaaContextImpl)c).setCached("ace_delete|" + obj.getId(), MTimeInterval.MINUTE_IN_MILLISECOUNDS * 5,ret);
+		((AaaContextImpl)c).setCached("ace_delete|" + obj.getId(), MPeriod.MINUTE_IN_MILLISECOUNDS * 5,ret);
 		return ret.bool;
 	}
 
@@ -395,7 +395,7 @@ public class AdbApiImpl extends MLog implements AdbApi {
 		
 		ContextCachedItem ret = new ContextCachedItem();
 		ret.bool = controller.canCreate(c,obj);
-		((AaaContextImpl)c).setCached("ace_create|" + obj.getId(),MTimeInterval.MINUTE_IN_MILLISECOUNDS * 5, ret);
+		((AaaContextImpl)c).setCached("ace_create|" + obj.getId(),MPeriod.MINUTE_IN_MILLISECOUNDS * 5, ret);
 		return ret.bool;
 	}
 

@@ -21,7 +21,7 @@ import de.mhus.lib.adb.DbSchema;
 import de.mhus.lib.adb.model.Table;
 import de.mhus.lib.adb.transaction.MemoryLockStrategy;
 import de.mhus.lib.core.MApi;
-import de.mhus.lib.core.MTimeInterval;
+import de.mhus.lib.core.MPeriod;
 import de.mhus.lib.core.logging.Log;
 import de.mhus.lib.errors.AccessDeniedException;
 import de.mhus.lib.sql.DbConnection;
@@ -38,7 +38,7 @@ public abstract class AbstractDbSchema extends DbSchema {
 		trace.i("start");
 		lockStrategy = new MemoryLockStrategy();
 		((MemoryLockStrategy)lockStrategy).setMaxLockAge(
-				MApi.getCfg(DbManagerService.class).getLong("maxLockAge", MTimeInterval.MINUTE_IN_MILLISECOUNDS * 5)
+				MApi.getCfg(DbManagerService.class).getLong("maxLockAge", MPeriod.MINUTE_IN_MILLISECOUNDS * 5)
 		);
 	}
 	

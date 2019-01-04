@@ -44,7 +44,7 @@ import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.MThread;
-import de.mhus.lib.core.MTimeInterval;
+import de.mhus.lib.core.MPeriod;
 import de.mhus.lib.core.lang.TempFile;
 import de.mhus.lib.core.strategy.NotSuccessful;
 import de.mhus.lib.core.strategy.OperationResult;
@@ -137,7 +137,7 @@ public class JmsOperationProvider extends MLog implements OperationsProvider {
 		
 		String ticket = api == null ? null : api.createTrustTicket(SopUtil.TRUST_NAME.value(), api.getCurrent()); // TODO Configurable via execute options
 		Locale locale = api == null || api.getCurrent() == null ? Locale.getDefault() : api.getCurrent().getLocale();
-		long timeout = OperationUtil.getOption(executeOptions, JmsApi.OPT_TIMEOUT, MTimeInterval.MINUTE_IN_MILLISECOUNDS); // TODO Configurable via execute options
+		long timeout = OperationUtil.getOption(executeOptions, JmsApi.OPT_TIMEOUT, MPeriod.MINUTE_IN_MILLISECOUNDS); // TODO Configurable via execute options
 		
 		try {
 			return doExecuteOperation(con, queueName, path, version, properties, ticket, locale, timeout, executeOptions);
@@ -300,7 +300,7 @@ public class JmsOperationProvider extends MLog implements OperationsProvider {
 	@Override
 	public void synchronize() {
 		// TODO time configurable
-		if (MTimeInterval.isTimeOut(JmsApiImpl.instance.lastRegistryRequest,MTimeInterval.MINUTE_IN_MILLISECOUNDS * 3)) {
+		if (MPeriod.isTimeOut(JmsApiImpl.instance.lastRegistryRequest,MPeriod.MINUTE_IN_MILLISECOUNDS * 3)) {
 			long now = System.currentTimeMillis();
 			JmsApiImpl.instance.requestOperationRegistry();
 			MThread.sleep(30000);

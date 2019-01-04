@@ -24,7 +24,7 @@ import de.mhus.lib.basics.AclControlled;
 import de.mhus.lib.basics.UuidIdentificable;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MLog;
-import de.mhus.lib.core.MTimeInterval;
+import de.mhus.lib.core.MPeriod;
 import de.mhus.lib.core.MValidator;
 import de.mhus.lib.core.cfg.CfgLong;
 import de.mhus.lib.errors.MException;
@@ -34,7 +34,7 @@ import de.mhus.osgi.sop.api.model.SopAcl;
 
 public abstract class AbstractDbSchemaService extends MLog implements DbSchemaService {
 
-	public static CfgLong CFG_TIMEOUT = new CfgLong(DbSchemaService.class, "cacheTimeout", MTimeInterval.MINUTE_IN_MILLISECOUNDS * 5);
+	public static CfgLong CFG_TIMEOUT = new CfgLong(DbSchemaService.class, "cacheTimeout", MPeriod.MINUTE_IN_MILLISECOUNDS * 5);
 	
 	@Override
 	public boolean canRead(AaaContext context, Persistable obj)

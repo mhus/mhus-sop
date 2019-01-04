@@ -33,7 +33,7 @@ import aQute.bnd.annotation.component.Reference;
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MThread;
-import de.mhus.lib.core.MTimeInterval;
+import de.mhus.lib.core.MPeriod;
 import de.mhus.lib.core.MTimerTask;
 import de.mhus.lib.core.base.service.TimerFactory;
 import de.mhus.lib.core.base.service.TimerIfc;
@@ -96,7 +96,7 @@ public class OperationApiImpl extends MLog implements OperationApi {
 				synchronize();
 			}
 		};
-		timer.schedule(timerTask, CFG_OPERATION_SYNC.value(), MTimeInterval.MINUTE_IN_MILLISECOUNDS );
+		timer.schedule(timerTask, CFG_OPERATION_SYNC.value(), MPeriod.MINUTE_IN_MILLISECOUNDS );
 	}
 
 	private class MyServiceTrackerCustomizer implements ServiceTrackerCustomizer<OperationsProvider,OperationsProvider> {

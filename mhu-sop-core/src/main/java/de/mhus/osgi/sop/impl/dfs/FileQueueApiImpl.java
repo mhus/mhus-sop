@@ -36,7 +36,7 @@ import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
-import de.mhus.lib.core.MTimeInterval;
+import de.mhus.lib.core.MPeriod;
 import de.mhus.lib.core.MValidator;
 import de.mhus.lib.core.cfg.CfgInt;
 import de.mhus.lib.core.cfg.CfgLong;
@@ -419,7 +419,7 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 						long access = prop.getLong("access", 0);
 						if (
 								expires > 0 && System.currentTimeMillis() > expires ||
-								expires == 0 && MTimeInterval.isTimeOut(access, FileQueueApi.DEFAULT_TTL) ||
+								expires == 0 && MPeriod.isTimeOut(access, FileQueueApi.DEFAULT_TTL) ||
 								expires == 0 && access == 0
 							) {
 							String id = MString.beforeIndex(file.getName(), '.');
@@ -447,7 +447,7 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 			if (queueFileCnt > CFG_MAX_FILES.value() || queueFileSize > CFG_MAX_QUEUE_SIZE.value()) {
 				// if the queue is full a manual cleanup check will executed to - maybe - cleanup resources
 				// to avoid overload this will only be executed every 10 sec.
-				if (MTimeInterval.isTimeOut(lastManualQueueCleanup, 10000)) {
+				if (MPeriod.isTimeOut(lastManualQueueCleanup, 10000)) {
 					log().w("Manual File Queue Cleanup", queueFileCnt, queueFileSize);
 					cleanupQueue();
 					lastManualQueueCleanup = System.currentTimeMillis();

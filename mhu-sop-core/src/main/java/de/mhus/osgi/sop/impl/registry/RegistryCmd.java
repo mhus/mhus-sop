@@ -27,7 +27,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MDate;
 import de.mhus.lib.core.MString;
-import de.mhus.lib.core.MTimeInterval;
+import de.mhus.lib.core.MPeriod;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.osgi.sop.api.registry.RegistryApi;
 import de.mhus.osgi.sop.api.registry.RegistryManager;
@@ -75,7 +75,7 @@ public class RegistryCmd implements Action {
 				for (String child : api.getNodeChildren(path))
 					out.addRowValues("/" + child,"[node]","","", "","", "");
 				for (RegistryValue value : api.getParameters(path) ) 
-					out.addRowValues("@" + MString.afterIndex(value.getPath(), '@'), value.getValue(),value.getSource(),new Date(value.getUpdated()), value.getTimeout() > 0 ? MTimeInterval.getIntervalAsString( value.getTimeout() - ( System.currentTimeMillis() - value.getUpdated() ) ) : "", value.isReadOnly(), value.isPersistent() );
+					out.addRowValues("@" + MString.afterIndex(value.getPath(), '@'), value.getValue(),value.getSource(),new Date(value.getUpdated()), value.getTimeout() > 0 ? MPeriod.getIntervalAsString( value.getTimeout() - ( System.currentTimeMillis() - value.getUpdated() ) ) : "", value.isReadOnly(), value.isPersistent() );
 				out.print(System.out);
 			} else {
 				RegistryManager manager = MApi.lookup(RegistryManager.class);
@@ -87,7 +87,7 @@ public class RegistryCmd implements Action {
 				out.setHeaderValues("Path","Value","Source","Updated", "TTL", "RO","Persistent");
 				for (RegistryValue value : list ) {
 					if (path == null && !value.getPath().startsWith(RegistryApi.PATH_SYSTEM) && !value.getPath().startsWith(RegistryApi.PATH_WORKER) || MString.compareFsLikePattern(value.getPath(), path))
-						out.addRowValues(value.getPath(), value.getValue(),value.getSource(),new Date(value.getUpdated()), value.getTimeout() > 0 ? MTimeInterval.getIntervalAsString( value.getTimeout() - ( System.currentTimeMillis() - value.getUpdated() ) ) : "", value.isReadOnly(), value.isPersistent() );
+						out.addRowValues(value.getPath(), value.getValue(),value.getSource(),new Date(value.getUpdated()), value.getTimeout() > 0 ? MPeriod.getIntervalAsString( value.getTimeout() - ( System.currentTimeMillis() - value.getUpdated() ) ) : "", value.isReadOnly(), value.isPersistent() );
 				}
 				out.print(System.out);
 			}
@@ -98,8 +98,8 @@ public class RegistryCmd implements Action {
 			System.out.println("Source    : " + entry.getSource());
 			System.out.println("Persistent: " + entry.isPersistent());
 			System.out.println("Readonly  : " + entry.isReadOnly());
-			System.out.println("Updated   : " + MDate.toIsoDateTime(entry.getUpdated()) + " Age: " + MTimeInterval.getIntervalAsString( System.currentTimeMillis() - entry.getUpdated() ));
-			System.out.println("Timeout   : " + entry.getTimeout() + " " + (entry.getTimeout() > 0 ? MTimeInterval.getIntervalAsString( entry.getTimeout() - ( System.currentTimeMillis() - entry.getUpdated() ) ) : ""));
+			System.out.println("Updated   : " + MDate.toIsoDateTime(entry.getUpdated()) + " Age: " + MPeriod.getIntervalAsString( System.currentTimeMillis() - entry.getUpdated() ));
+			System.out.println("Timeout   : " + entry.getTimeout() + " " + (entry.getTimeout() > 0 ? MPeriod.getIntervalAsString( entry.getTimeout() - ( System.currentTimeMillis() - entry.getUpdated() ) ) : ""));
 			System.out.println("Value     : " + entry.getValue());
 			RegistryValue c = entry.getRemoteValue();
 			if (c != null) {
@@ -108,8 +108,8 @@ public class RegistryCmd implements Action {
 				System.out.println("Remote Source    : " + c.getSource());
 				System.out.println("Remote Persistent: " + c.isPersistent());
 				System.out.println("Remote Readonly  : " + c.isReadOnly());
-				System.out.println("Remote Updated   : " + MDate.toIsoDateTime(c.getUpdated()) + " Age: " + MTimeInterval.getIntervalAsString( System.currentTimeMillis() - c.getUpdated() ));
-				System.out.println("Remote Timeout   : " + c.getTimeout() + " " + (c.getTimeout() > 0 ? MTimeInterval.getIntervalAsString( c.getTimeout() - ( System.currentTimeMillis() - c.getUpdated() ) ) : ""));
+				System.out.println("Remote Updated   : " + MDate.toIsoDateTime(c.getUpdated()) + " Age: " + MPeriod.getIntervalAsString( System.currentTimeMillis() - c.getUpdated() ));
+				System.out.println("Remote Timeout   : " + c.getTimeout() + " " + (c.getTimeout() > 0 ? MPeriod.getIntervalAsString( c.getTimeout() - ( System.currentTimeMillis() - c.getUpdated() ) ) : ""));
 				System.out.println("Remote Value     : " + c.getValue());
 			}
 			

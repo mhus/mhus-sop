@@ -31,7 +31,7 @@ import de.mhus.lib.core.MDate;
 import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
-import de.mhus.lib.core.MTimeInterval;
+import de.mhus.lib.core.MPeriod;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.lib.core.util.MUri;
 import de.mhus.osgi.sop.api.dfs.FileInfo;
@@ -83,7 +83,7 @@ public class FileQueueCmd implements Action {
 				for (UUID id : FileQueueApiImpl.instance.getQueuedIdList(true)) {
 					FileInfo info = api.getFileInfo(id);
 					MProperties prop = FileQueueApiImpl.instance.getProperties(id);
-					String ttl = MTimeInterval.getIntervalAsString( prop.getLong("expires", 0) - System.currentTimeMillis());
+					String ttl = MPeriod.getIntervalAsString( prop.getLong("expires", 0) - System.currentTimeMillis());
 					table.addRowValues(id, info.getName(), MString.toByteDisplayString(info.getSize()), MDate.toIso8601(info.getModified()), ttl, prop.getString("source", ""));
 				}
 			} else {

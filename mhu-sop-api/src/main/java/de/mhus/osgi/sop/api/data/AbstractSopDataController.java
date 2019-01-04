@@ -20,7 +20,7 @@ import java.util.List;
 
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MLog;
-import de.mhus.lib.core.MTimeInterval;
+import de.mhus.lib.core.MPeriod;
 import de.mhus.lib.core.strategy.NotSuccessful;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.errors.MException;
@@ -30,7 +30,7 @@ import de.mhus.osgi.sop.api.rest.CallContext;
 
 public abstract class AbstractSopDataController extends MLog implements SopDataController {
 
-	protected long syncTimeout = MTimeInterval.MINUTE_IN_MILLISECOUNDS * 5;
+	protected long syncTimeout = MPeriod.MINUTE_IN_MILLISECOUNDS * 5;
 
 	@Override
 	public void createSopData(SopData data) throws Exception {
@@ -53,7 +53,7 @@ public abstract class AbstractSopDataController extends MLog implements SopDataC
 //		if (ls != null && !MTimeInterval.isTimeOut(ls.getTime(), getSyncTimeout()))
 //			return false;
 		Date ls = obj.getLastSyncTry();
-		if (ls != null && !MTimeInterval.isTimeOut(ls.getTime(), getSyncTimeout()))
+		if (ls != null && !MPeriod.isTimeOut(ls.getTime(), getSyncTimeout()))
 			return false;
 		return true;
 	}
