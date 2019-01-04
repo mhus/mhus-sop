@@ -22,7 +22,7 @@
 
     <groupId>de.mhus.osgi</groupId>
     <artifactId>mhus-sop</artifactId>
-    <version>1.3.4</version>
+    <version>1.3.5-SNAPSHOT</version>
     <packaging>pom</packaging>
   <name>MHUS OSGi Tools</name>
   <description>A set of tools to improve OSGi frameworks and karaf</description>
@@ -48,9 +48,9 @@
     </developer>
   </developers>
     <properties>
-		<mhulib.version>3.4.0</mhulib.version>
-		<osgitools.version>1.4.4</osgitools.version>
-		<osgiservlets.version>1.4.3</osgiservlets.version>
+		<mhulib.version>3.4.1-SNAPSHOT</mhulib.version>
+		<osgitools.version>1.4.5-SNAPSHOT</osgitools.version>
+		<osgiservlets.version>1.4.4-SNAPSHOT</osgiservlets.version>
 		<ports.version>1.3.6</ports.version>
 		<ports.vaadin.version>1.3.6</ports.vaadin.version>
 		
