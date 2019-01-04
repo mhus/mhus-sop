@@ -37,7 +37,7 @@ public class _SopJournal extends ConstBase {
   public static final Identifier PROJECT_ARTIFACT = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopJournal.class,"mhu-sop-api");
   public static final Identifier PROJECT_DESCRIPTION = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopJournal.class,"A set of tools to improve OSGi frameworks and karaf");
   public static final Identifier PROJECT_GROUP = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopJournal.class,"de.mhus.osgi");
-  public static final Identifier PROJECT_VERSION = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopJournal.class,"1.3.5-SNAPSHOT");
+  public static final Identifier PROJECT_VERSION = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopJournal.class,"1.5.0-SNAPSHOT");
   public static final Identifier _ADB_CHANGED = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopJournal.class,"AdbChanged");
   public static final Identifier _ADB_MANAGED = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopJournal.class,"AdbManaged");
   public static final Identifier _ADB_PERSISTENT = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopJournal.class,"AdbPersistent");
