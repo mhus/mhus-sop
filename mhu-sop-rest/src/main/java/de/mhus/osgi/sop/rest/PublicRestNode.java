@@ -17,7 +17,7 @@ package de.mhus.osgi.sop.rest;
 
 import org.codehaus.jackson.node.ObjectNode;
 
-import aQute.bnd.annotation.component.Component;
+import org.osgi.service.component.annotations.Component;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MThread;
 import de.mhus.osgi.sop.api.rest.SingleObjectNode;
@@ -25,7 +25,7 @@ import de.mhus.osgi.sop.api.rest.CallContext;
 import de.mhus.osgi.sop.api.rest.JsonResult;
 import de.mhus.osgi.sop.api.rest.RestNodeService;
 
-@Component(immediate=true,provide=RestNodeService.class)
+@Component(immediate=true,service=RestNodeService.class)
 public class PublicRestNode extends SingleObjectNode<Object> {
 	
 	@Override

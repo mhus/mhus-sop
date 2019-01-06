@@ -15,11 +15,11 @@
  */
 package de.mhus.osgi.sop.impl.aaa;
 
-import aQute.bnd.annotation.component.Component;
+import org.osgi.service.component.annotations.Component;
 import de.mhus.osgi.services.AbstractCacheControl;
 import de.mhus.osgi.services.CacheControlIfc;
 
-@Component(provide=CacheControlIfc.class)
+@Component(service=CacheControlIfc.class)
 public class TrustCacheService extends AbstractCacheControl {
 
 	{

@@ -15,7 +15,7 @@
  */
 package de.mhus.osgi.sop.jms.operation;
 
-import aQute.bnd.annotation.component.Component;
+import org.osgi.service.component.annotations.Component;
 import de.mhus.lib.core.MLog;
 import de.mhus.osgi.sop.api.registry.RegistryProvider;
 import de.mhus.osgi.sop.api.registry.RegistryValue;

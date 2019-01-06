@@ -18,7 +18,7 @@ package de.mhus.osgi.sop.foundation;
 import java.util.List;
 import java.util.UUID;
 
-import aQute.bnd.annotation.component.Component;
+import org.osgi.service.component.annotations.Component;
 import de.mhus.lib.adb.Persistable;
 import de.mhus.lib.adb.query.Db;
 import de.mhus.lib.basics.Ace;
@@ -42,7 +42,7 @@ import de.mhus.osgi.sop.api.foundation.model.SopJournal;
 import de.mhus.osgi.sop.api.model.SopAcl;
 import de.mhus.osgi.sop.api.model.SopObjectParameter;
 
-@Component(provide=DbSchemaService.class,immediate=true)
+@Component(service=DbSchemaService.class,immediate=true)
 public class FoundationDbImpl extends AbstractDbSchemaService {
 
 	private XdbService service;

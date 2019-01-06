@@ -15,7 +15,7 @@
  */
 package de.mhus.osgi.sop.impl.util;
 
-import aQute.bnd.annotation.component.Component;
+import org.osgi.service.component.annotations.Component;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.strategy.AbstractOperation;
@@ -28,7 +28,7 @@ import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
 import de.mhus.osgi.sop.api.util.SopUtil;
 
-@Component(provide=Operation.class, properties="tags=acl=*")
+@Component(service=Operation.class, properties="tags=acl=*")
 public class PingOperation extends AbstractOperation {
 
 	@Override

@@ -17,7 +17,7 @@ package de.mhus.osgi.sop.foundation.rest;
 
 import java.util.List;
 
-import aQute.bnd.annotation.component.Component;
+import org.osgi.service.component.annotations.Component;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.foundation.FoundationApi;
@@ -26,7 +26,7 @@ import de.mhus.osgi.sop.api.rest.CallContext;
 import de.mhus.osgi.sop.api.rest.ObjectListNode;
 import de.mhus.osgi.sop.api.rest.RestNodeService;
 
-@Component(immediate=true,provide=RestNodeService.class)
+@Component(immediate=true,service=RestNodeService.class)
 public class FoundationNode extends ObjectListNode<SopFoundation> {
 
 	@Override

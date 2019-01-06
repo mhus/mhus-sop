@@ -23,9 +23,9 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-import aQute.bnd.annotation.component.Activate;
-import aQute.bnd.annotation.component.Component;
-import aQute.bnd.annotation.component.Deactivate;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import de.mhus.lib.adb.DbManager;
 import de.mhus.lib.adb.DbSchema;
 import de.mhus.lib.core.MApi;
@@ -39,7 +39,7 @@ import de.mhus.osgi.services.adb.DbManagerService;
 import de.mhus.osgi.services.adb.DbManagerServiceImpl;
 import de.mhus.osgi.sop.api.adb.DbSchemaService;
 
-@Component(provide=DbManagerService.class,immediate=true)
+@Component(service=DbManagerService.class,immediate=true)
 public class SopDbManagerService extends DbManagerServiceImpl {
 	
 	private static final CfgBoolean CFG_USE_PSEUDO = new CfgBoolean(DbSchemaService.class, "usePseudoPool", false);

@@ -19,9 +19,12 @@ import java.util.Locale;
 
 import org.osgi.service.component.ComponentContext;
 
-import aQute.bnd.annotation.component.Activate;
-import aQute.bnd.annotation.component.Deactivate;
-import aQute.bnd.annotation.component.Reference;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MPassword;
 import de.mhus.lib.core.MString;
@@ -375,7 +378,7 @@ public class AccessApiImpl extends MLog implements AccessApi {
 		
 	}
 
-	@Reference(optional=true,dynamic=true)
+	@Reference(policy = ReferencePolicy.DYNAMIC,cardinality = ReferenceCardinality.MULTIPLE)
 	public void setAccountSource(AccountSource source) {
 		this.accountSource = source;
 	}
@@ -383,7 +386,7 @@ public class AccessApiImpl extends MLog implements AccessApi {
 		this.accountSource = null;
 	}
 	
-	@Reference(optional=true,dynamic=true)
+	@Reference(policy = ReferencePolicy.DYNAMIC,cardinality = ReferenceCardinality.MULTIPLE)
 	public void setTrustSource(TrustSource source) {
 		this.trustSource = source;
 	}
@@ -392,7 +395,7 @@ public class AccessApiImpl extends MLog implements AccessApi {
 		this.trustSource = null;
 	}
 
-	@Reference(optional=true,dynamic=true)
+	@Reference(policy = ReferencePolicy.DYNAMIC,cardinality = ReferenceCardinality.MULTIPLE)
 	public void setAuthorizationSource(AuthorizationSource source) {
 		this.authorizationSource = source;
 	}

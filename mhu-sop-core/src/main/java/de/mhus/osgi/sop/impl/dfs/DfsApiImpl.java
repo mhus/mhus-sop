@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map;
 
-import aQute.bnd.annotation.component.Component;
+import org.osgi.service.component.annotations.Component;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.util.MUri;

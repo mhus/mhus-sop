@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.UUID;
 
-import aQute.bnd.annotation.component.Component;
+import org.osgi.service.component.annotations.Component;
 import de.mhus.lib.core.strategy.Operation;
 import de.mhus.lib.core.strategy.OperationDescription;
 import de.mhus.lib.core.strategy.OperationToIfcProxy;
@@ -30,7 +30,7 @@ import de.mhus.osgi.services.MOsgi;
 import de.mhus.osgi.sop.api.dfs.FileInfo;
 import de.mhus.osgi.sop.api.dfs.FileQueueOperation;
 
-@Component(provide=Operation.class)
+@Component(service=Operation.class)
 public class FileQueueOperationImpl extends OperationToIfcProxy implements FileQueueOperation {
 
 	@Override

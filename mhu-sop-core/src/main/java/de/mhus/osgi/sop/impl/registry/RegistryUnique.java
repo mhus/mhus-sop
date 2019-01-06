@@ -15,7 +15,7 @@
  */
 package de.mhus.osgi.sop.impl.registry;
 
-import aQute.bnd.annotation.component.Component;
+import org.osgi.service.component.annotations.Component;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.crypt.MRandom;

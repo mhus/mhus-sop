@@ -20,9 +20,9 @@ import java.util.Date;
 
 import org.osgi.service.component.ComponentContext;
 
-import aQute.bnd.annotation.component.Activate;
-import aQute.bnd.annotation.component.Component;
-import aQute.bnd.annotation.component.Deactivate;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import de.mhus.lib.adb.query.Db;
 import de.mhus.lib.annotations.util.Interval;
 import de.mhus.lib.core.MApi;
@@ -41,7 +41,7 @@ import de.mhus.osgi.services.scheduler.SchedulerServiceAdapter;
 import de.mhus.osgi.sop.api.SopApi;
 import de.mhus.osgi.sop.api.mailqueue.MailQueueOperation;
 
-@Component(provide=SchedulerService.class,immediate=true)
+@Component(service=SchedulerService.class,immediate=true)
 @Interval("interval=*/5 * * * * *")
 public class MailQueueTimer extends SchedulerServiceAdapter {
 

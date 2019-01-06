@@ -22,10 +22,10 @@ import javax.jms.JMSException;
 
 import org.osgi.service.component.ComponentContext;
 
-import aQute.bnd.annotation.component.Activate;
-import aQute.bnd.annotation.component.Component;
-import aQute.bnd.annotation.component.Deactivate;
-import aQute.bnd.annotation.component.Reference;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.cfg.CfgString;
@@ -42,7 +42,7 @@ import de.mhus.osgi.sop.api.jms.TicketAccessInterceptor;
 import de.mhus.osgi.sop.api.operation.OperationApi;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 
-@Component(provide=JmsDataChannel.class,immediate=true)
+@Component(service=JmsDataChannel.class,immediate=true)
 public class Jms2LocalOperationExecuteChannel extends AbstractJmsOperationExecuteChannel {
 
 	public static CfgString queueName = new CfgString(Jms2LocalOperationExecuteChannel.class, "queue", "sop.operation." + MApi.lookup(ServerIdent.class));

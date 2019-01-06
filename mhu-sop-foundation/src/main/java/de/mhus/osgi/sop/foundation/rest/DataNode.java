@@ -22,7 +22,7 @@ import java.util.UUID;
 
 import org.codehaus.jackson.node.ObjectNode;
 
-import aQute.bnd.annotation.component.Component;
+import org.osgi.service.component.annotations.Component;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MProperties;
@@ -44,7 +44,7 @@ import de.mhus.osgi.sop.api.rest.RestException;
 import de.mhus.osgi.sop.api.rest.RestNodeService;
 import de.mhus.osgi.sop.api.rest.RestResult;
 
-@Component(immediate=true,provide=RestNodeService.class)
+@Component(immediate=true,service=RestNodeService.class)
 public class DataNode extends ObjectListNode<SopData>{
 
 	Log log = Log.getLog(DataNode.class);

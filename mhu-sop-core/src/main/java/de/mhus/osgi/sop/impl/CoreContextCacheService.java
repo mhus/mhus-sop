@@ -17,16 +17,16 @@ package de.mhus.osgi.sop.impl;
 
 import org.osgi.service.component.ComponentContext;
 
-import aQute.bnd.annotation.component.Activate;
-import aQute.bnd.annotation.component.Component;
-import aQute.bnd.annotation.component.Deactivate;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import de.mhus.lib.core.util.SoftHashMap;
 import de.mhus.osgi.services.AbstractCacheControl;
 import de.mhus.osgi.services.CacheControlIfc;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.ContextCachedItem;
 
-@Component(provide=CacheControlIfc.class)
+@Component(service=CacheControlIfc.class)
 public class CoreContextCacheService extends AbstractCacheControl {
 
 	private SoftHashMap<String, ContextCachedItem> cache = new SoftHashMap<String, ContextCachedItem>();

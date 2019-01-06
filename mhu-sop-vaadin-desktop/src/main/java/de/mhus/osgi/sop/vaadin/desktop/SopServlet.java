@@ -31,10 +31,10 @@ import com.vaadin.server.VaadinServletRequest;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 
-import aQute.bnd.annotation.component.Activate;
-import aQute.bnd.annotation.component.Component;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 
-@Component(provide = Servlet.class, properties = { "alias=/sop" }, name="SopDesktop",servicefactory=true)
+@Component(service = Servlet.class, properties = { "alias=/sop" }, name="SopDesktop",servicefactory=true)
 @VaadinServletConfiguration(ui=SopUi.class, productionMode=true)
 public class SopServlet extends VaadinServlet {
 

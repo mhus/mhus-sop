@@ -18,7 +18,7 @@ package de.mhus.osgi.sop.impl.adb;
 import java.util.List;
 import java.util.UUID;
 
-import aQute.bnd.annotation.component.Component;
+import org.osgi.service.component.annotations.Component;
 import de.mhus.lib.adb.Persistable;
 import de.mhus.lib.basics.Ace;
 import de.mhus.lib.basics.UuidIdentificable;
@@ -38,7 +38,7 @@ import de.mhus.osgi.sop.api.model.SopObjectParameter;
 import de.mhus.osgi.sop.api.model.SopRegister;
 import de.mhus.osgi.sop.api.model.SopAccount;
 
-@Component(provide=DbSchemaService.class,immediate=true)
+@Component(service=DbSchemaService.class,immediate=true)
 public class SopDbImpl extends AbstractDbSchemaService {
 
 	private XdbService service;

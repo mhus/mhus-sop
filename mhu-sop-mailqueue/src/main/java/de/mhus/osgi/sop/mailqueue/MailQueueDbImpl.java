@@ -17,7 +17,7 @@ package de.mhus.osgi.sop.mailqueue;
 
 import java.util.List;
 
-import aQute.bnd.annotation.component.Component;
+import org.osgi.service.component.annotations.Component;
 import de.mhus.lib.adb.Persistable;
 import de.mhus.lib.basics.AclControlled;
 import de.mhus.lib.errors.MException;
@@ -27,7 +27,7 @@ import de.mhus.osgi.sop.api.adb.AbstractDbSchemaService;
 import de.mhus.osgi.sop.api.adb.DbSchemaService;
 import de.mhus.osgi.sop.api.adb.ReferenceCollector;
 
-@Component(provide=DbSchemaService.class,immediate=true)
+@Component(service=DbSchemaService.class,immediate=true)
 public class MailQueueDbImpl extends AbstractDbSchemaService {
 
 	@Override

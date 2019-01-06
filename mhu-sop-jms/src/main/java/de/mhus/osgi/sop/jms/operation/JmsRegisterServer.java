@@ -25,8 +25,8 @@ import javax.jms.Message;
 
 import org.w3c.dom.Document;
 
-import aQute.bnd.annotation.component.Component;
-import aQute.bnd.annotation.component.Reference;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCollection;
 import de.mhus.lib.core.MXml;
@@ -51,7 +51,7 @@ import de.mhus.osgi.sop.jms.operation.JmsApiImpl.JmsOperationDescriptor;
  * @author mikehummel
  *
  */
-@Component(immediate=true,provide=JmsDataChannel.class)
+@Component(immediate=true,service=JmsDataChannel.class)
 public class JmsRegisterServer extends AbstractJmsDataChannel {
 
 	private JmsApi jmsApi;

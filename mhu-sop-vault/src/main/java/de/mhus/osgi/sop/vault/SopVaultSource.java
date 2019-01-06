@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.UUID;
 
-import aQute.bnd.annotation.component.Component;
+import org.osgi.service.component.annotations.Component;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.vault.MutableVaultSource;
@@ -29,7 +29,7 @@ import de.mhus.lib.errors.MException;
 import de.mhus.lib.xdb.XdbService;
 import de.mhus.osgi.sop.api.SopApi;
 
-@Component(provide=VaultSource.class)
+@Component(service=VaultSource.class)
 public class SopVaultSource extends MLog implements MutableVaultSource {
 
 	@Override

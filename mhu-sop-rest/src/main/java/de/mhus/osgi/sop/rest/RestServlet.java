@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 
-import aQute.bnd.annotation.component.Component;
+import org.osgi.service.component.annotations.Component;
 import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MProperties;
@@ -59,7 +59,7 @@ import de.mhus.lib.core.io.http.MHttp;
 /*
  * Test: http://localhost:8182/rest/public/?_action=ping&_method=POST
  */
-@Component(immediate=true,name="RestServlet",provide=Servlet.class,properties="alias=/rest/*")
+@Component(immediate=true,name="RestServlet",service=Servlet.class,properties="alias=/rest/*")
 public class RestServlet extends HttpServlet {
 
 	static Log trace = new SopFileLogger("rest", "rest_trace");

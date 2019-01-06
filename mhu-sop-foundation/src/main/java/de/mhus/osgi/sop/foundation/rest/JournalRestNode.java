@@ -21,7 +21,7 @@ import java.util.UUID;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
 
-import aQute.bnd.annotation.component.Component;
+import org.osgi.service.component.annotations.Component;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.pojo.MPojo;
@@ -35,7 +35,7 @@ import de.mhus.osgi.sop.api.rest.JsonListNode;
 import de.mhus.osgi.sop.api.rest.JsonResult;
 import de.mhus.osgi.sop.api.rest.RestNodeService;
 
-@Component(immediate=true,provide=RestNodeService.class)
+@Component(immediate=true,service=RestNodeService.class)
 public class JournalRestNode extends JsonListNode<JournalQueue>{
 
 	@Override

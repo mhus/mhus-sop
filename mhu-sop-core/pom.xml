@@ -109,11 +109,6 @@
             <artifactId>org.apache.karaf.shell.core</artifactId>
             <version>4.0.1</version>
         </dependency>
-		<dependency>
-            <groupId>biz.aQute</groupId>
-            <artifactId>bndlib</artifactId>
-            <version>${bndlib.version}</version>
-        </dependency>
 	</dependencies>
 
 

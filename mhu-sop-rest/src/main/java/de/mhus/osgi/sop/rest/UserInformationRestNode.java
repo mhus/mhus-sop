@@ -15,7 +15,7 @@
  */
 package de.mhus.osgi.sop.rest;
 
-import aQute.bnd.annotation.component.Component;
+import org.osgi.service.component.annotations.Component;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.errors.NotFoundException;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
@@ -24,7 +24,7 @@ import de.mhus.osgi.sop.api.rest.SingleObjectNode;
 import de.mhus.osgi.sop.api.rest.CallContext;
 import de.mhus.osgi.sop.api.rest.RestNodeService;
 
-@Component(immediate=true,provide=RestNodeService.class)
+@Component(immediate=true,service=RestNodeService.class)
 public class UserInformationRestNode extends SingleObjectNode<UserInformation>{
 
 	@Override

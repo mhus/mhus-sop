@@ -26,10 +26,13 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-import aQute.bnd.annotation.component.Activate;
-import aQute.bnd.annotation.component.Component;
-import aQute.bnd.annotation.component.Deactivate;
-import aQute.bnd.annotation.component.Reference;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MThread;
@@ -47,7 +50,7 @@ import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 import de.mhus.osgi.sop.api.operation.OperationUtil;
 import de.mhus.osgi.sop.api.operation.OperationsProvider;
 
-@Component(immediate=true,provide=OperationApi.class)
+@Component(immediate=true,service=OperationApi.class)
 public class OperationApiImpl extends MLog implements OperationApi {
 
 	private ServiceTracker<OperationsProvider,OperationsProvider> nodeTracker;
@@ -85,7 +88,7 @@ public class OperationApiImpl extends MLog implements OperationApi {
 		context = null;
 	}
 
-	@Reference(service=TimerFactory.class,optional=true)
+	@Reference(service=TimerFactory.class,policy = ReferencePolicy.DYNAMIC,cardinality = ReferenceCardinality.MULTIPLE)
 	public void setTimerFactory(TimerFactory factory) {
 		log().i("create timer");
 		timer = factory.getTimer();

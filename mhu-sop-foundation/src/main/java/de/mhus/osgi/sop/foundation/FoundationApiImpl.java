@@ -24,9 +24,9 @@ import java.util.UUID;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
-import aQute.bnd.annotation.component.Activate;
-import aQute.bnd.annotation.component.Component;
-import aQute.bnd.annotation.component.Deactivate;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import de.mhus.lib.adb.DbCollection;
 import de.mhus.lib.adb.query.AQuery;
 import de.mhus.lib.adb.query.Db;

@@ -31,10 +31,10 @@ import java.util.TreeSet;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 
-import aQute.bnd.annotation.component.Activate;
-import aQute.bnd.annotation.component.Component;
-import aQute.bnd.annotation.component.Deactivate;
-import aQute.bnd.annotation.component.Reference;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MLog;
@@ -63,7 +63,7 @@ import de.mhus.osgi.sop.api.registry.RegistryProvider;
 import de.mhus.osgi.sop.api.registry.RegistryValue;
 import de.mhus.osgi.sop.api.util.SopUtil;
 
-@Component(provide={RegistryApi.class,RegistryManager.class},immediate=true)
+@Component(service={RegistryApi.class,RegistryManager.class},immediate=true)
 public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManager, CfgProvider {
 
 	public static final int DEFAULT_PRIORITY = 100;

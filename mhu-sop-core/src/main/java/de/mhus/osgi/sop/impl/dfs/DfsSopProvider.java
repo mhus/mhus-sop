@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 
-import aQute.bnd.annotation.component.Component;
+import org.osgi.service.component.annotations.Component;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.strategy.Operation;
@@ -41,7 +41,7 @@ import de.mhus.osgi.sop.api.dfs.FileInfo;
 import de.mhus.osgi.sop.api.dfs.FileQueueApi;
 import de.mhus.osgi.sop.api.util.SopUtil;
 
-@Component(provide=Operation.class,immediate=true)
+@Component(service=Operation.class,immediate=true)
 public class DfsSopProvider extends OperationToIfcProxy implements DfsProviderOperation {
 
 	private SoftHashMap<String, UUID> queueCache = new SoftHashMap<>();

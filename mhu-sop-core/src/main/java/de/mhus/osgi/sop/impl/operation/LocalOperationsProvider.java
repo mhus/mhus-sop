@@ -27,10 +27,10 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-import aQute.bnd.annotation.component.Activate;
-import aQute.bnd.annotation.component.Component;
-import aQute.bnd.annotation.component.Deactivate;
-import aQute.bnd.annotation.component.Reference;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MLog;
@@ -51,7 +51,7 @@ import de.mhus.osgi.sop.api.operation.OperationUtil;
 import de.mhus.osgi.sop.api.operation.OperationsProvider;
 import de.mhus.osgi.sop.api.util.SopUtil;
 
-@Component(immediate=true,provide=OperationsProvider.class,properties="provider=local")
+@Component(immediate=true,service=OperationsProvider.class,properties="provider=local")
 public class LocalOperationsProvider extends MLog implements OperationsProvider {
 
 	static final String PROVIDER_NAME = "local";

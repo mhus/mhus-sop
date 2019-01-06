@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 
-import aQute.bnd.annotation.component.Component;
+import org.osgi.service.component.annotations.Component;
 import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MFile;
@@ -39,7 +39,7 @@ import de.mhus.osgi.sop.api.mailqueue.MailMessage;
 import de.mhus.osgi.sop.api.mailqueue.MailQueueOperation;
 import de.mhus.osgi.sop.api.util.SopUtil;
 
-@Component(immediate=true,provide=Operation.class)
+@Component(immediate=true,service=Operation.class)
 public class MailQueueOperationImpl extends OperationToIfcProxy implements MailQueueOperation {
 
 	@Override
