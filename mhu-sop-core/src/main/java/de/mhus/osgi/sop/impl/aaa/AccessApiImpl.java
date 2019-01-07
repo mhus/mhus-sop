@@ -378,7 +378,7 @@ public class AccessApiImpl extends MLog implements AccessApi {
 		
 	}
 
-	@Reference(policy = ReferencePolicy.DYNAMIC,cardinality = ReferenceCardinality.MULTIPLE)
+	@Reference(policy = ReferencePolicy.DYNAMIC,cardinality = ReferenceCardinality.OPTIONAL)
 	public void setAccountSource(AccountSource source) {
 		this.accountSource = source;
 	}
@@ -386,7 +386,7 @@ public class AccessApiImpl extends MLog implements AccessApi {
 		this.accountSource = null;
 	}
 	
-	@Reference(policy = ReferencePolicy.DYNAMIC,cardinality = ReferenceCardinality.MULTIPLE)
+	@Reference(policy = ReferencePolicy.DYNAMIC,cardinality = ReferenceCardinality.OPTIONAL)
 	public void setTrustSource(TrustSource source) {
 		this.trustSource = source;
 	}
@@ -395,7 +395,7 @@ public class AccessApiImpl extends MLog implements AccessApi {
 		this.trustSource = null;
 	}
 
-	@Reference(policy = ReferencePolicy.DYNAMIC,cardinality = ReferenceCardinality.MULTIPLE)
+	@Reference(policy = ReferencePolicy.DYNAMIC,cardinality = ReferenceCardinality.OPTIONAL)
 	public void setAuthorizationSource(AuthorizationSource source) {
 		this.authorizationSource = source;
 	}
