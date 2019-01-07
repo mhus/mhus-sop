@@ -51,7 +51,7 @@ import de.mhus.osgi.sop.api.operation.OperationUtil;
 import de.mhus.osgi.sop.api.operation.OperationsProvider;
 import de.mhus.osgi.sop.api.util.SopUtil;
 
-@Component(immediate=true,service=OperationsProvider.class,properties="provider=local")
+@Component(immediate=true,service=OperationsProvider.class,property="provider=local")
 public class LocalOperationsProvider extends MLog implements OperationsProvider {
 
 	static final String PROVIDER_NAME = "local";

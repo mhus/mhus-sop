@@ -59,7 +59,7 @@ import de.mhus.lib.core.io.http.MHttp;
 /*
  * Test: http://localhost:8182/rest/public/?_action=ping&_method=POST
  */
-@Component(immediate=true,name="RestServlet",service=Servlet.class,properties="alias=/rest/*")
+@Component(immediate=true,name="RestServlet",service=Servlet.class,property="alias=/rest/*")
 public class RestServlet extends HttpServlet {
 
 	static Log trace = new SopFileLogger("rest", "rest_trace");

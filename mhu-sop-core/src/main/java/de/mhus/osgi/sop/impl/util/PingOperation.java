@@ -28,7 +28,7 @@ import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
 import de.mhus.osgi.sop.api.util.SopUtil;
 
-@Component(service=Operation.class, properties="tags=acl=*")
+@Component(service=Operation.class, property="tags=acl=*")
 public class PingOperation extends AbstractOperation {
 
 	@Override

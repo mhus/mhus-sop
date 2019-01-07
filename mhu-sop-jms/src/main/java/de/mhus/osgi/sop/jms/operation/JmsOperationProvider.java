@@ -72,7 +72,7 @@ import de.mhus.osgi.sop.jms.operation.JmsApiImpl.JmsOperationDescriptor;
  *
  */
 
-@Component(immediate=true,properties="provider=jms")
+@Component(immediate=true,property="provider=jms")
 public class JmsOperationProvider extends MLog implements OperationsProvider {
 
 	protected static final String PROVIDER_NAME = "jms";

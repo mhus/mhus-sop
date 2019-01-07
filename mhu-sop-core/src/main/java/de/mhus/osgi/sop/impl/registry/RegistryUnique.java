@@ -23,7 +23,7 @@ import de.mhus.osgi.sop.api.registry.RegistryManager;
 import de.mhus.osgi.sop.api.registry.RegistryPathControl;
 import de.mhus.osgi.sop.api.registry.RegistryValue;
 
-@Component(properties="path=/system/master/")
+@Component(property="path=/system/master/")
 public class RegistryUnique implements RegistryPathControl {
 
 	@Override
