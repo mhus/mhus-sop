@@ -379,28 +379,28 @@ public class AccessApiImpl extends MLog implements AccessApi {
 	}
 
 	@Reference(policy = ReferencePolicy.DYNAMIC,cardinality = ReferenceCardinality.OPTIONAL)
-	public void setAccountSource(AccountSource source) {
+	public void addAccountSource(AccountSource source) {
 		this.accountSource = source;
 	}
-	public void unsetAccountSource(AccountSource source) {
+	public void removeAccountSource(AccountSource source) {
 		this.accountSource = null;
 	}
 	
 	@Reference(policy = ReferencePolicy.DYNAMIC,cardinality = ReferenceCardinality.OPTIONAL)
-	public void setTrustSource(TrustSource source) {
+	public void addTrustSource(TrustSource source) {
 		this.trustSource = source;
 	}
 	
-	public void unsetTrustSource(TrustSource source) {
+	public void removeTrustSource(TrustSource source) {
 		this.trustSource = null;
 	}
 
 	@Reference(policy = ReferencePolicy.DYNAMIC,cardinality = ReferenceCardinality.OPTIONAL)
-	public void setAuthorizationSource(AuthorizationSource source) {
+	public void addAuthorizationSource(AuthorizationSource source) {
 		this.authorizationSource = source;
 	}
 	
-	public void unsetAuthorizationSource(AuthorizationSource source) {
+	public void removeAuthorizationSource(AuthorizationSource source) {
 		this.authorizationSource = null;
 	}
 

@@ -89,7 +89,7 @@ public class OperationApiImpl extends MLog implements OperationApi {
 	}
 
 	@Reference(service=TimerFactory.class,policy = ReferencePolicy.DYNAMIC,cardinality = ReferenceCardinality.OPTIONAL)
-	public void setTimerFactory(TimerFactory factory) {
+	public void addTimerFactory(TimerFactory factory) {
 		log().i("create timer");
 		timer = factory.getTimer();
 		timerTask = new MTimerTask() {
@@ -102,6 +102,10 @@ public class OperationApiImpl extends MLog implements OperationApi {
 		timer.schedule(timerTask, CFG_OPERATION_SYNC.value(), MPeriod.MINUTE_IN_MILLISECOUNDS );
 	}
 
+   public void removeTimerFactory(TimerFactory factory) {
+       
+   }
+   
 	private class MyServiceTrackerCustomizer implements ServiceTrackerCustomizer<OperationsProvider,OperationsProvider> {
 
 		@Override
