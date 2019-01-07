@@ -34,7 +34,7 @@ import com.vaadin.ui.UI;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 
-@Component(service = Servlet.class, properties = { "alias=/sop" }, name="SopDesktop",servicefactory=true)
+@Component(service = Servlet.class, property = "alias=/sop", name="SopDesktop",servicefactory=true)
 @VaadinServletConfiguration(ui=SopUi.class, productionMode=true)
 public class SopServlet extends VaadinServlet {
 

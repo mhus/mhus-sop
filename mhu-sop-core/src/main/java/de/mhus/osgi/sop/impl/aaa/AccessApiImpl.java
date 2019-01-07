@@ -385,24 +385,31 @@ public class AccessApiImpl extends MLog implements AccessApi {
 	public void removeAccountSource(AccountSource source) {
 		this.accountSource = null;
 	}
+    public void setAccountSource(AccountSource source) {
+        this.accountSource = source;
+    }
 	
 	@Reference(policy = ReferencePolicy.DYNAMIC,cardinality = ReferenceCardinality.OPTIONAL)
 	public void addTrustSource(TrustSource source) {
 		this.trustSource = source;
 	}
-	
 	public void removeTrustSource(TrustSource source) {
 		this.trustSource = null;
 	}
+    public void setTrustSource(TrustSource source) {
+        this.trustSource = source;
+    }
 
 	@Reference(policy = ReferencePolicy.DYNAMIC,cardinality = ReferenceCardinality.OPTIONAL)
 	public void addAuthorizationSource(AuthorizationSource source) {
 		this.authorizationSource = source;
 	}
-	
 	public void removeAuthorizationSource(AuthorizationSource source) {
 		this.authorizationSource = null;
 	}
+    public void setAuthorizationSource(AuthorizationSource source) {
+        this.authorizationSource = source;
+    }
 
 	@Override
 	public boolean hasGroupAccess(Account account, String aclName, String action, String def) {
