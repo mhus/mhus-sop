@@ -243,6 +243,9 @@ public class AccessApiImpl extends MLog implements AccessApi {
 	
 	protected synchronized Account getAccountUnsecure(String account) throws MException {
 		
+	    if (account == null || account.equals("?") || account.equals("")) // XXX It's a good idea?
+	        return GUEST_CONTEXT.getAccount();
+	    
 		if (account.equals("root"))
 			return ROOT_CONTEXT.getAccount();
 		
