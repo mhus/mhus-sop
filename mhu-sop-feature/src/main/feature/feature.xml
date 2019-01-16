@@ -19,12 +19,12 @@
 <features name="${project.artifactId}-${project.version}"
 	xmlns="http://karaf.apache.org/xmlns/features/v1.3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0 http://karaf.apache.org/xmlns/features/v1.3.0">
 
-	<feature name='mhu-sop-base' description='mhu-sop-base' version='${project.version}'>
+    <feature name='mhu-sop-libs' description='mhu-sop-libs' version='${project.version}'>
 		<details>${project.description}</details>
 		<!-- <config>foo=bar</config> -->
 		<feature>scr</feature>
 		<feature>jdbc</feature>
-		<feature>openjpa</feature>
+		<feature>openjpa3</feature>
 		<feature>jndi</feature>
 
 		<bundle>mvn:org.jsoup/jsoup/1.8.3</bundle>
@@ -47,6 +47,11 @@
 		<bundle>mvn:de.mhus.osgi/mhu-karaf-xdb/${osgitools.version}</bundle>
 
 		<bundle>mvn:javax.xml.rpc/javax.xml.rpc-api/1.1.1</bundle>
+
+    </feature>
+    
+    <feature name='mhu-sop-base' description='mhu-sop-base' version='${project.version}'>
+        <feature>mhu-sop-libs</feature>
 
 		<bundle>mvn:de.mhus.osgi/mhu-sop-api/${project.version}</bundle>
 		<bundle>mvn:de.mhus.osgi/mhu-sop-core/${project.version}</bundle>

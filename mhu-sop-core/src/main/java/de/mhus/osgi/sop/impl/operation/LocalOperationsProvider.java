@@ -31,6 +31,8 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MLog;
@@ -75,7 +77,7 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
 		context = null;
 	}
 
-	@Reference
+	@Reference(cardinality=ReferenceCardinality.OPTIONAL)
 	public void getAccessApi(AccessApi api) {}
 	
 	private class MyServiceTrackerCustomizer implements ServiceTrackerCustomizer<Operation,Operation> {
