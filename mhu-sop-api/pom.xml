@@ -30,24 +30,10 @@
 
 	<build>
 		<plugins>
-	    		<plugin>
-	    			<groupId>de.mhus.lib</groupId>
-	    			<artifactId>constgenerator-maven-plugin</artifactId>
-	    			<version>${mhulib.version}</version>
-				<executions>
-		          <execution>
-		            <phase>compile</phase>
-		            <goals>
-		              <goal>const-generate</goal>
-		            </goals>
-		          </execution>
-		        </executions>
-		        <configuration>
-		        <!-- 
-		          <force>true</force>
-		         -->
-		        </configuration>
-	    		</plugin>
+			<plugin>
+				<groupId>de.mhus.lib</groupId>
+				<artifactId>constgenerator-maven-plugin</artifactId>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>

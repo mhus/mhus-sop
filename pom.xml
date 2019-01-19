@@ -172,6 +172,22 @@
                         </execution>
                     </executions>
                 </plugin>
+			    <plugin>
+			        <groupId>de.mhus.lib</groupId>
+			        <artifactId>constgenerator-maven-plugin</artifactId>
+			        <version>${mhulib.version}</version>
+			        <executions>
+			            <execution>
+			                <phase>compile</phase>
+			                <goals>
+			                    <goal>const-generate</goal>
+			                </goals>
+			            </execution>
+			        </executions>
+			        <configuration>
+                        <artifactInclude>.*mhu.*</artifactInclude>
+			        </configuration>
+			    </plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-deploy-plugin</artifactId>
