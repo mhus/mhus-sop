@@ -96,10 +96,22 @@ public abstract class AbstractNode extends MLog implements RestNodeService {
 			try {
 				Method action = actions.get(actionName);
 				if (action != null) {
-					Object res = action.invoke(this, callContext);
-					return doTransform(action, res);
+				    if (action.getParameterCount() == 2) {
+		                JsonResult result = new JsonResult();
+                        action.invoke(this, result, callContext);
+                        return result;
+				    } else
+				    if (action.getParameterCount() == 1) {
+    					Object res = action.invoke(this, callContext);
+    					return doTransform(action, res);
+				    } else
+				    if (action.getParameterCount() == 0) {
+                        Object res = action.invoke(this);
+                        return doTransform(action, res);
+				    } else
+	                    log().w("action wrong number of parameters",actionName, action);
 				} else {
-					log().d("action unknown",actionName);
+					log().w("action unknown",actionName);
 				}
 			} catch (Throwable t) {
 				log().d(actionName,callContext,t);
