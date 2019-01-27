@@ -36,6 +36,10 @@ public class OperationsSelector {
 	private MProperties properties;
 	private String[] executeOptions;
 
+    public OperationsSelector setFilter(Class<?> filter) {
+        this.filter = filter == null ? null : filter.getCanonicalName();
+        return this;
+    }
 	public OperationsSelector setFilter(String filter) {
 		this.filter = filter;
 		return this;
