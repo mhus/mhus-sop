@@ -50,7 +50,7 @@ public class DfsApiImpl extends MLog implements DfsApi {
 		LinkedList<String> tags = new LinkedList<>();
 		if (uri.getLocation() != null)
 			tags.add(OperationDescriptor.TAG_IDENT + "=" + uri.getLocation());
-		for (OperationDescriptor desc : api.findOperations(DfsProviderOperation.class.getCanonicalName(), null, tags)) {
+		for (OperationDescriptor desc : api.findOperations(DfsProviderOperation.class, null, tags)) {
 			if (uri.getScheme().equals(desc.getParameter(DfsProviderOperation.PARAM_SCHEME))) {
 				try {
 					DfsProviderOperation provider = OperationUtil.createOpertionProxy(DfsProviderOperation.class, desc);
@@ -74,7 +74,7 @@ public class DfsApiImpl extends MLog implements DfsApi {
 		LinkedList<String> tags = new LinkedList<>();
 		if (uri.getLocation() != null)
 			tags.add(OperationDescriptor.TAG_IDENT + "=" + uri.getLocation());
-		for (OperationDescriptor desc : api.findOperations(DfsProviderOperation.class.getCanonicalName(), null, tags)) {
+		for (OperationDescriptor desc : api.findOperations(DfsProviderOperation.class, null, tags)) {
 			if (uri.getScheme().equals(desc.getParameter(DfsProviderOperation.PARAM_SCHEME))) {
 				try {
 					DfsProviderOperation provider = OperationUtil.createOpertionProxy(DfsProviderOperation.class, desc);
@@ -96,7 +96,7 @@ public class DfsApiImpl extends MLog implements DfsApi {
 		LinkedList<String> tags = new LinkedList<>();
 		if (uri.getLocation() != null)
 			tags.add(OperationDescriptor.TAG_IDENT + "=" + uri.getLocation());
-		for (OperationDescriptor desc : api.findOperations(DfsProviderOperation.class.getCanonicalName(), null, tags)) {
+		for (OperationDescriptor desc : api.findOperations(DfsProviderOperation.class, null, tags)) {
 			if (uri.getScheme().equals(desc.getParameter(DfsProviderOperation.PARAM_SCHEME))) {
 				try {
 					DfsProviderOperation provider = OperationUtil.createOpertionProxy(DfsProviderOperation.class, desc);
@@ -114,7 +114,7 @@ public class DfsApiImpl extends MLog implements DfsApi {
 	public Collection<String> listProviders() {
 		LinkedList<String> out = new LinkedList<>();
 		OperationApi api = MApi.lookup(OperationApi.class);
-		for (OperationDescriptor desc : api.findOperations(DfsProviderOperation.class.getCanonicalName(), null, null)) {
+		for (OperationDescriptor desc : api.findOperations(DfsProviderOperation.class, null, null)) {
 			out.add(desc.getParameter(DfsProviderOperation.PARAM_SCHEME) + "://" + OperationUtil.getOption(desc.getTags(), OperationDescriptor.TAG_IDENT, "" ) );
 		}
 		return out;
@@ -128,7 +128,7 @@ public class DfsApiImpl extends MLog implements DfsApi {
 		LinkedList<String> tags = new LinkedList<>();
 		if (target.getLocation() != null)
 			tags.add(OperationDescriptor.TAG_IDENT + "=" + target.getLocation());
-		for (OperationDescriptor desc : api.findOperations(DfsProviderOperation.class.getCanonicalName(), null, tags)) {
+		for (OperationDescriptor desc : api.findOperations(DfsProviderOperation.class, null, tags)) {
 			if (target.getScheme().equals(desc.getParameter(DfsProviderOperation.PARAM_SCHEME))) {
 				try {
 					DfsProviderOperation provider = OperationUtil.createOpertionProxy(DfsProviderOperation.class, desc);
@@ -150,7 +150,7 @@ public class DfsApiImpl extends MLog implements DfsApi {
 		LinkedList<String> tags = new LinkedList<>();
 		if (uri.getLocation() != null)
 			tags.add(OperationDescriptor.TAG_IDENT + "=" + uri.getLocation());
-		for (OperationDescriptor desc : api.findOperations(DfsProviderOperation.class.getCanonicalName(), null, tags)) {
+		for (OperationDescriptor desc : api.findOperations(DfsProviderOperation.class, null, tags)) {
 			if (uri.getScheme().equals(desc.getParameter(DfsProviderOperation.PARAM_SCHEME))) {
 				try {
 					DfsProviderOperation provider = OperationUtil.createOpertionProxy(DfsProviderOperation.class, desc);
@@ -171,7 +171,7 @@ public class DfsApiImpl extends MLog implements DfsApi {
 		LinkedList<String> tags = new LinkedList<>();
 		if (uri.getLocation() != null)
 			tags.add(OperationDescriptor.TAG_IDENT + "=" + uri.getLocation());
-		for (OperationDescriptor desc : api.findOperations(DfsProviderOperation.class.getCanonicalName(), null, tags)) {
+		for (OperationDescriptor desc : api.findOperations(DfsProviderOperation.class, null, tags)) {
 			if (uri.getScheme().equals(desc.getParameter(DfsProviderOperation.PARAM_SCHEME))) {
 				try {
 					DfsProviderOperation provider = OperationUtil.createOpertionProxy(DfsProviderOperation.class, desc);

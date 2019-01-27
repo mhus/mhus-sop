@@ -87,7 +87,15 @@ public class OperationsSelector {
 		if (list.size() == 0) return null;
 		return list.get(0);
 	}
-	
+
+   public List<OperationDescriptor> doSelectAll() {
+        List<OperationDescriptor> list = MApi.lookup(OperationApi.class).findOperations(filter, version, providedTags);
+        if (list == null || list.size() == 0) return null;
+        for (Selector selector : selectors)
+            selector.select(list);
+        return list;
+    }
+
 	
 	public OperationResult doExecute(IProperties properties, String ... executeOptions) throws NotFoundException {
 		OperationDescriptor desc = doSelect();
@@ -98,5 +106,20 @@ public class OperationsSelector {
 	public OperationResult doExecute() throws NotFoundException {
 		return doExecute(properties, executeOptions);
 	}
+	
+    public List<OperationResult> doExecuteAll(IProperties properties, String ... executeOptions) throws NotFoundException {
+        List<OperationDescriptor> list = doSelectAll();
+        LinkedList<OperationResult> res = new LinkedList<>();
+        for (OperationDescriptor desc : list) {
+            OperationResult r = MApi.lookup(OperationApi.class).doExecute(desc, properties, executeOptions);
+            if (r != null)
+                res.add(r);
+        }
+        return res;
+    }
+
+    public List<OperationResult> doExecuteAll() throws NotFoundException {
+        return doExecuteAll(properties, executeOptions);
+    }
 
 }

@@ -30,9 +30,9 @@ public class SelectorRoundRobin implements Selector {
 			if (cnt >= list.size()) // reset already done list
 				done.clear();
 			OperationDescriptor item = list.get(cnt);
-			String addr = item.getAddress().toString();
-			if (!done.contains(addr)) {
-				done.add(addr);
+			String uuid = item.getUuid().toString();
+			if (!done.contains(uuid)) {
+				done.add(uuid);
 				list.clear();
 				list.add(item);
 				return;

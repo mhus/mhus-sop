@@ -537,7 +537,7 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 	public Set<String> listProviders() {
 		HashSet<String> out = new HashSet<>();
 		OperationApi api = MApi.lookup(OperationApi.class);
-		for (OperationDescriptor desc : api.findOperations(FileQueueOperation.class.getCanonicalName(), null, null)) {
+		for (OperationDescriptor desc : api.findOperations(FileQueueOperation.class, null, null)) {
 			String ident = OperationUtil.getOption(desc.getTags(), OperationDescriptor.TAG_IDENT, "");
 			out.add(ident);
 		}

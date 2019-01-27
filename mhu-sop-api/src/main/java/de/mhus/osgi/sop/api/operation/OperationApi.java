@@ -29,8 +29,18 @@ public interface OperationApi extends SApi {
 	static final String DEFAULT_PROVIDER_NAME = "local";
 	static final String LOCAL_ONLY = "localOnly";
 
+    default List<OperationDescriptor> findOperations(Class<?> clazz, VersionRange version, Collection<String> providedTags) {
+        return findOperations(clazz.getCanonicalName(), version, providedTags);
+    }
+
 	List<OperationDescriptor> findOperations(String filter, VersionRange version, Collection<String> providedTags);
+	
+    default OperationDescriptor findOperation(Class<?> clazz, VersionRange version, Collection<String> providedTags) throws NotFoundException {
+        return findOperation(clazz.getCanonicalName(), version, providedTags);
+    }
+
 	OperationDescriptor findOperation(String filter, VersionRange version, Collection<String> providedTags) throws NotFoundException;
+	
 	OperationDescriptor getOperation(OperationAddress addr) throws NotFoundException;
 	
 	OperationResult doExecute(String filter, VersionRange version, Collection<String> providedTags, IProperties properties, String ... executeOptions) throws NotFoundException;
