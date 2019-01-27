@@ -53,6 +53,7 @@ public class SopAccount extends DbMetadata implements Account {
 	
 	public SopAccount(String name, String pass, IReadProperties properties) {
 		this.name = name;
+		this.password = MPassword.encodePasswordMD5(pass);
 		groups = new HashSet<>();
 		this.attributes = new MProperties(properties);
 	}

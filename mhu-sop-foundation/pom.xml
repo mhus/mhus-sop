@@ -34,6 +34,9 @@
 			<plugin>
 				<groupId>org.apache.karaf.tooling</groupId>
 				<artifactId>karaf-services-maven-plugin</artifactId>
+                <configuration>
+                    <artifactInclude>.*mhu.*</artifactInclude>
+                </configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.felix</groupId>

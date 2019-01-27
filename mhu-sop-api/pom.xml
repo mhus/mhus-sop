@@ -33,6 +33,9 @@
 			<plugin>
 				<groupId>de.mhus.lib</groupId>
 				<artifactId>constgenerator-maven-plugin</artifactId>
+				<configuration>
+				    <artifactInclude>.*mhu.*</artifactInclude>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.felix</groupId>

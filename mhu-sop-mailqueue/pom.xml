@@ -34,7 +34,9 @@
 	    		<plugin>
 	    			<groupId>de.mhus.lib</groupId>
 	    			<artifactId>constgenerator-maven-plugin</artifactId>
-	    			<version>${mhulib.version}</version>
+	                <configuration>
+	                    <artifactInclude>.*mhu.*</artifactInclude>
+	                </configuration>
 				<executions>
 		          <execution>
 		            <phase>compile</phase>
