@@ -20,21 +20,113 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Proxy;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
+import de.mhus.lib.core.logging.MLogUtil;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.core.strategy.OperationToIfcProxy;
+import de.mhus.lib.core.util.MCallback2;
 import de.mhus.lib.core.util.VersionRange;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.errors.MRuntimeException;
+import de.mhus.lib.errors.NotFoundException;
 
 public class OperationUtil {
 
+    public static OperationResult doExecute(Class<?> filter, IProperties properties, String ... providedTags) throws NotFoundException {
+        OperationsSelector selector = new OperationsSelector();
+        selector.setFilter(filter);
+        selector.setTags(providedTags);
+        return selector.doExecute(properties);
+    }
+    
+    public static List<OperationResult> doExecuteAll(Class<?> filter, IProperties properties, String ... providedTags) throws NotFoundException {
+        OperationsSelector selector = new OperationsSelector();
+        selector.setFilter(filter);
+        selector.setTags(providedTags);
+        return selector.doExecuteAll(properties);
+    }
+    
+    public static <T> boolean doExecuteOperation(Class<T> filter, MCallback2<OperationDescriptor,T> executor, String ... providedTags) throws MException {
+        OperationsSelector selector = new OperationsSelector();
+        selector.setFilter(filter);
+        selector.setTags(providedTags);
+        OperationDescriptor desc = selector.doSelect();
+        if (desc == null) return false;
+        T obj = createOpertionProxy(filter, desc);
+        executor.event(desc,obj);
+        return true;
+    }
+    
+    public static <T> boolean doExecuteOperations(Class<T> filter, MCallback2<OperationDescriptor,T> executor, String ... providedTags) throws MException {
+        OperationsSelector selector = new OperationsSelector();
+        selector.setFilter(filter);
+        selector.setTags(providedTags);
+        List<OperationDescriptor> list = selector.doSelectAll();
+        for (OperationDescriptor desc : list) {
+            try {
+                T obj = createOpertionProxy(filter, desc);
+                executor.event(desc,obj);
+            } catch (Throwable t) {
+                MLogUtil.log().d(filter,t);
+            }
+        }
+        return !list.isEmpty();
+    }
+    
+    public static OperationResult doExecute(Class<?> filter, VersionRange range, IProperties properties, String ... providedTags) throws NotFoundException {
+        OperationsSelector selector = new OperationsSelector();
+        selector.setFilter(filter);
+        selector.setTags(providedTags);
+        selector.setVersion(range);
+        return selector.doExecute(properties);
+    }
+    
+    public static List<OperationResult> doExecuteAll(Class<?> filter, VersionRange range, IProperties properties, String ... providedTags) throws NotFoundException {
+        OperationsSelector selector = new OperationsSelector();
+        selector.setFilter(filter);
+        selector.setTags(providedTags);
+        selector.setVersion(range);
+        return selector.doExecuteAll(properties);
+    }
+    
+    public static <T> boolean doExecuteOperation(Class<T> filter, VersionRange range, MCallback2<OperationDescriptor,T> executor, String ... providedTags) throws MException {
+        OperationsSelector selector = new OperationsSelector();
+        selector.setFilter(filter);
+        selector.setTags(providedTags);
+        selector.setVersion(range);
+        OperationDescriptor desc = selector.doSelect();
+        if (desc == null) return false;
+        T obj = createOpertionProxy(filter, desc);
+        executor.event(desc,obj);
+        return true;
+    }
+    
+    public static <T> boolean doExecuteOperations(Class<T> filter, VersionRange range, MCallback2<OperationDescriptor,T> executor, String ... providedTags) throws MException {
+        OperationsSelector selector = new OperationsSelector();
+        selector.setFilter(filter);
+        selector.setTags(providedTags);
+        selector.setVersion(range);
+        List<OperationDescriptor> list = selector.doSelectAll();
+        for (OperationDescriptor desc : list) {
+            try {
+                T obj = createOpertionProxy(filter, desc);
+                executor.event(desc,obj);
+            } catch (Throwable t) {
+                MLogUtil.log().d(filter,t);
+            }
+        }
+        return !list.isEmpty();
+    }
+    
+    
 	public static boolean matches(OperationDescriptor desc, String filter, VersionRange version, Collection<String> providedTags) {
 		return  (filter == null || MString.compareFsLikePattern(desc.getPath(), filter)) 
 				&& 
