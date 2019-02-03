@@ -107,7 +107,7 @@ public class AccountGuest implements Account {
 
 	@Override
 	public boolean isActive() {
-		return false;
+		return true;
 	}
 	
 }
