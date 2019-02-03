@@ -100,7 +100,7 @@ public class AccountRoot implements Account {
 
 	@Override
 	public boolean isActive() {
-		return false;
+		return true;
 	}
 
 }
