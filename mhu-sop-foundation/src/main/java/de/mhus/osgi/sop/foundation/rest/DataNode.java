@@ -21,12 +21,11 @@ import java.util.List;
 import java.util.UUID;
 
 import org.codehaus.jackson.node.ObjectNode;
-
 import org.osgi.service.component.annotations.Component;
+
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MProperties;
-import de.mhus.lib.core.MString;
 import de.mhus.lib.core.MValidator;
 import de.mhus.lib.core.logging.Log;
 import de.mhus.lib.core.pojo.MPojo;
@@ -86,15 +85,7 @@ public class DataNode extends ObjectListNode<SopData>{
 		size = callContext.getParameter("size", size);
 		page = callContext.getParameter("page", page);
 		order = callContext.getParameter("order");
-		{
-			if (search == null) search = "";
-			for (String name : callContext.getParameterNames()) {
-				if (name.startsWith("__") || !name.startsWith("_")) {
-					if (!MString.isEmptyTrim(search)) search=search+",";
-					search = search + (name.startsWith("__") ? name.substring(1) : name) + ":" + callContext.getParameter(name);
-				}
-			}
-		}
+		
 		if (type == null && !AaaUtil.isCurrentAdmin()) {
 			throw new RestException(OperationResult.USAGE, "no type specified");
 		}
