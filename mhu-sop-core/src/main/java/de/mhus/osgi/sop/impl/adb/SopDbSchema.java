@@ -65,7 +65,7 @@ public class SopDbSchema extends AbstractDbSchema {
 
 	@Override
 	public Object createObject(Class<?> clazz, String registryName, DbResult ret, DbManager manager, boolean isPersistent) throws Exception {
-		Object object = clazz.newInstance();
+		Object object = clazz.getDeclaredConstructor().newInstance();
 		if (object instanceof DbObject) {
 			((DbObject)object).doInit(manager, registryName, isPersistent);
 		}
