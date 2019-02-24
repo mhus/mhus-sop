@@ -15,8 +15,9 @@
  */
 package de.mhus.osgi.sop.impl;
 
+import de.mhus.lib.core.MLog;
 
-public class ContextPool {
+public class ContextPool extends MLog {
 
 	private static ContextPool instance;
 	private ThreadLocal<AaaContextImpl> pool = new ThreadLocal<>();
@@ -34,6 +35,7 @@ public class ContextPool {
 	}
 	
 	public void set(AaaContextImpl context, boolean forward) {
+		log().d("set",context,forward);
 		synchronized (pool) {
 			AaaContextImpl parent = pool.get();
 			if (context != null) {
