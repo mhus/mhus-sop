@@ -412,6 +412,9 @@ public class DfsSql2Provider extends OperationToIfcProxy implements DfsProviderO
 				if (parent == null)
 					throw new IOException("can't create " + parentPath );
 			}
+			EntryData existing = getEntry(parent.id, name);
+			if (existing != null) return;
+			
 			con = pool.getConnection();
 			DbStatement sth = con.createStatement("INSERT INTO " + prefix + "_entry_ (name_,id_,parent_,created_,modified_,type_) "
 					+ "VALUES ($name$,$id$,$parent$,$created$,$modified$,1)");
