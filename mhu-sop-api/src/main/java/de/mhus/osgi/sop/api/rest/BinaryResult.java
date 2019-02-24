@@ -52,7 +52,12 @@ public class BinaryResult implements RestResult {
 			MFile.copyFile(reader, writer);
 			reader.close();
 			reader = null;
+			onClose();
 		}
+	}
+	
+	protected void onClose() {
+		
 	}
 
 	@Override
