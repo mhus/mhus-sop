@@ -22,6 +22,10 @@ public class ContextPool extends MLog {
 	private static ContextPool instance;
 	private ThreadLocal<AaaContextImpl> pool = new ThreadLocal<>();
 	
+	private ContextPool() {
+		log().d("Create Context Pool");
+	}
+	
 	public synchronized static ContextPool getInstance() {
 		if (instance == null)
 			instance = new ContextPool();
