@@ -24,7 +24,6 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-import com.github.wolfie.refresher.Refresher;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Widgetset;
 import com.vaadin.server.VaadinRequest;
@@ -80,7 +79,7 @@ public class SopUi extends UI implements SopUiApi {
         desktop = new Desktop(this) {
 			private static final long serialVersionUID = 1L;
 			private MenuItem menuTrace;
-			private Refresher refresher;
+//			private Refresher refresher;
         	
         	@SuppressWarnings("deprecation")
 			@Override
@@ -102,16 +101,16 @@ public class SopUi extends UI implements SopUiApi {
 	        			addStyleName("desktop-suit");
         		}
 
-        		refresher = new Refresher();
-        		refresher.setRefreshInterval(1000);
-        		refresher.addListener(new Refresher.RefreshListener() {
-					private static final long serialVersionUID = 1L;
-					@Override
-        			public void refresh(Refresher source) {
-        				doTick();
-        			}
-        		});
-        		addExtension(refresher);
+//        		refresher = new Refresher();
+//        		refresher.setRefreshInterval(1000);
+//        		refresher.addListener(new Refresher.RefreshListener() {
+//					private static final long serialVersionUID = 1L;
+//					@Override
+//        			public void refresh(Refresher source) {
+//        				doTick();
+//        			}
+//        		});
+//        		addExtension(refresher);
 
         		menuTrace = menuUser.addItem("Trace An", new MenuBar.Command() {
 					private static final long serialVersionUID = 1L;
@@ -129,9 +128,9 @@ public class SopUi extends UI implements SopUiApi {
         		
         	}
         	
-        	protected void doTick() {
-
-        	}
+//        	protected void doTick() {
+//
+//        	}
         };
         
         VerticalLayout content = new VerticalLayout();
