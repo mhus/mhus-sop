@@ -30,11 +30,11 @@ import java.util.TreeSet;
 
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
-
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MLog;
@@ -49,7 +49,6 @@ import de.mhus.lib.core.cfg.CfgProvider;
 import de.mhus.lib.core.config.IConfig;
 import de.mhus.lib.core.directory.ResourceNode;
 import de.mhus.lib.core.directory.WritableResourceNode;
-import de.mhus.lib.core.system.IApi;
 import de.mhus.lib.errors.AccessDeniedException;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.errors.NotSupportedException;
@@ -813,7 +812,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	}
 	
 	private File getFile() {
-		return MApi.getFile(IApi.SCOPE.DATA, RegistryApi.class.getCanonicalName() + ".properties");
+		return MApi.getFile(MApi.SCOPE.DATA, RegistryApi.class.getCanonicalName() + ".properties");
 	}
 
 	private class ControlDescriptor implements Comparable<ControlDescriptor> {
