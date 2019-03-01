@@ -33,7 +33,6 @@
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
-				<version>${bundle.plugin.version}</version>
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
@@ -55,12 +54,10 @@
 		<dependency>
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.core</artifactId>
-			<version>5.0.0</version>
 		</dependency>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.compendium</artifactId>
-            <version>${osgi.version}</version>
         </dependency>
 		
 		<dependency>
@@ -75,17 +72,14 @@
     	<dependency>
     		<groupId>com.vaadin</groupId>
     		<artifactId>vaadin-compatibility-server</artifactId>
-    		<version>${vaadin.version}</version>
     	</dependency>
     	<dependency>
     		<groupId>com.vaadin</groupId>
     		<artifactId>vaadin-compatibility-shared</artifactId>
-    		<version>${vaadin.version}</version>
     	</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
-			<version>${servlet.version}</version>
 		</dependency>
 <!-- 
 		<dependency>
@@ -97,7 +91,6 @@
 		<dependency>
 			<groupId>de.mhus.osgi</groupId>
 			<artifactId>mhu-sop-api</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		
 	</dependencies>

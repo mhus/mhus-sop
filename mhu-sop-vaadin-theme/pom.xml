@@ -33,12 +33,10 @@
     	<dependency>
     		<groupId>com.vaadin</groupId>
     		<artifactId>vaadin-compatibility-server</artifactId>
-    		<version>${vaadin.version}</version>
     	</dependency>
     	<dependency>
     		<groupId>com.vaadin</groupId>
     		<artifactId>vaadin-compatibility-shared</artifactId>
-    		<version>${vaadin.version}</version>
     	</dependency>
     	        
     </dependencies>
@@ -48,7 +46,6 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>${bundle.plugin.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -90,7 +87,6 @@
       			<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-war-plugin</artifactId>
-					<version>2.3</version>
 					<configuration>
 						<failOnMissingWebXml>false</failOnMissingWebXml>
 					</configuration>
@@ -98,16 +94,6 @@
 				<plugin>
 					<groupId>com.vaadin</groupId>
 					<artifactId>vaadin-maven-plugin</artifactId>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-jar-plugin</artifactId>
-					<version>2.5</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-source-plugin</artifactId>
-					<version>2.4</version>
 				</plugin>
                 <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
                 <!-- TODO Remove when http://dev.vaadin.com/ticket/14924 is resolved -->

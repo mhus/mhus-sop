@@ -5,7 +5,7 @@ import de.mhus.lib.basics.consts.ConstBase;
 
 /**
  * File created by mhu const generator. Changes will be overwritten.
- * 26.2.2019
+ * 28.2.2019
  **/
 
 public class _SopData extends ConstBase {
@@ -74,7 +74,7 @@ public class _SopData extends ConstBase {
   public static final Identifier PROJECT_ARTIFACT = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"mhu-sop-api");
   public static final Identifier PROJECT_DESCRIPTION = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"A set of tools to improve OSGi frameworks and karaf");
   public static final Identifier PROJECT_GROUP = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"de.mhus.osgi");
-  public static final Identifier PROJECT_VERSION = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"1.5.1-SNAPSHOT");
+  public static final Identifier PROJECT_VERSION = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"1.6.0-SNAPSHOT");
   public static final Identifier _ARCHIVED = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"archived");
   public static final Identifier _CREATION_DATE = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"creationDate");
   public static final Identifier _DATA = new Identifier(de.mhus.osgi.sop.api.foundation.model.SopData.class,"data");

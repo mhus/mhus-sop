@@ -5,7 +5,7 @@ import de.mhus.lib.basics.consts.ConstBase;
 
 /**
  * File created by mhu const generator. Changes will be overwritten.
- * 26.2.2019
+ * 28.2.2019
  **/
 
 public class _SopAcl extends ConstBase {
@@ -35,7 +35,7 @@ public class _SopAcl extends ConstBase {
   public static final Identifier PROJECT_ARTIFACT = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"mhu-sop-api");
   public static final Identifier PROJECT_DESCRIPTION = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"A set of tools to improve OSGi frameworks and karaf");
   public static final Identifier PROJECT_GROUP = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"de.mhus.osgi");
-  public static final Identifier PROJECT_VERSION = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"1.5.1-SNAPSHOT");
+  public static final Identifier PROJECT_VERSION = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"1.6.0-SNAPSHOT");
   public static final Identifier _ACL = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"Acl");
   public static final Identifier _ADB_CHANGED = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"AdbChanged");
   public static final Identifier _ADB_MANAGED = new Identifier(de.mhus.osgi.sop.api.model.SopAcl.class,"AdbManaged");
