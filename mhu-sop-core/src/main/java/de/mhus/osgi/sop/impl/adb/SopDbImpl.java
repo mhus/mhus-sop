@@ -24,6 +24,7 @@ import de.mhus.lib.basics.Ace;
 import de.mhus.lib.basics.UuidIdentificable;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.errors.MException;
+import de.mhus.lib.errors.MRuntimeException;
 import de.mhus.lib.xdb.XdbService;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.adb.AbstractDbSchemaService;
@@ -75,6 +76,8 @@ public class SopDbImpl extends AbstractDbSchemaService {
 	}
 
 	public static XdbService getManager() {
+		if (instance == null || instance.service == null)
+			throw new MRuntimeException("db manager not available", instance == null);
 		return instance
 				.service;
 	}
