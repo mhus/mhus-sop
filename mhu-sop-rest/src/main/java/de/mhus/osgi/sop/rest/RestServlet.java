@@ -31,12 +31,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
-
 import org.osgi.service.component.annotations.Component;
+
 import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
+import de.mhus.lib.core.io.http.MHttp;
 import de.mhus.lib.core.logging.LevelMapper;
 import de.mhus.lib.core.logging.Log;
 import de.mhus.lib.core.logging.MLogUtil;
@@ -45,7 +46,6 @@ import de.mhus.lib.core.util.Base64;
 import de.mhus.lib.core.util.MNls;
 import de.mhus.lib.core.util.MUri;
 import de.mhus.lib.errors.AccessDeniedException;
-import de.mhus.lib.logging.level.ThreadMapperConfig;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
 import de.mhus.osgi.sop.api.aaa.Trust;
@@ -56,7 +56,6 @@ import de.mhus.osgi.sop.api.rest.RestApi;
 import de.mhus.osgi.sop.api.rest.RestResult;
 import de.mhus.osgi.sop.api.util.SopFileLogger;
 import de.mhus.osgi.sop.api.util.TicketUtil;
-import de.mhus.lib.core.io.http.MHttp;
 
 /*
  * Test: http://localhost:8182/rest/public/?_action=ping&_method=POST
@@ -102,8 +101,8 @@ public class RestServlet extends HttpServlet {
 	    		LevelMapper lm = MApi.get().getLogFactory().getLevelMapper();
 	    		if (lm != null && lm instanceof TrailLevelMapper) {
 	    			isTrailEnabled = true;
-	    			if (trail.length() == 0) trail = ThreadMapperConfig.MAP_LABEL;
-	    			((TrailLevelMapper)lm).doConfigureTrail(MLogUtil.createTrailConfig(MLogUtil.TRAIL_SOURCE_REST, trail));
+	    			if (trail.length() == 0) trail = MLogUtil.MAP_LABEL;
+	    			((TrailLevelMapper)lm).doConfigureTrail(MLogUtil.TRAIL_SOURCE_REST, trail);
 	    		}
 	    	}
 	    	
