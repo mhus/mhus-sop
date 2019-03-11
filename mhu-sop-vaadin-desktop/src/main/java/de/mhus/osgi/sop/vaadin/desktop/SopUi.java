@@ -312,7 +312,7 @@ public class SopUi extends UI implements SopUiApi {
 
 	public void requestBegin() {
 		if (trailConfig != null)
-			MLogUtil.setTrailConfig(trailConfig);
+			MLogUtil.setTrailConfig(MLogUtil.TRAIL_SOURCE_UI, trailConfig);
 		else
 			MLogUtil.releaseTrailConfig();
 		AccessApi aaa = MApi.lookup(AccessApi.class);
@@ -338,7 +338,7 @@ public class SopUi extends UI implements SopUiApi {
 			this.trailConfig = trailConfig;
 			MLogUtil.releaseTrailConfig();
 		} else {
-			MLogUtil.setTrailConfig(trailConfig);
+			MLogUtil.setTrailConfig(MLogUtil.TRAIL_SOURCE_UI,trailConfig);
 			this.trailConfig = MLogUtil.getTrailConfig();
 		}
 	}

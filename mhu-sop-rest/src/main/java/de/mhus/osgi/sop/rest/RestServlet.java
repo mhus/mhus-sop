@@ -39,11 +39,13 @@ import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
 import de.mhus.lib.core.logging.LevelMapper;
 import de.mhus.lib.core.logging.Log;
+import de.mhus.lib.core.logging.MLogUtil;
 import de.mhus.lib.core.logging.TrailLevelMapper;
 import de.mhus.lib.core.util.Base64;
 import de.mhus.lib.core.util.MNls;
 import de.mhus.lib.core.util.MUri;
 import de.mhus.lib.errors.AccessDeniedException;
+import de.mhus.lib.logging.level.ThreadMapperConfig;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
 import de.mhus.osgi.sop.api.aaa.Trust;
@@ -100,7 +102,8 @@ public class RestServlet extends HttpServlet {
 	    		LevelMapper lm = MApi.get().getLogFactory().getLevelMapper();
 	    		if (lm != null && lm instanceof TrailLevelMapper) {
 	    			isTrailEnabled = true;
-	    			((TrailLevelMapper)lm).doConfigureTrail(trail);
+	    			if (trail.length() == 0) trail = ThreadMapperConfig.MAP_LABEL;
+	    			((TrailLevelMapper)lm).doConfigureTrail(MLogUtil.createTrailConfig(MLogUtil.TRAIL_SOURCE_REST, trail));
 	    		}
 	    	}
 	    	
