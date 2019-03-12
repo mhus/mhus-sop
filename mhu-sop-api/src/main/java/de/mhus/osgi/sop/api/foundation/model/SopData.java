@@ -25,6 +25,7 @@ import de.mhus.lib.annotations.adb.DbPersistent;
 import de.mhus.lib.annotations.adb.DbPrimaryKey;
 import de.mhus.lib.annotations.generic.Public;
 import de.mhus.lib.basics.consts.GenerateConst;
+import de.mhus.lib.basics.consts.Identifier.TYPE;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MSystem;
@@ -32,7 +33,7 @@ import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.foundation.FoundationApi;
 import de.mhus.osgi.sop.api.foundation.FoundationRelated;
 
-@GenerateConst(annotation= {DbPersistent.class,DbPrimaryKey.class})
+@GenerateConst(annotation= {DbPersistent.class,DbPrimaryKey.class},shortcuts=TYPE.FIELD)
 public class SopData extends DbMetadata implements FoundationRelated {
 	
 	@DbPersistent(ro=true)
