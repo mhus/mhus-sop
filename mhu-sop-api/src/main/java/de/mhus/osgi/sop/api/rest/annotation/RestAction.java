@@ -18,6 +18,14 @@ package de.mhus.osgi.sop.api.rest.annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+/**
+ * Mark a method to be used as rest action use the following method pattern
+ * 
+ * public void onAction(JsonResult result, CallContext callContext) throws Exception
+ * 
+ * @author mikehummel
+ *
+ */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RestAction {
 
