@@ -27,7 +27,7 @@ import de.mhus.osgi.sop.api.rest.ObjectListNode;
 import de.mhus.osgi.sop.api.rest.RestNodeService;
 
 @Component(immediate=true,service=RestNodeService.class)
-public class FoundationNode extends ObjectListNode<SopFoundation> {
+public class FoundationNode extends ObjectListNode<SopFoundation,SopFoundation> {
 
 	@Override
 	public String[] getParentNodeIds() {
@@ -46,10 +46,10 @@ public class FoundationNode extends ObjectListNode<SopFoundation> {
 		return api.searchFoundations(callContext.getParameter("search"), page);
 	}
 
-	@Override
-	public Class<SopFoundation> getManagedClass() {
-		return SopFoundation.class;
-	}
+//	@Override
+//	public Class<SopFoundation> getManagedClass() {
+//		return SopFoundation.class;
+//	}
 
 	@Override
 	protected SopFoundation getObjectForId(CallContext context, String id) throws Exception {

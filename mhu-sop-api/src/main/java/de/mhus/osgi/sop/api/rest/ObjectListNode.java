@@ -25,7 +25,7 @@ import de.mhus.lib.core.pojo.PojoModelFactory;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.errors.MException;
 
-public abstract class ObjectListNode<T> extends JsonListNode<T> {
+public abstract class ObjectListNode<T,L> extends JsonListNode<T> {
 
 	@Override
 	public void doRead(JsonResult result, CallContext callContext)
@@ -33,16 +33,16 @@ public abstract class ObjectListNode<T> extends JsonListNode<T> {
 
 		PojoModelFactory schema = getPojoModelFactory();
 		
-		T obj = getObjectFromContext(callContext, getManagedClass());
+		T obj = getObjectFromContext(callContext, getManagedClassName());
 		if (obj != null) {
-			doPrepareForOutput(obj, callContext, false);
+			doPrepareForOutput(obj, callContext);
 			ObjectNode jRoot = result.createObjectNode();
 			MPojo.pojoToJson(obj, jRoot, schema, true);
 		} else {
 			ArrayNode jList = result.createArrayNode();
 			
-			for (T item : getObjectList(callContext) ) {
-				doPrepareForOutput(item, callContext, true);
+			for (L item : getObjectList(callContext) ) {
+				doPrepareForOutputList(item, callContext);
 				ObjectNode jItem = jList.objectNode();
 				jList.add(jItem);
 				MPojo.pojoToJson(item, jItem, schema, true);
@@ -56,9 +56,12 @@ public abstract class ObjectListNode<T> extends JsonListNode<T> {
 		return RestUtil.getPojoModelFactory();
 	}
 
-	protected abstract List<T> getObjectList(CallContext callContext) throws MException;
+	protected abstract List<L> getObjectList(CallContext callContext) throws MException;
 
-	protected void doPrepareForOutput(T obj, CallContext context, boolean listMode) throws MException {
+    protected void doPrepareForOutputList(L obj, CallContext context) throws MException {
+    }
+    
+	protected void doPrepareForOutput(T obj, CallContext context) throws MException {
 	}
 
 	@Override

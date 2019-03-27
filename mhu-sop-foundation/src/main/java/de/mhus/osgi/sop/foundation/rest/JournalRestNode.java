@@ -76,10 +76,10 @@ public class JournalRestNode extends JsonListNode<JournalQueue>{
 		
 	}
 
-	@Override
-	public Class<JournalQueue> getManagedClass() {
-		return JournalQueue.class;
-	}
+//	@Override
+//	public Class<JournalQueue> getManagedClass() {
+//		return JournalQueue.class;
+//	}
 
 	@Override
 	protected JournalQueue getObjectForId(CallContext context, String id) throws Exception {

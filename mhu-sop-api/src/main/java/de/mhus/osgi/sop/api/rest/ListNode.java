@@ -17,6 +17,8 @@ package de.mhus.osgi.sop.api.rest;
 
 import java.util.List;
 
+import de.mhus.lib.core.MSystem;
+
 public abstract class ListNode<T> extends AbstractNode {
 
 	public static final String ID 		= "_id";
@@ -36,8 +38,8 @@ public abstract class ListNode<T> extends AbstractNode {
 
 		if (obj == null) return null;
 		
-		callContext.put(getManagedClass().getCanonicalName() + ID, id);
-		callContext.put(getManagedClass().getCanonicalName() + OBJECT, obj);
+		callContext.put(getManagedClassName() + ID, id);
+		callContext.put(getManagedClassName() + OBJECT, obj);
 
 		if (parts.size() < 1) return this;
 
@@ -49,25 +51,36 @@ public abstract class ListNode<T> extends AbstractNode {
 		return (T) callContext.get(clazz.getCanonicalName() + OBJECT);
 	}
 
+    @SuppressWarnings("unchecked")
+    public static <T> T getObjectFromContext(CallContext callContext, String clazz) {
+        return (T) callContext.get(clazz + OBJECT);
+    }
+    
 	@SuppressWarnings("unchecked")
 	protected T getObjectFromContext(CallContext callContext) {
-		return (T) callContext.get(getManagedClass().getCanonicalName() + OBJECT);
+		return (T) callContext.get(getManagedClassName() + OBJECT);
 	}
  
 	/**
 	 * Return a the managed class as class
 	 * @return x
 	 */
-	public abstract Class<T> getManagedClass();
+	public String getManagedClassName() {
+	    return MSystem.getTemplateCanonicalName(getClass(), 0);
+	}
 
 	protected String getIdFromContext(CallContext callContext) {
-		return (String) callContext.get(getManagedClass().getCanonicalName() + ID);
+		return (String) callContext.get(getManagedClassName() + ID);
 	}
 	
 	public static <T> String getIdFromContext(CallContext callContext, Class<T> clazz) {
 		return (String) callContext.get(clazz.getCanonicalName() + ID);
 	}
 	
+    public static <T> String getIdFromContext(CallContext callContext, String clazz) {
+        return (String) callContext.get(clazz + ID);
+    }
+    
 	protected abstract T getObjectForId(CallContext context, String id) throws Exception;
 
 }

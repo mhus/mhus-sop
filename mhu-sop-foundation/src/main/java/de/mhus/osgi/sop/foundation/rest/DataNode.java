@@ -44,7 +44,7 @@ import de.mhus.osgi.sop.api.rest.RestNodeService;
 import de.mhus.osgi.sop.api.rest.RestResult;
 
 @Component(immediate=true,service=RestNodeService.class)
-public class DataNode extends ObjectListNode<SopData>{
+public class DataNode extends ObjectListNode<SopData,SopData>{
 
 	Log log = Log.getLog(DataNode.class);
 	
@@ -118,10 +118,10 @@ public class DataNode extends ObjectListNode<SopData>{
 		return ret;
 	}
 
-	@Override
-	public Class<SopData> getManagedClass() {
-		return SopData.class;
-	}
+//	@Override
+//	public Class<SopData> getManagedClass() {
+//		return SopData.class;
+//	}
 
 	@Override
 	protected SopData getObjectForId(CallContext callContext, String id) throws Exception {
@@ -147,16 +147,27 @@ public class DataNode extends ObjectListNode<SopData>{
 	}
 
 	@Override
-	protected void doPrepareForOutput(SopData obj, CallContext context, boolean listMode) throws MException {
-		super.doPrepareForOutput(obj, context, listMode);
+	protected void doPrepareForOutput(SopData obj, CallContext context) throws MException {
+		super.doPrepareForOutput(obj, context);
 		String type = obj.getType();
 		FoundationApi api = MApi.lookup(FoundationApi.class);
 		SopDataController control = api.getDataSyncControllerForType(type);
 		if (control != null) {
-			control.doPrepareForOutput(obj, context, listMode);
+			control.doPrepareForOutput(obj, context, false);
 		}
 	}
 
+    @Override
+    protected void doPrepareForOutputList(SopData obj, CallContext context) throws MException {
+        super.doPrepareForOutputList(obj, context);
+        String type = obj.getType();
+        FoundationApi api = MApi.lookup(FoundationApi.class);
+        SopDataController control = api.getDataSyncControllerForType(type);
+        if (control != null) {
+            control.doPrepareForOutput(obj, context, true);
+        }
+    }
+    
 	@Override
 	public RestResult doAction(CallContext callContext) throws Exception {
 		SopData data = getObjectFromContext(callContext, SopData.class);
