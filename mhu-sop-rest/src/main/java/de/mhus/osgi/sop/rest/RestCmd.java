@@ -63,8 +63,7 @@ public class RestCmd implements Action {
             }
             
             ConsoleTable table = new ConsoleTable(full);
-            table.setLineSpacer(true);
-            table.setHeaderValues("Class","Node Id","Parents","Managed","Registrations");
+            table.setHeaderValues("Class","Node Id","Managed","Parents","Registrations");
             for (Entry<RestNodeService, LinkedList<String>> entry : list.entrySet()) {
                 String managed = "";
                 if (entry.getKey() instanceof AbstractNode)
@@ -73,8 +72,8 @@ public class RestCmd implements Action {
             	table.addRowValues(
             	        entry.getKey().getClass().getCanonicalName(),
             	        entry.getKey().getNodeId(), 
-            	        entry.getKey().getParentNodeCanonicalClassNames(),
             	        managed,
+            	        entry.getKey().getParentNodeCanonicalClassNames(),
             	        entry.getValue()
             	      );
             }
