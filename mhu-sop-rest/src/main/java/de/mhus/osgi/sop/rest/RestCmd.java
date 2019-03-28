@@ -63,6 +63,7 @@ public class RestCmd implements Action {
             }
             
             ConsoleTable table = new ConsoleTable(full);
+            table.setLineSpacer(true);
             table.setHeaderValues("Class","Node Id","Parents","Managed","Registrations");
             for (Entry<RestNodeService, LinkedList<String>> entry : list.entrySet()) {
                 String managed = "";
