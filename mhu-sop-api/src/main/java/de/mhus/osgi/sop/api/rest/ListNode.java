@@ -17,12 +17,8 @@ package de.mhus.osgi.sop.api.rest;
 
 import java.util.List;
 
-import de.mhus.lib.core.MSystem;
-
 public abstract class ListNode<T> extends AbstractNode {
 
-	public static final String ID 		= "_id";
-	public static final String OBJECT 	= "_obj";
 	public static final String SOURCE 	= "source";
 	public static final String INTERNAL_PREFIX = "_";
 
@@ -45,42 +41,16 @@ public abstract class ListNode<T> extends AbstractNode {
 
 		return callContext.lookup(parts, getNodeId());
 	}
-	
-	@SuppressWarnings("unchecked")
-	public static <T> T getObjectFromContext(CallContext callContext, Class<T> clazz) {
-		return (T) callContext.get(clazz.getCanonicalName() + OBJECT);
-	}
 
-    @SuppressWarnings("unchecked")
-    public static <T> T getObjectFromContext(CallContext callContext, String clazz) {
-        return (T) callContext.get(clazz + OBJECT);
-    }
-    
 	@SuppressWarnings("unchecked")
 	protected T getObjectFromContext(CallContext callContext) {
 		return (T) callContext.get(getManagedClassName() + OBJECT);
 	}
  
-	/**
-	 * Return a the managed class as class
-	 * @return x
-	 */
-	public String getManagedClassName() {
-	    return MSystem.getTemplateCanonicalName(getClass(), 0);
-	}
-
 	protected String getIdFromContext(CallContext callContext) {
 		return (String) callContext.get(getManagedClassName() + ID);
 	}
 	
-	public static <T> String getIdFromContext(CallContext callContext, Class<T> clazz) {
-		return (String) callContext.get(clazz.getCanonicalName() + ID);
-	}
-	
-    public static <T> String getIdFromContext(CallContext callContext, String clazz) {
-        return (String) callContext.get(clazz + ID);
-    }
-    
 	protected abstract T getObjectForId(CallContext context, String id) throws Exception;
 
 }

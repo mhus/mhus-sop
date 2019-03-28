@@ -35,11 +35,6 @@ public abstract class VoidNode extends SingleObjectNode<Void>  {
 	}
 	
 	@Override
-	public final Class<Void> getManagedClass() {
-		return Void.class;
-	}
-
-	@Override
 	protected final Void getObject(CallContext context) throws Exception {
 		return null;
 	}

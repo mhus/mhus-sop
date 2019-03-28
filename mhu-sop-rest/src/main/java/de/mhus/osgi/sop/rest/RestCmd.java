@@ -20,10 +20,12 @@ import java.util.Map.Entry;
 
 import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.console.ConsoleTable;
+import de.mhus.osgi.sop.api.rest.AbstractNode;
 import de.mhus.osgi.sop.api.rest.RestApi;
 import de.mhus.osgi.sop.api.rest.RestNodeService;
 
@@ -31,17 +33,30 @@ import de.mhus.osgi.sop.api.rest.RestNodeService;
 @Service
 public class RestCmd implements Action {
 
+    @Option(name="-x", description="Full Table Content",required=false, multiValued=false)
+    boolean full = false;
+
 	@Override
 	public Object execute() throws Exception {
 
         RestApi restService = MApi.lookup(RestApi.class);
 
-        ConsoleTable table = new ConsoleTable();
-        table.setHeaderValues("Registered","Node Id","Parents","Class");
+        ConsoleTable table = new ConsoleTable(full);
+        table.setHeaderValues("Registered","Node Id","Parents","Managed","Class");
         for (Entry<String, RestNodeService> entry : restService.getRestNodeRegistry().entrySet()) {
-        	table.addRowValues(entry.getKey(),entry.getValue().getNodeId(), Arrays.toString( entry.getValue().getParentNodeIds() ),entry.getValue().getClass().getCanonicalName() );
+            String managed = "";
+            if (entry.getValue() instanceof AbstractNode)
+                managed = ((AbstractNode)entry.getValue()).getManagedClassName();
+            
+        	table.addRowValues(
+        	        entry.getKey(),
+        	        entry.getValue().getNodeId(), 
+        	        Arrays.toString( entry.getValue().getParentNodeIds() ),
+        	        managed,
+        	        entry.getValue().getClass().getCanonicalName() 
+        	      );
         }
-        table.print(System.out);
+        table.print();
 		return null;
 	}
 

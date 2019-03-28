@@ -37,10 +37,10 @@ public class UserInformationRestNode extends SingleObjectNode<UserInformation>{
 		return "uid";
 	}
 
-	@Override
-	public Class<UserInformation> getManagedClass() {
-		return UserInformation.class;
-	}
+//	@Override
+//	public Class<UserInformation> getManagedClass() {
+//		return UserInformation.class;
+//	}
 
 	@Override
 	protected UserInformation getObject(CallContext context) throws Exception {

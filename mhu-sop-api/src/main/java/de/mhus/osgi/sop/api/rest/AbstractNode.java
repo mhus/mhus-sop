@@ -30,6 +30,9 @@ import de.mhus.osgi.sop.api.rest.annotation.RestNode;
 
 public abstract class AbstractNode extends MLog implements RestNodeService {
 
+    public static final String ID       = "_id";
+    public static final String OBJECT   = "_obj";
+
 	private RestNode nodeDef;
 	private HashMap<String, Method> actions = null;
 
@@ -180,5 +183,32 @@ public abstract class AbstractNode extends MLog implements RestNodeService {
 			return null;
 		return nodeDef.acl();
 	}
+
+	   /**
+     * Return a the managed class as class
+     * @return x
+     */
+    public String getManagedClassName() {
+        String ret = MSystem.getTemplateCanonicalName(getClass(), 0);
+        return ret == null ? Void.class.getCanonicalName() : ret;
+    }
+
+    public static <T> String getIdFromContext(CallContext callContext, Class<T> clazz) {
+        return (String) callContext.get(clazz.getCanonicalName() + ID);
+    }
+    
+    public static <T> String getIdFromContext(CallContext callContext, String clazz) {
+        return (String) callContext.get(clazz + ID);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T getObjectFromContext(CallContext callContext, Class<T> clazz) {
+        return (T) callContext.get(clazz.getCanonicalName() + OBJECT);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T getObjectFromContext(CallContext callContext, String clazz) {
+        return (T) callContext.get(clazz + OBJECT);
+    }
 
 }

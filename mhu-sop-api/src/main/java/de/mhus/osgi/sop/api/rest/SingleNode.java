@@ -32,7 +32,7 @@ public abstract class SingleNode<T> extends AbstractNode {
 
 		if (obj == null) return null;
 		
-		callContext.put(getManagedClass().getCanonicalName() + OBJECT, obj);
+		callContext.put(getManagedClassName() + OBJECT, obj);
 
 		if (parts.size() < 1) return this;
 
@@ -40,20 +40,10 @@ public abstract class SingleNode<T> extends AbstractNode {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static <T> T getObjectFromContext(CallContext callContext, Class<T> clazz) {
-		return (T) callContext.get(clazz.getCanonicalName() + OBJECT);
+	protected T getObjectFromContext(CallContext callContext) {
+		return (T) callContext.get(getManagedClassName() + OBJECT);
 	}
 
-	@SuppressWarnings("unchecked")
-	protected T getObjectFromContext(CallContext callContext) {
-		return (T) callContext.get(getManagedClass().getCanonicalName() + OBJECT);
-	}
- 
-	/**
-	 * Return a the managed class as class
-	 * @return x
-	 */
-	public abstract Class<T> getManagedClass();
 	
 	protected abstract T getObject(CallContext context) throws Exception;
 	

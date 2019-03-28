@@ -31,7 +31,7 @@ public abstract class SingleObjectNode<T> extends JsonSingleNode<T> {
 
 		PojoModelFactory schema = getPojoModelFactory();
 		
-		T obj = getObjectFromContext(callContext, getManagedClass());
+		T obj = getObjectFromContext(callContext, getManagedClassName());
 		if (obj == null)
 			throw new NotFoundException();
 		

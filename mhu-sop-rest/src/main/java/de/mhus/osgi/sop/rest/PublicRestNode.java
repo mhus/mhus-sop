@@ -38,10 +38,10 @@ public class PublicRestNode extends SingleObjectNode<Object> {
 		return PUBLIC_ID;
 	}
 
-	@Override
-	public Class<Object> getManagedClass() {
-		return Object.class;
-	}
+//	@Override
+//	public Class<Object> getManagedClass() {
+//		return Object.class;
+//	}
 
 	@Override
 	protected Object getObject(CallContext callContext) throws Exception {
