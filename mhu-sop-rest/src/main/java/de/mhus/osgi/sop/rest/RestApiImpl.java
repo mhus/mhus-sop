@@ -72,6 +72,8 @@ public class RestApiImpl extends MLog implements RestApi {
 			if (service != null) {
 				for (String x : service.getParentNodeCanonicalClassNames()) {
 					if (x != null) {
+					    if (!x.contains(".")) // print a warning - class name without dot should be a mistake
+					        log().w("Register RestNode with malformed parent name - should be a class",service.getClass(),service.getNodeId(),x);
 						String key = x + "-" + service.getNodeId();
 						log().i("register",key,service.getClass().getCanonicalName());
 						register.put(key,service);
