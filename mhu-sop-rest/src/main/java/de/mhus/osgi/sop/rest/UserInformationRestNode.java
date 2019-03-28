@@ -28,8 +28,8 @@ import de.mhus.osgi.sop.api.rest.RestNodeService;
 public class UserInformationRestNode extends SingleObjectNode<UserInformation>{
 
 	@Override
-	public String[] getParentNodeIds() {
-		return new String[] {PUBLIC_ID};
+	public String[] getParentNodeCanonicalClassNames() {
+		return new String[] {PUBLIC_PARENT};
 	}
 
 	@Override

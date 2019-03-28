@@ -155,15 +155,15 @@ public abstract class AbstractNode extends MLog implements RestNodeService {
 	
 	// root by default
 	@Override
-	public String[] getParentNodeIds() {
+	public String[] getParentNodeCanonicalClassNames() {
 		if (nodeDef == null)
 			throw new UsageException("parent node not defined");
 		if (nodeDef.parentNode().length != 0) {
 			String[] out = new String[nodeDef.parentNode().length];
 			for (int i = 0; i < out.length; i++) {
-				RestNode parentNodeDef = nodeDef.parentNode()[i].getAnnotation(RestNode.class);
-				if (parentNodeDef != null)
-					out[i] = parentNodeDef.name();
+				String parentName = nodeDef.parentNode()[i].getCanonicalName();
+				if (parentName != null)// could be a inner class
+					out[i] = parentName;
 			}
 			return out;
 		}

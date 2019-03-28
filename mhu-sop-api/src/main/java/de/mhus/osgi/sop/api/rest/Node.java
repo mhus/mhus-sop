@@ -21,10 +21,14 @@ public interface Node {
 
 	String ACTION = "_action";
 
-	String ROOT_ID = "";
-	String FOUNDATION_ID = "foundation";
-	String PUBLIC_ID = "public";
-	String GENERAL_ID = "general";
+	String FOUNDATION_NODE_NAME = "foundation";
+	String PUBLIC_NODE_NAME = "public";
+	String GENERAL_NODE_NAME = "general";
+
+    String ROOT_PARENT = "";
+	String FOUNDATION_PARENT = "de.mhus.osgi.sop.foundation.rest.FoundationNode";
+	String PUBLIC_PARENT = "de.mhus.osgi.sop.rest.PublicRestNode";
+	//String GENERAL_PARENT = "general";
 
 	Node lookup(List<String> parts, CallContext callContext) throws Exception;
 

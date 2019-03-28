@@ -51,7 +51,7 @@ public class RestCmd implements Action {
         	table.addRowValues(
         	        entry.getKey(),
         	        entry.getValue().getNodeId(), 
-        	        Arrays.toString( entry.getValue().getParentNodeIds() ),
+        	        Arrays.toString( entry.getValue().getParentNodeCanonicalClassNames() ),
         	        managed,
         	        entry.getValue().getClass().getCanonicalName() 
         	      );

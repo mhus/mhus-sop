@@ -30,13 +30,13 @@ import de.mhus.osgi.sop.api.rest.RestNodeService;
 public class FoundationNode extends ObjectListNode<SopFoundation,SopFoundation> {
 
 	@Override
-	public String[] getParentNodeIds() {
-		return new String[] {ROOT_ID};
+	public String[] getParentNodeCanonicalClassNames() {
+		return new String[] {ROOT_PARENT};
 	}
 
 	@Override
 	public String getNodeId() {
-		return FOUNDATION_ID;
+		return FOUNDATION_NODE_NAME;
 	}
 
 	@Override

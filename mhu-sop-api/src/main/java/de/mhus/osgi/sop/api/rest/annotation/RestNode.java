@@ -27,7 +27,7 @@ public @interface RestNode {
 
 	String acl() default "*";
 
-	String[] parent() default RestNodeService.ROOT_ID;
+	String[] parent() default RestNodeService.ROOT_PARENT;
 	
 	Class<? extends Node>[] parentNode() default {};
 

@@ -110,10 +110,10 @@ public class CallContext {
 		return method;
 	}
 
-	public Node lookup(List<String> parts, String lastNodeId)
+	public Node lookup(List<String> parts, Class<? extends Node> lastNode)
 			throws Exception {
         RestApi restService = MApi.lookup(RestApi.class);
-        return restService.lookup(parts, lastNodeId, this);
+        return restService.lookup(parts, lastNode, this);
 	}
 
 }

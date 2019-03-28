@@ -29,13 +29,13 @@ import de.mhus.osgi.sop.api.rest.RestNodeService;
 public class PublicRestNode extends SingleObjectNode<Object> {
 	
 	@Override
-	public String[] getParentNodeIds() {
-		return new String[] {ROOT_ID};
+	public String[] getParentNodeCanonicalClassNames() {
+		return new String[] {ROOT_PARENT};
 	}
 
 	@Override
 	public String getNodeId() {
-		return PUBLIC_ID;
+		return PUBLIC_NODE_NAME;
 	}
 
 //	@Override

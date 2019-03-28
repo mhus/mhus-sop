@@ -23,7 +23,7 @@ import de.mhus.osgi.sop.api.SApi;
 
 public interface RestApi extends SApi {
 
-	Node lookup(List<String> parts, String lastNodeId, CallContext context)
+	Node lookup(List<String> parts, Class<? extends Node> lastNode, CallContext context)
 			throws Exception;
 
 	Map<String, RestNodeService> getRestNodeRegistry();

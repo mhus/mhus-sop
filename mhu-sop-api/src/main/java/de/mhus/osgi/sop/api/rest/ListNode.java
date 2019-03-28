@@ -39,7 +39,7 @@ public abstract class ListNode<T> extends AbstractNode {
 
 		if (parts.size() < 1) return this;
 
-		return callContext.lookup(parts, getNodeId());
+		return callContext.lookup(parts, getClass());
 	}
 
 	@SuppressWarnings("unchecked")

@@ -19,7 +19,7 @@ package de.mhus.osgi.sop.api.rest;
 
 public interface RestNodeService extends Node {
 
-	String[] getParentNodeIds();
+	String[] getParentNodeCanonicalClassNames();
 	
 	String getNodeId();
 

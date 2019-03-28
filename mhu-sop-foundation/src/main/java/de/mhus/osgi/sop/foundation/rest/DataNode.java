@@ -49,8 +49,8 @@ public class DataNode extends ObjectListNode<SopData,SopData>{
 	Log log = Log.getLog(DataNode.class);
 	
 	@Override
-	public String[] getParentNodeIds() {
-		return new String[] {"foundation"};
+	public String[] getParentNodeCanonicalClassNames() {
+		return new String[] {FOUNDATION_PARENT};
 	}
 
 	@Override

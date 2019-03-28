@@ -70,7 +70,7 @@ public class RestApiImpl extends MLog implements RestApi {
 
 			RestNodeService service = context.getService(reference);
 			if (service != null) {
-				for (String x : service.getParentNodeIds()) {
+				for (String x : service.getParentNodeCanonicalClassNames()) {
 					if (x != null) {
 						String key = x + "-" + service.getNodeId();
 						log().i("register",key,service.getClass().getCanonicalName());
@@ -94,7 +94,7 @@ public class RestApiImpl extends MLog implements RestApi {
 				RestNodeService service) {
 			
 			if (service != null) {
-				for (String x : service.getParentNodeIds()) {
+				for (String x : service.getParentNodeCanonicalClassNames()) {
 					if (x != null) {
 						String key = x + "-" + service.getNodeId();
 						log().i("unregister",key,service.getClass().getCanonicalName());
@@ -113,11 +113,11 @@ public class RestApiImpl extends MLog implements RestApi {
 	}
 
 	@Override
-	public Node lookup(List<String> parts, String lastNodeId, CallContext context) throws Exception {
+	public Node lookup(List<String> parts, Class<? extends Node> lastNode, CallContext context) throws Exception {
 		if (parts.size() < 1) return null;
 		String name = parts.get(0);
 		parts.remove(0);
-		if (lastNodeId == null) lastNodeId = RestNodeService.ROOT_ID;
+		String lastNodeId = lastNode == null ? RestNodeService.ROOT_PARENT : lastNode.getCanonicalName();
 		RestNodeService next = register.get(lastNodeId + "-" + name); 
 		if (next == null) return null;
 		

@@ -31,7 +31,7 @@ public abstract class VoidNode extends SingleObjectNode<Void>  {
 			throws Exception {
 		
 		if (parts.size() < 1) return this;
-		return callContext.lookup(parts, getNodeId());
+		return callContext.lookup(parts, getClass());
 	}
 	
 	@Override
