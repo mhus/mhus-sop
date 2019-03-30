@@ -39,4 +39,9 @@ public abstract class VoidNode extends SingleObjectNode<Void>  {
 		return null;
 	}
 
+    @Override
+    public void doRead(JsonResult result, CallContext callContext)
+            throws Exception {
+    }
+
 }
