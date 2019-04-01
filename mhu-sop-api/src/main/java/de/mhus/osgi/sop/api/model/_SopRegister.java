@@ -35,7 +35,7 @@ public class _SopRegister extends ConstBase {
   public static final Identifier PROJECT_ARTIFACT = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.api.model.SopRegister.class,"mhu-sop-api");
   public static final Identifier PROJECT_DESCRIPTION = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.api.model.SopRegister.class,"A set of tools to improve OSGi frameworks and karaf");
   public static final Identifier PROJECT_GROUP = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.api.model.SopRegister.class,"de.mhus.osgi");
-  public static final Identifier PROJECT_VERSION = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.api.model.SopRegister.class,"1.6.0");
+  public static final Identifier PROJECT_VERSION = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.api.model.SopRegister.class,"1.6.1-SNAPSHOT");
   public static final Identifier _ADB_CHANGED = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopRegister.class,"AdbChanged");
   public static final Identifier _ADB_MANAGED = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopRegister.class,"AdbManaged");
   public static final Identifier _ADB_PERSISTENT = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopRegister.class,"AdbPersistent");
@@ -45,7 +45,7 @@ public class _SopRegister extends ConstBase {
   public static final Identifier _DELETE = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopRegister.class,"delete");
   public static final Identifier _ID = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopRegister.class,"Id");
   public static final Identifier _KEY1 = new Identifier(Identifier.TYPE.SETTER, de.mhus.osgi.sop.api.model.SopRegister.class,"Key1");
-  public static final Identifier _KEY2 = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopRegister.class,"Key2");
+  public static final Identifier _KEY2 = new Identifier(Identifier.TYPE.SETTER, de.mhus.osgi.sop.api.model.SopRegister.class,"Key2");
   public static final Identifier _LOG = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopRegister.class,"log");
   public static final Identifier _MANAGER = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopRegister.class,"manager");
   public static final Identifier _NAME = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopRegister.class,"Name");
@@ -55,7 +55,7 @@ public class _SopRegister extends ConstBase {
   public static final Identifier _RELOAD = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopRegister.class,"reload");
   public static final Identifier _SAVE = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopRegister.class,"save");
   public static final Identifier _SAVE_CHANGED = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopRegister.class,"saveChanged");
-  public static final Identifier _VALUE1 = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopRegister.class,"Value1");
+  public static final Identifier _VALUE1 = new Identifier(Identifier.TYPE.SETTER, de.mhus.osgi.sop.api.model.SopRegister.class,"Value1");
   public static final Identifier _VALUE2 = new Identifier(Identifier.TYPE.SETTER, de.mhus.osgi.sop.api.model.SopRegister.class,"Value2");
 
 }
