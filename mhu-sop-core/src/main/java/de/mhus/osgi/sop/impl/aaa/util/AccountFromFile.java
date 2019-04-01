@@ -52,14 +52,14 @@ public class AccountFromFile extends MLog implements AccountSource, ModifyAccoun
 	public Account findAccount(String account) {
 		File file = SopUtil.getFile( path + MFile.normalize(account.trim()).toLowerCase() + ".xml" );
 		if (!file.exists() || !file.isFile()) {
-			log().i("file not found", file);
+			log().w("file not found", file);
 			return null;
 		}
 		
 		try {
 			return new AccountFile(file, account);
 		} catch (ParserConfigurationException | SAXException | IOException e) {
-			log().w(account, e);
+			log().e(account, e);
 			return null;
 		}
 	}

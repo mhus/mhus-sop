@@ -97,7 +97,7 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
 							log().w("Operation already defined",desc.getPath());
 					}
 				} else {
-					log().i("no description found, not registered",reference.getProperty("objectClass"));
+					log().w("no description found, not registered",reference.getProperty("objectClass"));
 				}
 			}
 			return service;
@@ -133,7 +133,7 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
 				else
 					log().w("AccessApi not found",desc,acl);
 			} catch (Throwable t) {
-				log().i(t);
+				log().e(t);
 			}
 			return new LocalOperationDescriptor(service.getUuid(), OperationAddress.create(PROVIDER_NAME,desc), desc,tags, acl, service);
 		}

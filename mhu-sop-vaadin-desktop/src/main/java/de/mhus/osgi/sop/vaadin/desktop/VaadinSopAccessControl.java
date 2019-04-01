@@ -87,7 +87,7 @@ public class VaadinSopAccessControl extends MLog implements AccessControl {
 		try {
 			return aaa.getAccount(account);
 		} catch (MException e) {
-			log().i(account,e);
+			log().w(account,e);
 			return null;
 		}
 	}
@@ -105,7 +105,7 @@ public class VaadinSopAccessControl extends MLog implements AccessControl {
 			AccessApi aaa = MApi.lookup(AccessApi.class);
 			return aaa.getAccount(account);
 		} catch (MException e) {
-			MLogUtil.log().i(account, e);
+			MLogUtil.log().w(account, e);
 			return null;
 		}
 	}

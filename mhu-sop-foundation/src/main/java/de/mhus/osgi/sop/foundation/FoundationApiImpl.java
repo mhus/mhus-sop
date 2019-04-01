@@ -376,7 +376,7 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 		try {
 			sync.synchronizeSopData(obj);
 		} catch (Throwable t) {
-			log().i("SopData sync failed",obj,t);
+			log().w("SopData sync failed",obj,t);
 			obj.setLastSyncTry(true);
 			obj.setLastSyncMsg(t.toString(), true);
 			return false;

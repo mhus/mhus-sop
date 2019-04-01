@@ -217,7 +217,7 @@ public class AccessApiImpl extends MLog implements AccessApi {
 			if (out != null) {
 				trustCache.put(trust, out);
 			} else {
-				log().i("trust not found",trust);
+				log().w("trust not found",trust);
 			}
 		}
 		if (out != null)

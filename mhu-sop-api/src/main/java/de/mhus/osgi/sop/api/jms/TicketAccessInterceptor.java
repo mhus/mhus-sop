@@ -60,7 +60,7 @@ public class TicketAccessInterceptor extends MLog implements JmsInterceptor {
 			else
 				api.process(ticket, locale);
 		} catch (Throwable t) {
-			log().i("Incoming Access Denied",message);
+			log().d("Incoming Access Denied",message);
 			throw new RuntimeException(t);
 		}
 	}

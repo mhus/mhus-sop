@@ -33,7 +33,7 @@ public class PingOperation extends AbstractOperation {
 
 	@Override
 	protected OperationResult doExecute2(TaskContext context) throws Exception {
-		log().i("PING PONG", context.getParameters() );
+		log().d("PING PONG", context.getParameters() );
 		String user = "";
 		boolean admin = false;
 		try {
