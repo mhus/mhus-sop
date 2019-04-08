@@ -28,7 +28,7 @@ public interface OperationApi extends SApi {
 
 	static final String DEFAULT_PROVIDER_NAME = "local";
 	static final String LOCAL_ONLY = "localOnly";
-
+	
     default List<OperationDescriptor> findOperations(Class<?> clazz, VersionRange version, Collection<String> providedTags) {
         return findOperations(clazz.getCanonicalName(), version, providedTags);
     }

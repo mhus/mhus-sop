@@ -43,19 +43,19 @@ public class _SopRegister extends ConstBase {
   public static final Identifier _CREATE = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopRegister.class,"create");
   public static final Identifier _DB_HANDLER = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopRegister.class,"DbHandler");
   public static final Identifier _DELETE = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopRegister.class,"delete");
-  public static final Identifier _ID = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopRegister.class,"Id");
-  public static final Identifier _KEY1 = new Identifier(Identifier.TYPE.SETTER, de.mhus.osgi.sop.api.model.SopRegister.class,"Key1");
-  public static final Identifier _KEY2 = new Identifier(Identifier.TYPE.SETTER, de.mhus.osgi.sop.api.model.SopRegister.class,"Key2");
-  public static final Identifier _LOG = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopRegister.class,"log");
+  public static final Identifier _ID = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopRegister.class,"id");
+  public static final Identifier _KEY1 = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopRegister.class,"key1");
+  public static final Identifier _KEY2 = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopRegister.class,"key2");
+  public static final Identifier _LOG = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopRegister.class,"log");
   public static final Identifier _MANAGER = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopRegister.class,"manager");
-  public static final Identifier _NAME = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopRegister.class,"Name");
+  public static final Identifier _NAME = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopRegister.class,"name");
   public static final Identifier _PERSISTENT = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopRegister.class,"persistent");
   public static final Identifier _REGISTER_NATIVES = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopRegister.class,"registerNatives");
   public static final Identifier _REGISTRY_NAME = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopRegister.class,"registryName");
   public static final Identifier _RELOAD = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopRegister.class,"reload");
   public static final Identifier _SAVE = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopRegister.class,"save");
   public static final Identifier _SAVE_CHANGED = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopRegister.class,"saveChanged");
-  public static final Identifier _VALUE1 = new Identifier(Identifier.TYPE.SETTER, de.mhus.osgi.sop.api.model.SopRegister.class,"Value1");
-  public static final Identifier _VALUE2 = new Identifier(Identifier.TYPE.SETTER, de.mhus.osgi.sop.api.model.SopRegister.class,"Value2");
+  public static final Identifier _VALUE1 = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopRegister.class,"value1");
+  public static final Identifier _VALUE2 = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopRegister.class,"value2");
 
 }

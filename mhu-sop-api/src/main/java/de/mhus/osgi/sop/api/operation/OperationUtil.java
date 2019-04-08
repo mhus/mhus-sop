@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Proxy;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -27,9 +28,11 @@ import java.util.TreeMap;
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCast;
+import de.mhus.lib.core.MDate;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
 import de.mhus.lib.core.logging.MLogUtil;
+import de.mhus.lib.core.strategy.OperationDescription;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.core.strategy.OperationToIfcProxy;
 import de.mhus.lib.core.util.MCallback2;
@@ -188,10 +191,12 @@ public class OperationUtil {
 		@SuppressWarnings("unused")
 		private Class<?> ifc;
 		private OperationDescriptor desc;
+        private boolean isJava;
 
 		public OperationInvocationHandler(Class<?> ifc, OperationDescriptor desc) {
 			this.ifc = ifc;
 			this.desc = desc;
+			this.isJava = getOption(desc.getTags(),OperationDescription.TAG_TECH,"").equals(OperationDescription.TECH_JAVA);
 		}
 
 		@Override
@@ -201,13 +206,19 @@ public class OperationUtil {
 
 			MProperties properties = new MProperties();
 			properties.setString(OperationToIfcProxy.METHOD, method.getName());
-			Parameter[] parameters = method.getParameters();;
+			Parameter[] parameters = method.getParameters();
 			for (int i = 0; i < parameters.length; i++) {
 				if (args[i] != null) {
-					properties.put(OperationToIfcProxy.PARAMETER + i, MCast.serializeToString(args[i]));
-//					properties.put(OperationToIfcProxy.TYPE + i, method.getParameters()[i].getType().getCanonicalName() );
-					properties.put(OperationToIfcProxy.TYPE + i, OperationToIfcProxy.SERIALISED );
-					properties.put(OperationToIfcProxy.PARAMETERORGTYPE + i, args[i].getClass().getCanonicalName() );
+				    if (isJava) {
+    					properties.put(OperationToIfcProxy.PARAMETER + i, MCast.serializeToString(args[i]));
+    //					properties.put(OperationToIfcProxy.TYPE + i, method.getParameters()[i].getType().getCanonicalName() );
+    					properties.put(OperationToIfcProxy.TYPE + i, OperationToIfcProxy.SERIALISED );
+    					properties.put(OperationToIfcProxy.PARAMETERORGTYPE + i, args[i].getClass().getCanonicalName() );
+				    } else {
+				        String type = toType(args[i]);
+				        properties.put(OperationToIfcProxy.TYPE + i, type );
+                        properties.put(OperationToIfcProxy.PARAMETER + i, toString(type, args[i]));
+				    }
 				} else {
 					properties.put(OperationToIfcProxy.TYPE + i, OperationToIfcProxy.NULL);
 				}
@@ -224,6 +235,41 @@ public class OperationUtil {
 			
 			return res.getResult();
 		}
+
+        private String toString(String type, Object o) {
+            switch (type) {
+            case "short": 
+            case "byte": 
+            case "int": 
+                return String.valueOf(MCast.toint(o, 0));
+            case "long": 
+                return String.valueOf(MCast.tolong(o, 0));
+            case "double":
+            case "float":
+                return String.valueOf(MCast.todouble(o, 0));
+            case "string": 
+                return String.valueOf(o);
+            case "date":
+                return MDate.toIso8601(MCast.toDate(o, MDate.NULL_DATE));
+            default:
+                return String.valueOf(o);
+            }
+        }
+
+        private String toType(Object o) {
+            if (o == null) return OperationToIfcProxy.NULL;
+            if (o instanceof Integer) return "int";
+            if (o instanceof Long) return "long";
+            if (o instanceof Short) return "short";
+            if (o instanceof String) return "string";
+            if (o instanceof Double) return "double";
+            if (o instanceof Float) return "float";
+            if (o instanceof Byte) return "byte";
+            if (o instanceof Date) return "date";
+            if (o instanceof Map) return "map";
+            if (o instanceof List) return "list";
+            return o.getClass().getCanonicalName();
+        }
 		
 	}
 

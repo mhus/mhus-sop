@@ -45,17 +45,17 @@ public class _SopObjectParameter extends ConstBase {
   public static final Identifier _ADB_PERSISTENT = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"AdbPersistent");
   public static final Identifier _CON = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"con");
   public static final Identifier _CREATE = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"create");
-  public static final Identifier _CREATION_DATE = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"CreationDate");
+  public static final Identifier _CREATION_DATE = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"creationDate");
   public static final Identifier _DB_HANDLER = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"DbHandler");
   public static final Identifier _DELETE = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"delete");
   public static final Identifier _FIND_PARENT_OBJECT = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"findParentObject");
-  public static final Identifier _ID = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"Id");
-  public static final Identifier _KEY = new Identifier(Identifier.TYPE.SETTER, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"Key");
-  public static final Identifier _LOG = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"log");
+  public static final Identifier _ID = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"id");
+  public static final Identifier _KEY = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"key");
+  public static final Identifier _LOG = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"log");
   public static final Identifier _MANAGER = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"manager");
-  public static final Identifier _MODIFY_DATE = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"ModifyDate");
-  public static final Identifier _OBJECT_ID = new Identifier(Identifier.TYPE.SETTER, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"ObjectId");
-  public static final Identifier _OBJECT_TYPE = new Identifier(Identifier.TYPE.SETTER, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"ObjectType");
+  public static final Identifier _MODIFY_DATE = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"modifyDate");
+  public static final Identifier _OBJECT_ID = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"objectId");
+  public static final Identifier _OBJECT_TYPE = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"objectType");
   public static final Identifier _PERSISTENT = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"persistent");
   public static final Identifier _REGISTER_NATIVES = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"registerNatives");
   public static final Identifier _REGISTRY_NAME = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"registryName");
@@ -63,7 +63,7 @@ public class _SopObjectParameter extends ConstBase {
   public static final Identifier _SAVE = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"save");
   public static final Identifier _SAVE_CHANGED = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"saveChanged");
   public static final Identifier _TYPE__GLOBAL = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"TYPE_GLOBAL");
-  public static final Identifier _VALUE = new Identifier(Identifier.TYPE.SETTER, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"Value");
-  public static final Identifier _VSTAMP = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"Vstamp");
+  public static final Identifier _VALUE = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"value");
+  public static final Identifier _VSTAMP = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopObjectParameter.class,"vstamp");
 
 }

@@ -41,22 +41,22 @@ public class _SopAcl extends ConstBase {
   public static final Identifier _ADB_PERSISTENT = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopAcl.class,"AdbPersistent");
   public static final Identifier _CON = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopAcl.class,"con");
   public static final Identifier _CREATE = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopAcl.class,"create");
-  public static final Identifier _CREATION_DATE = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopAcl.class,"CreationDate");
+  public static final Identifier _CREATION_DATE = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopAcl.class,"creationDate");
   public static final Identifier _DB_HANDLER = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopAcl.class,"DbHandler");
   public static final Identifier _DELETE = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopAcl.class,"delete");
   public static final Identifier _FIND_PARENT_OBJECT = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopAcl.class,"findParentObject");
-  public static final Identifier _ID = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopAcl.class,"Id");
-  public static final Identifier _LIST = new Identifier(Identifier.TYPE.SETTER, de.mhus.osgi.sop.api.model.SopAcl.class,"List");
-  public static final Identifier _LOG = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopAcl.class,"log");
+  public static final Identifier _ID = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopAcl.class,"id");
+  public static final Identifier _LIST = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopAcl.class,"list");
+  public static final Identifier _LOG = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopAcl.class,"log");
   public static final Identifier _MANAGER = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopAcl.class,"manager");
-  public static final Identifier _MODIFY_DATE = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopAcl.class,"ModifyDate");
+  public static final Identifier _MODIFY_DATE = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopAcl.class,"modifyDate");
   public static final Identifier _PERSISTENT = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopAcl.class,"persistent");
   public static final Identifier _REGISTER_NATIVES = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopAcl.class,"registerNatives");
   public static final Identifier _REGISTRY_NAME = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopAcl.class,"registryName");
   public static final Identifier _RELOAD = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopAcl.class,"reload");
   public static final Identifier _SAVE = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopAcl.class,"save");
   public static final Identifier _SAVE_CHANGED = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopAcl.class,"saveChanged");
-  public static final Identifier _TARGET = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopAcl.class,"Target");
-  public static final Identifier _VSTAMP = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopAcl.class,"Vstamp");
+  public static final Identifier _TARGET = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopAcl.class,"target");
+  public static final Identifier _VSTAMP = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopAcl.class,"vstamp");
 
 }

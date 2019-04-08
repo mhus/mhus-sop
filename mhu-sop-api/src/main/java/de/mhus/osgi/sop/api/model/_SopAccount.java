@@ -48,27 +48,27 @@ public class _SopAccount extends ConstBase {
   public static final Identifier PROJECT_DESCRIPTION = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.api.model.SopAccount.class,"A set of tools to improve OSGi frameworks and karaf");
   public static final Identifier PROJECT_GROUP = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.api.model.SopAccount.class,"de.mhus.osgi");
   public static final Identifier PROJECT_VERSION = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.api.model.SopAccount.class,"1.6.1-SNAPSHOT");
-  public static final Identifier _ACTIVE = new Identifier(Identifier.TYPE.SETTER, de.mhus.osgi.sop.api.model.SopAccount.class,"Active");
+  public static final Identifier _ACTIVE = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopAccount.class,"active");
   public static final Identifier _ADB_CHANGED = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopAccount.class,"AdbChanged");
   public static final Identifier _ADB_MANAGED = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopAccount.class,"AdbManaged");
   public static final Identifier _ADB_PERSISTENT = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopAccount.class,"AdbPersistent");
-  public static final Identifier _ATTRIBUTES = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopAccount.class,"Attributes");
+  public static final Identifier _ATTRIBUTES = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopAccount.class,"attributes");
   public static final Identifier _CLEAR_ATTRIBUTES = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopAccount.class,"clearAttributes");
   public static final Identifier _CON = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopAccount.class,"con");
   public static final Identifier _CREATE = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopAccount.class,"create");
-  public static final Identifier _CREATION_DATE = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopAccount.class,"CreationDate");
+  public static final Identifier _CREATION_DATE = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopAccount.class,"creationDate");
   public static final Identifier _DB_HANDLER = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopAccount.class,"DbHandler");
   public static final Identifier _DELETE = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopAccount.class,"delete");
   public static final Identifier _DISPLAY_NAME = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopAccount.class,"DisplayName");
   public static final Identifier _FIND_PARENT_OBJECT = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopAccount.class,"findParentObject");
-  public static final Identifier _GROUPS = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopAccount.class,"Groups");
+  public static final Identifier _GROUPS = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopAccount.class,"groups");
   public static final Identifier _HAS_GROUP = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopAccount.class,"hasGroup");
-  public static final Identifier _ID = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopAccount.class,"Id");
-  public static final Identifier _LOG = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopAccount.class,"log");
+  public static final Identifier _ID = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopAccount.class,"id");
+  public static final Identifier _LOG = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopAccount.class,"log");
   public static final Identifier _MANAGER = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopAccount.class,"manager");
-  public static final Identifier _MODIFY_DATE = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopAccount.class,"ModifyDate");
-  public static final Identifier _NAME = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopAccount.class,"Name");
-  public static final Identifier _PASSWORD = new Identifier(Identifier.TYPE.SETTER, de.mhus.osgi.sop.api.model.SopAccount.class,"Password");
+  public static final Identifier _MODIFY_DATE = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopAccount.class,"modifyDate");
+  public static final Identifier _NAME = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopAccount.class,"name");
+  public static final Identifier _PASSWORD = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopAccount.class,"password");
   public static final Identifier _PASSWORD_INTERNAL = new Identifier(Identifier.TYPE.SETTER, de.mhus.osgi.sop.api.model.SopAccount.class,"PasswordInternal");
   public static final Identifier _PERSISTENT = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopAccount.class,"persistent");
   public static final Identifier _PUT_ATTRIBUTES = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopAccount.class,"putAttributes");
@@ -82,6 +82,6 @@ public class _SopAccount extends ConstBase {
   public static final Identifier _UUID = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopAccount.class,"UUID");
   public static final Identifier _VALID = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopAccount.class,"Valid");
   public static final Identifier _VALIDATE_PASSWORD = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.model.SopAccount.class,"validatePassword");
-  public static final Identifier _VSTAMP = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopAccount.class,"Vstamp");
+  public static final Identifier _VSTAMP = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopAccount.class,"vstamp");
 
 }
