@@ -124,6 +124,7 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
 			
 			tags.add(OperationDescriptor.TAG_IDENT + "=" + SopUtil.getServerIdent());
 			tags.add(OperationDescriptor.TAG_HOST + "=localhost");
+            tags.add(OperationDescription.TAG_TECH + "=" + OperationDescription.TECH_JAVA);
 			
 			String acl = OperationUtil.getOption(tags, OperationDescriptor.TAG_DEFAULT_ACL, "");
 			try {

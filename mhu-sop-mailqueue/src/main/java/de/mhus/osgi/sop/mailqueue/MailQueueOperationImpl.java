@@ -51,6 +51,10 @@ public class MailQueueOperationImpl extends OperationToIfcProxy implements MailQ
 	
 	@Override
 	public void scheduleHtmlMail(MailMessage mails, IReadProperties properties) throws MException {
+	    if (mails == null) {
+	        log().d("mails are null");
+	        return;
+	    }
 		SopApi api = MApi.lookup(SopApi.class);
 		// create task
 		for (MailMessage mail : mails.getSeparateMails()) {
