@@ -24,6 +24,7 @@ import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
+import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.lib.core.security.Account;
 import de.mhus.lib.core.security.ModifyAccountApi;
 import de.mhus.lib.core.security.ModifyAuthorizationApi;
@@ -50,10 +51,10 @@ public class ModifyAccessCmd implements Action {
 			+ " user set <name> *[key=value] - will remove all other keys\n"
 			+ " user add <name> *[key=value]\n"
 			+ " user delete <name>\n"
-			+ " user add <name> <group>\n"
-			+ " user remove <name> <group>\n"
 			+ " user list <filter>\n"
 			+ " user active <name> <active> - activate or deactivate user\n"
+			+ " group add <name> <group>\n"
+			+ " group remove <name> <group>\n"
 			+ " trust create <name> <password> *[key=value]\n"
 			+ " trust password <name> <newPassword>\n"
 			+ " trust set <name> *[key=value]\n"
@@ -108,22 +109,25 @@ public class ModifyAccessCmd implements Action {
 			modify.deleteAccount(name);
 			System.out.println("OK");
 		} else
-		if (entity.equals("user") && action.equals("add")) {
+		if (entity.equals("group") && action.equals("add")) {
 			ModifyAccountApi modify = api.getModifyAccountApi();
 			modify.appendGroups(name, parameters[0]);
 			System.out.println("OK");
 		} else
-		if (entity.equals("user") && action.equals("remove")) {
+		if (entity.equals("group") && action.equals("remove")) {
 			ModifyAccountApi modify = api.getModifyAccountApi();
 			modify.removeGroups(name, parameters[0]);
 			System.out.println("OK");
 		} else
 		if (entity.equals("user") && action.equals("list")) {
 			ModifyAccountApi modify = api.getModifyAccountApi();
-			System.out.println(" Users");
-			System.out.println("-------");
-			for (String n  : modify.getAccountList(name))
-				System.out.println(n);
+			ConsoleTable table = new ConsoleTable(false);
+			table.setHeaderValues("Name","Display Name", "Ident", "Created","Modified");
+			for (String n  : modify.getAccountList(name)) {
+			    Account acc = api.getAccount(n);
+			    table.addRowValues(n,acc.getDisplayName(),acc.getUUID(), acc.getCreationDate(),acc.getModifyDate());
+			}
+			table.print();
 		} else
 		if (entity.equals("user") && action.equals("active")) {
 			ModifyAccountApi modify = api.getModifyAccountApi();
