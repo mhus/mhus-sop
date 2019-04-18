@@ -20,7 +20,7 @@ import java.util.HashSet;
 import java.util.UUID;
 
 import org.osgi.service.component.annotations.Component;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.vault.MutableVaultSource;
 import de.mhus.lib.core.vault.VaultEntry;
@@ -34,7 +34,7 @@ public class SopVaultSource extends MLog implements MutableVaultSource {
 
 	@Override
 	public VaultEntry getEntry(UUID id) {
-		XdbService db = MApi.lookup(SopApi.class).getManager();
+		XdbService db = M.l(SopApi.class).getManager();
 		try {
 			SopVaultEntry entry = db.getObject(SopVaultEntry.class, id);
 			return entry;
@@ -46,7 +46,7 @@ public class SopVaultSource extends MLog implements MutableVaultSource {
 
 	@Override
 	public Iterable<UUID> getEntryIds() {
-		XdbService db = MApi.lookup(SopApi.class).getManager();
+		XdbService db = M.l(SopApi.class).getManager();
 		HashSet<UUID> out = new HashSet<>();
 		// TODO use a database source set for huge lists?
 		try {
@@ -75,14 +75,14 @@ public class SopVaultSource extends MLog implements MutableVaultSource {
 
 	@Override
 	public void addEntry(VaultEntry entry) throws MException {
-		XdbService db = MApi.lookup(SopApi.class).getManager();
+		XdbService db = M.l(SopApi.class).getManager();
 		SopVaultEntry clone = db.inject(new SopVaultEntry(entry));
 		clone.save();
 	}
 
 	@Override
 	public void removeEntry(UUID id) throws MException {
-		XdbService db = MApi.lookup(SopApi.class).getManager();
+		XdbService db = M.l(SopApi.class).getManager();
 		SopVaultEntry item = db.getObject(SopVaultEntry.class, id);
 		item.delete();
 	}

@@ -18,7 +18,7 @@ package de.mhus.osgi.sop.api.foundation;
 import java.util.UUID;
 
 import de.mhus.lib.adb.DbMetadata;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.errors.MException;
 
 public interface FoundationRelated {
@@ -26,7 +26,7 @@ public interface FoundationRelated {
 	UUID getFoundation();
 	
 	default public DbMetadata findParentObject() throws MException {
-		return MApi.lookup(FoundationApi.class).getFoundation(getFoundation());
+		return M.l(FoundationApi.class).getFoundation(getFoundation());
 	}
 
 }

@@ -16,7 +16,7 @@
 package de.mhus.osgi.sop.api.operation;
 
 import de.mhus.lib.core.IProperties;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.core.util.MUri;
@@ -68,7 +68,7 @@ public class OperationAnswer {
 	}
 	
 	public OperationResult send(IProperties properties, String ... executeOptions) throws NotFoundException {
-		OperationApi api = MApi.lookup(OperationApi.class);
+		OperationApi api = M.l(OperationApi.class);
 		MProperties prop = getProperties();
 		if (properties != null)
 			prop.putAll(properties);

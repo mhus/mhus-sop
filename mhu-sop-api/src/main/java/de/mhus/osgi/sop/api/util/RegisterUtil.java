@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.mhus.lib.adb.query.Db;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.logging.Log;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.xdb.XdbService;
@@ -35,7 +35,7 @@ public class RegisterUtil {
 	}
 	
 	public static boolean isEmpty(String name) throws MException {
-		long cnt = MApi.lookup(SopApi.class).getManager().count(Db.query(SopRegister.class).eq("name", name));
+		long cnt = M.l(SopApi.class).getManager().count(Db.query(SopRegister.class).eq("name", name));
 		return cnt == 0;
 	}
 	
@@ -44,7 +44,7 @@ public class RegisterUtil {
 	}
 	
 	public static void fillKey(String name, List<String> list) {
-		XdbService db = MApi.lookup(SopApi.class).getManager();
+		XdbService db = M.l(SopApi.class).getManager();
 		if (list == null) return;
 		for (String item : list) {
 			try {
@@ -60,7 +60,7 @@ public class RegisterUtil {
 	}
 	
 	public static void fillKeyValue(String name, Map<String,String> map) {
-		XdbService db = MApi.lookup(SopApi.class).getManager();
+		XdbService db = M.l(SopApi.class).getManager();
 		if (map == null) return;
 		for (Map.Entry<String, String> entry : map.entrySet()) {
 			try {
@@ -76,7 +76,7 @@ public class RegisterUtil {
 	}
 	
 	public static void fillKeyKey(String name, Map<String,String> map) {
-		XdbService db = MApi.lookup(SopApi.class).getManager();
+		XdbService db = M.l(SopApi.class).getManager();
 		if (map == null) return;
 		for (Map.Entry<String, String> entry : map.entrySet()) {
 			try {
@@ -92,7 +92,7 @@ public class RegisterUtil {
 	}
 	
 	public static boolean hasKey(String name, String key) throws MException {
-		XdbService db = MApi.lookup(SopApi.class).getManager();
+		XdbService db = M.l(SopApi.class).getManager();
 		if (key == null) return false;
 		SopRegister out = db.getObjectByQualification(Db.query(SopRegister.class).eq("name", name).eq("key1", key));
 		return out != null;
@@ -103,7 +103,7 @@ public class RegisterUtil {
 	}
 	
 	public static SopRegister getByKey(String name, String key) throws MException {
-		XdbService db = MApi.lookup(SopApi.class).getManager();
+		XdbService db = M.l(SopApi.class).getManager();
 		if (key == null) return null;
 		SopRegister out = db.getObjectByQualification(Db.query(SopRegister.class).eq("name", name).eq("key1", key));
 		return out;
@@ -114,7 +114,7 @@ public class RegisterUtil {
 	}
 	
 	public static boolean hasKeyKey(String name, String key1, String key2) throws MException {
-		XdbService db = MApi.lookup(SopApi.class).getManager();
+		XdbService db = M.l(SopApi.class).getManager();
 		if (key1 == null || key2 == null) return false;
 		SopRegister out = db.getObjectByQualification(Db.query(SopRegister.class).eq("name", name).eq("key1", key1).eq("key2", key2));
 		return out != null;
@@ -125,7 +125,7 @@ public class RegisterUtil {
 	}
 	
 	public static SopRegister getByKeyKey(String name, String key1, String key2) throws MException {
-		XdbService db = MApi.lookup(SopApi.class).getManager();
+		XdbService db = M.l(SopApi.class).getManager();
 		if (key1 == null || key2 == null) return null;
 		SopRegister out = db.getObjectByQualification(Db.query(SopRegister.class).eq("name", name).eq("key1", key1).eq("key2", key2));
 		return out;
@@ -136,7 +136,7 @@ public class RegisterUtil {
 	}
 	
 	public static List<SopRegister> listByKey(String name, String key) throws MException {
-		XdbService db = MApi.lookup(SopApi.class).getManager();
+		XdbService db = M.l(SopApi.class).getManager();
 		if (key == null) return null;
 		return db.getByQualification(Db.query(SopRegister.class).eq("name", name).eq("key1", key)).toCacheAndClose();
 	}
@@ -146,7 +146,7 @@ public class RegisterUtil {
 	}
 	
 	public static List<SopRegister> listByKeyKey(String name, String key1, String key2) throws MException {
-		XdbService db = MApi.lookup(SopApi.class).getManager();
+		XdbService db = M.l(SopApi.class).getManager();
 		if (key1 == null || key2 == null) return null;
 		return db.getByQualification(Db.query(SopRegister.class).eq("name", name).eq("key1", key1).eq("key2", key2)).toCacheAndClose();
 	}
@@ -159,7 +159,7 @@ public class RegisterUtil {
 
 		SopRegister r = getByKeyKey(name, key1, key2);
 		if (r == null) {
-			XdbService db = MApi.lookup(SopApi.class).getManager();
+			XdbService db = M.l(SopApi.class).getManager();
 			r = db.inject(new SopRegister(name, key1, key2, null, null));
 		}
 		r.setValue1(value1);

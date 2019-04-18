@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import de.mhus.lib.core.IProperties;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MDate;
 import de.mhus.lib.core.MProperties;
@@ -202,7 +202,7 @@ public class OperationUtil {
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			
-			OperationApi api = MApi.lookup(OperationApi.class);
+			OperationApi api = M.l(OperationApi.class);
 
 			MProperties properties = new MProperties();
 			properties.setString(OperationToIfcProxy.METHOD, method.getName());
@@ -281,7 +281,7 @@ public class OperationUtil {
 	}
 
 	public static <T> T getOperationIfc(Class<T> ifc) throws MException {
-		OperationApi api = MApi.lookup(OperationApi.class);
+		OperationApi api = M.l(OperationApi.class);
 		OperationDescriptor desc = api.findOperation(ifc.getCanonicalName(), null, null);
 		return createOpertionProxy(ifc, desc);
 	}

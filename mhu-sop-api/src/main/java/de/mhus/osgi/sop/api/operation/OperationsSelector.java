@@ -20,7 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.mhus.lib.core.IProperties;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MCollection;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.strategy.OperationResult;
@@ -84,7 +84,7 @@ public class OperationsSelector {
 	}
 	
 	public OperationDescriptor doSelect() {
-		List<OperationDescriptor> list = MApi.lookup(OperationApi.class).findOperations(filter, version, providedTags);
+		List<OperationDescriptor> list = M.l(OperationApi.class).findOperations(filter, version, providedTags);
 		if (list == null || list.size() == 0) return null;
 		for (Selector selector : selectors)
 			selector.select(list);
@@ -93,7 +93,7 @@ public class OperationsSelector {
 	}
 
    public List<OperationDescriptor> doSelectAll() {
-        List<OperationDescriptor> list = MApi.lookup(OperationApi.class).findOperations(filter, version, providedTags);
+        List<OperationDescriptor> list = M.l(OperationApi.class).findOperations(filter, version, providedTags);
         if (list == null || list.size() == 0) return null;
         for (Selector selector : selectors)
             selector.select(list);
@@ -104,7 +104,7 @@ public class OperationsSelector {
 	public OperationResult doExecute(IProperties properties, String ... executeOptions) throws NotFoundException {
 		OperationDescriptor desc = doSelect();
 		if (desc == null) throw new NotFoundException(filter,version,providedTags);
-		return MApi.lookup(OperationApi.class).doExecute(desc, properties, executeOptions);
+		return M.l(OperationApi.class).doExecute(desc, properties, executeOptions);
 	}
 
 	public OperationResult doExecute() throws NotFoundException {
@@ -115,7 +115,7 @@ public class OperationsSelector {
         List<OperationDescriptor> list = doSelectAll();
         LinkedList<OperationResult> res = new LinkedList<>();
         for (OperationDescriptor desc : list) {
-            OperationResult r = MApi.lookup(OperationApi.class).doExecute(desc, properties, executeOptions);
+            OperationResult r = M.l(OperationApi.class).doExecute(desc, properties, executeOptions);
             if (r != null)
                 res.add(r);
         }

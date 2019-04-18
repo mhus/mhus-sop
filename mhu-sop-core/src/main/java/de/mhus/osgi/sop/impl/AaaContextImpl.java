@@ -17,7 +17,7 @@ package de.mhus.osgi.sop.impl;
 
 import java.util.Locale;
 
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.security.Account;
 import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
@@ -39,7 +39,7 @@ public class AaaContextImpl implements AaaContext {
 		this.account = account;
 		this.trust = trust;
 		if (admin) {
-			AccessApi aa = MApi.lookup(AccessApi.class);
+			AccessApi aa = M.l(AccessApi.class);
 			if (aa.hasGroupAccess(account, Account.MAP_ADMIN, null, null))
 				adminMode = true;
 		}

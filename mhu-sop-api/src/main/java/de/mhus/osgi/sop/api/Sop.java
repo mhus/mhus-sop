@@ -46,7 +46,7 @@ public class Sop {
 
 	public static final String PARAM_ERROR = "_error";
 	
-/* use MApi.lookup() instead
+/* use M.l() instead
 
 	private static HashMap<String, Container> apiCache = new HashMap<>();
 
@@ -163,7 +163,7 @@ public class Sop {
 		long start = System.currentTimeMillis();
 		while (true) {
 			try {
-				T api = MApi.lookup(ifc);
+				T api = M.l(ifc);
 				if (api != null) // should not happen
 					return api;
 			} catch (Throwable t) {}

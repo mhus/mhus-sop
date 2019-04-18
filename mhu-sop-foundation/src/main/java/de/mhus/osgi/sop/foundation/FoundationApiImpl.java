@@ -23,20 +23,19 @@ import java.util.UUID;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
-
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+
 import de.mhus.lib.adb.DbCollection;
 import de.mhus.lib.adb.query.AQuery;
 import de.mhus.lib.adb.query.Db;
 import de.mhus.lib.adb.query.SearchHelper;
 import de.mhus.lib.core.M;
-import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MLog;
-import de.mhus.lib.core.MString;
 import de.mhus.lib.core.MPeriod;
+import de.mhus.lib.core.MString;
 import de.mhus.lib.core.MValidator;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.errors.NotFoundException;
@@ -177,7 +176,7 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 	}
 
 	public XdbService getManager() {
-		return MApi.lookup(SopApi.class).getManager();
+		return M.l(SopApi.class).getManager();
 	}
 
 	@Override
@@ -397,7 +396,7 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 	@Override
 	public List<SopFoundation> searchFoundations(String search, int page) throws MException {
 
-		AaaContext context = MApi.lookup(AccessApi.class).getCurrent();
+		AaaContext context = M.l(AccessApi.class).getCurrent();
 		
 		if (!context.isAdminMode()) {
 			List<UUID> list = FoundationContextCacheService.get(context, SopFoundation.class.getCanonicalName() + "_" + search );

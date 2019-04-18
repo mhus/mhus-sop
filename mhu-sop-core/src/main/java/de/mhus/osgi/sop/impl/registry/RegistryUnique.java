@@ -16,7 +16,7 @@
 package de.mhus.osgi.sop.impl.registry;
 
 import org.osgi.service.component.annotations.Component;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.crypt.MRandom;
 import de.mhus.osgi.sop.api.registry.RegistryManager;
@@ -33,7 +33,7 @@ public class RegistryUnique implements RegistryPathControl {
 			if (cur != null)
 				return null; // can't overwrite locally
 		}
-		long mySeed = MApi.lookup(MRandom.class).getLong();
+		long mySeed = M.l(MRandom.class).getLong();
 		return new RegistryValue(String.valueOf(mySeed), value.getSource(), value.getUpdated(), value.getPath(), Math.max(60000, value.getTimeout()), false, false);
 	}
 
@@ -49,7 +49,7 @@ public class RegistryUnique implements RegistryPathControl {
 			long theirSeed = MCast.tolong(value.getValue(), Long.MIN_VALUE);
 			if (cur == null) {
 				// create my own seed
-				long mySeed = MApi.lookup(MRandom.class).getLong();
+				long mySeed = M.l(MRandom.class).getLong();
 				if (theirSeed < mySeed) {
 					manager.setParameter(value.getPath(), String.valueOf(mySeed), value.getTimeout(), false, false, false);
 					return null;

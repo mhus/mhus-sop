@@ -26,7 +26,7 @@ import de.mhus.lib.annotations.adb.DbPrimaryKey;
 import de.mhus.lib.annotations.generic.Public;
 import de.mhus.lib.basics.consts.GenerateConst;
 import de.mhus.lib.basics.consts.Identifier.TYPE;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MSystem;
 import de.mhus.lib.errors.MException;
@@ -145,7 +145,7 @@ public class SopData extends DbMetadata implements FoundationRelated {
 	@Override
 	public DbMetadata findParentObject() throws MException {
 		if (getFoundation() == null) return null;
-		return MApi.lookup(FoundationApi.class).getFoundation(getFoundation());
+		return M.l(FoundationApi.class).getFoundation(getFoundation());
 	}
 
 	public boolean isIsPublic() {

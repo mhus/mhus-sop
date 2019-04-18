@@ -25,7 +25,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import de.mhus.lib.adb.query.Db;
 import de.mhus.lib.annotations.util.Interval;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MPeriod;
@@ -71,7 +71,7 @@ public class MailQueueTimer extends SchedulerServiceAdapter {
 	public void run(Object environment) {
 		try {
 			Date now = new Date();
-			XdbService manager = MApi.lookup(SopApi.class).getManager();
+			XdbService manager = M.l(SopApi.class).getManager();
 			if (manager == null) {
 				log().w("XdbService is null");
 				return;
@@ -157,7 +157,7 @@ public class MailQueueTimer extends SchedulerServiceAdapter {
 		String cc = source.getString("cc", task.getCc());
 		String bcc = source.getString("bcc", task.getBcc());
 		
-		MApi.lookup(MSendMail.class).sendHtmlMail(task.getFrom(), toMailArray(to), toMailArray(cc), toMailArray(bcc), task.getSubject(), html, attachments);
+		M.l(MSendMail.class).sendHtmlMail(task.getFrom(), toMailArray(to), toMailArray(cc), toMailArray(bcc), task.getSubject(), html, attachments);
 		
 		if (source.getBoolean("cleanupAfterSent", true)) {
 			log().d("cleanup",task,dir);

@@ -22,7 +22,7 @@ import org.osgi.service.component.annotations.Component;
 import de.mhus.lib.adb.Persistable;
 import de.mhus.lib.basics.Ace;
 import de.mhus.lib.basics.UuidIdentificable;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.errors.MRuntimeException;
 import de.mhus.lib.xdb.XdbService;
@@ -99,7 +99,7 @@ public class SopDbImpl extends AbstractDbSchemaService {
 ////			if (ace == null) return false;
 ////			return ace.canRead();
 //			
-//			return MApi.lookup(AccessApi.class).hasResourceAccess(account.getAccount(), type, String.valueOf(o.getObjectId()), Account.ACT_READ, null);
+//			return M.l(AccessApi.class).hasResourceAccess(account.getAccount(), type, String.valueOf(o.getObjectId()), Account.ACT_READ, null);
 //		}
 //		if (obj instanceof SopFoundation) {
 //			
@@ -128,7 +128,7 @@ public class SopDbImpl extends AbstractDbSchemaService {
 ////			Ace ace = Sop.getApi(SopApi.class).findAce(account.getAccountId(), type, o.getObjectId() );
 ////			if (ace == null) return false;
 ////			return ace.canUpdate();
-//			return MApi.lookup(AccessApi.class).hasResourceAccess(account.getAccount(), type, String.valueOf(o.getObjectId()), Account.ACT_UPDATE, null);
+//			return M.l(AccessApi.class).hasResourceAccess(account.getAccount(), type, String.valueOf(o.getObjectId()), Account.ACT_UPDATE, null);
 //
 //		}
 //		return false;
@@ -148,7 +148,7 @@ public class SopDbImpl extends AbstractDbSchemaService {
 ////			Ace ace = Sop.getApi(SopApi.class).findAce(account.getAccountId(), type, o.getObjectId() );
 ////			if (ace == null) return false;
 ////			return ace.canDelete();
-//			return MApi.lookup(AccessApi.class).hasResourceAccess(account.getAccount(), type, String.valueOf(o.getObjectId()), Account.ACT_DELETE, null);
+//			return M.l(AccessApi.class).hasResourceAccess(account.getAccount(), type, String.valueOf(o.getObjectId()), Account.ACT_DELETE, null);
 //		}
 //		return false;
 //	}
@@ -171,7 +171,7 @@ public class SopDbImpl extends AbstractDbSchemaService {
 ////			Ace ace = Sop.getApi(SopApi.class).findAce(account.getAccountId(), type, o.getObjectId() );
 ////			if (ace == null) return false;
 ////			return ace.canCreate();
-//			return MApi.lookup(AccessApi.class).hasResourceAccess(account.getAccount(), type, String.valueOf(o.getObjectId()), Account.ACT_CREATE, null);
+//			return M.l(AccessApi.class).hasResourceAccess(account.getAccount(), type, String.valueOf(o.getObjectId()), Account.ACT_CREATE, null);
 //		}
 //		
 //		return false;
@@ -205,7 +205,7 @@ public class SopDbImpl extends AbstractDbSchemaService {
 		if (object == null || !(object instanceof UuidIdentificable)) return;
 		UuidIdentificable meta = (UuidIdentificable)object;
 		try {
-			for (SopObjectParameter p : MApi.lookup(AdbApi.class).getParameters(object.getClass(), meta.getId())) {
+			for (SopObjectParameter p : M.l(AdbApi.class).getParameters(object.getClass(), meta.getId())) {
 				collector.foundReference(new Reference<Persistable>(p,TYPE.CHILD));
 			}
 		} catch (MException e) {
@@ -235,7 +235,7 @@ public class SopDbImpl extends AbstractDbSchemaService {
 			if (type == null) return null;
 			if (type.equals(SopObjectParameter.class.getCanonicalName())) return Ace.RIGHTS_ALL;
 			
-			DbSchemaService controller = MApi.lookup(AdbApi.class).getController(type);
+			DbSchemaService controller = M.l(AdbApi.class).getController(type);
 			Persistable parentObj = controller.getObject(type, o.getObjectId());
 			return controller.getAcl(context, parentObj);
 		}

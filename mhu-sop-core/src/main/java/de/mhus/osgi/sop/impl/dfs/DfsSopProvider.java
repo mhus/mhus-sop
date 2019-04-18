@@ -24,7 +24,7 @@ import java.util.TreeMap;
 import java.util.UUID;
 
 import org.osgi.service.component.annotations.Component;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.strategy.Operation;
 import de.mhus.lib.core.strategy.OperationDescription;
@@ -66,7 +66,7 @@ public class DfsSopProvider extends OperationToIfcProxy implements DfsProviderOp
 		File file = new File (dir, MFile.normalizePath(uri.getPath()) );
 		if (!file.exists() && !file.isFile()) return null;
 		
-		FileQueueApi api = MApi.lookup(FileQueueApi.class);
+		FileQueueApi api = M.l(FileQueueApi.class);
 		UUID id = null;
 		synchronized (queueCache) {
 			id = queueCache.get(file.getCanonicalPath());
@@ -150,7 +150,7 @@ public class DfsSopProvider extends OperationToIfcProxy implements DfsProviderOp
 			queueCache.remove(file.getCanonicalPath());
 		}
 		
-		FileQueueApi api = MApi.lookup(FileQueueApi.class);
+		FileQueueApi api = M.l(FileQueueApi.class);
 		File fromFile;
 		try {
 			fromFile = api.loadFile(queueUri);

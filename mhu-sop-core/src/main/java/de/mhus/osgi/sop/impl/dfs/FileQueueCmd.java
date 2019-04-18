@@ -26,12 +26,11 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 import de.mhus.lib.core.M;
-import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MDate;
 import de.mhus.lib.core.MFile;
+import de.mhus.lib.core.MPeriod;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
-import de.mhus.lib.core.MPeriod;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.lib.core.util.MUri;
 import de.mhus.osgi.sop.api.dfs.FileInfo;
@@ -68,7 +67,7 @@ public class FileQueueCmd implements Action {
 	@Override
 	public Object execute() throws Exception {
 		
-		FileQueueApi api = MApi.lookup(FileQueueApi.class);
+		FileQueueApi api = M.l(FileQueueApi.class);
 		
 		switch(cmd) {
 		case "load": {

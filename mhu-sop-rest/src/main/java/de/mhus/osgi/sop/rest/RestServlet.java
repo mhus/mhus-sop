@@ -34,6 +34,7 @@ import org.codehaus.jackson.node.ObjectNode;
 import org.osgi.service.component.annotations.Component;
 
 import de.mhus.lib.core.IReadProperties;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
@@ -147,11 +148,11 @@ public class RestServlet extends HttpServlet {
 	
 			CallContext callContext = new CallContext(new HttpRequest(req.getParameterMap()), MHttp.toMethod(method), context);
 	        
-	        RestApi restService = MApi.lookup(RestApi.class);
+	        RestApi restService = M.l(RestApi.class);
 	        
 	        RestResult res = null;
 	        
-	        AccessApi access = MApi.lookup(AccessApi.class);
+	        AccessApi access = M.l(AccessApi.class);
 	        AaaContext user = null;
 	        if (MString.isEmpty(ticket) && path.startsWith(PUBLIC_PATH)) {
 	        		if (access != null)

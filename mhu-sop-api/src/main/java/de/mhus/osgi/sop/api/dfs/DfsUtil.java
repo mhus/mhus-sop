@@ -21,7 +21,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MFile;
 
 public class DfsUtil {
@@ -53,7 +53,7 @@ public class DfsUtil {
 	 * @throws IOException
 	 */
 	public static String provideResource(InputStream is, String name) throws IOException {
-		FileQueueApi api = MApi.lookup(FileQueueApi.class);
+		FileQueueApi api = M.l(FileQueueApi.class);
 		UUID id = api.createQueueFile("", FileQueueApi.DEFAULT_TTL);
 		OutputStream os = api.createQueueFileOutputStream(id);
 		MFile.copyFile(is, os);
@@ -72,7 +72,7 @@ public class DfsUtil {
 	 * @throws IOException
 	 */
 	public static String createTmpFile(String name, long ttl) throws IOException {
-		FileQueueApi api = MApi.lookup(FileQueueApi.class);
+		FileQueueApi api = M.l(FileQueueApi.class);
 		UUID id = api.createQueueFile("tmp_" + name, ttl);
 		api.closeQueueFile(id);
 		File file = api.loadFile(id);

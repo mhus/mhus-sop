@@ -35,7 +35,7 @@ import de.mhus.lib.adb.Persistable;
 import de.mhus.lib.adb.query.AQuery;
 import de.mhus.lib.adb.query.Db;
 import de.mhus.lib.basics.UuidIdentificable;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MConstants;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MPeriod;
@@ -486,7 +486,7 @@ public class AdbApiImpl extends MLog implements AdbApi {
 	}
 
 	private AaaContext getCurrent() {
-		return MApi.lookup(AccessApi.class).getCurrentOrGuest();
+		return M.l(AccessApi.class).getCurrentOrGuest();
 	}
 
 	@Override

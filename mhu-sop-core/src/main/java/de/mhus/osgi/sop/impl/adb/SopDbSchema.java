@@ -24,6 +24,7 @@ import de.mhus.lib.adb.DbObject;
 import de.mhus.lib.adb.Persistable;
 import de.mhus.lib.adb.model.Table;
 import de.mhus.lib.adb.transaction.DbLockObject;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.errors.AccessDeniedException;
 import de.mhus.lib.sql.DbConnection;
@@ -88,7 +89,7 @@ public class SopDbSchema extends AbstractDbSchema {
 			if (object instanceof DbMetadata) {
 				DbMetadata obj = (DbMetadata)object;
 				try {
-					AdbApi adb = MApi.lookup(AdbApi.class);
+					AdbApi adb = M.l(AdbApi.class);
 					if (adb == null) return; // means in init .. say ok
 					switch(right) {
 					case CREATE:

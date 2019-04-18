@@ -26,7 +26,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MDate;
 import de.mhus.lib.core.MString;
@@ -74,7 +74,7 @@ public class SopDataCmd implements Action {
 	@Override
 	public Object execute() throws Exception {
 		
-		FoundationApi api = MApi.lookup(FoundationApi.class);
+		FoundationApi api = M.l(FoundationApi.class);
 		if (api == null) {
 			System.out.println("*** API not found");
 			return null;
@@ -246,7 +246,7 @@ public class SopDataCmd implements Action {
 				return null;
 			}
 			
-			SopData d = MApi.lookup(SopApi.class).getManager().inject(new SopData(found, params[1]));
+			SopData d = M.l(SopApi.class).getManager().inject(new SopData(found, params[1]));
 			
 			
 			for (int i=2; i < params.length; i++) {

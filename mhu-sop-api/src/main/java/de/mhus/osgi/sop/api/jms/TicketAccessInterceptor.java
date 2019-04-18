@@ -20,7 +20,7 @@ import java.util.Locale;
 import javax.jms.JMSException;
 import javax.jms.Message;
 
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.cfg.CfgBoolean;
 import de.mhus.lib.errors.AccessDeniedException;
@@ -46,7 +46,7 @@ public class TicketAccessInterceptor extends MLog implements JmsInterceptor {
 			throw new MRuntimeException(e);
 		}
 		try {
-			AccessApi api = MApi.lookup(AccessApi.class);
+			AccessApi api = M.l(AccessApi.class);
 			if (api == null) {
 				if (RELAXED.value()) 
 					return;
@@ -68,7 +68,7 @@ public class TicketAccessInterceptor extends MLog implements JmsInterceptor {
 	@Override
 	public void end(Message message) {
 		
-		AccessApi api = MApi.lookup(AccessApi.class);
+		AccessApi api = M.l(AccessApi.class);
 		if (api == null) return;
 
 		String ticket;
@@ -78,15 +78,15 @@ public class TicketAccessInterceptor extends MLog implements JmsInterceptor {
 			throw new MRuntimeException(e);
 		}
 		if (ticket == null)
-			MApi.lookup(AccessApi.class).release(api.getGuestContext());
+			M.l(AccessApi.class).release(api.getGuestContext());
 		else
-			MApi.lookup(AccessApi.class).release(ticket);
+			M.l(AccessApi.class).release(ticket);
 	}
 
 	@Override
 	public void prepare(Message message) {
 
-		AccessApi api = MApi.lookup(AccessApi.class);
+		AccessApi api = M.l(AccessApi.class);
 		if (api == null) return;
 		
 		AaaContext current = api.getCurrent();

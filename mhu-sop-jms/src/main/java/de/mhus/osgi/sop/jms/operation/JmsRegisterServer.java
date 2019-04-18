@@ -27,7 +27,7 @@ import org.w3c.dom.Document;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MCollection;
 import de.mhus.lib.core.MXml;
 import de.mhus.lib.core.definition.DefRoot;
@@ -137,7 +137,7 @@ public class JmsRegisterServer extends AbstractJmsDataChannel {
 						}
 					} else
 					if ("registrypublish".equals(type)) {
-						RegistryManager api = MApi.lookup(RegistryManager.class);
+						RegistryManager api = M.l(RegistryManager.class);
 						int cnt = 0;
 						String ident = m.getStringProperty("ident");
 						String scope = m.getStringProperty("scope");
@@ -159,7 +159,7 @@ public class JmsRegisterServer extends AbstractJmsDataChannel {
 						}
 					} else
 					if ("registryremove".equals(type)) {
-						RegistryManager api = MApi.lookup(RegistryManager.class);
+						RegistryManager api = M.l(RegistryManager.class);
 						int cnt = 0;
 						String ident = m.getStringProperty("ident");
 						while (m.getString("path" + cnt) != null) {

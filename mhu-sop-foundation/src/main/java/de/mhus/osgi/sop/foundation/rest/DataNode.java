@@ -23,7 +23,7 @@ import java.util.UUID;
 import org.codehaus.jackson.node.ObjectNode;
 import org.osgi.service.component.annotations.Component;
 
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MValidator;
@@ -60,7 +60,7 @@ public class DataNode extends ObjectListNode<SopData,SopData>{
 
 	@Override
 	protected List<SopData> getObjectList(CallContext callContext) throws MException {
-		FoundationApi api = MApi.lookup(FoundationApi.class);
+		FoundationApi api = M.l(FoundationApi.class);
 		
 		SopFoundation orga = getObjectFromContext(callContext, SopFoundation.class);
 		Boolean archived = false;
@@ -125,7 +125,7 @@ public class DataNode extends ObjectListNode<SopData,SopData>{
 
 	@Override
 	protected SopData getObjectForId(CallContext callContext, String id) throws Exception {
-		FoundationApi api = MApi.lookup(FoundationApi.class);
+		FoundationApi api = M.l(FoundationApi.class);
 		
 		SopFoundation found = getObjectFromContext(callContext, SopFoundation.class);
 		SopData data = null;
@@ -150,7 +150,7 @@ public class DataNode extends ObjectListNode<SopData,SopData>{
 	protected void doPrepareForOutput(SopData obj, CallContext context) throws MException {
 		super.doPrepareForOutput(obj, context);
 		String type = obj.getType();
-		FoundationApi api = MApi.lookup(FoundationApi.class);
+		FoundationApi api = M.l(FoundationApi.class);
 		SopDataController control = api.getDataSyncControllerForType(type);
 		if (control != null) {
 			control.doPrepareForOutput(obj, context, false);
@@ -161,7 +161,7 @@ public class DataNode extends ObjectListNode<SopData,SopData>{
     protected void doPrepareForOutputList(SopData obj, CallContext context) throws MException {
         super.doPrepareForOutputList(obj, context);
         String type = obj.getType();
-        FoundationApi api = MApi.lookup(FoundationApi.class);
+        FoundationApi api = M.l(FoundationApi.class);
         SopDataController control = api.getDataSyncControllerForType(type);
         if (control != null) {
             control.doPrepareForOutput(obj, context, true);
@@ -172,7 +172,7 @@ public class DataNode extends ObjectListNode<SopData,SopData>{
 	public RestResult doAction(CallContext callContext) throws Exception {
 		SopData data = getObjectFromContext(callContext, SopData.class);
 
-		FoundationApi api = MApi.lookup(FoundationApi.class);
+		FoundationApi api = M.l(FoundationApi.class);
 		SopDataController handler = api.getDataSyncControllerForType(data.getType());
 		MProperties p = new MProperties();
 		for (String name : callContext.getParameterNames())

@@ -17,7 +17,7 @@ package de.mhus.osgi.sop.api.util;
 
 import java.io.File;
 
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.cfg.CfgString;
 import de.mhus.lib.core.service.ServerIdent;
 import de.mhus.osgi.sop.api.jms.JmsApi;
@@ -34,7 +34,7 @@ public class SopUtil {
 
 	public static String getServerIdent() {
 		if (ident == null)
-			ident = MApi.lookup(ServerIdent.class).toString();
+			ident = M.l(ServerIdent.class).toString();
 		return ident;
 	}
 

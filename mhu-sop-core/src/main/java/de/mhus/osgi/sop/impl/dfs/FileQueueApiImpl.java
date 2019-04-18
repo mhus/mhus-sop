@@ -31,7 +31,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MProperties;
@@ -293,7 +293,7 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 			}
 		}
 		
-		OperationApi api = MApi.lookup(OperationApi.class);
+		OperationApi api = M.l(OperationApi.class);
 		LinkedList<String> tags = new LinkedList<>();
 		tags.add(OperationDescriptor.TAG_IDENT + "=" + uri.getLocation());
 		OperationDescriptor desc = api.findOperation(FileQueueOperation.class.getCanonicalName(), null, tags);
@@ -392,7 +392,7 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 			}
 		}
 		
-		OperationApi api = MApi.lookup(OperationApi.class);
+		OperationApi api = M.l(OperationApi.class);
 		LinkedList<String> tags = new LinkedList<>();
 		tags.add(OperationDescriptor.TAG_IDENT + "=" + uri.getLocation());
 		OperationDescriptor desc = api.findOperation(FileQueueOperation.class.getCanonicalName(), null, tags);
@@ -536,7 +536,7 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 
 	public Set<String> listProviders() {
 		HashSet<String> out = new HashSet<>();
-		OperationApi api = MApi.lookup(OperationApi.class);
+		OperationApi api = M.l(OperationApi.class);
 		for (OperationDescriptor desc : api.findOperations(FileQueueOperation.class, null, null)) {
 			String ident = OperationUtil.getOption(desc.getTags(), OperationDescriptor.TAG_IDENT, "");
 			out.add(ident);
@@ -545,7 +545,7 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 	}
 
 	public FileQueueOperation getOperation(String ident) throws MException {
-		OperationApi api = MApi.lookup(OperationApi.class);
+		OperationApi api = M.l(OperationApi.class);
 		LinkedList<String> tags = new LinkedList<>();
 		tags.add(OperationDescriptor.TAG_IDENT + "=" + ident);
 		OperationDescriptor desc = api.findOperation(FileQueueOperation.class.getCanonicalName(), null, tags);

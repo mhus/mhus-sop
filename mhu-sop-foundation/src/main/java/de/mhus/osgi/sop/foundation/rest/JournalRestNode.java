@@ -22,7 +22,7 @@ import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
 
 import org.osgi.service.component.annotations.Component;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.pojo.MPojo;
 import de.mhus.lib.core.pojo.PojoModelFactory;
@@ -64,8 +64,8 @@ public class JournalRestNode extends JsonListNode<JournalQueue>{
 		
 		UUID foundationId = getObjectFromContext(callContext, SopFoundation.class).getId();
 		
-		FoundationApi api = MApi.lookup(FoundationApi.class);
-		SopApi sop = MApi.lookup(SopApi.class);
+		FoundationApi api = M.l(FoundationApi.class);
+		SopApi sop = M.l(SopApi.class);
 		PojoModelFactory factory = sop.getDataPojoModelFactory();
 		ArrayNode list = result.createArrayNode();
 		List<SopJournal> res = api.getJournalEntries(foundationId, queue.getName(), since, max, page, search);

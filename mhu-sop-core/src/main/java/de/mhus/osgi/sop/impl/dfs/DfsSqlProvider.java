@@ -29,7 +29,7 @@ import java.util.UUID;
 
 import javax.sql.DataSource;
 
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
 import de.mhus.lib.core.MSystem;
@@ -129,7 +129,7 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 		
 		String path = normalizePath(uri.getPath());
 		UUID id = null;
-		FileQueueApi api = MApi.lookup(FileQueueApi.class);
+		FileQueueApi api = M.l(FileQueueApi.class);
 		if (api == null) throw new IOException("FileQueueApi not found");
 		
 		// from cache ?
@@ -244,7 +244,7 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 			if (!AaaUtil.isCurrentAdmin())
 				throw new IOException("Not supported"); // TODO use ACL!!!!
 	
-			FileQueueApi api = MApi.lookup(FileQueueApi.class);
+			FileQueueApi api = M.l(FileQueueApi.class);
 			if (api == null) throw new IOException("FileQueueApi not found");
 			File fromFile = api.loadFile(queueUri);
 	

@@ -21,7 +21,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.util.MUri;
 import de.mhus.lib.errors.MException;
@@ -45,7 +45,7 @@ public class DfsApiImpl extends MLog implements DfsApi {
 				return null;
 			}
 		}
-		OperationApi api = MApi.lookup(OperationApi.class);
+		OperationApi api = M.l(OperationApi.class);
 		
 		LinkedList<String> tags = new LinkedList<>();
 		if (uri.getLocation() != null)
@@ -69,7 +69,7 @@ public class DfsApiImpl extends MLog implements DfsApi {
 		if ( DfsApi.SCHEME_DFQ.equals(uri.getScheme())) {
 			return uri;
 		}
-		OperationApi api = MApi.lookup(OperationApi.class);
+		OperationApi api = M.l(OperationApi.class);
 		
 		LinkedList<String> tags = new LinkedList<>();
 		if (uri.getLocation() != null)
@@ -92,7 +92,7 @@ public class DfsApiImpl extends MLog implements DfsApi {
 	public Map<String, MUri> getDirectoryList(MUri uri) {
 		if ( DfsApi.SCHEME_DFQ.equals(uri.getScheme())) 
 			return null;
-		OperationApi api = MApi.lookup(OperationApi.class);
+		OperationApi api = M.l(OperationApi.class);
 		LinkedList<String> tags = new LinkedList<>();
 		if (uri.getLocation() != null)
 			tags.add(OperationDescriptor.TAG_IDENT + "=" + uri.getLocation());
@@ -113,7 +113,7 @@ public class DfsApiImpl extends MLog implements DfsApi {
 	@Override
 	public Collection<String> listProviders() {
 		LinkedList<String> out = new LinkedList<>();
-		OperationApi api = MApi.lookup(OperationApi.class);
+		OperationApi api = M.l(OperationApi.class);
 		for (OperationDescriptor desc : api.findOperations(DfsProviderOperation.class, null, null)) {
 			out.add(desc.getParameter(DfsProviderOperation.PARAM_SCHEME) + "://" + OperationUtil.getOption(desc.getTags(), OperationDescriptor.TAG_IDENT, "" ) );
 		}
@@ -124,7 +124,7 @@ public class DfsApiImpl extends MLog implements DfsApi {
 	public void importFile(MUri queueUri, MUri target) throws IOException {
 		if ( DfsApi.SCHEME_DFQ.equals(target.getScheme())) 
 			return;
-		OperationApi api = MApi.lookup(OperationApi.class);
+		OperationApi api = M.l(OperationApi.class);
 		LinkedList<String> tags = new LinkedList<>();
 		if (target.getLocation() != null)
 			tags.add(OperationDescriptor.TAG_IDENT + "=" + target.getLocation());
@@ -146,7 +146,7 @@ public class DfsApiImpl extends MLog implements DfsApi {
 	public void deleteFile(MUri uri) throws IOException {
 		if ( DfsApi.SCHEME_DFQ.equals(uri.getScheme())) 
 			return;
-		OperationApi api = MApi.lookup(OperationApi.class);
+		OperationApi api = M.l(OperationApi.class);
 		LinkedList<String> tags = new LinkedList<>();
 		if (uri.getLocation() != null)
 			tags.add(OperationDescriptor.TAG_IDENT + "=" + uri.getLocation());
@@ -167,7 +167,7 @@ public class DfsApiImpl extends MLog implements DfsApi {
 	public void createDirectories(MUri uri) throws IOException {
 		if ( DfsApi.SCHEME_DFQ.equals(uri.getScheme())) 
 			return;
-		OperationApi api = MApi.lookup(OperationApi.class);
+		OperationApi api = M.l(OperationApi.class);
 		LinkedList<String> tags = new LinkedList<>();
 		if (uri.getLocation() != null)
 			tags.add(OperationDescriptor.TAG_IDENT + "=" + uri.getLocation());

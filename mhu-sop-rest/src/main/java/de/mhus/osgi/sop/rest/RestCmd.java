@@ -25,7 +25,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.osgi.sop.api.rest.AbstractNode;
 import de.mhus.osgi.sop.api.rest.RestApi;
@@ -49,7 +49,7 @@ public class RestCmd implements Action {
 	@Override
 	public Object execute() throws Exception {
 
-        RestApi restService = MApi.lookup(RestApi.class);
+        RestApi restService = M.l(RestApi.class);
 
         if (cmd.equals("list")) {
             HashMap<RestNodeService, LinkedList<String>> list = new HashMap<RestNodeService, LinkedList<String>>();

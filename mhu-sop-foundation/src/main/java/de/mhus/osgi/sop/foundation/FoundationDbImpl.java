@@ -23,7 +23,7 @@ import de.mhus.lib.adb.Persistable;
 import de.mhus.lib.adb.query.Db;
 import de.mhus.lib.basics.Ace;
 import de.mhus.lib.basics.UuidIdentificable;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.xdb.XdbService;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
@@ -125,7 +125,7 @@ public class FoundationDbImpl extends AbstractDbSchemaService {
 		if (object == null || !(object instanceof UuidIdentificable)) return;
 		UuidIdentificable meta = (UuidIdentificable)object;
 		try {
-			for (SopObjectParameter p : MApi.lookup(AdbApi.class).getParameters(object.getClass(), meta.getId())) {
+			for (SopObjectParameter p : M.l(AdbApi.class).getParameters(object.getClass(), meta.getId())) {
 				collector.foundReference(new Reference<Persistable>(p,TYPE.CHILD));
 			}
 		} catch (MException e) {
@@ -162,12 +162,12 @@ public class FoundationDbImpl extends AbstractDbSchemaService {
 			SopFoundation f = getManager().getObject(SopFoundation.class, fId);
 			if (f == null) return Ace.RIGHTS_NONE;
 			{
-				SopAcl aclObject = MApi.lookup(AdbApi.class).getManager().getObjectByQualification(Db.query(SopAcl.class).eq("target", fId + "_"+obj.getClass().getSimpleName() ));
+				SopAcl aclObject = M.l(AdbApi.class).getManager().getObjectByQualification(Db.query(SopAcl.class).eq("target", fId + "_"+obj.getClass().getSimpleName() ));
 				if (aclObject != null)
 					return aclObject.getList();
 			}
 			{
-				SopAcl aclObject = MApi.lookup(AdbApi.class).getManager().getObjectByQualification(Db.query(SopAcl.class).eq("target", fId + "_" ));
+				SopAcl aclObject = M.l(AdbApi.class).getManager().getObjectByQualification(Db.query(SopAcl.class).eq("target", fId + "_" ));
 				if (aclObject != null)
 					return aclObject.getList();
 			}
@@ -186,14 +186,14 @@ public class FoundationDbImpl extends AbstractDbSchemaService {
 			SopFoundation f = getManager().getObject(SopFoundation.class, fId);
 			if (f == null) return false;
 			{
-				SopAcl aclObject = MApi.lookup(AdbApi.class).getManager().getObjectByQualification(Db.query(SopAcl.class).eq("target", fId + "_" + obj.getClass().getSimpleName() ));
+				SopAcl aclObject = M.l(AdbApi.class).getManager().getObjectByQualification(Db.query(SopAcl.class).eq("target", fId + "_" + obj.getClass().getSimpleName() ));
 				if (aclObject != null) {
 					Ace ace = AaaUtil.getAccessAce(context, aclObject.getList());
 					return ace.canCreate();
 				}
 			}
 			{
-				SopAcl aclObject = MApi.lookup(AdbApi.class).getManager().getObjectByQualification(Db.query(SopAcl.class).eq("target", fId + "_" ));
+				SopAcl aclObject = M.l(AdbApi.class).getManager().getObjectByQualification(Db.query(SopAcl.class).eq("target", fId + "_" ));
 				if (aclObject != null) {
 					Ace ace = AaaUtil.getAccessAce(context, aclObject.getList());
 					return ace.canCreate();

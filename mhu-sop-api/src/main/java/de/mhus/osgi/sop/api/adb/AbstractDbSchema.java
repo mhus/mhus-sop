@@ -20,6 +20,7 @@ import java.util.HashMap;
 import de.mhus.lib.adb.DbSchema;
 import de.mhus.lib.adb.model.Table;
 import de.mhus.lib.adb.transaction.MemoryLockStrategy;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MPeriod;
 import de.mhus.lib.core.logging.Log;
@@ -44,14 +45,14 @@ public abstract class AbstractDbSchema extends DbSchema {
 	
 	@Override
 	public void authorizeSaveForceAllowed(DbConnection con, Table table, Object object, boolean raw) throws AccessDeniedException {
-		if (!MApi.lookup(AccessApi.class).getCurrentOrGuest().isAdminMode())
+		if (!M.l(AccessApi.class).getCurrentOrGuest().isAdminMode())
 			throw new AccessDeniedException();
 	}
 
 	@Override
 	public void authorizeUpdateAttributes(DbConnection con, Table table,
 			Object object, boolean raw, String ... attributeNames) throws AccessDeniedException {
-		if (!MApi.lookup(AccessApi.class).getCurrentOrGuest().isAdminMode())
+		if (!M.l(AccessApi.class).getCurrentOrGuest().isAdminMode())
 			throw new AccessDeniedException();
 	}
 

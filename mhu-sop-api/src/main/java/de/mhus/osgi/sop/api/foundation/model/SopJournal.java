@@ -27,7 +27,7 @@ import de.mhus.lib.annotations.adb.DbPersistent;
 import de.mhus.lib.annotations.adb.DbPrimaryKey;
 import de.mhus.lib.basics.consts.GenerateConst;
 import de.mhus.lib.basics.consts.Identifier.TYPE;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.foundation.FoundationApi;
 import de.mhus.osgi.sop.api.foundation.FoundationRelated;
@@ -96,7 +96,7 @@ public class SopJournal extends DbMetadata implements FoundationRelated {
 
 	@Override
 	public DbMetadata findParentObject() throws MException {
-		return MApi.lookup(FoundationApi.class).getFoundation(getFoundation());
+		return M.l(FoundationApi.class).getFoundation(getFoundation());
 	}
 
 }

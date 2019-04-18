@@ -23,7 +23,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 import de.mhus.lib.adb.query.AQuery;
 import de.mhus.lib.adb.query.Db;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.lib.xdb.XdbService;
 import de.mhus.osgi.sop.api.SopApi;
@@ -46,7 +46,7 @@ public class RegisterCmd implements Action {
 	@Override
 	public Object execute() throws Exception {
 
-		XdbService db = MApi.lookup(SopApi.class).getManager();
+		XdbService db = M.l(SopApi.class).getManager();
 		
 		if (cmd.equals("list")) {
 			

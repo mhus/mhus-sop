@@ -28,7 +28,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.cfg.CfgBoolean;
 import de.mhus.lib.errors.AccessDeniedException;
@@ -123,7 +123,7 @@ public class RestApiImpl extends MLog implements RestApi {
 		RestNodeService next = register.get(lastNodeId + "-" + name); 
 		if (next == null) return null;
 		
-		AccessApi aaa = MApi.lookup(AccessApi.class);
+		AccessApi aaa = M.l(AccessApi.class);
 		if (aaa != null) {
 			try {
 				String def = next.getDefaultAcl();

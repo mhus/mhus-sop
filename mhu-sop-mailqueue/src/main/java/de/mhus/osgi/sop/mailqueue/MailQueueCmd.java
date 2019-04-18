@@ -26,7 +26,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 import de.mhus.lib.adb.query.AQuery;
 import de.mhus.lib.adb.query.Db;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.lib.xdb.XdbService;
@@ -86,7 +86,7 @@ public class MailQueueCmd implements Action {
 			ConsoleTable table = new ConsoleTable(ct);
 			table.setHeaderValues("id","source","status","next","to","subject","attempts", "created");
 			
-			XdbService manager = MApi.lookup(SopApi.class).getManager();
+			XdbService manager = M.l(SopApi.class).getManager();
 			AQuery<SopMailTask> q = Db.query(SopMailTask.class);
 			if (!all)
 				q.eq(_SopMailTask._STATUS, MailQueueOperation.STATUS.READY);
@@ -138,7 +138,7 @@ public class MailQueueCmd implements Action {
 		case "retry": {
 			if (parameters == null || parameters.length == 0) {
 				// retry all
-				XdbService manager = MApi.lookup(SopApi.class).getManager();
+				XdbService manager = M.l(SopApi.class).getManager();
 				for (SopMailTask task : manager.getByQualification(Db.query(SopMailTask.class).eq(_SopMailTask._STATUS, MailQueueOperation.STATUS.ERROR))) {
 					System.out.println(task);
 					task.setStatus(STATUS.READY);
@@ -146,7 +146,7 @@ public class MailQueueCmd implements Action {
 				}
 			} else {
 				UUID id = UUID.fromString(parameters[0]);
-				SopApi api = MApi.lookup(SopApi.class);
+				SopApi api = M.l(SopApi.class);
 				SopMailTask task = api.getManager().getObject(SopMailTask.class, id);
 				if (force || task.getStatus() == STATUS.ERROR || task.getStatus() == STATUS.ERROR_PREPARE) {
 					task.setStatus(STATUS.READY);
@@ -159,7 +159,7 @@ public class MailQueueCmd implements Action {
 		} break;
 		case "send": {
 			UUID id = UUID.fromString(parameters[0]);
-			SopApi api = MApi.lookup(SopApi.class);
+			SopApi api = M.l(SopApi.class);
 			SopMailTask task = api.getManager().getObject(SopMailTask.class, id);
 			if (task == null) {
 				System.out.println("Task not found");
@@ -176,7 +176,7 @@ public class MailQueueCmd implements Action {
 		case "lost": {
 			if (parameters == null || parameters.length == 0) {
 				// retry all
-				XdbService manager = MApi.lookup(SopApi.class).getManager();
+				XdbService manager = M.l(SopApi.class).getManager();
 				for (SopMailTask task : manager.getByQualification(Db.query(SopMailTask.class).eq(_SopMailTask._STATUS, MailQueueOperation.STATUS.ERROR))) {
 					System.out.println(task);
 					task.setStatus(STATUS.LOST);
@@ -184,7 +184,7 @@ public class MailQueueCmd implements Action {
 				}
 			} else {
 				UUID id = UUID.fromString(parameters[0]);
-				SopApi api = MApi.lookup(SopApi.class);
+				SopApi api = M.l(SopApi.class);
 				SopMailTask task = api.getManager().getObject(SopMailTask.class, id);
 				if (force || task.getStatus() == STATUS.ERROR || task.getStatus() == STATUS.ERROR_PREPARE) {
 					task.setStatus(STATUS.LOST);
@@ -196,7 +196,7 @@ public class MailQueueCmd implements Action {
 			}
 		} break;
 		case "cleanup": {
-			XdbService manager = MApi.lookup(SopApi.class).getManager();
+			XdbService manager = M.l(SopApi.class).getManager();
 			for (SopMailTask task : manager.getByQualification(Db.query(SopMailTask.class).eq(_SopMailTask._STATUS, MailQueueOperation.STATUS.ERROR))) {
 				if (task.getStatus() == STATUS.NEW || task.getStatus() == STATUS.READY || task.getStatus() == STATUS.ERROR) {
 					// ignore
@@ -208,7 +208,7 @@ public class MailQueueCmd implements Action {
 		} break;
 		case "delete": {
 			UUID id = UUID.fromString(parameters[0]);
-			SopApi api = MApi.lookup(SopApi.class);
+			SopApi api = M.l(SopApi.class);
 			SopMailTask task = api.getManager().getObject(SopMailTask.class, id);
 			if (force || task.getStatus() == STATUS.ERROR || task.getStatus() == STATUS.ERROR_PREPARE || task.getStatus() == STATUS.SENT || task.getStatus() == STATUS.LOST) {
 				task.setStatus(STATUS.LOST);

@@ -24,7 +24,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MDate;
 import de.mhus.lib.core.MString;
 import de.mhus.lib.core.MPeriod;
@@ -64,7 +64,7 @@ public class RegistryCmd implements Action {
 	
 	@Override
 	public Object execute() throws Exception {
-		RegistryApi api = MApi.lookup(RegistryApi.class);
+		RegistryApi api = M.l(RegistryApi.class);
 		if (cmd.equals("list")) {
 			
 			if (path != null && !path.endsWith("*")) {
@@ -78,7 +78,7 @@ public class RegistryCmd implements Action {
 					out.addRowValues("@" + MString.afterIndex(value.getPath(), '@'), value.getValue(),value.getSource(),new Date(value.getUpdated()), value.getTimeout() > 0 ? MPeriod.getIntervalAsString( value.getTimeout() - ( System.currentTimeMillis() - value.getUpdated() ) ) : "", value.isReadOnly(), value.isPersistent() );
 				out.print(System.out);
 			} else {
-				RegistryManager manager = MApi.lookup(RegistryManager.class);
+				RegistryManager manager = M.l(RegistryManager.class);
 				LinkedList<RegistryValue> list = new LinkedList<>(manager.getAll());
 				list.sort((a,b) -> { return a.getPath().compareTo(b.getPath());});
 				ConsoleTable out = new ConsoleTable();
@@ -113,7 +113,7 @@ public class RegistryCmd implements Action {
 				System.out.println("Remote Value     : " + c.getValue());
 			}
 			
-			RegistryManager manager = MApi.lookup(RegistryManager.class);
+			RegistryManager manager = M.l(RegistryManager.class);
 			RegistryPathControl controller = manager.getPathController(path);
 			if (controller != null) {
 				System.out.println();

@@ -16,7 +16,7 @@
 package de.mhus.osgi.sop.rest;
 
 import org.osgi.service.component.annotations.Component;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.errors.NotFoundException;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
@@ -44,7 +44,7 @@ public class UserInformationRestNode extends SingleObjectNode<UserInformation>{
 
 	@Override
 	protected UserInformation getObject(CallContext context) throws Exception {
-		AccessApi aaa = MApi.lookup(AccessApi.class);
+		AccessApi aaa = M.l(AccessApi.class);
 		if (aaa == null) throw new NotFoundException("AccessApi not configured");
 		
 		AaaContext acc = aaa.getCurrentOrGuest();

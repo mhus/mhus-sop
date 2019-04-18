@@ -22,7 +22,7 @@ import java.util.UUID;
 
 import org.osgi.service.component.annotations.Component;
 import de.mhus.lib.core.IReadProperties;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.strategy.Operation;
@@ -55,7 +55,7 @@ public class MailQueueOperationImpl extends OperationToIfcProxy implements MailQ
 	        log().d("mails are null");
 	        return;
 	    }
-		SopApi api = MApi.lookup(SopApi.class);
+		SopApi api = M.l(SopApi.class);
 		// create task
 		for (MailMessage mail : mails.getSeparateMails()) {
 			SopMailTask task = api.getManager().inject(new SopMailTask(mail));
@@ -67,7 +67,7 @@ public class MailQueueOperationImpl extends OperationToIfcProxy implements MailQ
 				File dir = getMailFolder(task);
 				
 				if (mail.getContent().startsWith(DfsApi.SCHEME_DFQ + ":")) {
-					FileQueueApi dfq = MApi.lookup(FileQueueApi.class);
+					FileQueueApi dfq = M.l(FileQueueApi.class);
 					File contentFrom = dfq.loadFile(MUri.toUri(mail.getContent()));
 					MFile.copyFile(contentFrom, new File(dir,"content.html"));
 				} else {
@@ -76,7 +76,7 @@ public class MailQueueOperationImpl extends OperationToIfcProxy implements MailQ
 				MProperties prop = new MProperties();
 				
 				if (mail.getAttachments() != null && mail.getAttachments().length > 0) {
-					FileQueueApi dfq = MApi.lookup(FileQueueApi.class);
+					FileQueueApi dfq = M.l(FileQueueApi.class);
 					int cnt = 0;
 					for (String atta : mail.getAttachments()) {
 						File file = dfq.loadFile(MUri.toUri(atta));
@@ -142,7 +142,7 @@ public class MailQueueOperationImpl extends OperationToIfcProxy implements MailQ
 
 	@Override
 	public STATUS getStatus(UUID id) throws MException {
-		SopApi api = MApi.lookup(SopApi.class);
+		SopApi api = M.l(SopApi.class);
 		SopMailTask task = api.getManager().getObject(SopMailTask.class, id);
 		if (task == null) throw new NotFoundException(id);
 		return task.getStatus();
@@ -150,7 +150,7 @@ public class MailQueueOperationImpl extends OperationToIfcProxy implements MailQ
 
 	@Override
 	public Date getLastSendAttempt(UUID id) throws MException {
-		SopApi api = MApi.lookup(SopApi.class);
+		SopApi api = M.l(SopApi.class);
 		SopMailTask task = api.getManager().getObject(SopMailTask.class, id);
 		if (task == null) throw new NotFoundException(id);
 		return task.getLastSendAttempt();

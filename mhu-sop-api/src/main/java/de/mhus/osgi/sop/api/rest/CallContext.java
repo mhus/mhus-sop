@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import de.mhus.lib.core.IProperties;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.io.http.MHttp;
@@ -112,7 +112,7 @@ public class CallContext {
 
 	public Node lookup(List<String> parts, Class<? extends Node> lastNode)
 			throws Exception {
-        RestApi restService = MApi.lookup(RestApi.class);
+        RestApi restService = M.l(RestApi.class);
         return restService.lookup(parts, lastNode, this);
 	}
 

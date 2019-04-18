@@ -20,7 +20,7 @@ import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
@@ -68,7 +68,7 @@ public class ModifyAccessCmd implements Action {
 	@Override
 	public Object execute() throws Exception {
 
-		AccessApi api = MApi.lookup(AccessApi.class);
+		AccessApi api = M.l(AccessApi.class);
 		if (api == null) {
 			System.out.println("SOP API not found");
 			return null;

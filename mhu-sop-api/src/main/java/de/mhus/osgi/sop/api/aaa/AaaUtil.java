@@ -18,7 +18,7 @@ package de.mhus.osgi.sop.api.aaa;
 import java.util.List;
 
 import de.mhus.lib.basics.Ace;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.logging.Log;
 import de.mhus.lib.core.security.Account;
 import de.mhus.lib.core.security.Rightful;
@@ -176,14 +176,14 @@ public class AaaUtil {
 	}
 	
 	public static void enterRoot() {
-		AccessApi api = MApi.lookup(AccessApi.class);
+		AccessApi api = M.l(AccessApi.class);
 		if (api == null) return;
 		@SuppressWarnings("unused")
 		AaaContext rootContext = api.processAdminSession();
 	}
 
 	public static void leaveRoot() {
-		AccessApi api = MApi.lookup(AccessApi.class);
+		AccessApi api = M.l(AccessApi.class);
 		if (api == null) return;
 		AaaContext context = api.getCurrent();
 		if (context == null || !context.isAdminMode() || !context.getAccount().getName().equals("root") || !context.isAdminMode()) return;
@@ -191,21 +191,21 @@ public class AaaUtil {
 	}
 
 	public static Account currentAccount() {
-		AccessApi api = MApi.lookup(AccessApi.class);
+		AccessApi api = M.l(AccessApi.class);
 		if (api == null) return null;
 		AaaContext context = api.getCurrent();
 		return context.getAccount();
 	}
 	
 	public static AaaContext currentContext() {
-		AccessApi api = MApi.lookup(AccessApi.class);
+		AccessApi api = M.l(AccessApi.class);
 		if (api == null) return null;
 		AaaContext context = api.getCurrent();
 		return context;
 	}
 	
 	public static boolean isCurrentAdmin() {
-		AccessApi api = MApi.lookup(AccessApi.class);
+		AccessApi api = M.l(AccessApi.class);
 		if (api == null) return false;
 		AaaContext context = api.getCurrent();
 		if (context == null) return false;

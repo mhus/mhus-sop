@@ -16,7 +16,7 @@
 package de.mhus.osgi.sop.impl.util;
 
 import org.osgi.service.component.annotations.Component;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.strategy.AbstractOperation;
 import de.mhus.lib.core.strategy.Operation;
@@ -37,7 +37,7 @@ public class PingOperation extends AbstractOperation {
 		String user = "";
 		boolean admin = false;
 		try {
-			AccessApi aaa = MApi.lookup(AccessApi.class);
+			AccessApi aaa = M.l(AccessApi.class);
 			AaaContext c = aaa.getCurrentOrGuest();
 			user = c.getAccountId();
 			admin = c.isAdminMode();

@@ -21,7 +21,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 import de.mhus.lib.adb.query.Db;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.osgi.sop.api.SopApi;
 import de.mhus.osgi.sop.api.aaa.AaaUtil;
@@ -41,7 +41,7 @@ public class AclCmd implements Action {
 	@Override
 	public Object execute() throws Exception {
 
-		SopApi api = MApi.lookup(SopApi.class);
+		SopApi api = M.l(SopApi.class);
 		
 		switch (cmd) {
 		case "list": {

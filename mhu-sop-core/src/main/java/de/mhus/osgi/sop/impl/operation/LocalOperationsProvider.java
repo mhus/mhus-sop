@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 
 import de.mhus.lib.core.IProperties;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MValidator;
 import de.mhus.lib.core.strategy.DefaultTaskContext;
@@ -128,7 +128,7 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
 			
 			String acl = OperationUtil.getOption(tags, OperationDescriptor.TAG_DEFAULT_ACL, "");
 			try {
-				AccessApi aaa = MApi.lookup(AccessApi.class);
+				AccessApi aaa = M.l(AccessApi.class);
 				if (aaa != null)
 					acl = aaa.getResourceAccessAcl(aaa.getCurrentAccount(), "local.operation", desc.getPath(), "execute", acl);
 				else
@@ -219,7 +219,7 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
 		if (operation == null)
 			throw new NotFoundException("operation not found", desc);
 		
-		AccessApi aaa = MApi.lookup(AccessApi.class);
+		AccessApi aaa = M.l(AccessApi.class);
 		if (aaa != null) {
 			try {
 				String acl = OperationUtil.getOption(desc.getTags(), OperationDescriptor.TAG_DEFAULT_ACL, "");

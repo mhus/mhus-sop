@@ -38,7 +38,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import de.mhus.lib.core.IProperties;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MDate;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MProperties;
@@ -133,7 +133,7 @@ public class JmsOperationProvider extends MLog implements OperationsProvider {
 		
 		JmsConnection con = JmsUtil.getConnection(conName);
 		
-		AccessApi api = MApi.lookup(AccessApi.class);
+		AccessApi api = M.l(AccessApi.class);
 		
 		String ticket = api == null ? null : api.createTrustTicket(SopUtil.TRUST_NAME.value(), api.getCurrent()); // TODO Configurable via execute options
 		Locale locale = api == null || api.getCurrent() == null ? Locale.getDefault() : api.getCurrent().getLocale();

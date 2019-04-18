@@ -25,7 +25,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MXml;
@@ -82,9 +82,9 @@ public class OperationCmd implements Action {
 	public Object execute() throws Exception {
 
 //		if (conName == null)
-//			conName = MApi.lookup(JmsApi.class).getDefaultConnectionName();
+//			conName = M.l(JmsApi.class).getDefaultConnectionName();
 		
-		OperationApi api = MApi.lookup(OperationApi.class);
+		OperationApi api = M.l(OperationApi.class);
 		
 		if (cmd.equals("ping")) {
 			LinkedList<String> tags = new LinkedList<>();
@@ -151,11 +151,11 @@ public class OperationCmd implements Action {
 			}
 		} else
 		if (cmd.equals("request")) {
-			MApi.lookup(JmsApi.class).requestOperationRegistry();
+			M.l(JmsApi.class).requestOperationRegistry();
 			System.out.println("ok");
 		} else
 		if (cmd.equals("send")) {
-			MApi.lookup(JmsApi.class).sendLocalOperations();
+			M.l(JmsApi.class).sendLocalOperations();
 			System.out.println("ok");
 		} else
 		if (cmd.equals("sync")) {

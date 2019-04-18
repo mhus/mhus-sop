@@ -21,7 +21,7 @@ import de.mhus.lib.annotations.adb.DbPrimaryKey;
 import de.mhus.lib.annotations.generic.Public;
 import de.mhus.lib.basics.consts.GenerateConst;
 import de.mhus.lib.basics.consts.Identifier.TYPE;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.foundation.FoundationApi;
 
@@ -46,7 +46,7 @@ public class SopFoundation extends DbMetadata {
 
 	@Override
 	public DbMetadata findParentObject() throws MException {
-		return MApi.lookup(FoundationApi.class).getFoundationGroup(group);
+		return M.l(FoundationApi.class).getFoundationGroup(group);
 	}
 
 	public String getGroup() {

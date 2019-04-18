@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import de.mhus.lib.core.IProperties;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.cfg.CfgString;
 import de.mhus.lib.core.service.ServerIdent;
@@ -45,7 +46,7 @@ import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 @Component(service=JmsDataChannel.class,immediate=true)
 public class Jms2LocalOperationExecuteChannel extends AbstractJmsOperationExecuteChannel {
 
-	public static CfgString queueName = new CfgString(Jms2LocalOperationExecuteChannel.class, "queue", "sop.operation." + MApi.lookup(ServerIdent.class));
+	public static CfgString queueName = new CfgString(Jms2LocalOperationExecuteChannel.class, "queue", "sop.operation." + M.l(ServerIdent.class));
 	static Jms2LocalOperationExecuteChannel instance;
 	private JmsApi jmsApi;
 	
@@ -88,7 +89,7 @@ public class Jms2LocalOperationExecuteChannel extends AbstractJmsOperationExecut
 
 		log().d("execute operation",path,properties);
 		
-		OperationApi api = MApi.lookup(OperationApi.class);
+		OperationApi api = M.l(OperationApi.class);
 		OperationResult res = api.doExecute(path, version, null, properties, OperationApi.LOCAL_ONLY );
 		
 		log().d("operation result",path,res, res == null ? "" : res.getResult());
@@ -98,7 +99,7 @@ public class Jms2LocalOperationExecuteChannel extends AbstractJmsOperationExecut
 	@Override
 	protected List<String> getPublicOperations() {
 		LinkedList<String> out = new LinkedList<String>();
-		OperationApi admin = MApi.lookup(OperationApi.class);
+		OperationApi admin = M.l(OperationApi.class);
 		for (OperationDescriptor desc :  admin.findOperations("*", null, null)) {
 			if (!JmsOperationProvider.PROVIDER_NAME.equals(desc.getProvider())) {
 				try {
@@ -114,7 +115,7 @@ public class Jms2LocalOperationExecuteChannel extends AbstractJmsOperationExecut
 
 	@Override
 	protected OperationDescriptor getOperationDescription(String path, VersionRange version) throws NotFoundException {
-		OperationApi admin = MApi.lookup(OperationApi.class);
+		OperationApi admin = M.l(OperationApi.class);
 		OperationDescriptor desc = admin.findOperation(path, version, null);
 		if (desc == null) return null;
 		return desc;

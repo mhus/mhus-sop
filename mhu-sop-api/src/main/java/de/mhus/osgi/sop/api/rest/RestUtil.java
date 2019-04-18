@@ -24,7 +24,7 @@ import de.mhus.lib.adb.DbMetadata;
 import de.mhus.lib.adb.query.AQuery;
 import de.mhus.lib.annotations.generic.Public;
 import de.mhus.lib.core.IProperties;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.pojo.PojoAttribute;
 import de.mhus.lib.core.pojo.PojoModel;
 import de.mhus.lib.core.pojo.PojoModelFactory;
@@ -51,7 +51,7 @@ public class RestUtil {
 //	private static Log log = Log.getLog(RestUtil.class);
 
 	public static void updateObject(CallContext callContext, Object obj, boolean publicOnly) throws IOException {
-		PojoModelFactory schema = MApi.lookup(AdbApi.class).getManager().getPojoModelFactory();
+		PojoModelFactory schema = M.l(AdbApi.class).getManager().getPojoModelFactory();
 
 		PojoModel model = schema.createPojoModel(obj.getClass());
 		for (String name : callContext.getParameterNames()) {
@@ -68,7 +68,7 @@ public class RestUtil {
 	}
 
 	public static void updateObject(IProperties props, Object obj, boolean publicOnly) throws IOException {
-		PojoModelFactory schema = MApi.lookup(AdbApi.class).getManager().getPojoModelFactory();
+		PojoModelFactory schema = M.l(AdbApi.class).getManager().getPojoModelFactory();
 
 		PojoModel model = schema.createPojoModel(obj.getClass());
 		for (String name : props.keys()) {

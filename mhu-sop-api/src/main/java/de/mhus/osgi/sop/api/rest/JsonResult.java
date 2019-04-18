@@ -23,6 +23,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
 
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.logging.LevelMapper;
 import de.mhus.lib.core.logging.Log;
@@ -53,7 +54,7 @@ public class JsonResult implements RestResult {
     		((ObjectNode)json).put("_timestamp", System.currentTimeMillis());
     		((ObjectNode)json).put("_sequence", id);
 
-    		AaaContext user = MApi.lookup(AccessApi.class).getCurrentOrGuest();
+    		AaaContext user = M.l(AccessApi.class).getCurrentOrGuest();
     		((ObjectNode)json).put("_user", user.getAccountId());
     		if (user.isAdminMode())
         		((ObjectNode)json).put("_admin", true);

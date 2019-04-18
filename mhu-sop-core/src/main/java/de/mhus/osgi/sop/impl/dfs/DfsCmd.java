@@ -28,7 +28,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MDate;
 import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MString;
@@ -64,7 +64,7 @@ public class DfsCmd implements Action {
 	@Override
 	public Object execute() throws Exception {
 		
-		DfsApi api = MApi.lookup(DfsApi.class);
+		DfsApi api = M.l(DfsApi.class);
 
 		switch (cmd) {
 		case "providers" : {
@@ -104,7 +104,7 @@ public class DfsCmd implements Action {
 			System.out.println("Requested file: " + parameters[0]);
 			System.out.println("Queue: " + uri);
 			System.out.println("------------ Content -------------");
-			File file = MApi.lookup(FileQueueApi.class).loadFile(uri);
+			File file = M.l(FileQueueApi.class).loadFile(uri);
 			System.out.println( MFile.readFile(file) );
 			System.out.println("-------------- END ---------------");
 		} break;
@@ -135,7 +135,7 @@ public class DfsCmd implements Action {
 
 	private void testProvider(DfsApi api) throws IOException, MException {
 		
-		FileQueueApi queueApi = MApi.lookup(FileQueueApi.class);
+		FileQueueApi queueApi = M.l(FileQueueApi.class);
 		
 		String providerName = parameters[0];
 		System.out.println(">>> Root directory index");

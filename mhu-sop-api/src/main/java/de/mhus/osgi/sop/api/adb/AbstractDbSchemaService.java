@@ -22,7 +22,7 @@ import de.mhus.lib.adb.query.Db;
 import de.mhus.lib.basics.Ace;
 import de.mhus.lib.basics.AclControlled;
 import de.mhus.lib.basics.UuidIdentificable;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MPeriod;
 import de.mhus.lib.core.MValidator;
@@ -39,21 +39,21 @@ public abstract class AbstractDbSchemaService extends MLog implements DbSchemaSe
 	@Override
 	public boolean canRead(AaaContext context, Persistable obj)
 			throws MException {
-//		return MApi.lookup(AccessApi.class).hasResourceAccess(account.getAccount(),obj.getClass().getName(), String.valueOf(obj.getId()), Account.ACT_READ, null);
+//		return M.l(AccessApi.class).hasResourceAccess(account.getAccount(),obj.getClass().getName(), String.valueOf(obj.getId()), Account.ACT_READ, null);
 		return getAce(context, obj).canRead();
 	}
 
 	@Override
 	public boolean canUpdate(AaaContext context, Persistable obj)
 			throws MException {
-//		return MApi.lookup(AccessApi.class).hasResourceAccess(account.getAccount(),obj.getClass().getName(), String.valueOf(obj.getId()), Account.ACT_UPDATE, null);
+//		return M.l(AccessApi.class).hasResourceAccess(account.getAccount(),obj.getClass().getName(), String.valueOf(obj.getId()), Account.ACT_UPDATE, null);
 		return getAce(context, obj).canUpdate();
 	}
 
 	@Override
 	public boolean canDelete(AaaContext context, Persistable obj)
 			throws MException {
-//		return MApi.lookup(AccessApi.class).hasResourceAccess(context.getAccount(),obj.getClass().getName(), String.valueOf(obj.getId()), Account.ACT_DELETE, null);
+//		return M.l(AccessApi.class).hasResourceAccess(context.getAccount(),obj.getClass().getName(), String.valueOf(obj.getId()), Account.ACT_DELETE, null);
 		return getAce(context, obj).canDelete();
 	}
 
@@ -82,7 +82,7 @@ public abstract class AbstractDbSchemaService extends MLog implements DbSchemaSe
 			acl = ((AclControlled)obj).getAcl();
 		}
 		if (acl == null && ident != null) {
-			SopAcl aclObject = MApi.lookup(AdbApi.class).getManager().getObjectByQualification(Db.query(SopAcl.class).eq("target", ident ));
+			SopAcl aclObject = M.l(AdbApi.class).getManager().getObjectByQualification(Db.query(SopAcl.class).eq("target", ident ));
 			if (aclObject != null)
 				acl = aclObject.getList();
 		}
@@ -113,7 +113,7 @@ public abstract class AbstractDbSchemaService extends MLog implements DbSchemaSe
 		try {
 			Class<?> clazz = Class.forName(type, true, this.getClass().getClassLoader());
 			if (clazz != null) {
-				return (Persistable)MApi.lookup(AdbApi.class).getManager().getObject(clazz, id);
+				return (Persistable)M.l(AdbApi.class).getManager().getObject(clazz, id);
 			}
 		} catch (Throwable t) {
 			throw new MException("type error",type,t);

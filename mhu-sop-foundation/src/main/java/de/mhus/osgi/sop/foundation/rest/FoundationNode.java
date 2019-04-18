@@ -18,7 +18,7 @@ package de.mhus.osgi.sop.foundation.rest;
 import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.errors.MException;
 import de.mhus.osgi.sop.api.foundation.FoundationApi;
 import de.mhus.osgi.sop.api.foundation.model.SopFoundation;
@@ -41,7 +41,7 @@ public class FoundationNode extends ObjectListNode<SopFoundation,SopFoundation> 
 
 	@Override
 	protected List<SopFoundation> getObjectList(CallContext callContext) throws MException {
-		FoundationApi api = MApi.lookup(FoundationApi.class);
+		FoundationApi api = M.l(FoundationApi.class);
 		int page = callContext.getParameter("page", 0);
 		return api.searchFoundations(callContext.getParameter("search"), page);
 	}
@@ -53,7 +53,7 @@ public class FoundationNode extends ObjectListNode<SopFoundation,SopFoundation> 
 
 	@Override
 	protected SopFoundation getObjectForId(CallContext context, String id) throws Exception {
-		FoundationApi api = MApi.lookup(FoundationApi.class);
+		FoundationApi api = M.l(FoundationApi.class);
 		return api.getFoundation(id);
 	}
 

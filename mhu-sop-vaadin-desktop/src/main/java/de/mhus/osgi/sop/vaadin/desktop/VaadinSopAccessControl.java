@@ -18,7 +18,7 @@ package de.mhus.osgi.sop.vaadin.desktop;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.logging.MLogUtil;
 import de.mhus.lib.core.security.AccessControl;
@@ -36,7 +36,7 @@ public class VaadinSopAccessControl extends MLog implements AccessControl {
 
 	public VaadinSopAccessControl() {
 		session = UI.getCurrent().getSession();
-		aaa = MApi.lookup(AccessApi.class);
+		aaa = M.l(AccessApi.class);
 	}
 	
 	@Override
@@ -102,7 +102,7 @@ public class VaadinSopAccessControl extends MLog implements AccessControl {
 		String account = (String)session.getAttribute(ATTR_NAME);
 		if (account == null) return null;
 		try {
-			AccessApi aaa = MApi.lookup(AccessApi.class);
+			AccessApi aaa = M.l(AccessApi.class);
 			return aaa.getAccount(account);
 		} catch (MException e) {
 			MLogUtil.log().w(account, e);

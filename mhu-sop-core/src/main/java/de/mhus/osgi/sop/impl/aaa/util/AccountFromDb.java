@@ -23,7 +23,7 @@ import de.mhus.lib.adb.DbCollection;
 import de.mhus.lib.adb.query.AQuery;
 import de.mhus.lib.adb.query.Db;
 import de.mhus.lib.core.IReadProperties;
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.security.Account;
 import de.mhus.lib.core.security.AccountSource;
@@ -39,7 +39,7 @@ public class AccountFromDb extends MLog implements AccountSource, ModifyAccountA
 	public void createAccount(String username, String password, IReadProperties properties) throws MException {
 		Account acc = findAccount(username);
 		if (acc != null) throw new MException("Account already exists",username);
-		XdbService db = MApi.lookup(SopApi.class).getManager();
+		XdbService db = M.l(SopApi.class).getManager();
 		acc = db.inject(new SopAccount(username, password, properties)); 
 		((SopAccount)acc).save();
 	}
@@ -104,7 +104,7 @@ public class AccountFromDb extends MLog implements AccountSource, ModifyAccountA
 	@Override
 	public Collection<String> getAccountList(String filter) {
 		filter = filter.replace('%', ' ').trim();
-		XdbService db = MApi.lookup(SopApi.class).getManager();
+		XdbService db = M.l(SopApi.class).getManager();
 		AQuery<SopAccount> query = Db.query(SopAccount.class);
 		boolean not = false;
 		if (filter.startsWith("!")) {
@@ -145,7 +145,7 @@ public class AccountFromDb extends MLog implements AccountSource, ModifyAccountA
 	
 	@Override
 	public Account findAccount(String account) {
-		XdbService db = MApi.lookup(SopApi.class).getManager();
+		XdbService db = M.l(SopApi.class).getManager();
 		try {
 			return db.getObjectByQualification(Db.query(SopAccount.class).eq("name", account));
 		} catch (Exception e) {

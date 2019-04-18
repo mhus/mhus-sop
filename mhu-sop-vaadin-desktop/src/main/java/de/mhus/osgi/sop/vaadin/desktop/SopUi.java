@@ -33,7 +33,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MString;
 import de.mhus.lib.core.cfg.CfgBoolean;
@@ -271,7 +271,7 @@ public class SopUi extends UI implements SopUiApi {
 			return false;
 
 		try {
-			AccessApi aaa = MApi.lookup(AccessApi.class);
+			AccessApi aaa = M.l(AccessApi.class);
 			Account account = aaa.getCurrentAccount();
 			return aaa.hasResourceAccess(account, GuiSpace.class.getCanonicalName(), MFile.normalize(role.trim()).toLowerCase(), "access", null);
 		} catch (Throwable t) {
@@ -288,7 +288,7 @@ public class SopUi extends UI implements SopUiApi {
 
 		try {
 			try {
-				AccessApi aaa = MApi.lookup(AccessApi.class);
+				AccessApi aaa = M.l(AccessApi.class);
 				Account account = aaa.getCurrentAccount();
 				return aaa.hasResourceAccess(account, GuiSpace.class.getCanonicalName(), MFile.normalize(role.trim()).toLowerCase(), "write", null);
 			} catch (Throwable t) {
@@ -315,13 +315,13 @@ public class SopUi extends UI implements SopUiApi {
 			MLogUtil.setTrailConfig(MLogUtil.TRAIL_SOURCE_UI, trailConfig);
 		else
 			MLogUtil.releaseTrailConfig();
-		AccessApi aaa = MApi.lookup(AccessApi.class);
+		AccessApi aaa = M.l(AccessApi.class);
 		AaaContext acontext = aaa.processUserSession(getCurrentUserName(), Locale.getDefault());
 		getSession().setAttribute("_aaacontext", acontext);
 	}
 
 	public void requestEnd() {
-		AccessApi aaa = MApi.lookup(AccessApi.class);
+		AccessApi aaa = M.l(AccessApi.class);
 		
 //		AaaContext acontext = (AaaContext) getSession().getAttribute("_aaacontext");
 		aaa.resetContext();
