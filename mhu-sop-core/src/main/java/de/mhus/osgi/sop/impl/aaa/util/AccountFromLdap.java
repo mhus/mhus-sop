@@ -24,6 +24,7 @@ import de.mhus.lib.core.parser.StringCompiler;
 import de.mhus.lib.core.security.Account;
 import de.mhus.lib.core.security.AccountSource;
 import de.mhus.lib.core.security.ModifyAccountApi;
+import de.mhus.lib.core.util.MUri;
 import de.mhus.lib.errors.NotSupportedException;
 
 public class AccountFromLdap extends MLog implements AccountSource {
@@ -53,6 +54,7 @@ public class AccountFromLdap extends MLog implements AccountSource {
 
         LdapAccount ret = new LdapAccount(account);
         if (!ret.reloadAccount()) return null;
+        
         
         return ret;
     }
@@ -99,7 +101,7 @@ public class AccountFromLdap extends MLog implements AccountSource {
     }
 
     public void setUserAttributeMapping(String mapping) {
-        userAttributeMapping = MProperties.explodeToMProperties(mapping);
+        userAttributeMapping = MProperties.explodeToMProperties(MUri.explodeArray(mapping, ';'), '=', ':', 0, Integer.MAX_VALUE);
     }
     
     public String getUserAttributesDisplayName() {
@@ -144,12 +146,15 @@ public class AccountFromLdap extends MLog implements AccountSource {
 
     private class LdapAccount implements Account {
 
+        private static final String UUID_PREFIX = "ldapAccount:";
         private MProperties params;
         private String account;
         private String displayName;
         private HashSet<String> groups;
         private boolean active;
         private UUID uuid;
+        private String fqdn;
+        private boolean valid;
 
         public LdapAccount(String account) {
             this.account = account;
@@ -167,14 +172,17 @@ public class AccountFromLdap extends MLog implements AccountSource {
 
         @Override
         public boolean isValid() {
-            return true;
+            return valid;
         }
 
         @Override
         public boolean validatePassword(String password) {
             try {
-                DirContext ctx = MLdap.getConnection(url, account, MPassword.decode(password));
+                DirContext ctx = MLdap.getConnection(url, fqdn, MPassword.decode(password));
                 ctx.close();
+                return true;
+            } catch (javax.naming.AuthenticationException e) {
+                return false;
             } catch (Throwable t) {
                 log().e(account,t);
             }
@@ -209,15 +217,26 @@ public class AccountFromLdap extends MLog implements AccountSource {
         @Override
         public boolean reloadAccount() {
             try {
+                
+                MProperties repl = new MProperties();
+                repl.setString("account", account);
+                
+                valid = true;
                 DirContext ctx = MLdap.getConnection(url, principal, MPassword.decode(password));
                 
                 // user parameters
                 NamingEnumeration<SearchResult> res = ctx.search( 
-                        userSearchName.replace("%u", account),
-                        userSearchFilter.replace("%u", account),
+                        StringCompiler.compile(userSearchName).execute(repl),
+                        StringCompiler.compile(userSearchFilter).execute(repl),
                         SEARCH_CONTROLS_ALL);
                 Map<String, Object> first = MLdap.getFirst(res);
-                String fqdn = String.valueOf(first.get(MLdap.KEY_NAME_NAMESPACE));
+                if (first == null) {
+                    valid = false;
+                    return false;
+                }
+                fqdn = String.valueOf(first.get(MLdap.KEY_FQDN));
+                repl.setString("fqdn", fqdn);
+                
                 params = new MProperties();
                 if (userAttributeMapping != null) {
                     for (Entry<String, Object> mapping : userAttributeMapping.entrySet()) {
@@ -232,12 +251,12 @@ public class AccountFromLdap extends MLog implements AccountSource {
                 
                 active = userAttributesActive == null ? true : MCast.toboolean(first.get(userAttributesActive), false);
                 
-                uuid = userAttributesUuid == null ? MCrypt.toUuidHash(fqdn) : UUID.fromString(String.valueOf(first.get(userAttributesUuid)));
+                uuid = userAttributesUuid == null ? MCrypt.toUuidHash(UUID_PREFIX + fqdn) : UUID.fromString(String.valueOf(first.get(userAttributesUuid)));
 
                 // groups
                 res = ctx.search( 
-                        getGroupsSearchName().replace("%u", account).replace("%fqdn", fqdn),
-                        getGroupsSearchFilter().replace("%u", account).replace("%fqdn", fqdn),
+                        StringCompiler.compile(groupsSearchName).execute(repl),
+                        StringCompiler.compile(groupsSearchFilter).execute(repl),
                         SEARCH_CONTROLS_EMPTY);
                 
                 List<String> groupsList = MLdap.getNames(res);
