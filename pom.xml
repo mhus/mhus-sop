@@ -62,10 +62,7 @@
       <module>mhu-sop-vaadin-desktop</module>
       <module>mhu-sop-vaadin-theme</module>
       <module>mhu-sop-mailqueue</module>
-      <!-- 
-      Could not deploy features
       <module>mhu-sop-feature</module>
-       -->
     </modules>
 
 </project>
