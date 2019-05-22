@@ -175,20 +175,19 @@ public class AaaUtil {
 		
 	}
 	
-	public static void enterRoot() {
+	public static AaaContext enterRoot() {
 		AccessApi api = M.l(AccessApi.class);
-		if (api == null) return;
-		@SuppressWarnings("unused")
-		AaaContext rootContext = api.processAdminSession();
+		if (api == null) return null;
+		return api.processAdminSession();
 	}
 
-	public static void leaveRoot() {
-		AccessApi api = M.l(AccessApi.class);
-		if (api == null) return;
-		AaaContext context = api.getCurrent();
-		if (context == null || !context.isAdminMode() || !context.getAccount().getName().equals("root") || !context.isAdminMode()) return;
-		api.release(context);
-	}
+//	public static void leaveRoot() {
+//		AccessApi api = M.l(AccessApi.class);
+//		if (api == null) return;
+//		AaaContext context = api.getCurrent();
+//		if (context == null || !context.isAdminMode() || !context.getAccount().getName().equals("root") || !context.isAdminMode()) return;
+//		api.release(context);
+//	}
 
 	public static Account currentAccount() {
 		AccessApi api = M.l(AccessApi.class);

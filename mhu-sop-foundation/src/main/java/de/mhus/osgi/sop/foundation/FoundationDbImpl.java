@@ -70,9 +70,8 @@ public class FoundationDbImpl extends AbstractDbSchemaService {
 	@Override
 	public void doPostInitialize(XdbService manager) throws Exception {
 		
-		AaaUtil.enterRoot();
-		try {
-			// init base structure
+	    try (AaaContext ctx = AaaUtil.enterRoot()) {
+	        // init base structure
 			SopFoundationGroup defGroup = service.getObjectByQualification(Db.query(SopFoundationGroup.class).eq("name", ""));
 			if (defGroup == null) {
 				defGroup = service.inject(new SopFoundationGroup(""));
@@ -103,8 +102,6 @@ public class FoundationDbImpl extends AbstractDbSchemaService {
 			} catch (Throwable t) {
 				log().w(t);
 			}
-		} finally {
-			AaaUtil.leaveRoot();
 		}
 	}
 

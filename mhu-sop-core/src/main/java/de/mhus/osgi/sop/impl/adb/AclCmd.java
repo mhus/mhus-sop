@@ -24,6 +24,7 @@ import de.mhus.lib.adb.query.Db;
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.osgi.sop.api.SopApi;
+import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AaaUtil;
 import de.mhus.osgi.sop.api.model.SopAcl;
 
@@ -65,22 +66,18 @@ public class AclCmd implements Action {
 			}
 		} break;
 		case "create": {
-			AaaUtil.enterRoot();
-			try {
-				SopAcl acl = SopDbImpl.getManager().inject(new SopAcl(parameters[0], parameters[1]));
+			try (AaaContext ctx = AaaUtil.enterRoot()) {
+			    SopAcl acl = SopDbImpl.getManager().inject(new SopAcl(parameters[0], parameters[1]));
 				acl.save();
 				System.out.println("Id     : " + acl.getId() );
 				System.out.println("Created: " + acl.getCreationDate());
 				System.out.println("Target : " + acl.getTarget());
 				System.out.println("ACL    : " + acl.getList());
-			} finally {
-				AaaUtil.leaveRoot();
 			}
 		} break;
 		case "set": {
-			AaaUtil.enterRoot();
-			try {
-				SopAcl acl = api.getAcl(parameters[0]);
+		    try (AaaContext ctx = AaaUtil.enterRoot()) {
+		        SopAcl acl = api.getAcl(parameters[0]);
 				if (acl == null)
 					System.out.println("ACL not found");
 				else {
@@ -92,22 +89,18 @@ public class AclCmd implements Action {
 					System.out.println("Target  : " + acl.getTarget());
 					System.out.println("ACL     : " + acl.getList());
 				}
-			} finally {
-				AaaUtil.leaveRoot();
 			}
 		} break;
 		case "delete": {
 			AaaUtil.enterRoot();
-			try {
-				SopAcl acl = api.getAcl(parameters[0]);
+			try (AaaContext ctx = AaaUtil.enterRoot()) {
+			    SopAcl acl = api.getAcl(parameters[0]);
 				if (acl == null)
 					System.out.println("ACL not found");
 				else {
 					acl.delete();
 					System.out.println("Deleted");
 				}
-			} finally {
-				AaaUtil.leaveRoot();
 			}
 		} break;
 		default:

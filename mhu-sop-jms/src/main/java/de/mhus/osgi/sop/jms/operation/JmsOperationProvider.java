@@ -150,136 +150,135 @@ public class JmsOperationProvider extends MLog implements OperationsProvider {
 	public OperationResult doExecuteOperation(JmsConnection con, String queueName, String operationName, String version, IProperties parameters, String ticket, Locale l, long timeout, String ... options  ) throws Exception {
 
 		if (con == null) throw new JMSException("connection is null");
-		ClientJms client = new ClientJms(con.createQueue(queueName));
-		
-		boolean needObject = false;
-		if (!OperationUtil.isOption(options, JmsApi.OPT_FORCE_MAP_MESSAGE)) {
-			for (Entry<String, Object> item : parameters) {
-				Object value = item.getValue();
-				if (! (
-						value == null || 
-						value.getClass().isPrimitive() || 
-						value instanceof String || 
-						value instanceof Long || 
-						value instanceof Integer || 
-						value instanceof Boolean 
-					) ) {
-					needObject = true;
-					break;
-				}
-			}
+		try (ClientJms client = new ClientJms(con.createQueue(queueName))) {
+    		
+    		boolean needObject = false;
+    		if (!OperationUtil.isOption(options, JmsApi.OPT_FORCE_MAP_MESSAGE)) {
+    			for (Entry<String, Object> item : parameters) {
+    				Object value = item.getValue();
+    				if (! (
+    						value == null || 
+    						value.getClass().isPrimitive() || 
+    						value instanceof String || 
+    						value instanceof Long || 
+    						value instanceof Integer || 
+    						value instanceof Boolean 
+    					) ) {
+    					needObject = true;
+    					break;
+    				}
+    			}
+    		}
+    		
+    		Message msg = null;
+    		if (needObject) {
+    			msg = con.createObjectMessage((MProperties)parameters);
+    		} else {
+    			msg = con.createMapMessage();
+    			for (Entry<String, Object> item : parameters) {
+    				String name = item.getKey();
+    				//if (!name.startsWith("_"))
+    				Object value = item.getValue();
+    				if (value != null && value instanceof Date) 
+    					value = MDate.toIsoDateTime((Date)value);
+    				else
+    				if (value != null && 
+    					!(value instanceof String) && !value.getClass().isPrimitive() ) 
+    					value = String.valueOf(value);
+    				((MapMessage)msg).setObject(name, value);
+    			}
+    			((MapMessage)msg).getMapNames();
+    		}
+    		
+    		msg.setStringProperty(Sop.PARAM_OPERATION_PATH, operationName);
+    		msg.setStringProperty(Sop.PARAM_OPERATION_VERSION, version);
+    
+    		if (l == null) l = Locale.getDefault();
+    		String locale = l.toString();
+    
+    		msg.setStringProperty(Sop.PARAM_AAA_TICKET, ticket );
+    		msg.setStringProperty(Sop.PARAM_LOCALE, locale );
+    		client.setTimeout(timeout);
+        	// Send Request
+        	
+        	log().d(operationName,"sending Message", queueName, msg, options);
+        	
+        	if (OperationUtil.isOption(options,JmsApi.OPT_ONE_WAY)) {
+        		client.sendJmsOneWay(msg);
+        		return null;
+        	}
+        	
+        	Message answer = client.sendJms(msg);
+    
+        	// Process Answer
+        	
+        	OperationResult out = new OperationResult();
+        	out.setOperationPath(operationName);
+    		if (answer == null) {
+    			log().d(queueName,operationName,"answer is null");
+    			out.setSuccessful(false);
+    			out.setMsg("answer is null");
+    			out.setReturnCode(OperationResult.INTERNAL_ERROR);
+    		} else {
+    			// remote error handling
+    			String errorMsg = answer.getStringProperty(Sop.PARAM_ERROR);
+    			if (errorMsg != null) {
+    				throw new MException("Remote error",errorMsg);
+    			}
+    			
+    			// check if technical successful
+    			boolean successful = answer.getBooleanProperty(Sop.PARAM_SUCCESSFUL);
+    			out.setSuccessful(successful);
+    			
+    			if (!successful)
+    				out.setMsg(answer.getStringProperty(Sop.PARAM_MSG));
+    			out.setReturnCode(answer.getLongProperty(Sop.PARAM_RC));
+    			
+    			// if (successful) { // also errors can have a result object
+    				
+    				if (answer instanceof MapMessage) {
+    					MapMessage mapMsg = (MapMessage)answer;
+    					out.setResult(MJms.getMapProperties(mapMsg));
+    				} else
+    				if (answer instanceof TextMessage) {
+    					out.setMsg(((TextMessage)answer).getText());
+    					out.setResult(out.getMsg());
+    				} else
+    				if (answer instanceof BytesMessage) {
+    					
+    					File tmpFile = TempFile.createTempFile(MSystem.getPid() + "_jms_msg", ".bin");
+    					
+    					FileOutputStream os = new FileOutputStream(tmpFile);
+    					BytesMessage m = (BytesMessage)answer;
+    					long length = m.getBodyLength();
+    					byte[] buffer = new byte[1024 * 10];
+    					long done = 0;
+    					while (done < length) {
+    						int size = m.readBytes(buffer);
+    						if (size > 0) {
+    							os.write(buffer, 0, size);
+    						}
+    						done+=size;
+    					}
+    					os.close();
+    
+    					out.setResult(tmpFile);
+    
+    				} else
+    				if (answer instanceof ObjectMessage) {
+    					Serializable obj = ((ObjectMessage)answer).getObject();
+    					if (obj == null) {
+    						out.setResult(null);
+    					} else {
+    						out.setResult(obj);
+    					}
+    				}
+    			// }	
+    		}
+    		
+    		return out;
 		}
-		
-		Message msg = null;
-		if (needObject) {
-			msg = con.createObjectMessage((MProperties)parameters);
-		} else {
-			msg = con.createMapMessage();
-			for (Entry<String, Object> item : parameters) {
-				String name = item.getKey();
-				//if (!name.startsWith("_"))
-				Object value = item.getValue();
-				if (value != null && value instanceof Date) 
-					value = MDate.toIsoDateTime((Date)value);
-				else
-				if (value != null && 
-					!(value instanceof String) && !value.getClass().isPrimitive() ) 
-					value = String.valueOf(value);
-				((MapMessage)msg).setObject(name, value);
-			}
-			((MapMessage)msg).getMapNames();
-		}
-		
-		msg.setStringProperty(Sop.PARAM_OPERATION_PATH, operationName);
-		msg.setStringProperty(Sop.PARAM_OPERATION_VERSION, version);
 
-		if (l == null) l = Locale.getDefault();
-		String locale = l.toString();
-
-		msg.setStringProperty(Sop.PARAM_AAA_TICKET, ticket );
-		msg.setStringProperty(Sop.PARAM_LOCALE, locale );
-		client.setTimeout(timeout);
-    	// Send Request
-    	
-    	log().d(operationName,"sending Message", queueName, msg, options);
-    	
-    	if (OperationUtil.isOption(options,JmsApi.OPT_ONE_WAY)) {
-    		client.sendJmsOneWay(msg);
-    		return null;
-    	}
-    	
-    	Message answer = client.sendJms(msg);
-
-    	// Process Answer
-    	
-    	OperationResult out = new OperationResult();
-    	out.setOperationPath(operationName);
-		if (answer == null) {
-			log().d(queueName,operationName,"answer is null");
-			out.setSuccessful(false);
-			out.setMsg("answer is null");
-			out.setReturnCode(OperationResult.INTERNAL_ERROR);
-		} else {
-			// remote error handling
-			String errorMsg = answer.getStringProperty(Sop.PARAM_ERROR);
-			if (errorMsg != null) {
-				throw new MException("Remote error",errorMsg);
-			}
-			
-			// check if technical successful
-			boolean successful = answer.getBooleanProperty(Sop.PARAM_SUCCESSFUL);
-			out.setSuccessful(successful);
-			
-			if (!successful)
-				out.setMsg(answer.getStringProperty(Sop.PARAM_MSG));
-			out.setReturnCode(answer.getLongProperty(Sop.PARAM_RC));
-			
-			// if (successful) { // also errors can have a result object
-				
-				if (answer instanceof MapMessage) {
-					MapMessage mapMsg = (MapMessage)answer;
-					out.setResult(MJms.getMapProperties(mapMsg));
-				} else
-				if (answer instanceof TextMessage) {
-					out.setMsg(((TextMessage)answer).getText());
-					out.setResult(out.getMsg());
-				} else
-				if (answer instanceof BytesMessage) {
-					
-					File tmpFile = TempFile.createTempFile(MSystem.getPid() + "_jms_msg", ".bin");
-					
-					FileOutputStream os = new FileOutputStream(tmpFile);
-					BytesMessage m = (BytesMessage)answer;
-					long length = m.getBodyLength();
-					byte[] buffer = new byte[1024 * 10];
-					long done = 0;
-					while (done < length) {
-						int size = m.readBytes(buffer);
-						if (size > 0) {
-							os.write(buffer, 0, size);
-						}
-						done+=size;
-					}
-					os.close();
-
-					out.setResult(tmpFile);
-
-				} else
-				if (answer instanceof ObjectMessage) {
-					Serializable obj = ((ObjectMessage)answer).getObject();
-					if (obj == null) {
-						out.setResult(null);
-					} else {
-						out.setResult(obj);
-					}
-				}
-			// }	
-		}
-		
-		
-		client.close();
-		
-		return out;
 	}
 
 	@Override

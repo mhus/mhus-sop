@@ -96,5 +96,13 @@ public class AaaContextImpl implements AaaContext {
 	public Locale getLocale() {
 		return locale;
 	}
+    @Override
+    public void close() {
+        if (account == null) return;
+        AccessApi api = M.l(AccessApi.class);
+        if (api == null) return;
+        api.release(this);
+        account = null;
+    }
 	
 }

@@ -17,9 +17,10 @@ package de.mhus.osgi.sop.api.aaa;
 
 import java.util.Locale;
 
+import de.mhus.lib.basics.MCloseable;
 import de.mhus.lib.core.security.Account;
 
-public interface AaaContext {
+public interface AaaContext extends MCloseable {
 
 	Account getAccount();
 	Trust getTrust();
