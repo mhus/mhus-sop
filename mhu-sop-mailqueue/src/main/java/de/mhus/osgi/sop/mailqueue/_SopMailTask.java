@@ -47,7 +47,7 @@ public class _SopMailTask extends ConstBase {
   public static final Identifier PROJECT_ARTIFACT = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.mailqueue.SopMailTask.class,"mhu-sop-mailqueue");
   public static final Identifier PROJECT_DESCRIPTION = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.mailqueue.SopMailTask.class,"A set of tools to improve OSGi frameworks and karaf");
   public static final Identifier PROJECT_GROUP = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.mailqueue.SopMailTask.class,"de.mhus.osgi");
-  public static final Identifier PROJECT_VERSION = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.mailqueue.SopMailTask.class,"1.6.1-SNAPSHOT");
+  public static final Identifier PROJECT_VERSION = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.mailqueue.SopMailTask.class,"1.6.1");
   public static final Identifier _ADB_CHANGED = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.mailqueue.SopMailTask.class,"AdbChanged");
   public static final Identifier _ADB_MANAGED = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.mailqueue.SopMailTask.class,"AdbManaged");
   public static final Identifier _ADB_PERSISTENT = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.mailqueue.SopMailTask.class,"AdbPersistent");
