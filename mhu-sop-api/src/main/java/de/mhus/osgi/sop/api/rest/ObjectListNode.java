@@ -22,7 +22,6 @@ import org.codehaus.jackson.node.ObjectNode;
 
 import de.mhus.lib.core.pojo.MPojo;
 import de.mhus.lib.core.pojo.PojoModelFactory;
-import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.errors.MException;
 
 public abstract class ObjectListNode<T,L> extends JsonListNode<T> {
@@ -64,13 +63,14 @@ public abstract class ObjectListNode<T,L> extends JsonListNode<T> {
 	protected void doPrepareForOutput(T obj, CallContext context) throws MException {
 	}
 
-	@Override
-	protected void doUpdate(JsonResult result, CallContext callContext)
-			throws Exception {
-		T obj = getObjectFromContext(callContext);
-		if (obj == null) throw new RestException(OperationResult.NOT_FOUND);
-		
-		RestUtil.updateObject(callContext, obj, true);
-	}
+	// Not by default
+//	@Override
+//	protected void doUpdate(JsonResult result, CallContext callContext)
+//			throws Exception {
+//		T obj = getObjectFromContext(callContext);
+//		if (obj == null) throw new RestException(OperationResult.NOT_FOUND);
+//		
+//		RestUtil.updateObject(callContext, obj, true);
+//	}
 
 }

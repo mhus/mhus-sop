@@ -18,8 +18,8 @@ package de.mhus.osgi.sop.jms.operation;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -31,20 +31,22 @@ import javax.jms.Message;
 import javax.jms.ObjectMessage;
 
 import org.osgi.service.component.ComponentContext;
-
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
+import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.MThread;
 import de.mhus.lib.core.cfg.CfgString;
+import de.mhus.lib.core.lang.SerializedValue;
 import de.mhus.lib.core.pojo.DefaultFilter;
-import de.mhus.lib.core.pojo.PojoAttribute;
+import de.mhus.lib.core.pojo.MPojo;
 import de.mhus.lib.core.pojo.PojoModel;
 import de.mhus.lib.core.pojo.PojoModelFactory;
 import de.mhus.lib.core.pojo.PojoParser;
@@ -53,6 +55,7 @@ import de.mhus.lib.core.strategy.NotSuccessful;
 import de.mhus.lib.core.strategy.OperationDescription;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.core.strategy.Successful;
+import de.mhus.lib.core.strategy.util.MapValue;
 import de.mhus.lib.core.util.VersionRange;
 import de.mhus.lib.errors.NotFoundException;
 import de.mhus.lib.jms.JmsChannel;
@@ -71,6 +74,8 @@ import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 public class Jms2LocalOperationExecuteChannel extends AbstractJmsDataChannel {
 
 	public static CfgString queueName = new CfgString(Jms2LocalOperationExecuteChannel.class, "queue", "sop.operation." + M.l(ServerIdent.class));
+	private String ident = M.l(ServerIdent.class).toString();
+
 	static Jms2LocalOperationExecuteChannel instance;
 	private JmsApi jmsApi;
 	
@@ -160,6 +165,9 @@ public class Jms2LocalOperationExecuteChannel extends AbstractJmsDataChannel {
 		return connectionName;
 	}
 
+	/**
+	 * Receive operation calls and return the answer
+	 */
 	    @SuppressWarnings("rawtypes")
 	    protected Message received(Message msg) throws JMSException {
 	        
@@ -216,77 +224,115 @@ public class Jms2LocalOperationExecuteChannel extends AbstractJmsDataChannel {
 	            }
 	        Message ret = null;
 	        boolean consumed = false;
+	        
+	        // check if map message is possible and create a result message if possible
 	        if (res != null && res.getResult() != null && res.getResult() instanceof Map) {
 	            // Map Message is allowed if all values are primitives. If not use object Message
 	            consumed = true;
 	            ret = getServer().createMapMessage();
+	            ret.setStringProperty("_encoding", "map");
+	            
 	            Map<?,?> map = (Map<?,?>)res.getResult();
 	            for (Map.Entry<?,?> entry : map.entrySet()) {
 	                Object value = entry.getValue();
-	                if (value == null || value.getClass().isPrimitive() || value instanceof String )
-	                    ((MapMessage)ret).setObject(String.valueOf(entry.getKey()), entry.getValue() );
+	                if (MJms.isMapProperty(value))
+                        MJms.setMapProperty(String.valueOf(entry.getKey()), entry.getValue(), (MapMessage)ret );
 	                else {
 	                    consumed = false;
+	                    ret = null;
 	                    break;
 	                }
 	            }
 	        }
 	        
+	        // create result message and fill with result data from operation
 	        if (consumed) {
 	            // already done
 	        } else
-	        if (res != null && res.getResult() != null && res.getResult() instanceof File) {
-	            ret = getServer().createBytesMessage();
-	            try {
-	                File f = (File)res.getResult();
-	                FileInputStream is = new FileInputStream(f);
-	                byte[] buffer = new byte[1024 * 10];
-	                while (true) {
-	                    int size = is.read(buffer);
-	                    if (size == -1) break;
-	                    if (size == 0)
-	                        MThread.sleep(200);
-	                    else {
-	                        ((BytesMessage)ret).writeBytes(buffer, 0, size);
-	                    }
-	                }
-	                is.close();
-	            } catch (IOException e) {
-	                throw new JMSException(e.toString());
-	            }
-	        } else
-	        if (res != null && res.getResult() != null && res.getResult() instanceof Map) {
-	            ret = getServer().createMapMessage();
-	            MJms.setMapProperties((Map<?, ?>)res.getResult(), (MapMessage)ret);
-	        } else
-	        if (res != null && res.getResult() != null && res.getResult() instanceof byte[]) {
-	            ret = getServer().createBytesMessage();
-	            ((BytesMessage)ret).writeBytes((byte[])res.getResult());
-	        } else
-	        if (res != null && res.getResult() != null && res.getResult() instanceof Serializable ) {
-	            ret = getServer().createObjectMessage();
-	            ((ObjectMessage)ret).setObject((Serializable) res.getResult());
-	        } else
-	        if (res != null && res.getResult() != null) {
-	            ret = getServer().createMapMessage();
-	            try {
-	                IProperties prop = pojoToProperties(res.getResult(), new PojoModelFactory() {
-	                    
-	                    @Override
-	                    public PojoModel createPojoModel(Class<?> pojoClass) {
-	                        PojoModel model = new PojoParser().parse(pojoClass,"_",null).filter(new DefaultFilter(true, false, false, false, true) ).getModel();
-	                        return model;
-	                    }
-	                } );
-	                MJms.setMapProperties(prop, (MapMessage)ret);
-	            } catch (IOException e) {
-	                // TODO Auto-generated catch block
-	                e.printStackTrace();
-	            } //TODO MPojo.pojoToProperties();
-	        } else {
-	            ret = getServer().createTextMessage(null);
-	        }
-	        
+            if (res != null && res.getResult() != null) {
+                if (res.getResult() instanceof SerializedValue) {
+                    ret = getServer().createObjectMessage();
+                    ret.setStringProperty("_encoding", "serialized");
+                    ((ObjectMessage)ret).setObject( ((SerializedValue)res.getResult()).getValue() );
+                } else
+                if (res.getResult() instanceof MapValue) {
+                    ret = getServer().createMapMessage();
+                    ret.setStringProperty("_encoding", "mapvalue");
+                    MJms.setMapProperties((Map<?, ?>)((MapValue)res.getResult()).getValue(), (MapMessage)ret);
+                } else
+                if (res.getResult() instanceof InputStream) {
+                    ret = getServer().createBytesMessage();
+                    ret.setStringProperty("_encoding", "stream");
+                    try (InputStream is = (InputStream)res.getResult()) {
+                        byte[] buffer = new byte[1024 * 10];
+                        while (true) {
+                            int size = is.read(buffer);
+                            if (size == -1) break;
+                            if (size == 0)
+                                MThread.sleep(200);
+                            else {
+                                ((BytesMessage)ret).writeBytes(buffer, 0, size);
+                            }
+                        }
+                    } catch (IOException e) {
+                        throw new JMSException(e.toString());
+                    }
+                } else
+                if (res.getResult() instanceof File) {
+                    ret = getServer().createBytesMessage();
+                    ret.setStringProperty("_encoding", "file");
+                    ret.setStringProperty("_file", ((File)res.getResult()).getName() );
+                    try {
+                        File f = (File)res.getResult();
+                        try (FileInputStream is = new FileInputStream(f)) {
+                            byte[] buffer = new byte[1024 * 10];
+                            while (true) {
+                                int size = is.read(buffer);
+                                if (size == -1) break;
+                                if (size == 0)
+                                    MThread.sleep(200);
+                                else {
+                                    ((BytesMessage)ret).writeBytes(buffer, 0, size);
+                                }
+                            }
+                        }
+                    } catch (IOException e) {
+                        throw new JMSException(e.toString());
+                    }
+                } else
+                if (res.getResult() instanceof byte[]) {
+                    ret = getServer().createBytesMessage();
+                    ret.setStringProperty("_encoding", "byte[]");
+                    ((BytesMessage)ret).writeBytes((byte[])res.getResult());
+                } else
+                if (res.getResult() instanceof Serializable ) {
+                    ret = getServer().createObjectMessage();
+                    ret.setStringProperty("_encoding", "serialized");
+                    ((ObjectMessage)ret).setObject((Serializable) res.getResult());
+                } else {
+                    ret = getServer().createMapMessage();
+                    ret.setStringProperty("_encoding", "pojo");
+                    try {
+                        IProperties prop = MPojo.pojoToProperties(res.getResult(), new PojoModelFactory() {
+                            
+                            @Override
+                            public PojoModel createPojoModel(Class<?> pojoClass) {
+                                PojoModel model = new PojoParser().parse(pojoClass,"_",null).filter(new DefaultFilter(true, false, false, false, true) ).getModel();
+                                return model;
+                            }
+                        } );
+                        MJms.setMapProperties(prop, (MapMessage)ret);
+                    } catch (IOException e) {
+                        log().w(path,res,e);
+                        ret.setStringProperty("_error", e.getMessage());
+                    }
+                }
+            } else {
+                ret = getServer().createTextMessage(null);
+                ret.setStringProperty("_encoding", "empty");
+            }
+
+	        // fill metadata of result message
 	        if (res == null) {
 	            ret.setLongProperty("rc", OperationResult.INTERNAL_ERROR);
 	            ret.setStringProperty("msg", "null");
@@ -303,48 +349,14 @@ public class Jms2LocalOperationExecuteChannel extends AbstractJmsDataChannel {
 	            }
 	        }
 	        ret.setStringProperty("path", path);
-	        
+	        ret.setStringProperty("source", ident);
+            ret.setStringProperty("host", MSystem.getHostname());
+            ret.setStringProperty("reply_source", msg.getStringProperty("source"));
+            ret.setStringProperty("reply_host", msg.getStringProperty("host"));
+
 	        return ret;
 	    }
 	    
-	    @Deprecated // use MPojo instead
-	    public static IProperties pojoToProperties(Object from, PojoModelFactory factory) throws IOException {
-	        MProperties out = new MProperties();
-	        PojoModel model = factory.createPojoModel(from.getClass());
-
-	        for (PojoAttribute<?> attr : model) {
-	            Object value = attr.get(from);
-	            String name = attr.getName();
-	            Class<?> type = attr.getType();
-	            if (type == int.class) out.setInt(name, (int)value);
-	            else
-	            if (type == Integer.class) out.setInt(name, (Integer)value);
-	            else
-	            if (type == long.class)  out.setLong(name, (long)value);
-	            else
-	            if (type == Long.class)  out.setLong(name, (Long)value);
-	            else
-	            if (type == float.class)  out.setFloat(name, (float)value);
-	            else
-	            if (type == Float.class)  out.setFloat(name, (Float)value);
-	            else
-	            if (type == double.class)  out.setDouble(name, (double)value);
-	            else
-	            if (type == Double.class)  out.setDouble(name, (Double)value);
-	            else
-	            if (type == boolean.class)  out.setBoolean(name, (boolean)value);
-	            else
-	            if (type == Boolean.class)  out.setBoolean(name, (Boolean)value);
-	            else
-	            if (type == String.class)  out.setString(name, (String)value);
-	            else
-	            if (type == Date.class)  out.setDate(name, (Date)value);
-	            else
-	                out.setString(name, String.valueOf(value));
-	        }
-	        return out;
-	    }
-
 	    protected String getServiceName() {
 	        return getClass().getCanonicalName();
 	    }

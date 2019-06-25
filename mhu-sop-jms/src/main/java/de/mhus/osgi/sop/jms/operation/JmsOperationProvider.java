@@ -46,6 +46,7 @@ import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.MThread;
 import de.mhus.lib.core.MPeriod;
 import de.mhus.lib.core.lang.TempFile;
+import de.mhus.lib.core.service.ServerIdent;
 import de.mhus.lib.core.strategy.NotSuccessful;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.core.util.VersionRange;
@@ -76,6 +77,7 @@ import de.mhus.osgi.sop.jms.operation.JmsApiImpl.JmsOperationDescriptor;
 public class JmsOperationProvider extends MLog implements OperationsProvider {
 
 	protected static final String PROVIDER_NAME = "jms";
+	private String ident = M.l(ServerIdent.class).toString();
 
 	@Activate
 	public void doActivate(ComponentContext ctx) {
@@ -141,7 +143,7 @@ public class JmsOperationProvider extends MLog implements OperationsProvider {
 		
 		try {
 			return doExecuteOperation(con, queueName, path, version, properties, ticket, locale, timeout, executeOptions);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			return new NotSuccessful(path, e.getMessage(), OperationResult.INTERNAL_ERROR);
 		}
 		
@@ -156,14 +158,7 @@ public class JmsOperationProvider extends MLog implements OperationsProvider {
     		if (!OperationUtil.isOption(options, JmsApi.OPT_FORCE_MAP_MESSAGE)) {
     			for (Entry<String, Object> item : parameters) {
     				Object value = item.getValue();
-    				if (! (
-    						value == null || 
-    						value.getClass().isPrimitive() || 
-    						value instanceof String || 
-    						value instanceof Long || 
-    						value instanceof Integer || 
-    						value instanceof Boolean 
-    					) ) {
+    				if (!MJms.isMapProperty(value)) {
     					needObject = true;
     					break;
     				}
@@ -198,6 +193,10 @@ public class JmsOperationProvider extends MLog implements OperationsProvider {
     
     		msg.setStringProperty(Sop.PARAM_AAA_TICKET, ticket );
     		msg.setStringProperty(Sop.PARAM_LOCALE, locale );
+    		
+            msg.setStringProperty("source", ident);
+            msg.setStringProperty("host", MSystem.getHostname());
+
     		client.setTimeout(timeout);
         	// Send Request
         	

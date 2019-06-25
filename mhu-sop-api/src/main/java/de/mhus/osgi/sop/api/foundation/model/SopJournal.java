@@ -48,7 +48,7 @@ public class SopJournal extends DbMetadata implements FoundationRelated {
 	private String queue;
 	@DbPersistent(ro=true,features=AttributeFeatureCut.NAME)
 	private String event;
-	@DbPersistent(ro=true,features=AttributeFeatureCut.NAME)
+	@DbPersistent(ro=true)
 	private HashMap<String,String> data;
 
 	public SopJournal() {}
@@ -82,6 +82,7 @@ public class SopJournal extends DbMetadata implements FoundationRelated {
 	}
 
 	public Map<String,String> getData() {
+        if (data == null) data = new HashMap<>();
 		return data;
 	}
 

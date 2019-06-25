@@ -22,12 +22,12 @@ import java.util.Map;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.util.tracker.ServiceTracker;
-import org.osgi.util.tracker.ServiceTrackerCustomizer;
-
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
+
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.cfg.CfgBoolean;
@@ -72,7 +72,7 @@ public class RestApiImpl extends MLog implements RestApi {
 			if (service != null) {
 				for (String x : service.getParentNodeCanonicalClassNames()) {
 					if (x != null) {
-					    if (!x.contains(".")) // print a warning - class name without dot should be a mistake
+					    if (x.length() > 0 && !x.contains(".")) // print a warning - class name without dot should be a mistake
 					        log().w("Register RestNode with malformed parent name - should be a class",service.getClass(),service.getNodeId(),x);
 						String key = x + "-" + service.getNodeId();
 						log().i("register",key,service.getClass().getCanonicalName());
