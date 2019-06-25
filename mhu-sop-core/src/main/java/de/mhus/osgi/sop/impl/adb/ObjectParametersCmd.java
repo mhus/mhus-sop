@@ -17,7 +17,6 @@ package de.mhus.osgi.sop.impl.adb;
 
 import java.util.UUID;
 
-import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
@@ -29,6 +28,7 @@ import de.mhus.lib.core.MConstants;
 import de.mhus.lib.core.MString;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.lib.xdb.XdbService;
+import de.mhus.osgi.api.karaf.AbstractCmd;
 import de.mhus.osgi.sop.api.adb.AdbApi;
 import de.mhus.osgi.sop.api.model.SopObjectParameter;
 import de.mhus.osgi.sop.api.model._SopObjectParameter;
@@ -36,7 +36,7 @@ import de.mhus.osgi.sop.api.util.ObjectUtil;
 
 @Command(scope = "sop", name = "parameter", description = "Handle object parameters")
 @Service
-public class ObjectParametersCmd implements Action {
+public class ObjectParametersCmd extends AbstractCmd {
 
 	@Argument(index=0, name="type", required=true, description="Type of the object", multiValued=false)
     String type;
@@ -51,7 +51,7 @@ public class ObjectParametersCmd implements Action {
     String[] params;
 	
 	@Override
-	public Object execute() throws Exception {
+	public Object execute2() throws Exception {
 
 		XdbService manager = M.l(AdbApi.class).getManager();
 				

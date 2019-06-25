@@ -15,7 +15,6 @@
  */
 package de.mhus.osgi.sop.impl.aaa;
 
-import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
@@ -28,12 +27,13 @@ import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.lib.core.security.Account;
 import de.mhus.lib.core.security.ModifyAccountApi;
 import de.mhus.lib.core.security.ModifyAuthorizationApi;
+import de.mhus.osgi.api.karaf.AbstractCmd;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
 import de.mhus.osgi.sop.api.aaa.ModifyTrustApi;
 
 @Command(scope = "sop", name = "modifyaccess", description = "Modify Access Actions, you need admin access to use this command")
 @Service
-public class ModifyAccessCmd implements Action {
+public class ModifyAccessCmd extends AbstractCmd {
 
 	@Argument(index=0, name="entity", required=true, description="user, trust, auth", multiValued=false)
 	String entity;
@@ -66,7 +66,7 @@ public class ModifyAccessCmd implements Action {
     String[] parameters;
 	
 	@Override
-	public Object execute() throws Exception {
+	public Object execute2() throws Exception {
 
 		AccessApi api = M.l(AccessApi.class);
 		if (api == null) {

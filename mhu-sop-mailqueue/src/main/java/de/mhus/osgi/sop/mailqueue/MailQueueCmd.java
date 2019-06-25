@@ -18,7 +18,6 @@ package de.mhus.osgi.sop.mailqueue;
 import java.util.Arrays;
 import java.util.UUID;
 
-import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
@@ -30,6 +29,7 @@ import de.mhus.lib.core.M;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.lib.xdb.XdbService;
+import de.mhus.osgi.api.karaf.AbstractCmd;
 import de.mhus.osgi.sop.api.SopApi;
 import de.mhus.osgi.sop.api.mailqueue.MailMessage;
 import de.mhus.osgi.sop.api.mailqueue.MailQueueOperation;
@@ -39,7 +39,7 @@ import de.mhus.osgi.sop.api.operation.OperationUtil;
 
 @Command(scope = "sop", name = "mailqueue", description = "Main queue actions")
 @Service
-public class MailQueueCmd implements Action {
+public class MailQueueCmd extends AbstractCmd {
 
 	@Argument(index=0, name="cmd", required=true, description=
 			"Command:\n"
@@ -78,7 +78,7 @@ public class MailQueueCmd implements Action {
 	boolean individual = false;
 
 	@Override
-	public Object execute() throws Exception {
+	public Object execute2() throws Exception {
 
 		switch (cmd) {
 		case "list": {

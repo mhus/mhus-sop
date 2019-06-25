@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.LinkedList;
 
-import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
@@ -34,6 +33,7 @@ import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.core.util.VersionRange;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.form.ModelUtil;
+import de.mhus.osgi.api.karaf.AbstractCmd;
 import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.operation.OperationAddress;
 import de.mhus.osgi.sop.api.operation.OperationApi;
@@ -43,7 +43,7 @@ import de.mhus.osgi.sop.impl.util.PingOperation;
 
 @Command(scope = "sop", name = "operation", description = "Operation commands")
 @Service
-public class OperationCmd implements Action {
+public class OperationCmd extends AbstractCmd {
 
 	@Argument(index=0, name="cmd", required=true, description="Command:\n"
 			+ " list\n"
@@ -79,7 +79,7 @@ public class OperationCmd implements Action {
 	boolean full = false;
 	
 	@Override
-	public Object execute() throws Exception {
+	public Object execute2() throws Exception {
 
 //		if (conName == null)
 //			conName = M.l(JmsApi.class).getDefaultConnectionName();

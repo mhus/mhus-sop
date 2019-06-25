@@ -19,7 +19,6 @@ import java.io.File;
 import java.util.Map.Entry;
 import java.util.UUID;
 
-import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
@@ -33,13 +32,14 @@ import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.lib.core.util.MUri;
+import de.mhus.osgi.api.karaf.AbstractCmd;
 import de.mhus.osgi.sop.api.dfs.FileInfo;
 import de.mhus.osgi.sop.api.dfs.FileQueueApi;
 import de.mhus.osgi.sop.api.dfs.FileQueueOperation;
 
 @Command(scope = "sop", name = "dfq", description = "Distributed File Queue actions")
 @Service
-public class FileQueueCmd implements Action {
+public class FileQueueCmd extends AbstractCmd {
 
 	@Argument(index=0, name="cmd", required=true, description=
 			"Command:\n"
@@ -65,7 +65,7 @@ public class FileQueueCmd implements Action {
 	boolean full = false;
 
 	@Override
-	public Object execute() throws Exception {
+	public Object execute2() throws Exception {
 		
 		FileQueueApi api = M.l(FileQueueApi.class);
 		

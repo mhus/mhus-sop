@@ -15,7 +15,6 @@
  */
 package de.mhus.osgi.sop.impl.adb;
 
-import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
@@ -23,6 +22,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import de.mhus.lib.adb.query.Db;
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.console.ConsoleTable;
+import de.mhus.osgi.api.karaf.AbstractCmd;
 import de.mhus.osgi.sop.api.SopApi;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AaaUtil;
@@ -30,7 +30,7 @@ import de.mhus.osgi.sop.api.model.SopAcl;
 
 @Command(scope = "sop", name = "acl", description = "Handle acl objects")
 @Service
-public class AclCmd implements Action {
+public class AclCmd extends AbstractCmd {
 
 	@Argument(index=0, name="cmd", required=true, description=
 			"Command list <id>, get <id>, create <id> <acl>, set <id> <acl>, delete <id>", multiValued=false)
@@ -40,7 +40,7 @@ public class AclCmd implements Action {
     String[] parameters;
 	
 	@Override
-	public Object execute() throws Exception {
+	public Object execute2() throws Exception {
 
 		SopApi api = M.l(SopApi.class);
 		

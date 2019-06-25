@@ -20,7 +20,6 @@ import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.UUID;
 
-import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
@@ -37,6 +36,7 @@ import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.lib.core.security.Account;
 import de.mhus.lib.core.security.ModifyAccountApi;
 import de.mhus.lib.core.security.ModifyCurrentAccountApi;
+import de.mhus.osgi.api.karaf.AbstractCmd;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
 import de.mhus.osgi.sop.api.aaa.Trust;
@@ -48,7 +48,7 @@ import de.mhus.osgi.sop.impl.aaa.util.AccountFile;
 
 @Command(scope = "sop", name = "access", description = "Access actions")
 @Service
-public class AccessCmd implements Action {
+public class AccessCmd extends AbstractCmd {
 
 	@Argument(index=0, name="cmd", required=true, description=
 			"Command:\n"
@@ -81,7 +81,7 @@ public class AccessCmd implements Action {
 	boolean admin = false;
 
 	@Override
-	public Object execute() throws Exception {
+	public Object execute2() throws Exception {
 
 		AccessApi api = M.l(AccessApi.class);
 		if (api == null) {

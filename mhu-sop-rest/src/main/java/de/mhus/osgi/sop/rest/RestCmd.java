@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 
-import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
@@ -27,13 +26,14 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.console.ConsoleTable;
+import de.mhus.osgi.api.karaf.AbstractCmd;
 import de.mhus.osgi.sop.api.rest.AbstractNode;
 import de.mhus.osgi.sop.api.rest.RestApi;
 import de.mhus.osgi.sop.api.rest.RestNodeService;
 
 @Command(scope = "sop", name = "rest", description = "REST Call")
 @Service
-public class RestCmd implements Action {
+public class RestCmd extends AbstractCmd {
 
     @Argument(index=0, name="cmd", required=true, description="Command:\n"
             + " list\n"
@@ -47,7 +47,7 @@ public class RestCmd implements Action {
     boolean full = false;
 
 	@Override
-	public Object execute() throws Exception {
+	public Object execute2() throws Exception {
 
         RestApi restService = M.l(RestApi.class);
 

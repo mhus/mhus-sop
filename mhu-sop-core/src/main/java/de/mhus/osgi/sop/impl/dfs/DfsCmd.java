@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
-import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
@@ -35,13 +34,14 @@ import de.mhus.lib.core.MString;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.lib.core.util.MUri;
 import de.mhus.lib.errors.MException;
+import de.mhus.osgi.api.karaf.AbstractCmd;
 import de.mhus.osgi.sop.api.dfs.DfsApi;
 import de.mhus.osgi.sop.api.dfs.FileInfo;
 import de.mhus.osgi.sop.api.dfs.FileQueueApi;
 
 @Command(scope = "sop", name = "dfs", description = "Distributed File System actions")
 @Service
-public class DfsCmd implements Action {
+public class DfsCmd extends AbstractCmd {
 
 	@Argument(index=0, name="cmd", required=true, description=
 			"Command:\n"
@@ -62,7 +62,7 @@ public class DfsCmd implements Action {
 	boolean full = false;
 
 	@Override
-	public Object execute() throws Exception {
+	public Object execute2() throws Exception {
 		
 		DfsApi api = M.l(DfsApi.class);
 

@@ -16,7 +16,6 @@
 
 package de.mhus.osgi.sop.impl.adb;
 
-import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
@@ -26,13 +25,14 @@ import de.mhus.lib.adb.query.Db;
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.lib.xdb.XdbService;
+import de.mhus.osgi.api.karaf.AbstractCmd;
 import de.mhus.osgi.sop.api.SopApi;
 import de.mhus.osgi.sop.api.model.SopRegister;
 import de.mhus.osgi.sop.api.util.RegisterUtil;
 
 @Command(scope = "sop", name = "register", description = "Register actions")
 @Service
-public class RegisterCmd implements Action {
+public class RegisterCmd extends AbstractCmd {
 
 	@Argument(index=0, name="cmd", required=true, description="Command:\n"
 			+ " list <name> [<key1>] [<key2>],\n"
@@ -44,7 +44,7 @@ public class RegisterCmd implements Action {
     String[] parameters;
 	
 	@Override
-	public Object execute() throws Exception {
+	public Object execute2() throws Exception {
 
 		XdbService db = M.l(SopApi.class).getManager();
 		

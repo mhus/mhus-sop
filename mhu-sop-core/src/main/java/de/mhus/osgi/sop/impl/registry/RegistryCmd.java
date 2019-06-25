@@ -18,7 +18,6 @@ package de.mhus.osgi.sop.impl.registry;
 import java.util.Date;
 import java.util.LinkedList;
 
-import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
@@ -26,9 +25,10 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MDate;
-import de.mhus.lib.core.MString;
 import de.mhus.lib.core.MPeriod;
+import de.mhus.lib.core.MString;
 import de.mhus.lib.core.console.ConsoleTable;
+import de.mhus.osgi.api.karaf.AbstractCmd;
 import de.mhus.osgi.sop.api.registry.RegistryApi;
 import de.mhus.osgi.sop.api.registry.RegistryManager;
 import de.mhus.osgi.sop.api.registry.RegistryPathControl;
@@ -36,7 +36,7 @@ import de.mhus.osgi.sop.api.registry.RegistryValue;
 
 @Command(scope = "sop", name = "registry", description = "Registry commands")
 @Service
-public class RegistryCmd implements Action {
+public class RegistryCmd extends AbstractCmd {
 
 	@Argument(index=0, name="cmd", required=true, description="Command:\n list [path]\n set/add <path> <value>\n remove <path>\n publish\n request\n save\n load", multiValued=false)
 	String cmd;
@@ -63,7 +63,7 @@ public class RegistryCmd implements Action {
 	boolean local = false;
 	
 	@Override
-	public Object execute() throws Exception {
+	public Object execute2() throws Exception {
 		RegistryApi api = M.l(RegistryApi.class);
 		if (cmd.equals("list")) {
 			
