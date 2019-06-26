@@ -37,7 +37,7 @@ import de.mhus.lib.core.security.AccountSource;
 import de.mhus.lib.core.security.LoginCallbackHandler;
 import de.mhus.lib.core.security.ModifyAccountApi;
 import de.mhus.lib.errors.NotSupportedException;
-import de.mhus.osgi.services.MOsgi;
+import de.mhus.osgi.api.services.MOsgi;
 
 public class KarafAaaSource implements AccountSource {
 

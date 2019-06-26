@@ -23,10 +23,10 @@ import javax.jms.JMSException;
 import javax.jms.MapMessage;
 import javax.jms.Message;
 
-import org.w3c.dom.Document;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.w3c.dom.Document;
+
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MCollection;
 import de.mhus.lib.core.MXml;
@@ -36,8 +36,8 @@ import de.mhus.lib.form.ModelUtil;
 import de.mhus.lib.jms.JmsChannel;
 import de.mhus.lib.jms.JmsDestination;
 import de.mhus.lib.jms.ServerJms;
-import de.mhus.osgi.services.jms.AbstractJmsDataChannel;
-import de.mhus.osgi.services.jms.JmsDataChannel;
+import de.mhus.osgi.api.jms.JmsDataChannel;
+import de.mhus.osgi.jms.services.AbstractJmsDataChannel;
 import de.mhus.osgi.sop.api.jms.JmsApi;
 import de.mhus.osgi.sop.api.operation.OperationAddress;
 import de.mhus.osgi.sop.api.registry.RegistryManager;

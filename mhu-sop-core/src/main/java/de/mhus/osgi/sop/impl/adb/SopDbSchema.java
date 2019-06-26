@@ -29,7 +29,7 @@ import de.mhus.lib.core.MApi;
 import de.mhus.lib.errors.AccessDeniedException;
 import de.mhus.lib.sql.DbConnection;
 import de.mhus.lib.sql.DbResult;
-import de.mhus.osgi.services.adb.DbManagerService;
+import de.mhus.osgi.api.adb.DbManagerService;
 import de.mhus.osgi.sop.api.adb.AbstractDbSchema;
 import de.mhus.osgi.sop.api.adb.AdbApi;
 import de.mhus.osgi.sop.api.adb.DbSchemaService;

@@ -26,7 +26,7 @@ import de.mhus.lib.core.MPeriod;
 import de.mhus.lib.core.logging.Log;
 import de.mhus.lib.errors.AccessDeniedException;
 import de.mhus.lib.sql.DbConnection;
-import de.mhus.osgi.services.adb.DbManagerService;
+import de.mhus.osgi.api.adb.DbManagerService;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
 import de.mhus.osgi.sop.api.util.SopFileLogger;
 

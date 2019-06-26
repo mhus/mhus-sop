@@ -19,16 +19,16 @@ import java.io.File;
 import java.util.Date;
 
 import org.osgi.service.component.ComponentContext;
-
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+
 import de.mhus.lib.adb.query.Db;
 import de.mhus.lib.annotations.util.Interval;
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MFile;
-import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MPeriod;
+import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.cfg.CfgInt;
 import de.mhus.lib.core.cfg.CfgString;
 import de.mhus.lib.core.concurrent.Lock;
@@ -36,8 +36,8 @@ import de.mhus.lib.core.mail.MSendMail;
 import de.mhus.lib.core.mail.MailAttachment;
 import de.mhus.lib.core.util.MUri;
 import de.mhus.lib.xdb.XdbService;
-import de.mhus.osgi.services.scheduler.SchedulerService;
-import de.mhus.osgi.services.scheduler.SchedulerServiceAdapter;
+import de.mhus.osgi.api.scheduler.SchedulerService;
+import de.mhus.osgi.api.scheduler.SchedulerServiceAdapter;
 import de.mhus.osgi.sop.api.SopApi;
 import de.mhus.osgi.sop.api.mailqueue.MailQueueOperation;
 

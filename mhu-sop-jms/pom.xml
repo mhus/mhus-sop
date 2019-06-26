@@ -69,8 +69,12 @@
 		</dependency>
        	<dependency>
 			<groupId>de.mhus.osgi</groupId>
-			<artifactId>mhu-osgi-services</artifactId>
+			<artifactId>mhu-osgi-api</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>de.mhus.osgi</groupId>
+            <artifactId>mhu-osgi-jms</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>de.mhus.lib</groupId>
 			<artifactId>mhu-lib-annotations</artifactId>

@@ -24,6 +24,7 @@ import java.util.TreeMap;
 import java.util.UUID;
 
 import org.osgi.service.component.annotations.Component;
+
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.strategy.Operation;
@@ -34,7 +35,7 @@ import de.mhus.lib.core.util.MutableUri;
 import de.mhus.lib.core.util.SoftHashMap;
 import de.mhus.lib.core.util.Version;
 import de.mhus.lib.errors.MException;
-import de.mhus.osgi.services.MOsgi;
+import de.mhus.osgi.api.services.MOsgi;
 import de.mhus.osgi.sop.api.aaa.AaaUtil;
 import de.mhus.osgi.sop.api.dfs.DfsProviderOperation;
 import de.mhus.osgi.sop.api.dfs.FileInfo;

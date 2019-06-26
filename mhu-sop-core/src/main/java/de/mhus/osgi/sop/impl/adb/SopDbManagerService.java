@@ -35,7 +35,7 @@ import de.mhus.lib.sql.DataSourceProvider;
 import de.mhus.lib.sql.DbPool;
 import de.mhus.lib.sql.DefaultDbPool;
 import de.mhus.lib.sql.PseudoDbPool;
-import de.mhus.osgi.services.adb.DbManagerService;
+import de.mhus.osgi.api.adb.DbManagerService;
 import de.mhus.osgi.services.adb.DbManagerServiceImpl;
 import de.mhus.osgi.sop.api.adb.DbSchemaService;
 

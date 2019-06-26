@@ -16,13 +16,13 @@
 package de.mhus.osgi.sop.foundation;
 
 import org.osgi.service.component.ComponentContext;
-
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+
 import de.mhus.lib.core.util.SoftHashMap;
-import de.mhus.osgi.services.AbstractCacheControl;
-import de.mhus.osgi.services.CacheControlIfc;
+import de.mhus.osgi.api.services.AbstractCacheControl;
+import de.mhus.osgi.api.services.CacheControlIfc;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.ContextCachedItem;
 

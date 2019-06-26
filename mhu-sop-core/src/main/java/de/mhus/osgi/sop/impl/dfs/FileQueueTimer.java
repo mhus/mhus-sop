@@ -16,9 +16,10 @@
 package de.mhus.osgi.sop.impl.dfs;
 
 import org.osgi.service.component.annotations.Component;
+
 import de.mhus.lib.annotations.util.Interval;
-import de.mhus.osgi.services.scheduler.SchedulerService;
-import de.mhus.osgi.services.scheduler.SchedulerServiceAdapter;
+import de.mhus.osgi.api.scheduler.SchedulerService;
+import de.mhus.osgi.api.scheduler.SchedulerServiceAdapter;
 
 @Component(service=SchedulerService.class,immediate=true)
 @Interval("interval=*/15 * * * * *")

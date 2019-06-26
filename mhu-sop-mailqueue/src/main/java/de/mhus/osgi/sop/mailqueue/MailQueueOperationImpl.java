@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import org.osgi.service.component.annotations.Component;
+
 import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MFile;
@@ -31,7 +32,7 @@ import de.mhus.lib.core.util.MUri;
 import de.mhus.lib.core.util.Version;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.errors.NotFoundException;
-import de.mhus.osgi.services.MOsgi;
+import de.mhus.osgi.api.services.MOsgi;
 import de.mhus.osgi.sop.api.SopApi;
 import de.mhus.osgi.sop.api.dfs.DfsApi;
 import de.mhus.osgi.sop.api.dfs.FileQueueApi;
