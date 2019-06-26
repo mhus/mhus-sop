@@ -257,5 +257,9 @@ public class JmsApiImpl extends MLog implements JmsApi {
 		}
 		return false;
 	}
+	
+	public boolean isConnected() {
+	    return registerClient != null && registerClient.getSession() != null;
+	}
 
 }

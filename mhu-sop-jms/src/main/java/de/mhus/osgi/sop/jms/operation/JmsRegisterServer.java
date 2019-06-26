@@ -29,6 +29,7 @@ import org.w3c.dom.Document;
 
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MCollection;
+import de.mhus.lib.core.MThread;
 import de.mhus.lib.core.MXml;
 import de.mhus.lib.core.definition.DefRoot;
 import de.mhus.lib.core.strategy.OperationDescription;
@@ -59,7 +60,20 @@ public class JmsRegisterServer extends AbstractJmsDataChannel {
 	@Reference
 	public void setJmsApi(JmsApi api) {
 		this.jmsApi = api;
-		JmsApiImpl.instance.requestRegistry();
+		new MThread(new Runnable() {
+
+            @Override
+            public void run() {
+                while (true) {
+                    if (JmsApiImpl.instance.isConnected()) {
+                        JmsApiImpl.instance.requestRegistry();
+                        return;
+                    }
+                    MThread.sleep(10000);
+                }
+            }
+		    
+		}).start();
 	}
 
 	@Override
