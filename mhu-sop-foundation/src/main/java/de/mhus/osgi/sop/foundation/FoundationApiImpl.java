@@ -323,6 +323,12 @@ public class FoundationApiImpl extends MLog implements FoundationApi {
 		return out;
 	}
 
+    @Override
+    public SopData getSopData(UUID id) throws MException {
+        SopData out = getManager().getObject(SopData.class, id);
+        return out;
+    }
+
 	@Override
 	public SopData getSopData(UUID foundId, String id, boolean sync) throws MException {
 		SopData out = null;

@@ -61,4 +61,6 @@ public interface FoundationApi {
 
 	SopFoundation getFoundation(String id) throws MException;
 
+    SopData getSopData(UUID id) throws MException;
+
 }
