@@ -29,6 +29,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import de.mhus.lib.adb.DbManager;
 import de.mhus.lib.adb.DbSchema;
 import de.mhus.lib.core.MApi;
+import de.mhus.lib.core.MThread;
 import de.mhus.lib.core.cfg.CfgBoolean;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.sql.DataSourceProvider;
@@ -53,14 +54,31 @@ public class SopDbManagerService extends DbManagerServiceImpl {
 	public void doActivate(ComponentContext ctx) {
 //		new de.mhus.lib.adb.util.Property();
 		context = ctx.getBundleContext();
-		tracker = new ServiceTracker<>(context, DbSchemaService.class, new MyTrackerCustomizer() );
-		tracker.open();
+		new MThread(new Runnable() {
+
+            @Override
+            public void run() {
+                while (true) {
+                    if (context == null) return;
+                    if (getManager() != null) {
+                        log().i("Start tracker");
+                        tracker = new ServiceTracker<>(context, DbSchemaService.class, new MyTrackerCustomizer() );
+                        tracker.open();
+                        return;
+                    }
+                    log().i("Waiting for db manager");
+                    MThread.sleep(10000);
+                }
+            }
+		    
+		}).start();
 	}
 	
 	@Deactivate
 	public void doDeactivate(ComponentContext ctx) {
 //		super.doDeactivate(ctx);
-		tracker.close();
+	    if (tracker != null)
+	        tracker.close();
 		tracker = null;
 		context = null;
 		schemaList.clear();

@@ -39,8 +39,11 @@ import de.mhus.osgi.sop.api.foundation.model.SopData;
 import de.mhus.osgi.sop.api.foundation.model.SopFoundation;
 import de.mhus.osgi.sop.api.foundation.model.SopFoundationGroup;
 import de.mhus.osgi.sop.api.foundation.model.SopJournal;
+import de.mhus.osgi.sop.api.foundation.model._SopFoundation;
+import de.mhus.osgi.sop.api.foundation.model._SopFoundationGroup;
 import de.mhus.osgi.sop.api.model.SopAcl;
 import de.mhus.osgi.sop.api.model.SopObjectParameter;
+import de.mhus.osgi.sop.api.model._SopAcl;
 
 @Component(service=DbSchemaService.class,immediate=true)
 public class FoundationDbImpl extends AbstractDbSchemaService {
@@ -72,20 +75,20 @@ public class FoundationDbImpl extends AbstractDbSchemaService {
 		
 	    try (AaaContext ctx = AaaUtil.enterRoot()) {
 	        // init base structure
-			SopFoundationGroup defGroup = service.getObjectByQualification(Db.query(SopFoundationGroup.class).eq("name", ""));
+			SopFoundationGroup defGroup = service.getObjectByQualification(Db.query(SopFoundationGroup.class).eq(_SopFoundationGroup._NAME, ""));
 			if (defGroup == null) {
 				defGroup = service.inject(new SopFoundationGroup(""));
 				defGroup.save();
 			}
 			
-			SopFoundation defFound = service.getObjectByQualification(Db.query(SopFoundation.class).eq("ident", ""));
+			SopFoundation defFound = service.getObjectByQualification(Db.query(SopFoundation.class).eq(_SopFoundation._IDENT, ""));
 			if (defFound == null) {
 				defFound = service.inject(new SopFoundation("",""));
 				defFound.save();
 			}
 			defFoundationId = defFound.getId();
 			try {
-				SopAcl acl = service.getObjectByQualification(Db.query(SopAcl.class).eq("target", defFoundationId.toString()));
+				SopAcl acl = service.getObjectByQualification(Db.query(SopAcl.class).eq(_SopAcl._TARGET, defFoundationId.toString()));
 				if (acl == null) {
 					acl = service.inject(new SopAcl(defFoundationId.toString(), "*=r"));
 					acl.save();
@@ -94,7 +97,7 @@ public class FoundationDbImpl extends AbstractDbSchemaService {
 				log().w(t);
 			}
 			try {
-				SopAcl acl = service.getObjectByQualification(Db.query(SopAcl.class).eq("target", defFoundationId + "_"));
+				SopAcl acl = service.getObjectByQualification(Db.query(SopAcl.class).eq(_SopAcl._TARGET, defFoundationId + "_"));
 				if (acl == null) {
 					acl = service.inject(new SopAcl(defFoundationId.toString() + "_", "*=r"));
 					acl.save();
