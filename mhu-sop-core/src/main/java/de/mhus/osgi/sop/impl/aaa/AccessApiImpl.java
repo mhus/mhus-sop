@@ -311,7 +311,7 @@ public class AccessApiImpl extends MLog implements AccessApi {
 		synchronized (pool) {
 			current = pool.getCurrent();
 			try {
-				if (MString.isEmpty(account) || current == null || !account.equals(current.getAccount().getName()) ) return current;
+				if (MString.isEmpty(account) || current == null || current.getAccount() == null || !account.equals(current.getAccount().getName()) ) return current;
 			} catch (NullPointerException e) {
 				e.printStackTrace();
 				return current;
