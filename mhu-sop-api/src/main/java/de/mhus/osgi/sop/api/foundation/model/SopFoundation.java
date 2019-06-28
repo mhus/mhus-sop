@@ -16,6 +16,7 @@
 package de.mhus.osgi.sop.api.foundation.model;
 
 import de.mhus.lib.adb.DbMetadata;
+import de.mhus.lib.adb.model.AttributeFeatureCut;
 import de.mhus.lib.annotations.adb.DbPersistent;
 import de.mhus.lib.annotations.adb.DbPrimaryKey;
 import de.mhus.lib.annotations.generic.Public;
@@ -35,12 +36,16 @@ public class SopFoundation extends DbMetadata {
 	private String ident;
 	@DbPersistent
 	private boolean active;
+    @DbPersistent(features=AttributeFeatureCut.NAME)
+    @Public
+    private String title;
 	
 	public SopFoundation() {}
 	
-	public SopFoundation(String ident, String group) {
+	public SopFoundation(String ident, String title, String group) {
 		super();
 		this.ident = ident;
+		this.title = title;
 		this.group = group;
 	}
 
@@ -64,5 +69,13 @@ public class SopFoundation extends DbMetadata {
 	public void setActive(boolean active) {
 		this.active = active;
 	}
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
 }

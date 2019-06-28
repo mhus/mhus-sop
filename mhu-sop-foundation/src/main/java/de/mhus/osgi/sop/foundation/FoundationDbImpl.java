@@ -83,7 +83,7 @@ public class FoundationDbImpl extends AbstractDbSchemaService {
 			
 			SopFoundation defFound = service.getObjectByQualification(Db.query(SopFoundation.class).eq(_SopFoundation._IDENT, ""));
 			if (defFound == null) {
-				defFound = service.inject(new SopFoundation("",""));
+				defFound = service.inject(new SopFoundation("","",""));
 				defFound.save();
 			}
 			defFoundationId = defFound.getId();

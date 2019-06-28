@@ -21,6 +21,7 @@ public class _SopFoundation extends ConstBase {
   public static final Identifier METHOD_GET_ID = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.foundation.model.SopFoundation.class,"getId");
   public static final Identifier METHOD_GET_IDENT = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.foundation.model.SopFoundation.class,"getIdent");
   public static final Identifier METHOD_GET_MODIFY_DATE = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.foundation.model.SopFoundation.class,"getModifyDate");
+  public static final Identifier METHOD_GET_TITLE = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.foundation.model.SopFoundation.class,"getTitle");
   public static final Identifier METHOD_GET_VSTAMP = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.foundation.model.SopFoundation.class,"getVstamp");
   public static final Identifier METHOD_IS_ACTIVE = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.foundation.model.SopFoundation.class,"isActive");
   public static final Identifier METHOD_IS_ADB_CHANGED = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.foundation.model.SopFoundation.class,"isAdbChanged");
@@ -31,6 +32,7 @@ public class _SopFoundation extends ConstBase {
   public static final Identifier METHOD_SAVE = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.foundation.model.SopFoundation.class,"save");
   public static final Identifier METHOD_SAVE_CHANGED = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.foundation.model.SopFoundation.class,"saveChanged");
   public static final Identifier METHOD_SET_ACTIVE = new Identifier(Identifier.TYPE.SETTER, de.mhus.osgi.sop.api.foundation.model.SopFoundation.class,"setActive");
+  public static final Identifier METHOD_SET_TITLE = new Identifier(Identifier.TYPE.SETTER, de.mhus.osgi.sop.api.foundation.model.SopFoundation.class,"setTitle");
   public static final Identifier PROJECT_ARTIFACT = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.api.foundation.model.SopFoundation.class,"mhu-sop-api");
   public static final Identifier PROJECT_DESCRIPTION = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.api.foundation.model.SopFoundation.class,"A set of tools to improve OSGi frameworks and karaf");
   public static final Identifier PROJECT_GROUP = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.api.foundation.model.SopFoundation.class,"de.mhus.osgi");
@@ -41,6 +43,7 @@ public class _SopFoundation extends ConstBase {
   public static final Identifier _ID = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.foundation.model.SopFoundation.class,"id");
   public static final Identifier _IDENT = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.foundation.model.SopFoundation.class,"ident");
   public static final Identifier _MODIFY_DATE = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.foundation.model.SopFoundation.class,"modifyDate");
+  public static final Identifier _TITLE = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.foundation.model.SopFoundation.class,"title");
   public static final Identifier _VSTAMP = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.foundation.model.SopFoundation.class,"vstamp");
 
 }
