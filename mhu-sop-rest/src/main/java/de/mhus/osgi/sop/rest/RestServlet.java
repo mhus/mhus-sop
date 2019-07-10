@@ -274,13 +274,18 @@ public class RestServlet extends HttpServlet {
 
     	String paramLog = getParameterLog(parameterMap);
     	trace.i("access",id,remoteAddr,remotePort,getTicketLog(ticket), method, pathInfo, paramLog);
-    	log.d("access",id,remoteAddr,remotePort,getTicketLog(ticket), method, pathInfo, paramLog );
+    	log.d("access",id,
+    	        "\n Remote: " + remoteAddr + ":" + remotePort + 
+    	        "\n Ticket: " + getTicketLog(ticket) + 
+    	        "\n Method: " + method + 
+    	        "\n Request: " + pathInfo + 
+    	        "\n Parameters: " + paramLog + "\n" );
 	}
 
 	private String getParameterLog(Map<?,?> parameterMap) {
 		StringBuilder out = new StringBuilder().append('{');
 		for (Map.Entry<?,?> entry : parameterMap.entrySet()) {
-			out.append(entry.getKey()).append("=[");
+			out.append('\n').append(entry.getKey()).append("=[");
 			Object val = entry.getValue();
 			if (val == null) {
 			} else

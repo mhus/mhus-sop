@@ -26,14 +26,13 @@ import org.codehaus.jackson.node.ObjectNode;
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.logging.LevelMapper;
-import de.mhus.lib.core.logging.Log;
 import de.mhus.lib.core.logging.TrailLevelMapper;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
 
 public class JsonResult implements RestResult {
 
-	private static Log log = Log.getLog(JsonResult.class);
+	// private static Log log = Log.getLog(JsonResult.class);
 	private static int nextId = 0;
 	private org.codehaus.jackson.JsonNode json;
 	private long id;
@@ -46,7 +45,7 @@ public class JsonResult implements RestResult {
 	@Override
 	public void write(PrintWriter writer) throws Exception {
 		
-    	log.d("result",id,json);
+    	// log.d("result",id,json);
     	if (json == null) {
     		createObjectNode();
     	}
