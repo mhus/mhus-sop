@@ -43,8 +43,8 @@ public class RestCmd extends AbstractCmd {
     @Argument(index=1, name="parameters", required=false, description="More Parameters", multiValued=true)
     String[] parameters;
 
-    @Option(name="-x", description="Full Table Content",required=false, multiValued=false)
-    boolean full = false;
+    @Option(name = "-ct", aliases = { "--console-table" }, description = "Console table options", required = false, multiValued = false)
+    String consoleTable;
 
 	@Override
 	public Object execute2() throws Exception {
@@ -62,7 +62,7 @@ public class RestCmd extends AbstractCmd {
                 item.add(entry.getKey());
             }
             
-            ConsoleTable table = new ConsoleTable(full);
+            ConsoleTable table = new ConsoleTable(consoleTable);
             table.setHeaderValues("Class","Node Id","Managed","Parents","Registrations");
             for (Entry<RestNodeService, LinkedList<String>> entry : list.entrySet()) {
                 String managed = "";

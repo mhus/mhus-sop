@@ -31,6 +31,7 @@ import de.mhus.lib.core.logging.Log;
 import de.mhus.lib.core.pojo.MPojo;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.errors.MException;
+import de.mhus.osgi.sop.api.SopApi;
 import de.mhus.osgi.sop.api.aaa.AaaUtil;
 import de.mhus.osgi.sop.api.data.SopDataController;
 import de.mhus.osgi.sop.api.foundation.FoundationApi;
@@ -101,7 +102,7 @@ public class DataNode extends ObjectListNode<SopData,SopData>{
 		
 		
 		// add needed object if not already in list ....
-		String selectedId = callContext.getParameter("_selected");
+		String selectedId = callContext.getParameter("selected");
 		if (selectedId != null && MValidator.isUUID(selectedId)) {
 			UUID id = UUID.fromString(selectedId);
 			boolean found = false;
@@ -174,10 +175,8 @@ public class DataNode extends ObjectListNode<SopData,SopData>{
 
 		FoundationApi api = M.l(FoundationApi.class);
 		SopDataController handler = api.getDataSyncControllerForType(data.getType());
-		MProperties p = new MProperties();
-		for (String name : callContext.getParameterNames())
-			if (!name.startsWith("_") || name.startsWith("__"))
-				p.put(name, callContext.getParameter(name));
+		MProperties p = new MProperties(callContext.getParameters());
+		MProperties.updateFunctional(p);
 				
 		OperationResult res = handler.actionSopData(data,callContext.getAction(),p);
 		
@@ -193,5 +192,101 @@ public class DataNode extends ObjectListNode<SopData,SopData>{
 
 		return result;
 	}
+
+	@Override
+    protected void doUpdate(JsonResult result, CallContext callContext) throws Exception {
+        SopData data = getObjectFromContext(callContext, SopData.class);
+        FoundationApi api = M.l(FoundationApi.class);
+        SopDataController handler = api.getDataSyncControllerForType(data.getType());
+        MProperties p = new MProperties(callContext.getParameters());
+
+        String s0 = p.getString("_value0", null);
+        String s1 = p.getString("_value1", null);
+        String s2 = p.getString("_value2", null);
+        String s3 = p.getString("_value3", null);
+        String s4 = p.getString("_value4", null);
+        String s5 = p.getString("_value5", null);
+        String s6 = p.getString("_value6", null);
+        String s7 = p.getString("_value7", null);
+        String s8 = p.getString("_value8", null);
+        String s9 = p.getString("_value9", null);
+        
+        MProperties.updateFunctional(p);
+        
+        if (s0 != null) data.setValue0(s0);
+        if (s1 != null) data.setValue1(s1);
+        if (s2 != null) data.setValue2(s2);
+        if (s3 != null) data.setValue3(s3);
+        if (s4 != null) data.setValue4(s4);
+        if (s5 != null) data.setValue5(s5);
+        if (s6 != null) data.setValue6(s6);
+        if (s7 != null) data.setValue7(s7);
+        if (s8 != null) data.setValue8(s8);
+        if (s9 != null) data.setValue9(s9);
+        
+        data.getData().putAll(p);
+        handler.updateSopData(data);
+        
+        MPojo.pojoToJson(data, result.createObjectNode());
+
+    }
+    @Override
+    protected void doCreate(JsonResult result, CallContext callContext) throws Exception {
+        
+        MProperties p = new MProperties(callContext.getParameters());
+        String type = p.getString("_type");
+        
+        String s0 = p.getString("_value0", null);
+        String s1 = p.getString("_value1", null);
+        String s2 = p.getString("_value2", null);
+        String s3 = p.getString("_value3", null);
+        String s4 = p.getString("_value4", null);
+        String s5 = p.getString("_value5", null);
+        String s6 = p.getString("_value6", null);
+        String s7 = p.getString("_value7", null);
+        String s8 = p.getString("_value8", null);
+        String s9 = p.getString("_value9", null);
+        
+        MProperties.updateFunctional(p);
+
+        FoundationApi api = M.l(FoundationApi.class);
+        SopApi sop = M.l(SopApi.class);
+        SopDataController handler = api.getDataSyncControllerForType(type);
+        
+        SopFoundation foundation = getObjectFromContext(callContext, SopFoundation.class);
+        SopData data = sop.getManager().inject(new SopData(foundation, type));
+        
+        if (s0 != null) data.setValue0(s0);
+        if (s1 != null) data.setValue1(s1);
+        if (s2 != null) data.setValue2(s2);
+        if (s3 != null) data.setValue3(s3);
+        if (s4 != null) data.setValue4(s4);
+        if (s5 != null) data.setValue5(s5);
+        if (s6 != null) data.setValue6(s6);
+        if (s7 != null) data.setValue7(s7);
+        if (s8 != null) data.setValue8(s8);
+        if (s9 != null) data.setValue9(s9);
+
+        data.getData().putAll(p);
+        data.setPublic(true);
+        data.setWritable(false);
+        
+        handler.createSopData(data);
+        
+        MPojo.pojoToJson(data, result.createObjectNode());
+
+    }
+    @Override
+    protected void doDelete(JsonResult result, CallContext callContext) throws Exception {
+        
+        SopData data = getObjectFromContext(callContext, SopData.class);
+        FoundationApi api = M.l(FoundationApi.class);
+        SopDataController handler = api.getDataSyncControllerForType(data.getType());
+
+        handler.deleteSopData(data);
+        
+        MPojo.pojoToJson(data, result.createObjectNode());
+
+    }
 
 }

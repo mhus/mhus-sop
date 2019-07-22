@@ -123,6 +123,7 @@ public class RestUtil {
 
 	public static <T> LinkedList<T> collectResults(XdbService service, AQuery<T> query, int page, int size) throws MException {
 		LinkedList<T> list = new LinkedList<T>();
+		if (page < 0) return list;
 		DbCollection<T> res = service.getByQualification(query);
 		if (size <= 0)
 			size = PAGE_SIZE;

@@ -56,21 +56,19 @@ public class RegistryCmd extends AbstractCmd {
 	@Option(name="-p", aliases="--persistent", description="Set value persistent (locally)",required=false)
 	boolean persistent = false;
 	
-	@Option(name="-f", aliases="--full", description="Full output of content",required=false)
-	boolean fullOutput = false;
-	
 	@Option(name="-l", aliases="--local", description="Local overwrite",required=false)
 	boolean local = false;
 	
+    @Option(name = "-ct", aliases = { "--console-table" }, description = "Console table options", required = false, multiValued = false)
+    String consoleTable;
+
 	@Override
 	public Object execute2() throws Exception {
 		RegistryApi api = M.l(RegistryApi.class);
 		if (cmd.equals("list")) {
 			
 			if (path != null && !path.endsWith("*")) {
-				ConsoleTable out = new ConsoleTable();
-				if (!fullOutput)
-					out.setMaxColSize(40);
+				ConsoleTable out = new ConsoleTable(consoleTable);
 				out.setHeaderValues("Path","Value","Source","Updated", "TTL", "RO","Persistent");
 				for (String child : api.getNodeChildren(path))
 					out.addRowValues("/" + child,"[node]","","", "","", "");
@@ -82,8 +80,6 @@ public class RegistryCmd extends AbstractCmd {
 				LinkedList<RegistryValue> list = new LinkedList<>(manager.getAll());
 				list.sort((a,b) -> { return a.getPath().compareTo(b.getPath());});
 				ConsoleTable out = new ConsoleTable();
-				if (!fullOutput)
-					out.setMaxColSize(40);
 				out.setHeaderValues("Path","Value","Source","Updated", "TTL", "RO","Persistent");
 				for (RegistryValue value : list ) {
 					if (path == null && !value.getPath().startsWith(RegistryApi.PATH_SYSTEM) && !value.getPath().startsWith(RegistryApi.PATH_WORKER) || MString.compareFsLikePattern(value.getPath(), path))

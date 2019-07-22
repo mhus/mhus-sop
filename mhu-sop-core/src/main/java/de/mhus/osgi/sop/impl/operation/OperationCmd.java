@@ -75,8 +75,8 @@ public class OperationCmd extends AbstractCmd {
 	@Option(name="-p", aliases="--print", description="Print File Content",required=false)
 	boolean print = false;
 	
-	@Option(name="-f", aliases="--full", description="Full output",required=false)
-	boolean full = false;
+    @Option(name = "-ct", aliases = { "--console-table" }, description = "Console table options", required = false, multiValued = false)
+    String consoleTable;
 	
 	@Override
 	public Object execute2() throws Exception {
@@ -103,7 +103,7 @@ public class OperationCmd extends AbstractCmd {
 			System.out.println("Time difference: " + diff);
 		} else
 		if (cmd.equals("list")) {
-			ConsoleTable out = new ConsoleTable(full);
+			ConsoleTable out = new ConsoleTable(consoleTable);
 			out.setHeaderValues("address","title","tags","acl", "parameters","uuid");
 			for (OperationDescriptor desc : api.findOperations(path,version == null ? null : new VersionRange(version),null)) {
 				out.addRowValues(desc.getAddress(),desc.getTitle(),desc.getTags(), desc.getAcl(),OperationUtil.getParameters(desc), desc.getUuid());
