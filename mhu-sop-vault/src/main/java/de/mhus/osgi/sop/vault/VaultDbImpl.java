@@ -18,6 +18,7 @@ package de.mhus.osgi.sop.vault;
 import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
+
 import de.mhus.lib.adb.Persistable;
 import de.mhus.lib.basics.Ace;
 import de.mhus.lib.errors.MException;

@@ -68,7 +68,7 @@ public class DfsCmd extends AbstractCmd {
 
 		switch (cmd) {
 		case "providers" : {
-			ConsoleTable table = new ConsoleTable(full);
+		    ConsoleTable table = new ConsoleTable(full);
 			table.setHeaderValues("Scheme","Location","Uri");
 			for (String uri : api.listProviders()) {
 				MUri u = MUri.toUri(uri);

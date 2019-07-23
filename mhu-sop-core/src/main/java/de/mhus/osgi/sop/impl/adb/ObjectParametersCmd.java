@@ -60,7 +60,7 @@ public class ObjectParametersCmd extends AbstractCmd {
 			switch(cmd) {
 			case "list": {
 	
-				ConsoleTable out = new ConsoleTable();
+			    ConsoleTable out = new ConsoleTable(tableAll,tblOpt);
 				out.setHeaderValues("Key","Type","Object","Value","Id");
 				
 				for (SopObjectParameter p : manager.getByQualification(Db.query(SopObjectParameter.class).eq(_SopObjectParameter._KEY, id)))
@@ -88,7 +88,7 @@ public class ObjectParametersCmd extends AbstractCmd {
 		
 		switch(cmd) {
 		case "list": {
-			ConsoleTable table = new ConsoleTable();
+		    ConsoleTable table = new ConsoleTable(tableAll,tblOpt);
 			table.setHeaderValues("KEY","VALUE");
 
 			for (SopObjectParameter param : M.l(AdbApi.class).getParameters(cType, rId)) {

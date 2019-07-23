@@ -34,7 +34,8 @@ public class SopVaultEntry extends DbMetadata implements VaultEntry {
 
 	public SopVaultEntry() {}
 	
-	public SopVaultEntry(VaultEntry clone) {
+	@SuppressWarnings("deprecation")
+    public SopVaultEntry(VaultEntry clone) {
 		AdbUtil.setId(this, clone.getId());
 		type = clone.getType();
 		description = clone.getDescription();

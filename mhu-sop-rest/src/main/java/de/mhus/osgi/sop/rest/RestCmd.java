@@ -21,7 +21,6 @@ import java.util.Map.Entry;
 
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
-import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 import de.mhus.lib.core.M;
@@ -43,9 +42,6 @@ public class RestCmd extends AbstractCmd {
     @Argument(index=1, name="parameters", required=false, description="More Parameters", multiValued=true)
     String[] parameters;
 
-    @Option(name = "-ct", aliases = { "--console-table" }, description = "Console table options", required = false, multiValued = false)
-    String consoleTable;
-
 	@Override
 	public Object execute2() throws Exception {
 
@@ -62,7 +58,7 @@ public class RestCmd extends AbstractCmd {
                 item.add(entry.getKey());
             }
             
-            ConsoleTable table = new ConsoleTable(consoleTable);
+            ConsoleTable table = new ConsoleTable(tableAll, tblOpt);
             table.setHeaderValues("Class","Node Id","Managed","Parents","Registrations");
             for (Entry<RestNodeService, LinkedList<String>> entry : list.entrySet()) {
                 String managed = "";

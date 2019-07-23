@@ -50,7 +50,7 @@ public class RegisterCmd extends AbstractCmd {
 		
 		if (cmd.equals("list")) {
 			
-			ConsoleTable table = new ConsoleTable();
+		    ConsoleTable table = new ConsoleTable(tableAll,tblOpt);
 		
 			table.setHeaderValues("Key1","Key2","Value1","Value2");
 			AQuery<SopRegister> query = Db.query(SopRegister.class).eq("name", parameters[0]);

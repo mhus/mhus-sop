@@ -62,9 +62,6 @@ public class MailQueueCmd extends AbstractCmd {
 	@Option(name="-f", aliases="--force", description="Force action",required=false)
 	boolean force = false;
 	
-    @Option(name = "-ct", aliases = { "--console-table" }, description = "Console table options", required = false, multiValued = false)
-    String consoleTable;
-	
 	@Option(name="-cc", description="CC",required=false, multiValued=true)
 	String[] cc;
 	
@@ -83,7 +80,7 @@ public class MailQueueCmd extends AbstractCmd {
 		switch (cmd) {
 		case "list": {
 			
-			ConsoleTable table = new ConsoleTable(consoleTable);
+		    ConsoleTable table = new ConsoleTable(tableAll, tblOpt);
 			table.setHeaderValues("id","source","status","next","to","subject","attempts", "created");
 			
 			XdbService manager = M.l(SopApi.class).getManager();

@@ -193,7 +193,7 @@ public class AccessCmd extends AbstractCmd {
 				
 		} else
 		if(cmd.equals("controllers")) {
-			ConsoleTable table = new ConsoleTable();
+		    ConsoleTable table = new ConsoleTable(tableAll,tblOpt);
 			table.setHeaderValues("Type","Controller","Bundle");
 			AdbApi adb = M.l(AdbApi.class);
 			for (Entry<String, DbSchemaService> entry : adb.getController()) {

@@ -75,7 +75,7 @@ public class FileQueueCmd extends AbstractCmd {
 			System.out.println(id.getName());
 		} break;
 		case "list": {
-			ConsoleTable table = new ConsoleTable(full);
+		    ConsoleTable table = new ConsoleTable(full);
 
 			if (parameters == null) {
 				table.setHeaderValues("ID","Name","Size","Modified", "TTL", "Source");
