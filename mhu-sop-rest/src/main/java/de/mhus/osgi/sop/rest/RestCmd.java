@@ -58,7 +58,7 @@ public class RestCmd extends AbstractCmd {
                 item.add(entry.getKey());
             }
             
-            ConsoleTable table = new ConsoleTable(tableAll, tblOpt);
+            ConsoleTable table = new ConsoleTable(tblOpt);
             table.setHeaderValues("Class","Node Id","Managed","Parents","Registrations");
             for (Entry<RestNodeService, LinkedList<String>> entry : list.entrySet()) {
                 String managed = "";

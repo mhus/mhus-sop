@@ -80,7 +80,7 @@ public class MailQueueCmd extends AbstractCmd {
 		switch (cmd) {
 		case "list": {
 			
-		    ConsoleTable table = new ConsoleTable(tableAll, tblOpt);
+		    ConsoleTable table = new ConsoleTable(tblOpt);
 			table.setHeaderValues("id","source","status","next","to","subject","attempts", "created");
 			
 			XdbService manager = M.l(SopApi.class).getManager();

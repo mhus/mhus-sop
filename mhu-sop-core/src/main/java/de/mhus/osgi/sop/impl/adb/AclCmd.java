@@ -46,7 +46,7 @@ public class AclCmd extends AbstractCmd {
 		
 		switch (cmd) {
 		case "list": {
-		    ConsoleTable out = new ConsoleTable(tableAll,tblOpt);
+		    ConsoleTable out = new ConsoleTable(tblOpt);
 			out.setHeaderValues("target","acl","id");
 			for (SopAcl acl : SopDbImpl.getManager().getByQualification(Db.query(SopAcl.class).like("target", parameters[0] + "%") ) ) {
 				out.addRowValues(acl.getTarget(),acl.getList(),acl.getId());

@@ -82,7 +82,7 @@ public class SopDataCmd extends AbstractCmd {
 		if (cmd.equals("list")) {
 			SopFoundation found = api.getFoundation(params[0]);
 			
-			ConsoleTable out = new ConsoleTable(tableAll,tblOpt);
+			ConsoleTable out = new ConsoleTable(tblOpt);
 			out.setHeaderValues(
 					"id",
 					"type",

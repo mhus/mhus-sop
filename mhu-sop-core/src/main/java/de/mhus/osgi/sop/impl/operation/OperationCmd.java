@@ -100,7 +100,7 @@ public class OperationCmd extends AbstractCmd {
 			System.out.println("Time difference: " + diff);
 		} else
 		if (cmd.equals("list")) {
-		    ConsoleTable out = new ConsoleTable(tableAll, tblOpt);
+		    ConsoleTable out = new ConsoleTable(tblOpt);
 			out.setHeaderValues("address","title","tags","acl", "parameters","uuid");
 			for (OperationDescriptor desc : api.findOperations(path,version == null ? null : new VersionRange(version),null)) {
 				out.addRowValues(desc.getAddress(),desc.getTitle(),desc.getTags(), desc.getAcl(),OperationUtil.getParameters(desc), desc.getUuid());

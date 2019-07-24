@@ -36,7 +36,7 @@ import de.mhus.osgi.sop.api.rest.JsonResult;
 import de.mhus.osgi.sop.api.rest.RestNodeService;
 
 @Component(immediate=true,service=RestNodeService.class)
-public class JournalRestNode extends JsonListNode<JournalQueue>{
+public class JournalRestNode extends JsonListNode<JournalQueue> {
 
 	@Override
 	public String[] getParentNodeCanonicalClassNames() {

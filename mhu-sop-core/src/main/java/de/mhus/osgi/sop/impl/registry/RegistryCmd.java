@@ -65,7 +65,7 @@ public class RegistryCmd extends AbstractCmd {
 		if (cmd.equals("list")) {
 			
 			if (path != null && !path.endsWith("*")) {
-			    ConsoleTable out = new ConsoleTable(tableAll, tblOpt);
+			    ConsoleTable out = new ConsoleTable(tblOpt);
 				out.setHeaderValues("Path","Value","Source","Updated", "TTL", "RO","Persistent");
 				for (String child : api.getNodeChildren(path))
 					out.addRowValues("/" + child,"[node]","","", "","", "");
@@ -76,7 +76,7 @@ public class RegistryCmd extends AbstractCmd {
 				RegistryManager manager = M.l(RegistryManager.class);
 				LinkedList<RegistryValue> list = new LinkedList<>(manager.getAll());
 				list.sort((a,b) -> { return a.getPath().compareTo(b.getPath());});
-				ConsoleTable out = new ConsoleTable(tableAll,tblOpt);
+				ConsoleTable out = new ConsoleTable(tblOpt);
 				out.setHeaderValues("Path","Value","Source","Updated", "TTL", "RO","Persistent");
 				for (RegistryValue value : list ) {
 					if (path == null && !value.getPath().startsWith(RegistryApi.PATH_SYSTEM) && !value.getPath().startsWith(RegistryApi.PATH_WORKER) || MString.compareFsLikePattern(value.getPath(), path))

@@ -87,7 +87,7 @@ public class OperationCmd implements Action {
 			}
 		} else
 		if (cmd.equals("action")) {
-			ConsoleTable table = new ConsoleTable(tableAll,tblOpt);
+			ConsoleTable table = new ConsoleTable(tblOpt);
 			table.setHeaderValues("Name","Register name", "Service Class");
 			for (OperationBpmDefinition def : api.getActionDefinitions()) {
 				table.addRowValues(def.getName(), def.getRegisterName(), def.getServiceClass());
