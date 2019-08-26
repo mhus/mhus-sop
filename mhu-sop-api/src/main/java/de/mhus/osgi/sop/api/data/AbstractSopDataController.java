@@ -21,6 +21,7 @@ import java.util.List;
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MPeriod;
+import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.strategy.NotSuccessful;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.errors.MException;
@@ -67,7 +68,7 @@ public abstract class AbstractSopDataController extends MLog implements SopDataC
 		obj.setDbHandler(null); // do not save anymore
 		
 		obj.getData().entrySet()
-						.removeIf((e) -> e.getKey().contains("pass"));
+						.removeIf( (e) -> MSystem.isPasswordName(e.getKey()) );
 		
 //		Iterator<Entry<String, Object>> iter = obj.getData().iterator();
 //		while (iter.hasNext()) {
