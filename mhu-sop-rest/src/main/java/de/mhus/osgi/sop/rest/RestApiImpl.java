@@ -131,6 +131,7 @@ public class RestApiImpl extends MLog implements RestApi {
 				    log().d("access denied", aaa.getCurrentAccount(), "rest.node", name, "execute", def);
 					throw new AccessDeniedException("access denied");
 				}
+				log().d("access granted", aaa.getCurrentAccount(), "rest.node", name, "execute", def);
 			} catch (Throwable t) {
 				throw new AccessDeniedException("internal error", t);
 			}
