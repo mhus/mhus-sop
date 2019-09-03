@@ -64,10 +64,10 @@
 			<groupId>de.mhus.lib</groupId>
 			<artifactId>mhu-lib-core</artifactId>
 		</dependency>
-		<dependency>
-        	<groupId>de.mhus.lib</groupId>
-        	<artifactId>mhu-lib-vaadin</artifactId>
-        </dependency>
+        <dependency>
+           <groupId>de.mhus.vaadin</groupId>
+           <artifactId>vaadin-core</artifactId>
+       </dependency>
         
     	<dependency>
     		<groupId>com.vaadin</groupId>
