@@ -43,7 +43,8 @@ import de.mhus.osgi.sop.api.adb.DbSchemaService;
 @Component(service=DbManagerService.class,immediate=true)
 public class SopDbManagerService extends DbManagerServiceImpl {
 	
-	private static final CfgBoolean CFG_USE_PSEUDO = new CfgBoolean(DbSchemaService.class, "usePseudoPool", false);
+	private static final CfgBoolean CFG_USE_PSEUDO = new CfgBoolean(DbManagerService.class, "usePseudoPool", false);
+    private static final CfgBoolean CFG_ENABLED = new CfgBoolean(DbManagerService.class, "enabled", true);
 	
 	private ServiceTracker<DbSchemaService,DbSchemaService> tracker;
 	private TreeMap<String,DbSchemaService> schemaList = new TreeMap<>();
@@ -54,12 +55,18 @@ public class SopDbManagerService extends DbManagerServiceImpl {
 	public void doActivate(ComponentContext ctx) {
 //		new de.mhus.lib.adb.util.Property();
 		context = ctx.getBundleContext();
+		
+		if (context == null) return;
+		if (!CFG_ENABLED.value()) {
+		    log().i("not enabled");
+		    return;
+		}
+		
 		new MThread(new Runnable() {
 
             @Override
             public void run() {
                 while (true) {
-                    if (context == null) return;
                     if (getManager() != null) {
                         log().i("Start tracker");
                         tracker = new ServiceTracker<>(context, DbSchemaService.class, new MyTrackerCustomizer() );
