@@ -43,8 +43,8 @@ import de.mhus.osgi.sop.api.adb.DbSchemaService;
 @Component(service=DbManagerService.class,immediate=true)
 public class SopDbManagerService extends DbManagerServiceImpl {
 	
-	private static final CfgBoolean CFG_USE_PSEUDO = new CfgBoolean(DbManagerService.class, "usePseudoPool", false);
-    private static final CfgBoolean CFG_ENABLED = new CfgBoolean(DbManagerService.class, "enabled", true);
+	private static final CfgBoolean CFG_USE_PSEUDO = new CfgBoolean(SopDbManagerService.class, "usePseudoPool", false);
+    private static final CfgBoolean CFG_ENABLED = new CfgBoolean(SopDbManagerService.class, "enabled", true);
 	
 	private ServiceTracker<DbSchemaService,DbSchemaService> tracker;
 	private TreeMap<String,DbSchemaService> schemaList = new TreeMap<>();
