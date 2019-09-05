@@ -74,9 +74,12 @@ public class SopDbManagerService extends DbManagerServiceImpl {
          while (true) {
              if (getManager() != null) {
                  log().i("Start tracker");
-                 tracker = new ServiceTracker<>(context, DbSchemaService.class, new MyTrackerCustomizer() );
-                 tracker.open();
-                 status = STATUS.STARTED;
+                 try {
+                     tracker = new ServiceTracker<>(context, DbSchemaService.class, new MyTrackerCustomizer() );
+                     tracker.open();
+                 } finally {
+                     status = STATUS.STARTED;
+                 }
                  return;
              }
              log().i("Waiting for db manager");
@@ -132,8 +135,10 @@ public class SopDbManagerService extends DbManagerServiceImpl {
                     @Override
                     public void run() {
                         // wait for STARTED
-                        while (status == STATUS.ACTIVATED)
+                        while (status == STATUS.ACTIVATED) {
+                            log().d("Wait for start",service);
                             MThread.sleep(250);
+                        }
                         // already open
                         log().d("addingService","doPostInitialize",name);
                         try {
@@ -205,4 +210,8 @@ public class SopDbManagerService extends DbManagerServiceImpl {
 		}
 	}
 
+	public STATUS getStatus() {
+	    return status;
+	}
+	
 }
