@@ -356,9 +356,10 @@ public class AccessApiImpl extends MLog implements AccessApi {
 	public AaaContext processAdminSession() {
 		
 //		String ticket = TicketUtil.ACCOUNT + TicketUtil.SEP + ROOT_CONTEXT.getAccountId() + TicketUtil.SEP + TicketUtil.SEP + TicketUtil.ADMIN;
-		ContextPool.getInstance().set(ROOT_CONTEXT, true);
+	    RootContext context = new RootContext();
+		ContextPool.getInstance().set(context, true);
 		
-		return ROOT_CONTEXT;
+		return context;
 	}
 
 	@Override

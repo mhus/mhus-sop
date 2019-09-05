@@ -19,8 +19,15 @@ import de.mhus.osgi.sop.impl.AaaContextImpl;
 
 public class RootContext extends AaaContextImpl {
 
+    private static final AccountRoot ROOT_ACCOUNT = new AccountRoot();
+    
+    public RootContext(AaaContextImpl parent) {
+        this();
+        setParent(parent);
+    }
+    
 	public RootContext() {
-		super(new AccountRoot());
+		super(ROOT_ACCOUNT);
 		adminMode = true;
 	}
 	
