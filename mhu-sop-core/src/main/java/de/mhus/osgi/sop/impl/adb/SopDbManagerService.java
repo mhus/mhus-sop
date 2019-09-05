@@ -131,23 +131,7 @@ public class SopDbManagerService extends DbManagerServiceImpl {
 			}	
 
 			if (SopDbManagerService.this.getManager() != null) {
-			    MThread.asynchron(new Runnable() {
-                    @Override
-                    public void run() {
-                        // wait for STARTED
-                        while (status == STATUS.ACTIVATED) {
-                            log().d("Wait for start",service);
-                            MThread.sleep(250);
-                        }
-                        // already open
-                        log().d("addingService","doPostInitialize",name);
-                        try {
-                            service.doPostInitialize(SopDbManagerService.this.getManager());
-                        } catch (Throwable t) {
-                            log().w(name,t);
-                        }
-                    }
-                });
+			    servicePostInitialize(service, name);
 			}
 			return service;
 		}
@@ -185,7 +169,27 @@ public class SopDbManagerService extends DbManagerServiceImpl {
 		}
 	}
 
-	public DbSchemaService[] getSchemas() {
+	protected void servicePostInitialize(DbSchemaService service, String name) {
+        MThread.asynchron(new Runnable() {
+            @Override
+            public void run() {
+                // wait for STARTED
+                while (status == STATUS.ACTIVATED || SopDbManagerService.this.getManager().getPool() == null) {
+                    log().d("Wait for start",service);
+                    MThread.sleep(250);
+                }
+                // already open
+                log().d("addingService","doPostInitialize",name);
+                try {
+                    service.doPostInitialize(SopDbManagerService.this.getManager());
+                } catch (Throwable t) {
+                    log().w(name,t);
+                }
+            }
+        });
+    }
+
+    public DbSchemaService[] getSchemas() {
 		synchronized (schemaList) {
 			return schemaList.values().toArray(new DbSchemaService[schemaList.size()]);
 		}
@@ -201,11 +205,7 @@ public class SopDbManagerService extends DbManagerServiceImpl {
 		synchronized (schemaList) {
 			schemaList.forEach((name,service) -> {
 				log().d("doPostOpen","doPostInitialize",name);
-				try {
-					service.doPostInitialize(getManager());
-				} catch (Exception e) {
-					log().e("doPostInitialize",name,e);
-				}
+				servicePostInitialize(service, name);
 			});
 		}
 	}
