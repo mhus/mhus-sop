@@ -52,8 +52,12 @@ public class SopDbManagerService extends DbManagerServiceImpl {
 
 	private BundleContext context;
 	
+	enum STATUS {NONE,ACTIVATED,STARTED,CLOSED}
+	private STATUS status = STATUS.NONE;
+	
 	@Activate
 	public void doActivate(ComponentContext ctx) {
+	    status = STATUS.ACTIVATED;
 //		new de.mhus.lib.adb.util.Property();
 		context = ctx.getBundleContext();
 		
@@ -72,6 +76,7 @@ public class SopDbManagerService extends DbManagerServiceImpl {
                  log().i("Start tracker");
                  tracker = new ServiceTracker<>(context, DbSchemaService.class, new MyTrackerCustomizer() );
                  tracker.open();
+                 status = STATUS.STARTED;
                  return;
              }
              log().i("Waiting for db manager");
@@ -81,6 +86,7 @@ public class SopDbManagerService extends DbManagerServiceImpl {
     
 	@Deactivate
 	public void doDeactivate(ComponentContext ctx) {
+	    status = STATUS.CLOSED;
 //		super.doDeactivate(ctx);
 	    if (tracker != null)
 	        tracker.close();
@@ -120,15 +126,23 @@ public class SopDbManagerService extends DbManagerServiceImpl {
 				schemaList.put(name, service);
 				updateManager();
 			}	
-			
+
 			if (SopDbManagerService.this.getManager() != null) {
-				// already open
-				log().d("addingService","doPostInitialize",name);
-				try {
-					service.doPostInitialize(SopDbManagerService.this.getManager());
-				} catch (Throwable t) {
-					log().w(name,t);
-				}
+			    MThread.asynchron(new Runnable() {
+                    @Override
+                    public void run() {
+                        // wait for STARTED
+                        while (status == STATUS.ACTIVATED)
+                            MThread.sleep(250);
+                        // already open
+                        log().d("addingService","doPostInitialize",name);
+                        try {
+                            service.doPostInitialize(SopDbManagerService.this.getManager());
+                        } catch (Throwable t) {
+                            log().w(name,t);
+                        }
+                    }
+                });
 			}
 			return service;
 		}
