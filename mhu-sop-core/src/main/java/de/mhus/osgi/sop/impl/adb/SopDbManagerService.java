@@ -37,6 +37,7 @@ import de.mhus.lib.sql.DbPool;
 import de.mhus.lib.sql.DefaultDbPool;
 import de.mhus.lib.sql.PseudoDbPool;
 import de.mhus.osgi.api.adb.DbManagerService;
+import de.mhus.osgi.api.services.MOsgi;
 import de.mhus.osgi.services.adb.DbManagerServiceImpl;
 import de.mhus.osgi.sop.api.adb.DbSchemaService;
 
@@ -62,25 +63,22 @@ public class SopDbManagerService extends DbManagerServiceImpl {
 		    return;
 		}
 		
-		new MThread(new Runnable() {
-
-            @Override
-            public void run() {
-                while (true) {
-                    if (getManager() != null) {
-                        log().i("Start tracker");
-                        tracker = new ServiceTracker<>(context, DbSchemaService.class, new MyTrackerCustomizer() );
-                        tracker.open();
-                        return;
-                    }
-                    log().i("Waiting for db manager");
-                    MThread.sleep(10000);
-                }
-            }
-		    
-		}).start();
+		MOsgi.runAfterActivation(ctx, this::doStart);
 	}
-	
+
+    public void doStart(ComponentContext ctx) {
+         while (true) {
+             if (getManager() != null) {
+                 log().i("Start tracker");
+                 tracker = new ServiceTracker<>(context, DbSchemaService.class, new MyTrackerCustomizer() );
+                 tracker.open();
+                 return;
+             }
+             log().i("Waiting for db manager");
+             MThread.sleep(10000);
+         }
+    }
+    
 	@Deactivate
 	public void doDeactivate(ComponentContext ctx) {
 //		super.doDeactivate(ctx);
