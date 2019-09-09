@@ -31,6 +31,7 @@ import de.mhus.lib.core.MDate;
 import de.mhus.lib.core.MString;
 import de.mhus.lib.core.MValidator;
 import de.mhus.lib.core.console.ConsoleTable;
+import de.mhus.lib.errors.MException;
 import de.mhus.osgi.api.karaf.AbstractCmd;
 import de.mhus.osgi.sop.api.SopApi;
 import de.mhus.osgi.sop.api.data.SopDataController;
@@ -81,7 +82,8 @@ public class SopDataCmd extends AbstractCmd {
 		}
 		if (cmd.equals("list")) {
 			SopFoundation found = api.getFoundation(params[0]);
-			
+			if (found == null)
+			    throw new MException("Foundation not found",params[0]);
 			ConsoleTable out = new ConsoleTable(tblOpt);
 			out.setHeaderValues(
 					"id",

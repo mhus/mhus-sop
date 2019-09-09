@@ -23,7 +23,9 @@ import java.util.UUID;
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.api.console.Session;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
@@ -37,6 +39,8 @@ import de.mhus.lib.core.security.Account;
 import de.mhus.lib.core.security.ModifyAccountApi;
 import de.mhus.lib.core.security.ModifyCurrentAccountApi;
 import de.mhus.osgi.api.karaf.AbstractCmd;
+import de.mhus.osgi.api.karaf.CmdInterceptor;
+import de.mhus.osgi.api.karaf.CmdInterceptorUtil;
 import de.mhus.osgi.sop.api.aaa.AaaContext;
 import de.mhus.osgi.sop.api.aaa.AccessApi;
 import de.mhus.osgi.sop.api.aaa.Trust;
@@ -44,6 +48,7 @@ import de.mhus.osgi.sop.api.adb.AdbApi;
 import de.mhus.osgi.sop.api.adb.DbSchemaService;
 import de.mhus.osgi.sop.api.util.SopUtil;
 import de.mhus.osgi.sop.impl.AaaContextImpl;
+import de.mhus.osgi.sop.impl.ContextPool;
 import de.mhus.osgi.sop.impl.aaa.util.AccountFile;
 
 @Command(scope = "sop", name = "access", description = "Access actions")
@@ -80,6 +85,9 @@ public class AccessCmd extends AbstractCmd {
 	@Option(name="-a", aliases="--admin", description="Connect user as admin",required=false)
 	boolean admin = false;
 
+    @Reference
+    Session session;
+
 	@Override
 	public Object execute2() throws Exception {
 
@@ -96,21 +104,25 @@ public class AccessCmd extends AbstractCmd {
 		if (cmd.equals("login")) {
 			Account ac = api.getAccount(parameters[0]);
 			AaaContext cur = api.process(ac, null, admin,  parameters.length > 1 ? Locale.forLanguageTag(parameters[1]) : null);
+			CmdInterceptorUtil.setInterceptor(session, new AaaInterceptor(cur));
 			System.out.println(cur);
 		} else
 		if (cmd.equals("admin")) {
 			RootContext context = new RootContext();
 			context.setAdminMode(true);
 			api.process(context);
+            CmdInterceptorUtil.setInterceptor(session, new AaaInterceptor(context));
 			System.out.println(context);
 		} else
 		if (cmd.equals("logout")) {
 			AaaContext cur = api.getCurrentOrGuest();
 			cur = api.release(cur.getAccount());
+            CmdInterceptorUtil.setInterceptor(session, new AaaInterceptor(cur));
 			System.out.println(cur);
 		} else
 		if (cmd.equals("reset")) {
 			api.resetContext();
+            CmdInterceptorUtil.setInterceptor(session, new AaaInterceptor(null));
 		} else
 		if (cmd.equals("id")) {
 			AaaContext cur = api.getCurrentOrGuest();
@@ -133,6 +145,7 @@ public class AccessCmd extends AbstractCmd {
 		if (cmd.equals("root")) {
 			api.resetContext();
 			AaaContext cur = api.processAdminSession();
+            CmdInterceptorUtil.setInterceptor(session, new AaaInterceptor(cur));
 			System.out.println(cur);
 		} else
 		if (cmd.equals("group")) {
@@ -268,4 +281,30 @@ public class AccessCmd extends AbstractCmd {
 		return null;
 	}
 
+	private static class AaaInterceptor implements CmdInterceptor {
+
+        private AaaContextImpl context;
+        private AaaContextImpl old;
+
+        public AaaInterceptor(AaaContext context) {
+            this.context = (AaaContextImpl) context;
+        }
+
+        @Override
+        public void onCmdStart(Session session) {
+            ContextPool pool = ContextPool.getInstance();
+            synchronized (pool) {
+                old = pool.getCurrent();
+                pool.set(context, false);
+            }
+        }
+
+        @Override
+        public void onCmdEnd(Session session) {
+            ContextPool pool = ContextPool.getInstance();
+            synchronized (pool) {
+                pool.set(old, false);
+            }
+        }
+	}
 }
