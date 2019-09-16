@@ -28,6 +28,7 @@ public class _SopData extends ConstBase {
   public static final Identifier METHOD_GET_LAST_SYNC_TRY = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.foundation.model.SopData.class,"getLastSyncTry");
   public static final Identifier METHOD_GET_MODIFY_DATE = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.foundation.model.SopData.class,"getModifyDate");
   public static final Identifier METHOD_GET_STATUS = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.foundation.model.SopData.class,"getStatus");
+  public static final Identifier METHOD_GET_SUB_TYPE = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.foundation.model.SopData.class,"getSubType");
   public static final Identifier METHOD_GET_TYPE = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.foundation.model.SopData.class,"getType");
   public static final Identifier METHOD_GET_VALUE0 = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.foundation.model.SopData.class,"getValue0");
   public static final Identifier METHOD_GET_VALUE1 = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.foundation.model.SopData.class,"getValue1");
@@ -59,6 +60,7 @@ public class _SopData extends ConstBase {
   public static final Identifier METHOD_SET_LAST_SYNC_TRY = new Identifier(Identifier.TYPE.SETTER, de.mhus.osgi.sop.api.foundation.model.SopData.class,"setLastSyncTry");
   public static final Identifier METHOD_SET_PUBLIC = new Identifier(Identifier.TYPE.SETTER, de.mhus.osgi.sop.api.foundation.model.SopData.class,"setPublic");
   public static final Identifier METHOD_SET_STATUS = new Identifier(Identifier.TYPE.SETTER, de.mhus.osgi.sop.api.foundation.model.SopData.class,"setStatus");
+  public static final Identifier METHOD_SET_SUB_TYPE = new Identifier(Identifier.TYPE.SETTER, de.mhus.osgi.sop.api.foundation.model.SopData.class,"setSubType");
   public static final Identifier METHOD_SET_VALUE0 = new Identifier(Identifier.TYPE.SETTER, de.mhus.osgi.sop.api.foundation.model.SopData.class,"setValue0");
   public static final Identifier METHOD_SET_VALUE1 = new Identifier(Identifier.TYPE.SETTER, de.mhus.osgi.sop.api.foundation.model.SopData.class,"setValue1");
   public static final Identifier METHOD_SET_VALUE2 = new Identifier(Identifier.TYPE.SETTER, de.mhus.osgi.sop.api.foundation.model.SopData.class,"setValue2");
@@ -89,6 +91,7 @@ public class _SopData extends ConstBase {
   public static final Identifier _LAST_SYNC_TRY = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.foundation.model.SopData.class,"lastSyncTry");
   public static final Identifier _MODIFY_DATE = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.foundation.model.SopData.class,"modifyDate");
   public static final Identifier _STATUS = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.foundation.model.SopData.class,"status");
+  public static final Identifier _SUB_TYPE = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.foundation.model.SopData.class,"subType");
   public static final Identifier _TYPE = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.foundation.model.SopData.class,"type");
   public static final Identifier _VALUE0 = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.foundation.model.SopData.class,"value0");
   public static final Identifier _VALUE1 = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.foundation.model.SopData.class,"value1");

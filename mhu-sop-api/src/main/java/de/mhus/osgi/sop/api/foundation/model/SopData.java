@@ -37,7 +37,7 @@ import de.mhus.osgi.sop.api.foundation.FoundationRelated;
 public class SopData extends DbMetadata implements FoundationRelated {
 	
 	@DbPersistent(ro=true)
-	@DbIndex({"parent","t1","t2"})
+	@DbIndex({"parent","t1","t2","t4"})
 	private UUID foundation;
 	
 	// REST access restriction only !!!
@@ -49,8 +49,12 @@ public class SopData extends DbMetadata implements FoundationRelated {
 	
 	@DbPersistent(ro=true)
 	@Public
-	@DbIndex({"t3","t1","v0","v1","v2","v3","v4","v5","v6","v7","v8","v9"})
+	@DbIndex({"t3","t1","t5","v0","v1","v2","v3","v4","v5","v6","v7","v8","v9"})
 	private String type;
+    @DbPersistent
+    @Public
+    @DbIndex("t5")
+    private String subType;
 	@DbPersistent
 	@Public
 	@DbIndex({"v0"})
@@ -97,7 +101,7 @@ public class SopData extends DbMetadata implements FoundationRelated {
 	private Date due;
 	@DbPersistent
 	@Public
-	@DbIndex({"t1","v0","v1","v2","v3","v4","v5","v6","v7","v8","v9"})
+	@DbIndex({"t1","t5","v0","v1","v2","v3","v4","v5","v6","v7","v8","v9"})
 	private boolean archived;
 	@DbPersistent
 	@Public
@@ -283,7 +287,7 @@ public class SopData extends DbMetadata implements FoundationRelated {
 	
 	@Override
 	public String toString() {
-		return MSystem.toString(this, getId(), type, value0, value1, value2,value3,value4,value5,value6,value7,value8,value9,archived,foreignId,status);
+		return MSystem.toString(this, getId(), type, subType, value0, value1, value2,value3,value4,value5,value6,value7,value8,value9,archived,foreignId,status);
 	}
 
 	public Date getForeignDate() {
@@ -333,5 +337,13 @@ public class SopData extends DbMetadata implements FoundationRelated {
 	public void setValue0(String value0) {
 		this.value0 = value0;
 	}
+
+    public String getSubType() {
+        return subType;
+    }
+
+    public void setSubType(String subType) {
+        this.subType = subType;
+    }
 
 }
