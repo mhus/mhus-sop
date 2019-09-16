@@ -38,7 +38,7 @@ public class _SopActionTask extends ConstBase {
   public static final Identifier PROJECT_ARTIFACT = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.api.model.SopActionTask.class,"mhu-sop-api");
   public static final Identifier PROJECT_DESCRIPTION = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.api.model.SopActionTask.class,"A set of tools to improve OSGi frameworks and karaf");
   public static final Identifier PROJECT_GROUP = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.api.model.SopActionTask.class,"de.mhus.osgi");
-  public static final Identifier PROJECT_VERSION = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.api.model.SopActionTask.class,"1.6.2");
+  public static final Identifier PROJECT_VERSION = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.api.model.SopActionTask.class,"1.6.3-SNAPSHOT");
   public static final Identifier _ACTION = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.model.SopActionTask.class,"action");
   public static final Identifier _ADB_CHANGED = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopActionTask.class,"AdbChanged");
   public static final Identifier _ADB_MANAGED = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.model.SopActionTask.class,"AdbManaged");
