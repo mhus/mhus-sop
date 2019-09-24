@@ -63,7 +63,7 @@ public class OperationUtil {
         selector.setTags(providedTags);
         OperationDescriptor desc = selector.doSelect();
         if (desc == null) return false;
-        T obj = createOpertionProxy(filter, desc);
+        T obj = createOperationProxy(filter, desc);
         executor.event(desc,obj);
         return true;
     }
@@ -75,7 +75,7 @@ public class OperationUtil {
         List<OperationDescriptor> list = selector.doSelectAll();
         for (OperationDescriptor desc : list) {
             try {
-                T obj = createOpertionProxy(filter, desc);
+                T obj = createOperationProxy(filter, desc);
                 executor.event(desc,obj);
             } catch (Throwable t) {
                 MLogUtil.log().d(filter,t);
@@ -107,7 +107,7 @@ public class OperationUtil {
         selector.setVersion(range);
         OperationDescriptor desc = selector.doSelect();
         if (desc == null) return false;
-        T obj = createOpertionProxy(filter, desc);
+        T obj = createOperationProxy(filter, desc);
         executor.event(desc,obj);
         return true;
     }
@@ -120,7 +120,7 @@ public class OperationUtil {
         List<OperationDescriptor> list = selector.doSelectAll();
         for (OperationDescriptor desc : list) {
             try {
-                T obj = createOpertionProxy(filter, desc);
+                T obj = createOperationProxy(filter, desc);
                 executor.event(desc,obj);
             } catch (Throwable t) {
                 MLogUtil.log().d(filter,t);
@@ -178,7 +178,7 @@ public class OperationUtil {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static <T> T createOpertionProxy(Class<T> ifc, OperationDescriptor desc) throws MException {
+	public static <T> T createOperationProxy(Class<T> ifc, OperationDescriptor desc) throws MException {
 		if (!desc.getPath().equals(ifc.getName()))
 			throw new MException("Interface and operation do not match", ifc.getName(), desc.getName() );
 		
@@ -283,7 +283,7 @@ public class OperationUtil {
 	public static <T> T getOperationIfc(Class<T> ifc) throws MException {
 		OperationApi api = M.l(OperationApi.class);
 		OperationDescriptor desc = api.findOperation(ifc.getCanonicalName(), null, null);
-		return createOpertionProxy(ifc, desc);
+		return createOperationProxy(ifc, desc);
 	}
 	
 }
