@@ -297,7 +297,7 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 		LinkedList<String> tags = new LinkedList<>();
 		tags.add(OperationDescriptor.TAG_IDENT + "=" + uri.getLocation());
 		OperationDescriptor desc = api.findOperation(FileQueueOperation.class.getCanonicalName(), null, tags);
-		FileQueueOperation operation = OperationUtil.createOpertionProxy(FileQueueOperation.class, desc);
+		FileQueueOperation operation = OperationUtil.createOperationProxy(FileQueueOperation.class, desc);
 		FileInfo info = operation.getFileInfo(UUID.fromString(uri.getPath()));
 		File file = operation.getFile(UUID.fromString(uri.getPath()));
 		
@@ -396,7 +396,7 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 		LinkedList<String> tags = new LinkedList<>();
 		tags.add(OperationDescriptor.TAG_IDENT + "=" + uri.getLocation());
 		OperationDescriptor desc = api.findOperation(FileQueueOperation.class.getCanonicalName(), null, tags);
-		FileQueueOperation operation = OperationUtil.createOpertionProxy(FileQueueOperation.class, desc);
+		FileQueueOperation operation = OperationUtil.createOperationProxy(FileQueueOperation.class, desc);
 		FileInfo info = operation.getFileInfo(UUID.fromString(uri.getPath()));
 		return info;
 		
@@ -549,7 +549,7 @@ public class FileQueueApiImpl extends MLog implements FileQueueApi {
 		LinkedList<String> tags = new LinkedList<>();
 		tags.add(OperationDescriptor.TAG_IDENT + "=" + ident);
 		OperationDescriptor desc = api.findOperation(FileQueueOperation.class.getCanonicalName(), null, tags);
-		FileQueueOperation operation = OperationUtil.createOpertionProxy(FileQueueOperation.class, desc);
+		FileQueueOperation operation = OperationUtil.createOperationProxy(FileQueueOperation.class, desc);
 		return operation;
 	}
 

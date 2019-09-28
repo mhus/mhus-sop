@@ -53,7 +53,7 @@ public class DfsApiImpl extends MLog implements DfsApi {
 		for (OperationDescriptor desc : api.findOperations(DfsProviderOperation.class, null, tags)) {
 			if (uri.getScheme().equals(desc.getParameter(DfsProviderOperation.PARAM_SCHEME))) {
 				try {
-					DfsProviderOperation provider = OperationUtil.createOpertionProxy(DfsProviderOperation.class, desc);
+					DfsProviderOperation provider = OperationUtil.createOperationProxy(DfsProviderOperation.class, desc);
 					FileInfo info = provider.getFileInfo(uri);
 					if (info != null) return info;
 				} catch (Throwable t) {
@@ -77,7 +77,7 @@ public class DfsApiImpl extends MLog implements DfsApi {
 		for (OperationDescriptor desc : api.findOperations(DfsProviderOperation.class, null, tags)) {
 			if (uri.getScheme().equals(desc.getParameter(DfsProviderOperation.PARAM_SCHEME))) {
 				try {
-					DfsProviderOperation provider = OperationUtil.createOpertionProxy(DfsProviderOperation.class, desc);
+					DfsProviderOperation provider = OperationUtil.createOperationProxy(DfsProviderOperation.class, desc);
 					MUri out = provider.exportFile(uri);
 					if (out != null) return out;
 				} catch (Throwable t) {
@@ -99,7 +99,7 @@ public class DfsApiImpl extends MLog implements DfsApi {
 		for (OperationDescriptor desc : api.findOperations(DfsProviderOperation.class, null, tags)) {
 			if (uri.getScheme().equals(desc.getParameter(DfsProviderOperation.PARAM_SCHEME))) {
 				try {
-					DfsProviderOperation provider = OperationUtil.createOpertionProxy(DfsProviderOperation.class, desc);
+					DfsProviderOperation provider = OperationUtil.createOperationProxy(DfsProviderOperation.class, desc);
 					Map<String, MUri> out = provider.getDirectoryList(uri);
 					if (out != null) return out;
 				} catch (Throwable t) {
@@ -131,7 +131,7 @@ public class DfsApiImpl extends MLog implements DfsApi {
 		for (OperationDescriptor desc : api.findOperations(DfsProviderOperation.class, null, tags)) {
 			if (target.getScheme().equals(desc.getParameter(DfsProviderOperation.PARAM_SCHEME))) {
 				try {
-					DfsProviderOperation provider = OperationUtil.createOpertionProxy(DfsProviderOperation.class, desc);
+					DfsProviderOperation provider = OperationUtil.createOperationProxy(DfsProviderOperation.class, desc);
 					provider.importFile(queueUri, target);
 					return;
 				} catch (Throwable t) {
@@ -153,7 +153,7 @@ public class DfsApiImpl extends MLog implements DfsApi {
 		for (OperationDescriptor desc : api.findOperations(DfsProviderOperation.class, null, tags)) {
 			if (uri.getScheme().equals(desc.getParameter(DfsProviderOperation.PARAM_SCHEME))) {
 				try {
-					DfsProviderOperation provider = OperationUtil.createOpertionProxy(DfsProviderOperation.class, desc);
+					DfsProviderOperation provider = OperationUtil.createOperationProxy(DfsProviderOperation.class, desc);
 					provider.deleteFile(uri);
 					return;
 				} catch (Throwable t) {
@@ -174,7 +174,7 @@ public class DfsApiImpl extends MLog implements DfsApi {
 		for (OperationDescriptor desc : api.findOperations(DfsProviderOperation.class, null, tags)) {
 			if (uri.getScheme().equals(desc.getParameter(DfsProviderOperation.PARAM_SCHEME))) {
 				try {
-					DfsProviderOperation provider = OperationUtil.createOpertionProxy(DfsProviderOperation.class, desc);
+					DfsProviderOperation provider = OperationUtil.createOperationProxy(DfsProviderOperation.class, desc);
 					provider.createDirectories(uri);
 					return;
 				} catch (Throwable t) {

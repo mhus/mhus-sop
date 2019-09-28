@@ -20,14 +20,14 @@ import de.mhus.lib.errors.MException;
 public class RestException extends MException {
 
 	private static final long serialVersionUID = 1L;
-	private long errId;
+	private int errId;
 
-	public RestException(long errId, Object... in) {
+	public RestException(int errId, Object... in) {
 		super(in);
 		this.errId = errId;
 	}
 
-	public long getErrorId() {
+	public int getErrorId() {
 		return errId;
 	}
 }

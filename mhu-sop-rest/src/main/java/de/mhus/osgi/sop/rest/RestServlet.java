@@ -54,6 +54,7 @@ import de.mhus.osgi.sop.api.rest.CallContext;
 import de.mhus.osgi.sop.api.rest.HttpRequest;
 import de.mhus.osgi.sop.api.rest.Node;
 import de.mhus.osgi.sop.api.rest.RestApi;
+import de.mhus.osgi.sop.api.rest.RestException;
 import de.mhus.osgi.sop.api.rest.RestResult;
 import de.mhus.osgi.sop.api.util.SopFileLogger;
 import de.mhus.osgi.sop.api.util.TicketUtil;
@@ -251,6 +252,10 @@ public class RestServlet extends HttpServlet {
 	        	return;
 	        }
 	        
+	        } catch (RestException t) {
+                log.d(t);
+                sendError(errorResultType, id, resp, t.getErrorId(), t.getMessage(), t, user == null ? "?" : user.getAccountId() );
+                return;
 	        } catch (Throwable t) {
 	        	log.d(t);
 	        	sendError(errorResultType, id, resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, t.getMessage(), t, user == null ? "?" : user.getAccountId() );
