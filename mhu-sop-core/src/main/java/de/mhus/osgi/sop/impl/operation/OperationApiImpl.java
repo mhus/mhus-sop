@@ -41,7 +41,9 @@ import de.mhus.lib.core.MTimerTask;
 import de.mhus.lib.core.base.service.TimerFactory;
 import de.mhus.lib.core.base.service.TimerIfc;
 import de.mhus.lib.core.cfg.CfgLong;
+import de.mhus.lib.core.lang.Value;
 import de.mhus.lib.core.strategy.OperationResult;
+import de.mhus.lib.core.strategy.util.OperationResultProxy;
 import de.mhus.lib.core.util.VersionRange;
 import de.mhus.lib.errors.NotFoundException;
 import de.mhus.osgi.sop.api.operation.OperationAddress;
@@ -213,16 +215,15 @@ public class OperationApiImpl extends MLog implements OperationApi {
 	public OperationResult doExecute(String filter, VersionRange version, Collection<String> providedTags,
 			IProperties properties, String... executeOptions) throws NotFoundException {
 		
-		boolean locaOnly = OperationUtil.isOption(executeOptions, LOCAL_ONLY);
-		if (locaOnly) {
+		if (OperationUtil.isOption(executeOptions, LOCAL_ONLY)) {
 			synchronized (register) {
 				OperationsProvider provider = register.get(OperationApi.DEFAULT_PROVIDER_NAME);
-				return provider.doExecute(filter, version, providedTags, properties, executeOptions);
+				return unwrap(provider.doExecute(filter, version, providedTags, properties, executeOptions), executeOptions);
 			}
 		} else {
 			for (OperationsProvider provider : getProviders()) {
 				try {
-					return provider.doExecute(filter, version, providedTags, properties, executeOptions);
+					return unwrap(provider.doExecute(filter, version, providedTags, properties, executeOptions), executeOptions);
 				} catch (NotFoundException nfe) {}
 			}
 		}
@@ -234,10 +235,24 @@ public class OperationApiImpl extends MLog implements OperationApi {
 	public OperationResult doExecute(OperationDescriptor desc, IProperties properties, String ... executeOptions) throws NotFoundException {
 		OperationsProvider provider = getProvider(desc.getProvider());
 		if (provider == null) throw new NotFoundException("provider for operation not found",desc, executeOptions);
-		return provider.doExecute(desc, properties);
+		return unwrap(provider.doExecute(desc, properties), executeOptions);
 	}
 
-	@Override
+	protected OperationResult unwrap(OperationResult res, String[] executeOptions) {
+	    
+	    if (OperationUtil.isOption(executeOptions, RAW_RESULT))
+	        return res;
+	    
+        // unwrap result.result
+        if (res != null && res.getResult() != null && res.getResult() instanceof Value) {
+            OperationResultProxy wrap = new OperationResultProxy(res);
+            wrap.setResult( ((Value<?>)res.getResult()).getValue() );
+            res = wrap;
+        }
+        return res;
+    }
+
+    @Override
 	public void synchronize() {
 		for (OperationsProvider provider : getProviders()) {
 			try {

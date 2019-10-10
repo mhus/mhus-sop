@@ -24,14 +24,13 @@ import java.util.UUID;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.util.tracker.ServiceTracker;
-import org.osgi.util.tracker.ServiceTrackerCustomizer;
-
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.M;
@@ -236,7 +235,8 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
 		DefaultTaskContext taskContext = new DefaultTaskContext(getClass());
 		taskContext.setParameters(properties);
 		try {
-			return operation.doExecute(taskContext);
+			OperationResult res = operation.doExecute(taskContext);
+			return res;
 		} catch (OperationException e) {
 			log().w(desc,properties,e);
 			return new NotSuccessful(operation,e.getMessage(), e.getCaption(), e.getReturnCode());

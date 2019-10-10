@@ -38,11 +38,11 @@ import org.osgi.service.component.annotations.Reference;
 
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.M;
-import de.mhus.lib.core.MApi;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
 import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.MThread;
+import de.mhus.lib.core.cfg.CfgBoolean;
 import de.mhus.lib.core.cfg.CfgString;
 import de.mhus.lib.core.lang.SerializedValue;
 import de.mhus.lib.core.pojo.DefaultFilter;
@@ -73,7 +73,8 @@ import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 @Component(service=JmsDataChannel.class,immediate=true)
 public class Jms2LocalOperationExecuteChannel extends AbstractJmsDataChannel {
 
-	public static CfgString queueName = new CfgString(Jms2LocalOperationExecuteChannel.class, "queue", "sop.operation." + M.l(ServerIdent.class));
+	public static CfgString CFG_QUEUE_NAME = new CfgString(Jms2LocalOperationExecuteChannel.class, "queue", "sop.operation." + M.l(ServerIdent.class));
+	private static CfgBoolean CFG_IS_ACCESS_CONTROL = new CfgBoolean(Jms2LocalOperationExecuteChannel.class, "accessControl", true);
 	private String ident = M.l(ServerIdent.class).toString();
 
 	static Jms2LocalOperationExecuteChannel instance;
@@ -106,13 +107,13 @@ public class Jms2LocalOperationExecuteChannel extends AbstractJmsDataChannel {
             }
         };
 	    
-		if (out != null && MApi.getCfg(Jms2LocalOperationExecuteChannel.class).getBoolean("accessControl", true))
+		if (out != null && CFG_IS_ACCESS_CONTROL.value())
 			((ServerJms)out).setInterceptorIn(new TicketAccessInterceptor());
 		return out;
 	}
 	
 	protected String getQueueName() {
-		return  queueName.value();
+		return  CFG_QUEUE_NAME.value();
 	}
 
 	@Reference
@@ -130,7 +131,7 @@ public class Jms2LocalOperationExecuteChannel extends AbstractJmsDataChannel {
 		log().d("execute operation",path,properties);
 		
 		OperationApi api = M.l(OperationApi.class);
-		OperationResult res = api.doExecute(path, version, null, properties, OperationApi.LOCAL_ONLY );
+		OperationResult res = api.doExecute(path, version, null, properties, OperationApi.LOCAL_ONLY, OperationApi.RAW_RESULT );
 		
 		log().d("operation result",path,res, res == null ? "" : res.getResult());
 		return res;

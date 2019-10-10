@@ -71,7 +71,7 @@ public class JmsApiImpl extends MLog implements JmsApi {
 			MapMessage msg = registerClient.createMapMessage();
 			msg.setStringProperty("type", "operations");
 			msg.setStringProperty("connection", M.l(JmsApi.class).getDefaultConnectionName());
-			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.queueName.value());
+			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.CFG_QUEUE_NAME.value());
 			
 			int cnt = 0;
 			
@@ -111,7 +111,7 @@ public class JmsApiImpl extends MLog implements JmsApi {
 			MapMessage msg = registerClient.createMapMessage();
 			msg.setStringProperty("type", "request");
 			msg.setStringProperty("connection", M.l(JmsApi.class).getDefaultConnectionName());
-			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.queueName.value());
+			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.CFG_QUEUE_NAME.value());
 			registerClient.sendJmsOneWay(msg);
 		} catch (Throwable t) {
 			log().w(t);
@@ -170,7 +170,7 @@ public class JmsApiImpl extends MLog implements JmsApi {
 			MapMessage msg = registerClient.createMapMessage();
 			msg.setStringProperty("type", "registrypublish");
 			msg.setStringProperty("connection", M.l(JmsApi.class).getDefaultConnectionName());
-			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.queueName.value());
+			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.CFG_QUEUE_NAME.value());
 			msg.setStringProperty("ident", M.l(ServerIdent.class).toString());
 			msg.setStringProperty("scope", "single");
 			
@@ -194,7 +194,7 @@ public class JmsApiImpl extends MLog implements JmsApi {
 			MapMessage msg = registerClient.createMapMessage();
 			msg.setStringProperty("type", "registryremove");
 			msg.setStringProperty("connection", M.l(JmsApi.class).getDefaultConnectionName());
-			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.queueName.value());
+			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.CFG_QUEUE_NAME.value());
 			msg.setStringProperty("ident", M.l(ServerIdent.class).toString());
 			
 			msg.setString("path0", path);
@@ -215,7 +215,7 @@ public class JmsApiImpl extends MLog implements JmsApi {
 			MapMessage msg = registerClient.createMapMessage();
 			msg.setStringProperty("type", "registrypublish");
 			msg.setStringProperty("connection", M.l(JmsApi.class).getDefaultConnectionName());
-			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.queueName.value());
+			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.CFG_QUEUE_NAME.value());
 			msg.setStringProperty("ident", ident);
 			msg.setStringProperty("scope", "full");
 
@@ -249,7 +249,7 @@ public class JmsApiImpl extends MLog implements JmsApi {
 			MapMessage msg = registerClient.createMapMessage();
 			msg.setStringProperty("type", "registryrequest");
 			msg.setStringProperty("connection", M.l(JmsApi.class).getDefaultConnectionName());
-			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.queueName.value());
+			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.CFG_QUEUE_NAME.value());
 			registerClient.sendJmsOneWay(msg);
 			return true;
 		} catch (Throwable t) {

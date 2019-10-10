@@ -28,6 +28,11 @@ public interface OperationApi extends SApi {
 
 	static final String DEFAULT_PROVIDER_NAME = "local";
 	static final String LOCAL_ONLY = "localOnly";
+	/**
+	 * Results could be wrapped and unwrapped, usually the api unwrap the result. Set this to get the raw result object.
+	 * It will unwrap results from type 'Value'
+	 */
+    static final String RAW_RESULT = "rawResult";
 	
     default List<OperationDescriptor> findOperations(Class<?> clazz, VersionRange version, Collection<String> providedTags) {
         return findOperations(clazz.getCanonicalName(), version, providedTags);

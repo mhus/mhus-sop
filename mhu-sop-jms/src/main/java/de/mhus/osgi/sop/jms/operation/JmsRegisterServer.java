@@ -94,7 +94,7 @@ public class JmsRegisterServer extends AbstractJmsDataChannel {
 				}
 
 				if (msg instanceof MapMessage && 
-						!Jms2LocalOperationExecuteChannel.queueName.value().equals(msg.getStringProperty("queue")) // do not process my own messages
+						!Jms2LocalOperationExecuteChannel.CFG_QUEUE_NAME.value().equals(msg.getStringProperty("queue")) // do not process my own messages
 					   ) {
 
 					if ("operations".equals(type)) {
