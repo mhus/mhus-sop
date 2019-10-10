@@ -31,6 +31,7 @@ import de.mhus.lib.core.MPeriod;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.cfg.CfgInt;
 import de.mhus.lib.core.cfg.CfgString;
+import de.mhus.lib.core.concurrent.LocalLock;
 import de.mhus.lib.core.concurrent.Lock;
 import de.mhus.lib.core.mail.MSendMail;
 import de.mhus.lib.core.mail.MailAttachment;
@@ -50,7 +51,7 @@ public class MailQueueTimer extends SchedulerServiceAdapter {
 	private static final CfgString CFG_NEXT_SEND_ATTEMPT_INTERVAL = new CfgString(MailQueueOperation.class, "nextSendAttemptInterval", "15m");
 	private static final long LOCK_TIMEOUT = MPeriod.MINUTE_IN_MILLISECOUNDS;
 	private static MailQueueTimer instance;
-	private Lock lock = new Lock("MailQueueLock");
+	private Lock lock = new LocalLock("MailQueueLock");
 	
 	@Activate
 	public void doActivate(ComponentContext ctx) {
