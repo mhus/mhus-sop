@@ -26,15 +26,22 @@ import de.mhus.osgi.sop.api.registry.RegistryValue;
 @Component(property="path=/system/master/")
 public class RegistryUnique implements RegistryPathControl {
 
+    private ThreadLocal<String> working = new ThreadLocal<>();
+    
 	@Override
 	public RegistryValue checkSetParameter(RegistryManager manager, RegistryValue value) {
 		if (value.getPath().endsWith("@seed")) {
+		    
+		    if (working.get() != null)
+		        return value;
+		    
 			RegistryValue cur = manager.getParameter(value.getPath());
 			if (cur != null)
 				return null; // can't overwrite locally
+    		long mySeed = M.l(MRandom.class).getLong();
+    		return new RegistryValue(String.valueOf(mySeed), value.getSource(), value.getUpdated(), value.getPath(), Math.max(60000, value.getTimeout()), false, false);
 		}
-		long mySeed = M.l(MRandom.class).getLong();
-		return new RegistryValue(String.valueOf(mySeed), value.getSource(), value.getUpdated(), value.getPath(), Math.max(60000, value.getTimeout()), false, false);
+		return value;
 	}
 
 	@Override
@@ -51,7 +58,12 @@ public class RegistryUnique implements RegistryPathControl {
 				// create my own seed
 				long mySeed = M.l(MRandom.class).getLong();
 				if (theirSeed < mySeed) {
-					manager.setParameter(value.getPath(), String.valueOf(mySeed), value.getTimeout(), false, false, false);
+				    working.set("");
+				    try {
+				        manager.setParameter(value.getPath(), String.valueOf(mySeed), value.getTimeout(), false, false, false);
+				    } finally {
+				        working.remove();
+                    }
 					return null;
 				}
 			} else {

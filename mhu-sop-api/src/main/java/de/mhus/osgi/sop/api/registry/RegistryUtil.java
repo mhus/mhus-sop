@@ -14,6 +14,6 @@ public class RegistryUtil {
             rapi.setParameter(p, "");
             param = rapi.getParameter(p);
         }
-        return param.getLocation().equals(rapi.getServerIdent());
+        return param.getSource().equals(rapi.getServerIdent());
     }
 }
