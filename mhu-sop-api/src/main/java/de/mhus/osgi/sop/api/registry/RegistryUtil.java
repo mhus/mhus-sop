@@ -1,6 +1,7 @@
 package de.mhus.osgi.sop.api.registry;
 
 import de.mhus.lib.core.M;
+import de.mhus.lib.core.MThread;
 
 public class RegistryUtil {
 
@@ -12,6 +13,8 @@ public class RegistryUtil {
         RegistryValue param = rapi.getParameter(p);
         if (param == null) {
             rapi.setParameter(p, "");
+            param = rapi.getParameter(p);
+            MThread.sleep(1000);
             param = rapi.getParameter(p);
         }
         return param.getSource().equals(rapi.getServerIdent());
