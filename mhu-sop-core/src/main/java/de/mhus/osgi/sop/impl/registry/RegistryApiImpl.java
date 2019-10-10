@@ -142,7 +142,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	protected void checkUpdate() {
 		
 		// send worker update
-		setParameter(PATH_WORKER + SopUtil.getServerIdent() + "@pid", MSystem.getHostname() + ":" + MSystem.getPid(), CFG_UPDATE_INTERVAL.value() * 2, true, false, false);
+		setParameter(PATH_WORKER + getServerIdent() + "@pid", MSystem.getHostname() + ":" + MSystem.getPid(), CFG_UPDATE_INTERVAL.value() * 2, true, false, false);
 		
 		final long now = System.currentTimeMillis();
 		LinkedList<RegistryValue> values = null;
@@ -245,7 +245,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	public boolean setParameter(String path, String value, long timeout, boolean readOnly, boolean persistent, boolean local) {
 		path = validateParameterPath(path);
 		if (value == null) throw new NullPointerException("null value not allowed");
-		String source = SopUtil.getServerIdent();
+		String source = getServerIdent();
 		if (local) {
 			source = SOURCE_LOCAL;
 			timeout = 0;
@@ -365,7 +365,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 			}
 		}
 		
-		if (current.isReadOnly() && !current.getSource().equals(SopUtil.getServerIdent()))
+		if (current.isReadOnly() && !current.getSource().equals(getServerIdent()))
 			throw new AccessDeniedException("The entry is readOnly");
 	
 		// let the controller check the action
@@ -782,7 +782,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	public void save() throws IOException {
 		MProperties p = new MProperties();
 		for (RegistryValue entry : getAll())
-			if ((entry.getSource().equals(SopUtil.getServerIdent()) || entry.isLocal()) && entry.isPersistent()) {
+			if ((entry.getSource().equals(getServerIdent()) || entry.isLocal()) && entry.isPersistent()) {
 				p.setString(entry.getPath(), entry.isReadOnly() + "|" + entry.getTimeout() + "|" + entry.getSource() + "|" + entry.getValue());
 			}
 		p.save(getFile());
@@ -801,7 +801,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 		for (Entry<String, Object> entry : prop.entrySet()) {
 			String[] split = entry.getValue().toString().split("\\|", 4);
 			if (!SOURCE_LOCAL.equals(split[2])) {
-				split[2] = SopUtil.getServerIdent();
+				split[2] = getServerIdent();
 				setParameterFromRemote(new RegistryValue(split[3], split[2], updated, entry.getKey(), MCast.tolong(split[1],0), MCast.toboolean(split[0], true), true));
 			} else {
 				setParameter(entry.getKey(), split[3], 0, true, true, true);
@@ -871,4 +871,10 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 		}
 		
 	}
+
+    @Override
+    public String getServerIdent() {
+        return SopUtil.getServerIdent();
+    }
+    
 }

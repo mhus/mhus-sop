@@ -32,13 +32,22 @@ import de.mhus.osgi.api.karaf.AbstractCmd;
 import de.mhus.osgi.sop.api.registry.RegistryApi;
 import de.mhus.osgi.sop.api.registry.RegistryManager;
 import de.mhus.osgi.sop.api.registry.RegistryPathControl;
+import de.mhus.osgi.sop.api.registry.RegistryUtil;
 import de.mhus.osgi.sop.api.registry.RegistryValue;
 
 @Command(scope = "sop", name = "registry", description = "Registry commands")
 @Service
 public class RegistryCmd extends AbstractCmd {
 
-	@Argument(index=0, name="cmd", required=true, description="Command:\n list [path]\n set/add <path> <value>\n remove <path>\n publish\n request\n save\n load", multiValued=false)
+	@Argument(index=0, name="cmd", required=true, description="Command:\n"
+	        + " list [path]\n"
+	        + " set/add <path> <value>\n"
+	        + " remove <path>\n"
+	        + " publish\n"
+	        + " request\n"
+	        + " save\n"
+	        + " load\n"
+	        + " unique", multiValued=false)
 	String cmd;
 
 	@Argument(index=1, name="path", required=false, description="Path to Node", multiValued=false)
@@ -62,6 +71,10 @@ public class RegistryCmd extends AbstractCmd {
 	@Override
 	public Object execute2() throws Exception {
 		RegistryApi api = M.l(RegistryApi.class);
+		
+		if (cmd.equals("unique")) {
+		    System.out.println( RegistryUtil.unique(path) );
+		} else
 		if (cmd.equals("list")) {
 			
 			if (path != null && !path.endsWith("*")) {

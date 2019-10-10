@@ -84,4 +84,6 @@ public interface RegistryApi {
 
 	void load();
 	
+	String getServerIdent();
+	
 }
