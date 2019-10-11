@@ -9,6 +9,7 @@ public class RegistryUtil {
     public static final CfgLong CFG_WAIT_FOR_OTHERS = new CfgLong(RegistryApi.class, "waitForOthers", 200);
     public static final String MUTEX_PATH = RegistryApi.PATH_SYSTEM + "/mutex/";
     public static final String MASTER_VARNAME = "@master";
+    public static final String VALUE_VARNAME = "@value";
 
     /**
      * Negotiate with other notes which one is the master of the resource.
@@ -53,6 +54,12 @@ public class RegistryUtil {
 
     public static boolean masterRemove(String name) {
         return M.l(RegistryApi.class).removeParameter(RegistryUtil.MUTEX_PATH + name + RegistryUtil.MASTER_VARNAME);
+    }
+
+    public static void setValue(String path, String value) {
+        RegistryApi rapi = M.l(RegistryApi.class);
+        String p = MUTEX_PATH + path + VALUE_VARNAME;
+        rapi.setParameter(p, value, 1000, false, false, false);
     }
 
 }

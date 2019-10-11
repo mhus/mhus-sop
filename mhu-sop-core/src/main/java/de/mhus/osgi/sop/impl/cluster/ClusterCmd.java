@@ -17,12 +17,14 @@ package de.mhus.osgi.sop.impl.cluster;
 
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.concurrent.Lock;
 import de.mhus.osgi.api.karaf.AbstractCmd;
 import de.mhus.osgi.sop.api.cluster.ClusterApi;
+import de.mhus.osgi.sop.api.registry.RegistryUtil;
 
 @Command(scope = "sop", name = "cluster", description = "Cluster commands")
 @Service
@@ -31,6 +33,7 @@ public class ClusterCmd extends AbstractCmd {
 	@Argument(index=0, name="cmd", required=true, description="Command:\n"
 	        + " lock <path>\n"
 	        + " stacklock <path>\n"
+	        + " master <path>\n"
 	        + "", multiValued=false)
 	String cmd;
 
@@ -40,10 +43,23 @@ public class ClusterCmd extends AbstractCmd {
 	@Argument(index=2, name="parameters", required=false, description="More Parameters", multiValued=true)
     String[] parameters;
 
-	@Override
+    @Option(name="-t", aliases="--timeout", description="Set timeout for new entries",required=false)
+    long timeout = 0;
+
+    @Override
 	public Object execute2() throws Exception {
 	    ClusterApi api = M.l(ClusterApi.class);
 		
+	    if (cmd.equals("fire")) {
+	        api.fireEvent(path, parameters[0]);
+	        System.out.println("ok");
+	    } else
+	    if (cmd.equals("register")) {
+	        api.registerListener(path, n -> System.out.println("Event: " + n) );
+	    } else
+        if (cmd.equals("master")) {
+            System.out.println( RegistryUtil.master(path, timeout) );
+        } else
         if (cmd.equals("stacklock")) {
             System.out.println("Wait for lock");
             try (Lock lock = api.getStackLock(path).lock()) {

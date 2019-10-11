@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.mhus.osgi.sop.impl.registry;
+package de.mhus.osgi.sop.impl.cluster;
 
 import org.osgi.service.component.annotations.Component;
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MCast;
+import de.mhus.lib.core.MThread;
 import de.mhus.lib.core.crypt.MRandom;
 import de.mhus.osgi.sop.api.registry.RegistryManager;
 import de.mhus.osgi.sop.api.registry.RegistryPathControl;
@@ -31,6 +32,18 @@ public class RegistryMutex implements RegistryPathControl {
     
 	@Override
 	public RegistryValue checkSetParameter(RegistryManager manager, RegistryValue value) {
+        if (value.getPath().endsWith(RegistryUtil.VALUE_VARNAME)) {
+            MThread.asynchron(new Runnable() {
+                
+                @Override
+                public void run() {
+                    String name = value.getPath();
+                    name = name.substring(14);
+                    RegistryClusterApiImpl.instance().fireEventLocal(name, value.getValue());
+                }
+            });
+            return value;
+        }
 		if (value.getPath().endsWith(RegistryUtil.MASTER_VARNAME)) {
 		    
 //		    if (working.get() != null)

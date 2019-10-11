@@ -1,6 +1,7 @@
 package de.mhus.osgi.sop.api.cluster;
 
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import de.mhus.lib.core.concurrent.Lock;
 
@@ -46,7 +47,7 @@ public interface ClusterApi {
      */
     String getStackName();
     
-    void registerListener(String name, BiConsumer<String,String> consumer );
+    void registerListener(String name, Consumer<String> consumer );
     
     default void registerStackListener(String name, BiConsumer<String,String> consumer ) {
         registerStackListener(getStackName() + "/" + name, consumer);

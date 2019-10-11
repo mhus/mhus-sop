@@ -1,10 +1,15 @@
 package de.mhus.osgi.sop.impl.cluster;
 
-import java.util.function.BiConsumer;
+import java.util.HashMap;
+import java.util.function.Consumer;
 
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 
 import de.mhus.lib.core.M;
+import de.mhus.lib.core.MEventHandler;
 import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MPeriod;
@@ -23,6 +28,23 @@ public class RegistryClusterApiImpl extends MLog implements ClusterApi {
     public static CfgLong CFG_LOCK_TIMEOUT = new CfgLong(ClusterApi.class, "lockTimeout", MPeriod.HOUR_IN_MILLISECOUNDS);
     public static CfgLong CFG_LOCK_SLEEP = new CfgLong(ClusterApi.class, "lockSleep", 1000);
 
+    HashMap<String,EventHandler> listeners = new HashMap<>();
+    private static RegistryClusterApiImpl instance;
+
+    @Activate
+    public void doActivate(ComponentContext ctx) {
+        instance = this;
+    }
+
+    @Deactivate
+    public void doDeactivate(ComponentContext ctx) {
+        instance = null;
+    }
+    
+    public static RegistryClusterApiImpl instance() {
+        return instance;
+    }
+
     @Override
     public Lock getLock(String name) {
         return M.l(LockManager.class).getLock(CFG_PATH.value() + "/" + name, n -> {return new RegistryLock(n);});
@@ -40,16 +62,44 @@ public class RegistryClusterApiImpl extends MLog implements ClusterApi {
         return MSystem.getHostname();
     }
 
+    private EventHandler getEventHandler(String name) {
+        EventHandler ret = listeners.get(name);
+        if (ret == null) {
+            ret = new EventHandler();
+            listeners.put(name, ret);
+        }
+        return ret;
+    }
+    
     @Override
-    public void registerListener(String name, BiConsumer<String, String> consumer) {
-        // TODO Auto-generated method stub
-        
+    public void registerListener(String name, Consumer<String> consumer) {
+        synchronized (listeners) {
+            EventHandler handler = getEventHandler(name);
+            handler.registerWeak(consumer);
+        }
     }
 
     @Override
     public void fireEvent(String name, String value) {
-        // TODO Auto-generated method stub
-        
+        String p = MFile.normalizePath(CFG_PATH.value() + "/" + name);
+        RegistryUtil.setValue(p, value);
+    }
+    
+    public void fireEventLocal(String name, String value) {
+        EventHandler handler = null;
+        synchronized (listeners) {
+            name = name.substring(CFG_PATH.value().length() + 1);
+            handler = getEventHandler(name);
+        }
+        handler.fire(value);
     }
 
+    static class EventHandler extends MEventHandler<Consumer<String>> {
+        @Override
+        public void onFire(Consumer<String> listener, Object event, Object ... values) {
+            listener.accept((String)event);
+        }
+    }
+    
+    
 }

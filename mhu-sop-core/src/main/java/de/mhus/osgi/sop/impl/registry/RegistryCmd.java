@@ -32,7 +32,6 @@ import de.mhus.osgi.api.karaf.AbstractCmd;
 import de.mhus.osgi.sop.api.registry.RegistryApi;
 import de.mhus.osgi.sop.api.registry.RegistryManager;
 import de.mhus.osgi.sop.api.registry.RegistryPathControl;
-import de.mhus.osgi.sop.api.registry.RegistryUtil;
 import de.mhus.osgi.sop.api.registry.RegistryValue;
 
 @Command(scope = "sop", name = "registry", description = "Registry commands")
@@ -47,7 +46,7 @@ public class RegistryCmd extends AbstractCmd {
 	        + " request\n"
 	        + " save\n"
 	        + " load\n"
-	        + " master", multiValued=false)
+	        + "", multiValued=false)
 	String cmd;
 
 	@Argument(index=1, name="path", required=false, description="Path to Node", multiValued=false)
@@ -72,9 +71,6 @@ public class RegistryCmd extends AbstractCmd {
 	public Object execute2() throws Exception {
 		RegistryApi api = M.l(RegistryApi.class);
 		
-		if (cmd.equals("master")) {
-		    System.out.println( RegistryUtil.master(path, timeout) );
-		} else
 		if (cmd.equals("list")) {
 			
 			if (path != null && !path.endsWith("*")) {
