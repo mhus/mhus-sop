@@ -21,6 +21,7 @@ public class RegistryUtil {
     }
 
     public static RegistryValue master(String path, long timeout) {
+        timeout = Math.max(60000, timeout);
         RegistryApi rapi = M.l(RegistryApi.class);
         String p = MUTEX_PATH + path + MASTER_VARNAME;
         RegistryValue param = rapi.getParameter(p);
@@ -31,6 +32,23 @@ public class RegistryUtil {
             param = rapi.getParameter(p);
         }
         return param.getSource().equals(rapi.getServerIdent()) ? param : null;
+    }
+
+    public static RegistryValue masterRefresh(String path, long timeout) {
+        timeout = Math.max(60000, timeout);
+        RegistryApi rapi = M.l(RegistryApi.class);
+        String p = MUTEX_PATH + path + MASTER_VARNAME;
+        RegistryValue param = rapi.getParameter(p);
+        if (param == null) {
+            rapi.setParameter(p, "", timeout, false, false, false);
+            MThread.sleep(CFG_WAIT_FOR_OTHERS.value());
+            param = rapi.getParameter(p);
+        } else
+        if (param.getTimeout() - System.currentTimeMillis() < timeout / 2) {
+            rapi.setParameter(p, "", timeout, false, false, false);
+            param = rapi.getParameter(p);
+        }
+        return param;
     }
 
     public static boolean masterRemove(String name) {

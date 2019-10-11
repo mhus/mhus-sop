@@ -92,4 +92,17 @@ public class RegistryLock implements Lock {
         return lockTime;
     }
 
+    @Override
+    public boolean refresh() {
+        synchronized (this) {
+            if (lock == null) return false;
+            lock = RegistryUtil.masterRefresh(name, RegistryClusterApiImpl.CFG_LOCK_TIMEOUT.value());
+            if (lock == null) {
+                lockTime = 0;
+                return false;
+            }
+        }
+        return true;
+    }
+
 }
