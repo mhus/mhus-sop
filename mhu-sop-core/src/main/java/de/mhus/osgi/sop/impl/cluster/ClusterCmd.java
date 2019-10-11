@@ -50,9 +50,17 @@ public class ClusterCmd extends AbstractCmd {
                 System.out.println("Locked " + lock.getLocker());
                 System.out.println("Press ctrl+c to stop locking");
                 try {
+                    int cnt = 0;
                     while (true) {
                         System.out.print(".");
                         Thread.sleep(1000);
+                        cnt++;
+                        if (cnt >= 60 * 10) {
+                            System.out.println();
+                            System.out.println("Refresh");
+                            lock.refresh();
+                            cnt = 0;
+                        }
                     }
                 } catch (InterruptedException e) {}
             }
@@ -64,9 +72,17 @@ public class ClusterCmd extends AbstractCmd {
 		    try (Lock lock = api.getLock(path).lock()) {
                 System.out.println("Locked " + lock.getLocker());
 		        try {
+		            int cnt = 0;
     		        while (true) {
     		            System.out.print(".");
     		            Thread.sleep(1000);
+                        cnt++;
+                        if (cnt >= 60 * 10) {
+                            System.out.println();
+                            System.out.println("Refresh");
+                            lock.refresh();
+                            cnt = 0;
+                        }
     		        }
 		        } catch (InterruptedException e) {}
 		    }
