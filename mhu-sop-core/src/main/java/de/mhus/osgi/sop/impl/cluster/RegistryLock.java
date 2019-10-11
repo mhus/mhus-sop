@@ -20,6 +20,7 @@ public class RegistryLock implements Lock {
     @Override
     public Lock lock() {
         synchronized (this) {
+            if (isLocked()) return this;
             while (true) {
                 lock = RegistryUtil.master(name, RegistryClusterApiImpl.CFG_LOCK_TIMEOUT.value());
                 if ( lock != null) {
@@ -34,6 +35,7 @@ public class RegistryLock implements Lock {
     @Override
     public boolean lock(long timeout) {
         synchronized (this) {
+            if (isLocked()) return true;
             long start = System.currentTimeMillis();
             while (true) {
                 lock = RegistryUtil.master(name, RegistryClusterApiImpl.CFG_LOCK_TIMEOUT.value());
