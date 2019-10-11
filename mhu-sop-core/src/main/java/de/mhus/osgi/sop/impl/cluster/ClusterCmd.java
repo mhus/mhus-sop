@@ -15,8 +15,6 @@
  */
 package de.mhus.osgi.sop.impl.cluster;
 
-import java.util.function.Consumer;
-
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
@@ -26,6 +24,7 @@ import de.mhus.lib.core.M;
 import de.mhus.lib.core.concurrent.Lock;
 import de.mhus.osgi.api.karaf.AbstractCmd;
 import de.mhus.osgi.sop.api.cluster.ClusterApi;
+import de.mhus.osgi.sop.api.cluster.ValueListener;
 import de.mhus.osgi.sop.api.registry.RegistryUtil;
 
 @Command(scope = "sop", name = "cluster", description = "Cluster commands")
@@ -57,11 +56,21 @@ public class ClusterCmd extends AbstractCmd {
 	        System.out.println("ok");
 	    } else
 	    if (cmd.equals("register")) {
-            Consumer<String> c = v -> System.out.println("Event Value: " + v);
+	        ValueListener c = new ValueListener() {
+                @Override
+                public void event(String name, String value) {
+                    System.out.println("Event Value: " + name + "=" + value);
+                }
+	        };
             api.registerListener(path, c );
 	    } else
 	    if (cmd.equals("listen")) {
-	        Consumer<String> c = v -> System.out.println("Event Value: " + v);
+            ValueListener c = new ValueListener() {
+                @Override
+                public void event(String name, String value) {
+                    System.out.println("Event Value: " + name + "=" + value);
+                }
+            };
 	        api.registerListener(path, c );
 	        System.out.println("Press Ctrl+C to exit");
 	        try {

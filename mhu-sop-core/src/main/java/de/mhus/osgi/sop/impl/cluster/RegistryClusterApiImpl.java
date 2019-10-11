@@ -1,7 +1,6 @@
 package de.mhus.osgi.sop.impl.cluster;
 
 import java.util.HashMap;
-import java.util.function.Consumer;
 
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -19,6 +18,7 @@ import de.mhus.lib.core.cfg.CfgLong;
 import de.mhus.lib.core.cfg.CfgString;
 import de.mhus.lib.core.concurrent.Lock;
 import de.mhus.osgi.sop.api.cluster.ClusterApi;
+import de.mhus.osgi.sop.api.cluster.ValueListener;
 import de.mhus.osgi.sop.api.registry.RegistryUtil;
 
 @Component(immediate=true)
@@ -72,7 +72,7 @@ public class RegistryClusterApiImpl extends MLog implements ClusterApi {
     }
     
     @Override
-    public void registerListener(String name, Consumer<String> consumer) {
+    public void registerListener(String name, ValueListener consumer) {
         synchronized (listeners) {
             EventHandler handler = getEventHandler(name);
             handler.registerWeak(consumer);
@@ -94,15 +94,15 @@ public class RegistryClusterApiImpl extends MLog implements ClusterApi {
         handler.fire(value);
     }
 
-    static class EventHandler extends MEventHandler<Consumer<String>> {
+    static class EventHandler extends MEventHandler<ValueListener> {
         @Override
-        public void onFire(Consumer<String> listener, Object event, Object ... values) {
-            listener.accept((String)event);
+        public void onFire(ValueListener listener, Object event, Object ... values) {
+            listener.event((String)event, (String)values[0]);
         }
     }
 
     @Override
-    public void unregisterListener(Consumer<String> consumer) {
+    public void unregisterListener(ValueListener consumer) {
         synchronized (listeners) {
             for (EventHandler handler : listeners.values()) {
                 handler.unregister(consumer);
