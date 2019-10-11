@@ -15,6 +15,8 @@
  */
 package de.mhus.osgi.sop.impl.cluster;
 
+import java.util.function.Consumer;
+
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
@@ -54,8 +56,12 @@ public class ClusterCmd extends AbstractCmd {
 	        api.fireEvent(path, parameters[0]);
 	        System.out.println("ok");
 	    } else
-	    if (cmd.equals("register")) {
-	        api.registerListener(path, n -> System.out.println("Event: " + n) );
+	    if (cmd.equals("listen")) {
+	        Consumer<String> c = v -> System.out.println("Event Value: " + v);
+	        api.registerListener(path, c );
+	        System.out.println("Press Ctrl+C to exit");
+	        while (true)
+	            Thread.sleep(1000);
 	    } else
         if (cmd.equals("master")) {
             System.out.println( RegistryUtil.master(path, timeout) );
