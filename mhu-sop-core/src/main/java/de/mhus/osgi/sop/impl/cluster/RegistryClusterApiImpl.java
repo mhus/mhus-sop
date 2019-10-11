@@ -91,7 +91,7 @@ public class RegistryClusterApiImpl extends MLog implements ClusterApi {
             name = name.substring(CFG_PATH.value().length() + 1);
             handler = getEventHandler(name);
         }
-        handler.fire(value);
+        handler.fire(name, value);
     }
 
     static class EventHandler extends MEventHandler<ValueListener> {
