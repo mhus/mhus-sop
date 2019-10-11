@@ -100,6 +100,14 @@ public class RegistryClusterApiImpl extends MLog implements ClusterApi {
             listener.accept((String)event);
         }
     }
-    
-    
+
+    @Override
+    public void unregisterListener(Consumer<String> consumer) {
+        synchronized (listeners) {
+            for (EventHandler handler : listeners.values()) {
+                handler.unregister(consumer);
+            }
+        }
+    }
+
 }

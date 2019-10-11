@@ -53,14 +53,12 @@ public class RegistryMutex implements RegistryPathControl {
 	}
 
 	private void fireValue(RegistryValue value) {
-        System.out.println("### Path: " + value.getPath());
         MThread.asynchron(new Runnable() {
             
             @Override
             public void run() {
                 String name = value.getPath();
                 name = name.substring(14, name.length() - RegistryUtil.VALUE_VARNAME.length());
-                System.out.println("### Fire: " + name);
                 RegistryClusterApiImpl.instance().fireEventLocal(name, value.getValue());
             }
         });

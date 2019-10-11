@@ -58,5 +58,7 @@ public interface ClusterApi {
     default void fireStackEvent(String name, String value) {
         fireEvent(getStackName() + "/" + name, value);
     }
+
+    void unregisterListener(Consumer<String> consumer);
     
 }

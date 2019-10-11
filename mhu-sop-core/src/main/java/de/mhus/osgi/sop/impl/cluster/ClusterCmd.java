@@ -56,12 +56,19 @@ public class ClusterCmd extends AbstractCmd {
 	        api.fireEvent(path, parameters[0]);
 	        System.out.println("ok");
 	    } else
+	    if (cmd.equals("register")) {
+            Consumer<String> c = v -> System.out.println("Event Value: " + v);
+            api.registerListener(path, c );
+	    } else
 	    if (cmd.equals("listen")) {
 	        Consumer<String> c = v -> System.out.println("Event Value: " + v);
 	        api.registerListener(path, c );
 	        System.out.println("Press Ctrl+C to exit");
-	        while (true)
-	            Thread.sleep(1000);
+	        try {
+    	        while (true)
+    	            Thread.sleep(1000);
+	        } catch (InterruptedException e) {}
+	        api.unregisterListener( c );
 	    } else
         if (cmd.equals("master")) {
             System.out.println( RegistryUtil.master(path, timeout) );
