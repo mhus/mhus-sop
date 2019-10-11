@@ -108,4 +108,8 @@ public class RegistryValue implements Comparable<RegistryValue>{
 	    return MSystem.toString(this, path, source);
 	}
 	
+	public long getTTL() {
+	    return getTimeout() - ( System.currentTimeMillis() - getUpdated() );	    
+	}
+	
 }

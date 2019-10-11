@@ -83,7 +83,7 @@ public class RegistryCmd extends AbstractCmd {
 				for (String child : api.getNodeChildren(path))
 					out.addRowValues("/" + child,"[node]","","", "","", "");
 				for (RegistryValue value : api.getParameters(path) ) 
-					out.addRowValues("@" + MString.afterIndex(value.getPath(), '@'), value.getValue(),value.getSource(),new Date(value.getUpdated()), value.getTimeout() > 0 ? MPeriod.getIntervalAsString( value.getTimeout() - ( System.currentTimeMillis() - value.getUpdated() ) ) : "", value.isReadOnly(), value.isPersistent() );
+					out.addRowValues("@" + MString.afterIndex(value.getPath(), '@'), value.getValue(),value.getSource(),new Date(value.getUpdated()), value.getTimeout() > 0 ? MPeriod.getIntervalAsString( value.getTTL() ) : "", value.isReadOnly(), value.isPersistent() );
 				out.print(System.out);
 			} else {
 				RegistryManager manager = M.l(RegistryManager.class);

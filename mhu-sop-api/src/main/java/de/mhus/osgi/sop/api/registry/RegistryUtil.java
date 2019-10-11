@@ -44,7 +44,7 @@ public class RegistryUtil {
             MThread.sleep(CFG_WAIT_FOR_OTHERS.value());
             param = rapi.getParameter(p);
         } else
-        if (param.getTimeout() - System.currentTimeMillis() < timeout / 2) {
+        if (param.getTTL() < timeout / 2) {
             rapi.setParameter(p, "", timeout, false, false, false);
             param = rapi.getParameter(p);
         }
