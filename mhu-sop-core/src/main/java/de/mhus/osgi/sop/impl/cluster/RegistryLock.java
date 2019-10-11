@@ -20,7 +20,10 @@ public class RegistryLock implements Lock {
     @Override
     public Lock lock() {
         synchronized (this) {
-            if (isLocked()) return this;
+            if (isLocked()) {
+                refresh();
+                return this;
+            }
             while (true) {
                 lock = RegistryUtil.master(name, RegistryClusterApiImpl.CFG_LOCK_TIMEOUT.value());
                 if ( lock != null) {
