@@ -33,17 +33,7 @@ public class RegistryMutex implements RegistryPathControl {
 	@Override
 	public RegistryValue checkSetParameter(RegistryManager manager, RegistryValue value) {
         if (value.getPath().endsWith(RegistryUtil.VALUE_VARNAME)) {
-            System.out.println("### Path: " + value.getPath());
-            MThread.asynchron(new Runnable() {
-                
-                @Override
-                public void run() {
-                    String name = value.getPath();
-                    name = name.substring(14, name.length() - RegistryUtil.VALUE_VARNAME.length());
-                    System.out.println("### Fire: " + name);
-                    RegistryClusterApiImpl.instance().fireEventLocal(name, value.getValue());
-                }
-            });
+            fireValue(value);
             return value;
         }
 		if (value.getPath().endsWith(RegistryUtil.MASTER_VARNAME)) {
@@ -62,7 +52,22 @@ public class RegistryMutex implements RegistryPathControl {
 		return value;
 	}
 
-	@Override
+	private void fireValue(RegistryValue value) {
+        System.out.println("### Path: " + value.getPath());
+        MThread.asynchron(new Runnable() {
+            
+            @Override
+            public void run() {
+                String name = value.getPath();
+                name = name.substring(14, name.length() - RegistryUtil.VALUE_VARNAME.length());
+                System.out.println("### Fire: " + name);
+                RegistryClusterApiImpl.instance().fireEventLocal(name, value.getValue());
+            }
+        });
+    
+	}
+
+    @Override
 	public boolean checkRemoveParameter(RegistryManager manager, RegistryValue value) {
 	    if (value.getPath().endsWith(RegistryUtil.MASTER_VARNAME)) {
 	        if (value.getSource().equals(manager.getServerIdent())) {
@@ -74,6 +79,10 @@ public class RegistryMutex implements RegistryPathControl {
 
 	@Override
 	public RegistryValue checkSetParameterFromRemote(RegistryManager manager, RegistryValue value) {
+        if (value.getPath().endsWith(RegistryUtil.VALUE_VARNAME)) {
+            fireValue(value);
+            return value;
+        }
 		if (value.getPath().endsWith(RegistryUtil.MASTER_VARNAME)) {
 			RegistryValue cur = manager.getParameter(value.getPath());
 			long theirSeed = MCast.tolong(value.getValue(), Long.MIN_VALUE);
