@@ -21,19 +21,20 @@ import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.crypt.MRandom;
 import de.mhus.osgi.sop.api.registry.RegistryManager;
 import de.mhus.osgi.sop.api.registry.RegistryPathControl;
+import de.mhus.osgi.sop.api.registry.RegistryUtil;
 import de.mhus.osgi.sop.api.registry.RegistryValue;
 
-@Component(property="path=/system/master/")
-public class RegistryUnique implements RegistryPathControl {
+@Component(property="path=/system/mutex/")
+public class RegistryMutex implements RegistryPathControl {
 
-    private ThreadLocal<String> working = new ThreadLocal<>();
+//    private ThreadLocal<String> working = new ThreadLocal<>();
     
 	@Override
 	public RegistryValue checkSetParameter(RegistryManager manager, RegistryValue value) {
-		if (value.getPath().endsWith("@seed")) {
+		if (value.getPath().endsWith(RegistryUtil.MASTER_VARNAME)) {
 		    
-		    if (working.get() != null)
-		        return value;
+//		    if (working.get() != null)
+//		        return value;
 		    
 			RegistryValue cur = manager.getParameter(value.getPath());
 			if (cur != null)
@@ -46,26 +47,33 @@ public class RegistryUnique implements RegistryPathControl {
 
 	@Override
 	public boolean checkRemoveParameter(RegistryManager manager, RegistryValue value) {
+	    if (value.getPath().endsWith(RegistryUtil.MASTER_VARNAME)) {
+	        if (value.getSource().equals(manager.getServerIdent())) {
+	            return true;
+	        }
+	    }
 		return false;
 	}
 
 	@Override
 	public RegistryValue checkSetParameterFromRemote(RegistryManager manager, RegistryValue value) {
-		if (value.getPath().endsWith("@seed")) {
+		if (value.getPath().endsWith(RegistryUtil.MASTER_VARNAME)) {
 			RegistryValue cur = manager.getParameter(value.getPath());
 			long theirSeed = MCast.tolong(value.getValue(), Long.MIN_VALUE);
 			if (cur == null) {
-				// create my own seed
-				long mySeed = M.l(MRandom.class).getLong();
-				if (theirSeed < mySeed) {
-				    working.set("");
-				    try {
-				        manager.setParameter(value.getPath(), String.valueOf(mySeed), value.getTimeout(), false, false, false);
-				    } finally {
-				        working.remove();
-                    }
-					return null;
-				}
+//				// create my own seed
+//				long mySeed = M.l(MRandom.class).getLong();
+//				if (theirSeed < mySeed) {
+//				    working.set("");
+//				    try {
+//				        manager.setParameter(value.getPath(), String.valueOf(mySeed), value.getTimeout(), false, false, false);
+//				    } finally {
+//				        working.remove();
+//                    }
+//					return null;
+//				}
+			    // accept their seed by default
+			    return value;
 			} else {
 				long mySeed = MCast.tolong(cur.getValue(), Long.MIN_VALUE);
 				if (theirSeed < mySeed) return null;

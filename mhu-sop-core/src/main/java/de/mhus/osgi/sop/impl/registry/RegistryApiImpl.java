@@ -70,7 +70,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 	private TreeMap<String, RegistryValue> registry = new TreeMap<>();
 	private TimerIfc timer;
 	private MTimerTask timerTask;
-	private CfgLong CFG_UPDATE_INTERVAL = new CfgLong(RegistryApiImpl.class, "updateInterval", 60000);
+	private CfgLong CFG_UPDATE_INTERVAL = new CfgLong(RegistryApiImpl.class, "updateInterval", 10000);
 	private TreeSet<ControlDescriptor> pathControllers = new TreeSet<>();
 	private MServiceTracker<RegistryPathControl> pathControllerTracker = new MServiceTracker<RegistryPathControl>(RegistryPathControl.class) {
 		

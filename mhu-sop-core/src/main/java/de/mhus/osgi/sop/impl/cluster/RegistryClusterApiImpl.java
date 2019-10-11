@@ -2,39 +2,41 @@ package de.mhus.osgi.sop.impl.cluster;
 
 import java.util.function.BiConsumer;
 
+import org.osgi.service.component.annotations.Component;
+
 import de.mhus.lib.core.M;
+import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MLog;
+import de.mhus.lib.core.MPeriod;
+import de.mhus.lib.core.MSystem;
+import de.mhus.lib.core.base.service.LockManager;
+import de.mhus.lib.core.cfg.CfgLong;
 import de.mhus.lib.core.cfg.CfgString;
 import de.mhus.lib.core.concurrent.Lock;
 import de.mhus.osgi.sop.api.cluster.ClusterApi;
-import de.mhus.osgi.sop.api.registry.RegistryApi;
-import de.mhus.osgi.sop.api.registry.RegistryValue;
+import de.mhus.osgi.sop.api.registry.RegistryUtil;
 
+@Component(immediate=true)
 public class RegistryClusterApiImpl extends MLog implements ClusterApi {
 
-    private static CfgString CFG_PATH = new CfgString(ClusterApi.class, "registryPath", RegistryApi.PATH_SYSTEM + "/master/cluster");
+    private static CfgString CFG_PATH = new CfgString(ClusterApi.class, "registryPath", "cluster");
+    public static CfgLong CFG_LOCK_TIMEOUT = new CfgLong(ClusterApi.class, "lockTimeout", MPeriod.HOUR_IN_MILLISECOUNDS);
 
     @Override
     public Lock getLock(String name) {
-        RegistryApi rapi = M.l(RegistryApi.class);
-        String p = CFG_PATH + "/" + name + "@seed";
-        RegistryValue param = rapi.getParameter(p);
-        if (param == null) {
-//XXX            rapi.setParameter(p, value)
-        }
-        return null;
+        return M.l(LockManager.class).getLock(CFG_PATH.value() + "/" + name, n -> {return new RegistryLock(name);});
     }
 
     @Override
     public boolean isMaster(String name) {
-        // TODO Auto-generated method stub
-        return false;
+        String p = MFile.normalizePath(CFG_PATH.value() + "/" + name);
+        boolean master = RegistryUtil.master(p);
+        return master;
     }
 
     @Override
     public String getStackName() {
-        // TODO Auto-generated method stub
-        return null;
+        return MSystem.getHostname();
     }
 
     @Override

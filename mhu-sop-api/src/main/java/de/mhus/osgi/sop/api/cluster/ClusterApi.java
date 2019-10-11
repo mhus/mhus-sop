@@ -19,7 +19,7 @@ public interface ClusterApi {
      * @return The lock for the resource
      */
     default Lock getStackLock(String name) {
-        return getLock(getStackName() + "." + name);
+        return getLock(getStackName() + "/" + name);
     }
 
     /**
@@ -37,7 +37,7 @@ public interface ClusterApi {
      * @return true if I'm the master
      */
     default boolean isStackMaster(String name) {
-        return isMaster(getStackName() + "." + name);
+        return isMaster(getStackName() + "/" + name);
     }
     
     /**
@@ -49,13 +49,13 @@ public interface ClusterApi {
     void registerListener(String name, BiConsumer<String,String> consumer );
     
     default void registerStackListener(String name, BiConsumer<String,String> consumer ) {
-        registerStackListener(getStackName() + "." + name, consumer);
+        registerStackListener(getStackName() + "/" + name, consumer);
     }
     
     void fireEvent(String name, String value);
     
     default void fireStackEvent(String name, String value) {
-        fireEvent(getStackName() + "." + name, value);
+        fireEvent(getStackName() + "/" + name, value);
     }
     
 }

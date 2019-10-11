@@ -27,8 +27,10 @@ import de.mhus.lib.core.M;
 import de.mhus.lib.core.MDate;
 import de.mhus.lib.core.MPeriod;
 import de.mhus.lib.core.MString;
+import de.mhus.lib.core.concurrent.Lock;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.osgi.api.karaf.AbstractCmd;
+import de.mhus.osgi.sop.api.cluster.ClusterApi;
 import de.mhus.osgi.sop.api.registry.RegistryApi;
 import de.mhus.osgi.sop.api.registry.RegistryManager;
 import de.mhus.osgi.sop.api.registry.RegistryPathControl;
@@ -47,7 +49,7 @@ public class RegistryCmd extends AbstractCmd {
 	        + " request\n"
 	        + " save\n"
 	        + " load\n"
-	        + " unique", multiValued=false)
+	        + " master", multiValued=false)
 	String cmd;
 
 	@Argument(index=1, name="path", required=false, description="Path to Node", multiValued=false)
@@ -72,8 +74,36 @@ public class RegistryCmd extends AbstractCmd {
 	public Object execute2() throws Exception {
 		RegistryApi api = M.l(RegistryApi.class);
 		
-		if (cmd.equals("unique")) {
-		    System.out.println( RegistryUtil.unique(path) );
+        if (cmd.equals("stacklock")) {
+            ClusterApi cluster = M.l(ClusterApi.class);
+            System.out.println("Wait for lock");
+            try (Lock lock = cluster.getStackLock(path).lock()) {
+                System.out.println("Locked " + lock.getLocker());
+                try {
+                    while (true) {
+                        System.out.print(".");
+                        Thread.sleep(1000);
+                    }
+                } catch (InterruptedException e) {}
+            }
+            System.out.println("Released");
+        } else
+		if (cmd.equals("lock")) {
+		    ClusterApi cluster = M.l(ClusterApi.class);
+		    System.out.println("Wait for lock");
+		    try (Lock lock = cluster.getLock(path).lock()) {
+                System.out.println("Locked " + lock.getLocker());
+		        try {
+    		        while (true) {
+    		            System.out.print(".");
+    		            Thread.sleep(1000);
+    		        }
+		        } catch (InterruptedException e) {}
+		    }
+		    System.out.println("Released");
+		} else
+		if (cmd.equals("master")) {
+		    System.out.println( RegistryUtil.master(path, timeout) );
 		} else
 		if (cmd.equals("list")) {
 			
