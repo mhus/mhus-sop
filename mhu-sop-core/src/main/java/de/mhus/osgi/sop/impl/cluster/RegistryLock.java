@@ -26,7 +26,7 @@ public class RegistryLock implements Lock {
                     lockTime = System.currentTimeMillis();
                     return this;
                 }
-                MThread.sleep(30000);
+                MThread.sleep(RegistryClusterApiImpl.CFG_LOCK_SLEEP.value());
             }
         }
     }
@@ -42,7 +42,7 @@ public class RegistryLock implements Lock {
                     return true;
                 }
                 if (System.currentTimeMillis() - start >= timeout ) return false;
-                MThread.sleep(30000);
+                MThread.sleep(RegistryClusterApiImpl.CFG_LOCK_SLEEP.value());
             }
         }
     }

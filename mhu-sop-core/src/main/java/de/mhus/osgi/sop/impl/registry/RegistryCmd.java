@@ -79,6 +79,7 @@ public class RegistryCmd extends AbstractCmd {
             System.out.println("Wait for lock");
             try (Lock lock = cluster.getStackLock(path).lock()) {
                 System.out.println("Locked " + lock.getLocker());
+                System.out.println("Press ctrl+c to stop locking");
                 try {
                     while (true) {
                         System.out.print(".");
@@ -86,6 +87,7 @@ public class RegistryCmd extends AbstractCmd {
                     }
                 } catch (InterruptedException e) {}
             }
+            System.out.println();
             System.out.println("Released");
         } else
 		if (cmd.equals("lock")) {
@@ -100,6 +102,7 @@ public class RegistryCmd extends AbstractCmd {
     		        }
 		        } catch (InterruptedException e) {}
 		    }
+            System.out.println();
 		    System.out.println("Released");
 		} else
 		if (cmd.equals("master")) {

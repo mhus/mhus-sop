@@ -21,10 +21,11 @@ public class RegistryClusterApiImpl extends MLog implements ClusterApi {
 
     private static CfgString CFG_PATH = new CfgString(ClusterApi.class, "registryPath", "cluster");
     public static CfgLong CFG_LOCK_TIMEOUT = new CfgLong(ClusterApi.class, "lockTimeout", MPeriod.HOUR_IN_MILLISECOUNDS);
+    public static CfgLong CFG_LOCK_SLEEP = new CfgLong(ClusterApi.class, "lockSleep", 10000);
 
     @Override
     public Lock getLock(String name) {
-        return M.l(LockManager.class).getLock(CFG_PATH.value() + "/" + name, n -> {return new RegistryLock(name);});
+        return M.l(LockManager.class).getLock(CFG_PATH.value() + "/" + name, n -> {return new RegistryLock(n);});
     }
 
     @Override

@@ -15,6 +15,8 @@
  */
 package de.mhus.osgi.sop.api.registry;
 
+import de.mhus.lib.core.MSystem;
+
 public class RegistryValue implements Comparable<RegistryValue>{
 	
 	private String value;
@@ -99,6 +101,11 @@ public class RegistryValue implements Comparable<RegistryValue>{
 	
 	public String getLocation() {
 		return location;
+	}
+	
+	@Override
+    public String toString() {
+	    return MSystem.toString(this, path, source);
 	}
 	
 }
