@@ -72,7 +72,7 @@ public class ClusterCmd extends AbstractCmd {
                         }
                         System.out.println("# " + myNr + " Stop");
                     }
-                });
+                }).start();
 	        }
 	        System.out.println("Press ctrl+c to stop locking");
 	        try {
