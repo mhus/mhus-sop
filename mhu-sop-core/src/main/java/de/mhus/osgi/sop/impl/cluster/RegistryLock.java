@@ -1,14 +1,22 @@
 package de.mhus.osgi.sop.impl.cluster;
 
+import java.util.List;
+
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MCast;
+import de.mhus.lib.core.MLog;
+import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MThread;
 import de.mhus.lib.core.concurrent.Lock;
+import de.mhus.lib.core.strategy.OperationResult;
+import de.mhus.lib.errors.NotFoundException;
+import de.mhus.osgi.sop.api.operation.OperationsSelector;
+import de.mhus.osgi.sop.api.operation.SelectorProvider;
 import de.mhus.osgi.sop.api.registry.RegistryApi;
 import de.mhus.osgi.sop.api.registry.RegistryUtil;
 import de.mhus.osgi.sop.api.registry.RegistryValue;
 
-public class RegistryLock implements Lock {
+public class RegistryLock extends MLog implements Lock {
 
     private String name;
     protected long lockTime = 0;
@@ -55,6 +63,7 @@ public class RegistryLock implements Lock {
                     lock = RegistryUtil.master(name, RegistryClusterApiImpl.CFG_LOCK_TIMEOUT.value());
                     if (lock != null) {
                         lockTime = System.currentTimeMillis();
+                        validateLock();
                         return true;
                     }
                 }
@@ -63,6 +72,28 @@ public class RegistryLock implements Lock {
             }
         }
     }
+
+    private boolean validateLock() {
+        if(!RegistryClusterApiImpl.CFG_LOCK_VALIDATE.value()) return true;
+        MProperties properties = new MProperties();
+        properties.setString("name", getName());
+        try {
+            
+            OperationsSelector selector = new OperationsSelector();
+            selector.setFilter(RegisterLockOperation.class.getCanonicalName());
+            selector.addSelector(SelectorProvider.NOT_LOCAL_SELECTOR);
+            List<OperationResult> results = selector.doExecuteAll(properties);
+            
+            for (OperationResult res : results)
+                if (res.isSuccessful() && res.getReturnCode() == 1) {
+                    log().w("Lock already given",name);
+                    return false;
+                }
+        } catch (NotFoundException e) {
+        }
+        return true;
+    }
+
 
     @Override
     public boolean unlock() {

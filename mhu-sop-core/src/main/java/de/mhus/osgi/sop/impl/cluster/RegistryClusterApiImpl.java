@@ -14,6 +14,7 @@ import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MPeriod;
 import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.base.service.LockManager;
+import de.mhus.lib.core.cfg.CfgBoolean;
 import de.mhus.lib.core.cfg.CfgLong;
 import de.mhus.lib.core.cfg.CfgString;
 import de.mhus.lib.core.concurrent.Lock;
@@ -27,6 +28,7 @@ public class RegistryClusterApiImpl extends MLog implements ClusterApi {
     private static CfgString CFG_PATH = new CfgString(ClusterApi.class, "registryPath", "cluster");
     public static CfgLong CFG_LOCK_TIMEOUT = new CfgLong(ClusterApi.class, "lockTimeout", MPeriod.HOUR_IN_MILLISECOUNDS);
     public static CfgLong CFG_LOCK_SLEEP = new CfgLong(ClusterApi.class, "lockSleep", 1000);
+    public static CfgBoolean CFG_LOCK_VALIDATE = new CfgBoolean(ClusterApi.class, "lockValidate", true);
 
     HashMap<String,EventHandler> listeners = new HashMap<>();
     private static RegistryClusterApiImpl instance;
