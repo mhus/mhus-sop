@@ -1,6 +1,7 @@
 package de.mhus.osgi.sop.impl.cluster;
 
 import de.mhus.lib.core.M;
+import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MThread;
 import de.mhus.lib.core.concurrent.Lock;
 import de.mhus.osgi.sop.api.registry.RegistryApi;
@@ -12,6 +13,7 @@ public class RegistryLock implements Lock {
     private String name;
     protected long lockTime = 0;
     private RegistryValue lock;
+    private Thread localLock = null;
 
     public RegistryLock(String name) {
         this.name = name;
@@ -24,6 +26,9 @@ public class RegistryLock implements Lock {
                 refresh();
                 return this;
             }
+            // get local lock
+            localLock = Thread.currentThread();
+            // get remote lock
             while (true) {
                 lock = RegistryUtil.master(name, RegistryClusterApiImpl.CFG_LOCK_TIMEOUT.value());
                 if ( lock != null) {
@@ -38,13 +43,21 @@ public class RegistryLock implements Lock {
     @Override
     public boolean lock(long timeout) {
         synchronized (this) {
-            if (isLocked()) return true;
+            if (localLock != null && isLocked()) return true;
+
             long start = System.currentTimeMillis();
             while (true) {
-                lock = RegistryUtil.master(name, RegistryClusterApiImpl.CFG_LOCK_TIMEOUT.value());
-                if (lock != null) {
-                    lockTime = System.currentTimeMillis();
-                    return true;
+                if (localLock == null) {
+                    // get local lock
+                    if (!isLocked())
+                        localLock = Thread.currentThread();
+                } else {
+                    // get remote lock
+                    lock = RegistryUtil.master(name, RegistryClusterApiImpl.CFG_LOCK_TIMEOUT.value());
+                    if (lock != null) {
+                        lockTime = System.currentTimeMillis();
+                        return true;
+                    }
                 }
                 if (System.currentTimeMillis() - start >= timeout ) return false;
                 MThread.sleep(RegistryClusterApiImpl.CFG_LOCK_SLEEP.value());
@@ -54,27 +67,29 @@ public class RegistryLock implements Lock {
 
     @Override
     public boolean unlock() {
-        synchronized (this) {
-            if (lock == null) return false;
+//        synchronized (this) {
+            if (lock == null && localLock == null) return false;
             boolean ret = M.l(RegistryApi.class).removeParameter(lock.getPath());
             lock = null;
+            localLock = null;
             lockTime = 0;
             return ret;
-        }
+//        }
     }
 
     @Override
     public void unlockHard() {
-        synchronized (this) {
+//        synchronized (this) {
             RegistryUtil.masterRemove(name);
             lock = null;
+            localLock = null;
             lockTime = 0;
-        }
+//        }
     }
 
     @Override
     public boolean isLocked() {
-        return lock != null;
+        return lock != null || localLock != null;
     }
 
     @Override
@@ -84,12 +99,8 @@ public class RegistryLock implements Lock {
 
     @Override
     public String getLocker() {
-        return lock == null ? null : lock.toString();
-    }
-
-    @Override
-    public boolean isPrivacy() {
-        return false;
+        return  (lock == null ? "" : lock.toString() + "\n") + 
+                (localLock == null ? "" : MCast.toString(localLock.toString(),localLock.getStackTrace()));
     }
 
     @Override

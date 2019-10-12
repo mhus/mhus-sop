@@ -21,7 +21,9 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 import de.mhus.lib.core.M;
+import de.mhus.lib.core.MThread;
 import de.mhus.lib.core.concurrent.Lock;
+import de.mhus.lib.core.lang.Value;
 import de.mhus.osgi.api.karaf.AbstractCmd;
 import de.mhus.osgi.sop.api.cluster.ClusterApi;
 import de.mhus.osgi.sop.api.cluster.ValueListener;
@@ -51,6 +53,39 @@ public class ClusterCmd extends AbstractCmd {
 	public Object execute2() throws Exception {
 	    ClusterApi api = M.l(ClusterApi.class);
 		
+	    if (cmd.equals("test")) {
+	        int nrThreads = 10;
+	        Value<Boolean> running = new Value<>(true);
+	        System.out.println("Starting ...");
+	        for (int i = 0; i < nrThreads; i++) {
+	            final int myNr = i;
+	            new MThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        while (running.value) {
+                            System.out.println("# " + myNr + " wait for lock");
+                            try (Lock lock = api.getStackLock(path).lock()) {
+                                System.out.println("# " + myNr + " Locked " + lock.getLocker());
+                                MThread.sleep(1000);
+                                System.out.println("# " + myNr + " Unlock");
+                            }
+                        }
+                        System.out.println("# " + myNr + " Stop");
+                    }
+                });
+	        }
+	        System.out.println("Press ctrl+c to stop locking");
+	        try {
+    	        while (true) {
+    	            Thread.sleep(10000);
+    	        }
+	        } catch (InterruptedException e) {}
+	        System.out.println("Finishing ...");
+	        running.value = false;
+	        MThread.sleep(10000);
+	        System.out.println("Finished!");
+	        
+	    } else
 	    if (cmd.equals("fire")) {
 	        api.fireEvent(path, parameters[0]);
 	        System.out.println("ok");
