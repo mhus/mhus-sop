@@ -22,9 +22,8 @@ public class RegistryLock implements Lock {
     @Override
     public Lock lock() {
         synchronized (this) {
-            if (isLocked()) {
-                refresh();
-                return this;
+            while (localLock != null) {
+                MThread.sleep(RegistryClusterApiImpl.CFG_LOCK_SLEEP.value());
             }
             // get local lock
             localLock = Thread.currentThread();
