@@ -21,6 +21,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 import de.mhus.lib.core.M;
+import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.MThread;
 import de.mhus.lib.core.concurrent.Lock;
 import de.mhus.lib.core.lang.Value;
@@ -64,8 +65,8 @@ public class ClusterCmd extends AbstractCmd {
                     public void run() {
                         while (running.value) {
                             System.out.println("# " + myNr + " wait for lock");
-                            try (Lock lock = api.getStackLock(path).lock()) {
-                                System.out.println("# " + myNr + " Locked " + lock.getLocker());
+                            try (Lock lock = api.getLock(path).lock()) {
+                                System.out.println("# " + myNr + " Locked " + MSystem.getObjectId(lock) + " " + lock);
                                 MThread.sleep(1000);
                                 System.out.println("# " + myNr + " Unlock");
                             }
