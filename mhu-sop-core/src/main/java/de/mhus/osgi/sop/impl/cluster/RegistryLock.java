@@ -69,10 +69,11 @@ public class RegistryLock implements Lock {
     public boolean unlock() {
 //        synchronized (this) {
             if (lock == null && localLock == null) return false;
-            boolean ret = M.l(RegistryApi.class).removeParameter(lock.getPath());
-            lock = null;
             localLock = null;
             lockTime = 0;
+            if (lock == null) return true;
+            boolean ret = M.l(RegistryApi.class).removeParameter(lock.getPath());
+            lock = null;
             return ret;
 //        }
     }
