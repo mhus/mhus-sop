@@ -66,25 +66,25 @@ public class RegistryLock implements Lock {
 
     @Override
     public boolean unlock() {
-//        synchronized (this) {
             if (lock == null && localLock == null) return false;
+            Thread l = localLock;
+            if (l != null && l.getId() != Thread.currentThread().getId()) return false;
+            boolean ret = true;
+            if (lock != null) {
+                ret = M.l(RegistryApi.class).removeParameter(lock.getPath());
+                lock = null;
+            }
             localLock = null;
             lockTime = 0;
-            if (lock == null) return true;
-            boolean ret = M.l(RegistryApi.class).removeParameter(lock.getPath());
-            lock = null;
             return ret;
-//        }
     }
 
     @Override
     public void unlockHard() {
-//        synchronized (this) {
             RegistryUtil.masterRemove(name);
             lock = null;
             localLock = null;
             lockTime = 0;
-//        }
     }
 
     @Override
@@ -98,7 +98,7 @@ public class RegistryLock implements Lock {
     }
 
     @Override
-    public String getLocker() {
+    public String getOwner() {
         return  (lock == null ? "" : lock.toString() + "\n") + 
                 (localLock == null ? "" : MCast.toString(localLock.toString(),localLock.getStackTrace()));
     }

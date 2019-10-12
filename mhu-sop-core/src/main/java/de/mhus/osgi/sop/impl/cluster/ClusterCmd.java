@@ -121,7 +121,7 @@ public class ClusterCmd extends AbstractCmd {
         if (cmd.equals("stacklock")) {
             System.out.println("Wait for lock");
             try (Lock lock = api.getStackLock(path).lock()) {
-                System.out.println("Locked " + lock.getLocker());
+                System.out.println("Locked " + lock.getOwner());
                 System.out.println("Press ctrl+c to stop locking");
                 try {
                     int cnt = 0;
@@ -144,7 +144,7 @@ public class ClusterCmd extends AbstractCmd {
 		if (cmd.equals("lock")) {
 		    System.out.println("Wait for lock");
 		    try (Lock lock = api.getLock(path).lock()) {
-                System.out.println("Locked " + lock.getLocker());
+                System.out.println("Locked " + lock.getOwner());
 		        try {
 		            int cnt = 0;
     		        while (true) {
