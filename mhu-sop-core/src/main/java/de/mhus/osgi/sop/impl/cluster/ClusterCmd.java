@@ -76,7 +76,7 @@ public class ClusterCmd extends AbstractCmd {
                                 locks.value = locks.value + 1;
                                 try (Lock lock = api.getLock(path).lock()) {
                                     System.out.println("# " + myNr + " Locked " + MSystem.getObjectId(lock) + " " + lock);
-                                    MThread.sleep(500 + (long)(Math.random() * 500d));
+                                    MThread.sleep(500 + (long)(Math.random() * 1500d));
                                     System.out.println("# " + myNr + " Unlock");
                                 }
                             } catch (WrongStateException e) {
