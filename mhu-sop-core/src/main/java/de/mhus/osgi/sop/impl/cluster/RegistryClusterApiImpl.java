@@ -28,7 +28,7 @@ public class RegistryClusterApiImpl extends MLog implements ClusterApi {
     private static CfgString CFG_PATH = new CfgString(ClusterApi.class, "registryPath", "cluster");
     public static CfgLong CFG_LOCK_TIMEOUT = new CfgLong(ClusterApi.class, "lockTimeout", MPeriod.HOUR_IN_MILLISECOUNDS);
     public static CfgLong CFG_LOCK_SLEEP = new CfgLong(ClusterApi.class, "lockSleep", 1000);
-    public static CfgBoolean CFG_LOCK_VALIDATE = new CfgBoolean(ClusterApi.class, "lockValidate", true);
+    public static CfgBoolean CFG_LOCK_VALIDATE = new CfgBoolean(ClusterApi.class, "lockValidate", true); // XXX set to false
 
     HashMap<String,EventHandler> listeners = new HashMap<>();
     private static RegistryClusterApiImpl instance;

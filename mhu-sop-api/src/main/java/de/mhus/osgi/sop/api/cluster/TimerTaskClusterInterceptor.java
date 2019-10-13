@@ -5,17 +5,30 @@ import de.mhus.lib.core.concurrent.Lock;
 import de.mhus.lib.core.schedule.SchedulerJob;
 import de.mhus.lib.core.schedule.TimerTaskInterceptor;
 import de.mhus.lib.core.strategy.DefaultTaskContext;
-import de.mhus.lib.errors.MRuntimeException;
 
 public class TimerTaskClusterInterceptor implements TimerTaskInterceptor {
 
     private String name;
     private Lock mutex;
+    private boolean stack;
+    
+    public TimerTaskClusterInterceptor() {
+        stack = true;
+    }
+    
+    public TimerTaskClusterInterceptor(boolean stack) {
+        this.stack = stack;
+    }
+    
+    public TimerTaskClusterInterceptor(String name, boolean stack) {
+        this.name = name;
+        this.stack = stack;
+    }
     
     @Override
     public void initialize(SchedulerJob job) {
-        if (name != null) throw new MRuntimeException("interceptor already attached",name);
-        name = job.getName();
+        if (name == null)
+            name = job.getName();
     }
 
     @Override
@@ -25,7 +38,9 @@ public class TimerTaskClusterInterceptor implements TimerTaskInterceptor {
             mutex = null;
         }
         if (!ClusterApi.CFG_ENABLED.value()) return true;
-        Lock lock = M.l(ClusterApi.class).getLock(name);
+        ClusterApi api = M.l(ClusterApi.class);
+        @SuppressWarnings("resource")
+        Lock lock = stack ? api.getStackLock(name) : api.getLock(name);
         if (lock.isLocked()) return false;
         mutex = lock.lock();
         return true;
