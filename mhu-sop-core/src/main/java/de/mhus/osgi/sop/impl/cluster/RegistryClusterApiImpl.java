@@ -87,19 +87,19 @@ public class RegistryClusterApiImpl extends MLog implements ClusterApi {
         RegistryUtil.setValue(p, value);
     }
     
-    public void fireEventLocal(String name, String value) {
+    public void fireEventLocal(String name, String value, boolean local) {
         EventHandler handler = null;
         synchronized (listeners) {
             name = name.substring(CFG_PATH.value().length() + 1);
             handler = getEventHandler(name);
         }
-        handler.fire(name, value);
+        handler.fire(name, value, local);
     }
 
     static class EventHandler extends MEventHandler<ValueListener> {
         @Override
         public void onFire(ValueListener listener, Object event, Object ... values) {
-            listener.event((String)event, (String)values[0]);
+            listener.event((String)event, (String)values[0], (Boolean)values[1]);
         }
     }
 

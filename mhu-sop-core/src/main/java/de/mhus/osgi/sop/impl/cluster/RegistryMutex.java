@@ -33,7 +33,7 @@ public class RegistryMutex implements RegistryPathControl {
 	@Override
 	public RegistryValue checkSetParameter(RegistryManager manager, RegistryValue value) {
         if (value.getPath().endsWith(RegistryUtil.VALUE_VARNAME)) {
-            fireValue(value);
+            fireValue(value, true);
             return value;
         }
 		if (value.getPath().endsWith(RegistryUtil.MASTER_VARNAME)) {
@@ -52,14 +52,14 @@ public class RegistryMutex implements RegistryPathControl {
 		return value;
 	}
 
-	private void fireValue(RegistryValue value) {
+	private void fireValue(RegistryValue value, boolean local) {
         MThread.asynchron(new Runnable() {
             
             @Override
             public void run() {
                 String name = value.getPath();
                 name = name.substring(14, name.length() - RegistryUtil.VALUE_VARNAME.length());
-                RegistryClusterApiImpl.instance().fireEventLocal(name, value.getValue());
+                RegistryClusterApiImpl.instance().fireEventLocal(name, value.getValue(), local);
             }
         });
     
@@ -78,7 +78,7 @@ public class RegistryMutex implements RegistryPathControl {
 	@Override
 	public RegistryValue checkSetParameterFromRemote(RegistryManager manager, RegistryValue value) {
         if (value.getPath().endsWith(RegistryUtil.VALUE_VARNAME)) {
-            fireValue(value);
+            fireValue(value, false);
             return value;
         }
 		if (value.getPath().endsWith(RegistryUtil.MASTER_VARNAME)) {

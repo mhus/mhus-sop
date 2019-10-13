@@ -2,10 +2,13 @@ package de.mhus.osgi.sop.api.cluster;
 
 import java.util.function.BiConsumer;
 
+import de.mhus.lib.core.cfg.CfgBoolean;
 import de.mhus.lib.core.concurrent.Lock;
 
 public interface ClusterApi {
 
+    public static final CfgBoolean CFG_ENABLED = new CfgBoolean(ClusterApi.class, "enabled", true); // XXX set to false
+    
     /**
      * Get the lock object for a named resource.
      * @param name

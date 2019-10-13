@@ -116,8 +116,8 @@ public class ClusterCmd extends AbstractCmd {
 	    if (cmd.equals("register")) {
 	        ValueListener c = new ValueListener() {
                 @Override
-                public void event(String name, String value) {
-                    System.out.println("Event Value: " + name + "=" + value);
+                public void event(String name, String value, boolean local) {
+                    System.out.println((local ? "Local: " : "Remote: ") + name + "=" + value);
                 }
 	        };
             api.registerListener(path, c );
@@ -125,8 +125,8 @@ public class ClusterCmd extends AbstractCmd {
 	    if (cmd.equals("listen")) {
             ValueListener c = new ValueListener() {
                 @Override
-                public void event(String name, String value) {
-                    System.out.println("Event Value: " + name + "=" + value);
+                public void event(String name, String value, boolean local) {
+                    System.out.println((local ? "Local: " : "Remote: ") + name + "=" + value);
                 }
             };
 	        api.registerListener(path, c );
