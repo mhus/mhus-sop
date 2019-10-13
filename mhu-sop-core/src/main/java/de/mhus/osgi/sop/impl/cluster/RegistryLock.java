@@ -6,6 +6,7 @@ import de.mhus.lib.core.M;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MProperties;
+import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.MThread;
 import de.mhus.lib.core.concurrent.Lock;
 import de.mhus.lib.core.strategy.OperationResult;
@@ -50,13 +51,13 @@ public class RegistryLock extends MLog implements Lock {
     @Override
     public boolean lock(long timeout) {
         synchronized (this) {
-            if (localLock != null && isLocked()) return true;
+            if (isMyLock()) return true;
 
             long start = System.currentTimeMillis();
             while (true) {
                 if (localLock == null) {
                     // get local lock
-                    if (!isLocked())
+                    if (!isMyLock())
                         localLock = Thread.currentThread();
                 } else {
                     // get remote lock
@@ -118,9 +119,14 @@ public class RegistryLock extends MLog implements Lock {
             lockTime = 0;
     }
 
+    public boolean isMyLock() {
+        return lock != null || localLock != null;
+    }
+
     @Override
     public boolean isLocked() {
-        return lock != null || localLock != null;
+        if (lock != null || localLock != null) return true;
+        return RegistryUtil.getMaster(name) != null;
     }
 
     @Override
@@ -152,4 +158,8 @@ public class RegistryLock extends MLog implements Lock {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return MSystem.toString(this, name, isMyLock(), isLocked());
+    }
 }

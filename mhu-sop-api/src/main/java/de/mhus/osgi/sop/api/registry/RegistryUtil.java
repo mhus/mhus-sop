@@ -21,6 +21,13 @@ public class RegistryUtil {
         return master(path, 0) != null;
     }
 
+    public static RegistryValue getMaster(String path) {
+        RegistryApi rapi = M.l(RegistryApi.class);
+        String p = MUTEX_PATH + path + MASTER_VARNAME;
+        RegistryValue param = rapi.getParameter(p);
+        return param;
+    }
+    
     public static RegistryValue master(String path, long timeout) {
         timeout = Math.max(60000, timeout);
         RegistryApi rapi = M.l(RegistryApi.class);
