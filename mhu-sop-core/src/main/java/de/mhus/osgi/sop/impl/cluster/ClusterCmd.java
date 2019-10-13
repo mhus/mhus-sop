@@ -98,9 +98,12 @@ public class ClusterCmd extends AbstractCmd {
 	        System.out.println("Finishing ...");
 	        running.value = false;
 	        while (true) {
+	            int cnt = 0;
 	            for (MThread t : threads)
-	                if (t.getThread().isAlive()) continue;
-	            break;
+	                if (t.getThread().isAlive()) cnt++;
+	            System.out.println(cnt + " threads alive");
+	            if (cnt == 0) break;
+	            MThread.sleep(1000);
 	        }
 	        System.out.println("Finished!");
             System.out.println("With " + errors + " Errors in " + locks + " locks");
