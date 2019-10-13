@@ -92,7 +92,8 @@ public class ClusterCmd extends AbstractCmd {
 	        System.out.println("Press ctrl+c to stop locking");
 	        try {
     	        while (true) {
-    	            Thread.sleep(10000);
+    	            Thread.sleep(60000);
+    	            System.out.println("With " + errors + " errors in " + locks + " locks");
     	        }
 	        } catch (InterruptedException e) {}
 	        System.out.println("Finishing ...");
@@ -106,7 +107,7 @@ public class ClusterCmd extends AbstractCmd {
 	            MThread.sleep(1000);
 	        }
 	        System.out.println("Finished!");
-            System.out.println("With " + errors + " Errors in " + locks + " locks");
+            System.out.println("With " + errors + " errors in " + locks + " locks");
 	    } else
 	    if (cmd.equals("fire")) {
 	        api.fireEvent(path, parameters[0]);
