@@ -27,6 +27,7 @@ import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.MThread;
 import de.mhus.lib.core.concurrent.Lock;
 import de.mhus.lib.core.lang.Value;
+import de.mhus.lib.errors.WrongStateException;
 import de.mhus.osgi.api.karaf.AbstractCmd;
 import de.mhus.osgi.sop.api.cluster.ClusterApi;
 import de.mhus.osgi.sop.api.cluster.ValueListener;
@@ -59,6 +60,8 @@ public class ClusterCmd extends AbstractCmd {
 	    if (cmd.equals("test")) {
 	        int nrThreads = 10;
 	        Value<Boolean> running = new Value<>(true);
+	        Value<Integer> errors = new Value<Integer>(0);
+	        Value<Integer> locks = new Value<Integer>(0);
 	        System.out.println("Starting ...");
 	        LinkedList<MThread> threads = new LinkedList<MThread>();
 	        for (int i = 0; i < nrThreads; i++) {
@@ -69,10 +72,16 @@ public class ClusterCmd extends AbstractCmd {
                     public void run() {
                         while (running.value) {
                             System.out.println("# " + myNr + " wait for lock");
-                            try (Lock lock = api.getLock(path).lock()) {
-                                System.out.println("# " + myNr + " Locked " + MSystem.getObjectId(lock) + " " + lock);
-                                MThread.sleep(1000);
-                                System.out.println("# " + myNr + " Unlock");
+                            try {
+                                locks.value = locks.value + 1;
+                                try (Lock lock = api.getLock(path).lock()) {
+                                    System.out.println("# " + myNr + " Locked " + MSystem.getObjectId(lock) + " " + lock);
+                                    MThread.sleep(1000);
+                                    System.out.println("# " + myNr + " Unlock");
+                                }
+                            } catch (WrongStateException e) {
+                                System.err.println("# " + myNr + " " + e);
+                                errors.value = errors.value + 1;
                             }
                         }
                         System.out.println("# " + myNr + " Stop");
@@ -94,7 +103,7 @@ public class ClusterCmd extends AbstractCmd {
 	            break;
 	        }
 	        System.out.println("Finished!");
-	        
+            System.out.println("With " + errors + " Errors in " + locks + " locks");
 	    } else
 	    if (cmd.equals("fire")) {
 	        api.fireEvent(path, parameters[0]);
