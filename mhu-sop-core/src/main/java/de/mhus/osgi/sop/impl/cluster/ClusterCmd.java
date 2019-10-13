@@ -15,6 +15,8 @@
  */
 package de.mhus.osgi.sop.impl.cluster;
 
+import java.util.LinkedList;
+
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
@@ -58,9 +60,11 @@ public class ClusterCmd extends AbstractCmd {
 	        int nrThreads = 10;
 	        Value<Boolean> running = new Value<>(true);
 	        System.out.println("Starting ...");
+	        LinkedList<MThread> threads = new LinkedList<MThread>();
 	        for (int i = 0; i < nrThreads; i++) {
 	            final int myNr = i;
-	            new MThread(new Runnable() {
+	            threads.add(
+	              new MThread(new Runnable() {
                     @Override
                     public void run() {
                         while (running.value) {
@@ -73,7 +77,8 @@ public class ClusterCmd extends AbstractCmd {
                         }
                         System.out.println("# " + myNr + " Stop");
                     }
-                }).start();
+                  }).start()
+	            );
 	        }
 	        System.out.println("Press ctrl+c to stop locking");
 	        try {
@@ -83,7 +88,11 @@ public class ClusterCmd extends AbstractCmd {
 	        } catch (InterruptedException e) {}
 	        System.out.println("Finishing ...");
 	        running.value = false;
-	        MThread.sleep(10000);
+	        while (true) {
+	            for (MThread t : threads)
+	                if (t.getThread().isAlive()) continue;
+	            break;
+	        }
 	        System.out.println("Finished!");
 	        
 	    } else
