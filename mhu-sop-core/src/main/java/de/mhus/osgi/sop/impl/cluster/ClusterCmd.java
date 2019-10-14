@@ -25,11 +25,16 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.MThread;
+import de.mhus.lib.core.MTimerTask;
+import de.mhus.lib.core.base.service.TimerFactory;
+import de.mhus.lib.core.base.service.TimerIfc;
 import de.mhus.lib.core.concurrent.Lock;
 import de.mhus.lib.core.lang.Value;
+import de.mhus.lib.core.schedule.CronJob;
 import de.mhus.lib.errors.WrongStateException;
 import de.mhus.osgi.api.karaf.AbstractCmd;
 import de.mhus.osgi.sop.api.cluster.ClusterApi;
+import de.mhus.osgi.sop.api.cluster.TimerTaskClusterInterceptor;
 import de.mhus.osgi.sop.api.cluster.ValueListener;
 import de.mhus.osgi.sop.api.registry.RegistryUtil;
 
@@ -53,15 +58,54 @@ public class ClusterCmd extends AbstractCmd {
     @Option(name="-t", aliases="--timeout", description="Set timeout for new entries",required=false)
     long timeout = 0;
 
+    int errors = 0;
+    int locks = 0;
+    CronJob job = null;
+
     @Override
 	public Object execute2() throws Exception {
 	    ClusterApi api = M.l(ClusterApi.class);
 		
+	    if (cmd.equals("testscheduler")) {
+	        errors = 0;
+	        locks = 0;
+	        TimerFactory factory = M.l(TimerFactory.class);
+	        TimerIfc timer = factory.getTimer();
+	        job = new CronJob("* * * * *", new MTimerTask() {
+                @Override
+                protected void doit() throws Exception {
+                    locks++;
+                    long ms = (long)(Math.random() * 120d) * 1000;
+                    System.out.println("# Start Job, wait " + (ms / 1000) + " sec");
+                    if (!((RegistryLock)((TimerTaskClusterInterceptor)job.getInterceptor()).getLock()).validateLock()) {
+                        errors++;
+                        System.err.println("Error !!!! " + errors);
+                    }
+                    MThread.sleep(ms);
+                    System.out.println("# End Job");
+                }
+            });
+	        job.setIntercepter(new TimerTaskClusterInterceptor(path, false));
+	        timer.schedule(job);
+
+           System.out.println("Press ctrl+c to stop locking");
+            try {
+                while (true) {
+                    Thread.sleep(60000);
+                    System.out.println("With " + errors + " errors in " + locks + " locks");
+                }
+            } catch (InterruptedException e) {}
+            System.out.println("Finishing ...");
+            job.cancel();
+            System.out.println("Finished!");
+            System.out.println("With " + errors + " errors in " + locks + " locks");
+
+	    } else
 	    if (cmd.equals("test")) {
 	        int nrThreads = 10;
 	        Value<Boolean> running = new Value<>(true);
-	        Value<Integer> errors = new Value<Integer>(0);
-	        Value<Integer> locks = new Value<Integer>(0);
+	        errors = 0;
+	        locks = 0;
 	        System.out.println("Starting ...");
 	        LinkedList<MThread> threads = new LinkedList<MThread>();
 	        for (int i = 0; i < nrThreads; i++) {
@@ -73,7 +117,7 @@ public class ClusterCmd extends AbstractCmd {
                         while (running.value) {
                             System.out.println("# " + myNr + " wait for lock");
                             try {
-                                locks.value = locks.value + 1;
+                                locks++;
                                 try (Lock lock = api.getLock(path).lock()) {
                                     System.out.println("# " + myNr + " Locked " + MSystem.getObjectId(lock) + " " + lock);
                                     MThread.sleep(500 + (long)(Math.random() * 1500d));
@@ -81,7 +125,7 @@ public class ClusterCmd extends AbstractCmd {
                                 }
                             } catch (WrongStateException e) {
                                 System.err.println("# " + myNr + " " + e);
-                                errors.value = errors.value + 1;
+                                errors++;
                             }
                         }
                         System.out.println("# " + myNr + " Stop");

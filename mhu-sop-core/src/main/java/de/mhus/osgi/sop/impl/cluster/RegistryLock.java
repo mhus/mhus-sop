@@ -87,7 +87,7 @@ public class RegistryLock extends MLog implements LockWithExtend {
         }
     }
 
-    private boolean validateLock() {
+    public boolean validateLock() {
         if(!RegistryClusterApiImpl.CFG_LOCK_VALIDATE.value()) return true;
         MProperties properties = new MProperties();
         properties.setString("name", getName());
