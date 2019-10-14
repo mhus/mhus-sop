@@ -9,6 +9,7 @@ import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.MThread;
 import de.mhus.lib.core.concurrent.Lock;
+import de.mhus.lib.core.concurrent.LockWithExtend;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.errors.NotFoundException;
 import de.mhus.lib.errors.WrongStateException;
@@ -18,7 +19,7 @@ import de.mhus.osgi.sop.api.registry.RegistryApi;
 import de.mhus.osgi.sop.api.registry.RegistryUtil;
 import de.mhus.osgi.sop.api.registry.RegistryValue;
 
-public class RegistryLock extends MLog implements Lock {
+public class RegistryLock extends MLog implements LockWithExtend {
 
     private String name;
     protected long lockTime = 0;
@@ -110,12 +111,20 @@ public class RegistryLock extends MLog implements Lock {
 
     @Override
     public boolean unlock() {
+        return unlock(0);
+    }
+
+    @Override
+    public boolean unlock(long extend) {
             if (lock == null && localLock == null) return false;
             Thread l = localLock;
             if (l != null && l.getId() != Thread.currentThread().getId()) return false;
             boolean ret = true;
             if (lock != null) {
-                ret = M.l(RegistryApi.class).removeParameter(lock.getPath());
+                if (extend <= 0)
+                    ret = M.l(RegistryApi.class).removeParameter(lock.getPath());
+                else
+                    ret = RegistryUtil.masterExtend(name, extend) != null;
                 lock = null;
             }
             localLock = null;

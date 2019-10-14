@@ -59,6 +59,17 @@ public class RegistryUtil {
         return param;
     }
 
+    public static RegistryValue masterExtend(String path, long timeout) {
+        RegistryApi rapi = M.l(RegistryApi.class);
+        String p = MUTEX_PATH + path + MASTER_VARNAME;
+        RegistryValue param = rapi.getParameter(p);
+        if (param != null && !param.getSource().equals(rapi.getServerIdent()))
+            return null;
+        rapi.setParameter(p, param.getValue(), timeout, false, false, false);
+        param = rapi.getParameter(p);
+        return param;
+    }
+
     public static boolean masterRemove(String name) {
         return M.l(RegistryApi.class).removeParameter(RegistryUtil.MUTEX_PATH + name + RegistryUtil.MASTER_VARNAME);
     }

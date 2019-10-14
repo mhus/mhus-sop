@@ -2,6 +2,7 @@ package de.mhus.osgi.sop.api.cluster;
 
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.concurrent.Lock;
+import de.mhus.lib.core.concurrent.LockWithExtend;
 import de.mhus.lib.core.schedule.SchedulerJob;
 import de.mhus.lib.core.schedule.TimerTaskInterceptor;
 import de.mhus.lib.core.strategy.DefaultTaskContext;
@@ -49,7 +50,11 @@ public class TimerTaskClusterInterceptor implements TimerTaskInterceptor {
     @Override
     public void afterExecution(SchedulerJob job, DefaultTaskContext context) {
         if (mutex != null) {
-            mutex.close();
+            if (mutex instanceof LockWithExtend)
+                // extends lock 10 sec before next execution
+                ((LockWithExtend)mutex).unlock(System.currentTimeMillis() - job.getNextExecutionTime() - 10000);
+            else
+                mutex.unlock();
             mutex = null;
         }
     }

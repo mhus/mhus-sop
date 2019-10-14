@@ -44,6 +44,10 @@ public class RegistryMutex implements RegistryPathControl {
 			RegistryValue cur = manager.getParameter(value.getPath());
 			if (cur != null && !cur.getSource().equals(manager.getServerIdent()))
 				return null; // can't overwrite other locally
+			if (cur != null && cur.getValue().equals(value.getValue())) {
+			    // update timeout if value is the same
+	            return new RegistryValue(String.valueOf(value.getValue()), value.getSource(), value.getUpdated(), value.getPath(), value.getTimeout(), false, false);
+			}
     		long mySeed = M.l(MRandom.class).getLong();
     		if (cur != null)
     		    mySeed = MCast.tolong(cur.getValue(), Long.MIN_VALUE);
