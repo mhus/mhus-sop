@@ -70,11 +70,16 @@ public class ClusterCmd extends AbstractCmd {
 		
 	    if (cmd.equals("testscheduler")) {
 	        if (path == null) path = "test";
+	        String def = "* * * * *";
+	        if (parameters != null) {
+	            if (parameters.length > 0)
+	                def = parameters[0];
+	        }
 	        errors = 0;
 	        locks = 0;
 	        TimerFactory factory = M.l(TimerFactory.class);
 	        TimerIfc timer = factory.getTimer();
-	        job = new CronJob("* * * * *", new MTimerTask() {
+	        job = new CronJob(def, new MTimerTask() {
                 @Override
                 protected void doit() throws Exception {
                     locks++;
