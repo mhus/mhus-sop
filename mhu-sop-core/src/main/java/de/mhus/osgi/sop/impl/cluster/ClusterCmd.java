@@ -31,6 +31,8 @@ import de.mhus.lib.core.base.service.TimerIfc;
 import de.mhus.lib.core.concurrent.Lock;
 import de.mhus.lib.core.lang.Value;
 import de.mhus.lib.core.schedule.CronJob;
+import de.mhus.lib.core.schedule.SchedulerJob;
+import de.mhus.lib.core.strategy.DefaultTaskContext;
 import de.mhus.lib.errors.WrongStateException;
 import de.mhus.osgi.api.karaf.AbstractCmd;
 import de.mhus.osgi.sop.api.cluster.ClusterApi;
@@ -86,7 +88,15 @@ public class ClusterCmd extends AbstractCmd {
                     System.out.println("# End Job");
                 }
             });
-	        job.setIntercepter(new TimerTaskClusterInterceptor(path, false));
+	        job.setIntercepter(new TimerTaskClusterInterceptor(path, false) {
+	            @Override
+                public boolean beforeExecution(SchedulerJob job, DefaultTaskContext context, boolean forced) {
+	                boolean ret = super.beforeExecution(job, context, forced);
+	                System.out.println("# Try " + ret);
+	                return ret;
+	            }
+
+	        });
 	        timer.schedule(job);
 
            System.out.println("Press ctrl+c to stop locking");
