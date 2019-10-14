@@ -52,7 +52,7 @@ public class TimerTaskClusterInterceptor implements TimerTaskInterceptor {
         if (mutex != null) {
             if (mutex instanceof LockWithExtend)
                 // extends lock 10 sec. before next execution
-                ((LockWithExtend)mutex).unlock(System.currentTimeMillis() - job.getNextExecutionTime() - 10000);
+                ((LockWithExtend)mutex).unlock(job.getNextExecutionTime() - System.currentTimeMillis() - 10000);
             else
                 mutex.unlock();
             mutex = null;
