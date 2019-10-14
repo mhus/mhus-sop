@@ -67,6 +67,7 @@ public class ClusterCmd extends AbstractCmd {
 	    ClusterApi api = M.l(ClusterApi.class);
 		
 	    if (cmd.equals("testscheduler")) {
+	        if (path == null) path = "test";
 	        errors = 0;
 	        locks = 0;
 	        TimerFactory factory = M.l(TimerFactory.class);
@@ -102,6 +103,7 @@ public class ClusterCmd extends AbstractCmd {
 
 	    } else
 	    if (cmd.equals("test")) {
+            if (path == null) path = "test";
 	        int nrThreads = 10;
 	        Value<Boolean> running = new Value<>(true);
 	        errors = 0;
