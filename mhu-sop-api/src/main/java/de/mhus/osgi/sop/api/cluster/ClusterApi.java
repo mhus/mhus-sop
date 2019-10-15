@@ -1,7 +1,5 @@
 package de.mhus.osgi.sop.api.cluster;
 
-import java.util.function.BiConsumer;
-
 import de.mhus.lib.core.cfg.CfgBoolean;
 import de.mhus.lib.core.concurrent.Lock;
 
@@ -17,12 +15,12 @@ public interface ClusterApi {
     Lock getLock(String name);
 
     /**
-     * Get a lock object for the named resource of the current stack (hostname).
+     * Get a lock object for the named resource of the current service (hostname).
      * @param name
      * @return The lock for the resource
      */
-    default Lock getStackLock(String name) {
-        return getLock(getStackName() + "/" + name);
+    default Lock getServiceLock(String name) {
+        return getLock(getServiceName() + "/" + name);
     }
 
     /**
@@ -34,31 +32,31 @@ public interface ClusterApi {
     boolean isMaster(String name);
     
     /**
-     * Check if I'm the master of a named resource of the current stack (hostname).
+     * Check if I'm the master of a named resource of the current service (hostname).
      * The method will update masters before return.
      * @param name
      * @return true if I'm the master
      */
-    default boolean isStackMaster(String name) {
-        return isMaster(getStackName() + "/" + name);
+    default boolean isServiceMaster(String name) {
+        return isMaster(getServiceName() + "/" + name);
     }
     
     /**
-     * Return the name of the current stack. By default the hostname.
-     * @return technical stack name
+     * Return the name of the current service. By default the hostname.
+     * @return technical service name
      */
-    String getStackName();
+    String getServiceName();
     
     void registerListener(String name, ValueListener consumer );
     
-    default void registerStackListener(String name, BiConsumer<String,String> consumer ) {
-        registerStackListener(getStackName() + "/" + name, consumer);
+    default void registerServiceListener(String name, ValueListener consumer ) {
+        registerListener(getServiceName() + "/" + name, consumer);
     }
     
     void fireEvent(String name, String value);
     
-    default void fireStackEvent(String name, String value) {
-        fireEvent(getStackName() + "/" + name, value);
+    default void fireServiceEvent(String name, String value) {
+        fireEvent(getServiceName() + "/" + name, value);
     }
 
     void unregisterListener(ValueListener consumer);

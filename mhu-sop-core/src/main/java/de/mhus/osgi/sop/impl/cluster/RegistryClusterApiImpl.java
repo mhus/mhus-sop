@@ -60,7 +60,7 @@ public class RegistryClusterApiImpl extends MLog implements ClusterApi {
     }
 
     @Override
-    public String getStackName() {
+    public String getServiceName() {
         return MSystem.getHostname();
     }
 

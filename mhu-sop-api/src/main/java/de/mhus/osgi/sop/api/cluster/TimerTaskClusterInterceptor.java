@@ -11,19 +11,19 @@ public class TimerTaskClusterInterceptor implements TimerTaskInterceptor {
 
     private String name;
     private Lock mutex;
-    private boolean stack;
+    private boolean service;
     
     public TimerTaskClusterInterceptor() {
-        stack = true;
+        service = true;
     }
     
-    public TimerTaskClusterInterceptor(boolean stack) {
-        this.stack = stack;
+    public TimerTaskClusterInterceptor(boolean service) {
+        this.service = service;
     }
     
-    public TimerTaskClusterInterceptor(String name, boolean stack) {
+    public TimerTaskClusterInterceptor(String name, boolean service) {
         this.name = name;
-        this.stack = stack;
+        this.service = service;
     }
     
     @Override
@@ -41,7 +41,7 @@ public class TimerTaskClusterInterceptor implements TimerTaskInterceptor {
         if (!ClusterApi.CFG_ENABLED.value()) return true;
         ClusterApi api = M.l(ClusterApi.class);
         @SuppressWarnings("resource")
-        Lock lock = stack ? api.getStackLock(name) : api.getLock(name);
+        Lock lock = service ? api.getServiceLock(name) : api.getLock(name);
         if (lock.isLocked()) return false;
         mutex = lock.lock();
         return true;

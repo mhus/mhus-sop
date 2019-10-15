@@ -46,7 +46,7 @@ public class ClusterCmd extends AbstractCmd {
 
 	@Argument(index=0, name="cmd", required=true, description="Command:\n"
 	        + " lock <path>\n"
-	        + " stacklock <path>\n"
+	        + " servicelock <path>\n"
 	        + " master <path>\n"
 	        + "", multiValued=false)
 	String cmd;
@@ -201,9 +201,9 @@ public class ClusterCmd extends AbstractCmd {
         if (cmd.equals("master")) {
             System.out.println( RegistryUtil.master(path, timeout) );
         } else
-        if (cmd.equals("stacklock")) {
+        if (cmd.equals("servicelock")) {
             System.out.println("Wait for lock");
-            try (Lock lock = api.getStackLock(path).lock()) {
+            try (Lock lock = api.getServiceLock(path).lock()) {
                 System.out.println("Locked " + lock.getOwner());
                 System.out.println("Press ctrl+c to stop locking");
                 try {

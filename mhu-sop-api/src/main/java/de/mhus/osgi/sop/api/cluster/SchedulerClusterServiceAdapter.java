@@ -6,22 +6,22 @@ import de.mhus.osgi.api.scheduler.SchedulerServiceAdapter;
 public abstract class SchedulerClusterServiceAdapter extends SchedulerServiceAdapter {
 
     private TimerTaskInterceptor interceptor;
-    private boolean stack = true;
+    private boolean service = true;
 
     @Override
     public synchronized TimerTaskInterceptor getInterceptor() {
         if (interceptor == null) {
-            interceptor = new TimerTaskClusterInterceptor(stack );
+            interceptor = new TimerTaskClusterInterceptor(service);
         }
         return interceptor;
     }
 
-    public boolean isStack() {
-        return stack;
+    public boolean isService() {
+        return service;
     }
 
-    protected void setStack(boolean stack) {
-        this.stack = stack;
+    protected void setStack(boolean service) {
+        this.service = service;
     }
 
 }
