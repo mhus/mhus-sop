@@ -77,7 +77,7 @@ import de.mhus.osgi.sop.jms.operation.JmsApiImpl.JmsOperationDescriptor;
 public class JmsOperationProvider extends MLog implements OperationsProvider {
 
 	protected static final String PROVIDER_NAME = "jms";
-	private String ident = M.l(ServerIdent.class).toString();
+	private String ident = M.l(ServerIdent.class).getIdent();
 
 	@Activate
 	public void doActivate(ComponentContext ctx) {

@@ -34,8 +34,14 @@ public class SopUtil {
 
 	public static String getServerIdent() {
 		if (ident == null)
-			ident = M.l(ServerIdent.class).toString();
+			ident = M.l(ServerIdent.class).getIdent();
 		return ident;
 	}
 
+    public static String getServiceIdent() {
+        if (ident == null)
+            ident = M.l(ServerIdent.class).getService();
+        return ident;
+    }
+    
 }

@@ -12,7 +12,6 @@ import de.mhus.lib.core.MEventHandler;
 import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MPeriod;
-import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.base.service.LockManager;
 import de.mhus.lib.core.cfg.CfgBoolean;
 import de.mhus.lib.core.cfg.CfgLong;
@@ -57,11 +56,6 @@ public class RegistryClusterApiImpl extends MLog implements ClusterApi {
         String p = MFile.normalizePath(CFG_PATH.value() + "/" + name);
         boolean master = RegistryUtil.master(p);
         return master;
-    }
-
-    @Override
-    public String getServiceName() {
-        return MSystem.getHostname();
     }
 
     private EventHandler getEventHandler(String name) {

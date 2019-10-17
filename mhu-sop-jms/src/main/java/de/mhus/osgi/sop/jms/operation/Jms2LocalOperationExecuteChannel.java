@@ -75,7 +75,7 @@ public class Jms2LocalOperationExecuteChannel extends AbstractJmsDataChannel {
 
 	public static CfgString CFG_QUEUE_NAME = new CfgString(Jms2LocalOperationExecuteChannel.class, "queue", "sop.operation." + M.l(ServerIdent.class));
 	private static CfgBoolean CFG_IS_ACCESS_CONTROL = new CfgBoolean(Jms2LocalOperationExecuteChannel.class, "accessControl", true);
-	private String ident = M.l(ServerIdent.class).toString();
+	private String ident = M.l(ServerIdent.class).getIdent();
 
 	static Jms2LocalOperationExecuteChannel instance;
 	private JmsApi jmsApi;

@@ -1,7 +1,9 @@
 package de.mhus.osgi.sop.api.cluster;
 
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.cfg.CfgBoolean;
 import de.mhus.lib.core.concurrent.Lock;
+import de.mhus.lib.core.service.ServerIdent;
 
 public interface ClusterApi {
 
@@ -41,12 +43,6 @@ public interface ClusterApi {
         return isMaster(getServiceName() + "/" + name);
     }
     
-    /**
-     * Return the name of the current service. By default the hostname.
-     * @return technical service name
-     */
-    String getServiceName();
-    
     void registerListener(String name, ValueListener consumer );
     
     default void registerServiceListener(String name, ValueListener consumer ) {
@@ -61,4 +57,8 @@ public interface ClusterApi {
 
     void unregisterListener(ValueListener consumer);
     
+    default String getServiceName() {
+        return M.l(ServerIdent.class).getService();
+    }
+
 }

@@ -171,7 +171,7 @@ public class JmsApiImpl extends MLog implements JmsApi {
 			msg.setStringProperty("type", "registrypublish");
 			msg.setStringProperty("connection", M.l(JmsApi.class).getDefaultConnectionName());
 			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.CFG_QUEUE_NAME.value());
-			msg.setStringProperty("ident", M.l(ServerIdent.class).toString());
+			msg.setStringProperty("ident", M.l(ServerIdent.class).getIdent());
 			msg.setStringProperty("scope", "single");
 			
 			msg.setString("path0", entry.getPath());
@@ -195,7 +195,7 @@ public class JmsApiImpl extends MLog implements JmsApi {
 			msg.setStringProperty("type", "registryremove");
 			msg.setStringProperty("connection", M.l(JmsApi.class).getDefaultConnectionName());
 			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.CFG_QUEUE_NAME.value());
-			msg.setStringProperty("ident", M.l(ServerIdent.class).toString());
+			msg.setStringProperty("ident", M.l(ServerIdent.class).getIdent());
 			
 			msg.setString("path0", path);
 			
@@ -211,7 +211,7 @@ public class JmsApiImpl extends MLog implements JmsApi {
 		try {
 			checkClient();
 
-			String ident = M.l(ServerIdent.class).toString();
+			String ident = M.l(ServerIdent.class).getIdent();
 			MapMessage msg = registerClient.createMapMessage();
 			msg.setStringProperty("type", "registrypublish");
 			msg.setStringProperty("connection", M.l(JmsApi.class).getDefaultConnectionName());
