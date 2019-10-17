@@ -20,6 +20,7 @@ import de.mhus.lib.core.M;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MThread;
 import de.mhus.lib.core.crypt.MRandom;
+import de.mhus.osgi.sop.api.cluster.LockListener;
 import de.mhus.osgi.sop.api.registry.RegistryManager;
 import de.mhus.osgi.sop.api.registry.RegistryPathControl;
 import de.mhus.osgi.sop.api.registry.RegistryUtil;
@@ -51,6 +52,7 @@ public class RegistryMutex implements RegistryPathControl {
     		long mySeed = M.l(MRandom.class).getLong();
     		if (cur != null)
     		    mySeed = MCast.tolong(cur.getValue(), Long.MIN_VALUE);
+    		fireLock(LockListener.EVENT.LOCK, value, true);
     		return new RegistryValue(String.valueOf(mySeed), value.getSource(), value.getUpdated(), value.getPath(), Math.max(60000, value.getTimeout()), false, false);
 		}
 		return value;
@@ -63,20 +65,35 @@ public class RegistryMutex implements RegistryPathControl {
             public void run() {
                 String name = value.getPath();
                 name = name.substring(14, name.length() - RegistryUtil.VALUE_VARNAME.length());
-                RegistryClusterApiImpl.instance().fireEventLocal(name, value.getValue(), local);
+                RegistryClusterApiImpl.instance().fireValueEventLocal(name, value.getValue(), local);
             }
         });
     
 	}
 
+    private void fireLock(LockListener.EVENT event, RegistryValue value, boolean local) {
+        MThread.asynchron(new Runnable() {
+            
+            @Override
+            public void run() {
+                String name = value.getPath();
+                name = name.substring(14, name.length() - RegistryUtil.MASTER_VARNAME.length());
+                RegistryClusterApiImpl.instance().fireLockEventLocal(event, name, local);
+            }
+        });
+    
+    }
+    
     @Override
 	public boolean checkRemoveParameter(RegistryManager manager, RegistryValue value) {
 	    if (value.getPath().endsWith(RegistryUtil.MASTER_VARNAME)) {
 	        if (value.getSource().equals(manager.getServerIdent())) {
+	            fireLock(LockListener.EVENT.UNLOCK, value, true);
 	            return true;
 	        }
+	        return false;
 	    }
-		return false;
+	    return true;
 	}
 
 	@Override
@@ -101,6 +118,7 @@ public class RegistryMutex implements RegistryPathControl {
 //					return null;
 //				}
 			    // accept their seed by default
+			    fireLock(LockListener.EVENT.LOCK, value, false);
 			    return value;
 			} else {
 				long mySeed = MCast.tolong(cur.getValue(), Long.MIN_VALUE);
@@ -112,6 +130,10 @@ public class RegistryMutex implements RegistryPathControl {
 
 	@Override
 	public boolean checkRemoveParameterFromRemote(RegistryManager manager, RegistryValue value) {
+        if (value.getPath().endsWith(RegistryUtil.MASTER_VARNAME)) {
+            // should check that only owner can remove ... but no hard unlock possible!
+            fireLock(LockListener.EVENT.UNLOCK, value, false);
+        }
 		return true;
 	}
 

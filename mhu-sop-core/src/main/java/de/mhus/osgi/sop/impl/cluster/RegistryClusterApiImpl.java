@@ -18,6 +18,7 @@ import de.mhus.lib.core.cfg.CfgLong;
 import de.mhus.lib.core.cfg.CfgString;
 import de.mhus.lib.core.concurrent.Lock;
 import de.mhus.osgi.sop.api.cluster.ClusterApi;
+import de.mhus.osgi.sop.api.cluster.LockListener;
 import de.mhus.osgi.sop.api.cluster.ValueListener;
 import de.mhus.osgi.sop.api.registry.RegistryUtil;
 
@@ -29,7 +30,8 @@ public class RegistryClusterApiImpl extends MLog implements ClusterApi {
     public static CfgLong CFG_LOCK_SLEEP = new CfgLong(ClusterApi.class, "lockSleep", 1000);
     public static CfgBoolean CFG_LOCK_VALIDATE = new CfgBoolean(ClusterApi.class, "lockValidate", true); // XXX set to false
 
-    HashMap<String,EventHandler> listeners = new HashMap<>();
+    HashMap<String,ValueEventHandler> valueListeners = new HashMap<>();
+    LockEventHandler lockListeners = new LockEventHandler();
     private static RegistryClusterApiImpl instance;
 
     @Activate
@@ -58,52 +60,78 @@ public class RegistryClusterApiImpl extends MLog implements ClusterApi {
         return master;
     }
 
-    private EventHandler getEventHandler(String name) {
-        EventHandler ret = listeners.get(name);
+    private ValueEventHandler getEventHandler(String name) {
+        ValueEventHandler ret = valueListeners.get(name);
         if (ret == null) {
-            ret = new EventHandler();
-            listeners.put(name, ret);
+            ret = new ValueEventHandler();
+            valueListeners.put(name, ret);
         }
         return ret;
     }
     
     @Override
-    public void registerListener(String name, ValueListener consumer) {
-        synchronized (listeners) {
-            EventHandler handler = getEventHandler(name);
+    public void registerValueListener(String name, ValueListener consumer) {
+        synchronized (valueListeners) {
+            ValueEventHandler handler = getEventHandler(name);
             handler.registerWeak(consumer);
         }
     }
 
     @Override
-    public void fireEvent(String name, String value) {
+    public void fireValueEvent(String name, String value) {
         String p = MFile.normalizePath(CFG_PATH.value() + "/" + name);
         RegistryUtil.setValue(p, value);
     }
     
-    public void fireEventLocal(String name, String value, boolean local) {
-        EventHandler handler = null;
-        synchronized (listeners) {
+    public void fireValueEventLocal(String name, String value, boolean local) {
+        ValueEventHandler handler = null;
+        synchronized (valueListeners) {
             name = name.substring(CFG_PATH.value().length() + 1);
             handler = getEventHandler(name);
         }
         handler.fire(name, value, local);
     }
 
-    static class EventHandler extends MEventHandler<ValueListener> {
+    public void fireLockEventLocal(LockListener.EVENT event, String name, boolean local) {
+        ValueEventHandler handler = null;
+        synchronized (valueListeners) {
+            name = name.substring(CFG_PATH.value().length() + 1);
+            handler = getEventHandler(name);
+        }
+        handler.fire(event, name, local);
+    }
+    
+    static class ValueEventHandler extends MEventHandler<ValueListener> {
         @Override
         public void onFire(ValueListener listener, Object event, Object ... values) {
             listener.event((String)event, (String)values[0], (Boolean)values[1]);
         }
     }
 
+    static class LockEventHandler extends MEventHandler<LockListener> {
+        @Override
+        public void onFire(LockListener listener, Object event, Object ... values) {
+            listener.event((LockListener.EVENT)event, (String)values[0], (Boolean)values[1]);
+        }
+    }
+    
     @Override
-    public void unregisterListener(ValueListener consumer) {
-        synchronized (listeners) {
-            for (EventHandler handler : listeners.values()) {
+    public void unregisterValueListener(ValueListener consumer) {
+        synchronized (valueListeners) {
+            for (ValueEventHandler handler : valueListeners.values()) {
                 handler.unregister(consumer);
             }
         }
+    }
+
+    @Override
+    public void registerLockListener(LockListener consumer) {
+        lockListeners.registerWeak(consumer);
+    }
+
+    @Override
+    public void unregisterLockListener(LockListener consumer) {
+        lockListeners.unregister(consumer);
     }
 
 }

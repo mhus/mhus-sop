@@ -171,7 +171,7 @@ public class ClusterCmd extends AbstractCmd {
             System.out.println("With " + errors + " errors in " + locks + " locks");
 	    } else
 	    if (cmd.equals("fire")) {
-	        api.fireEvent(path, parameters[0]);
+	        api.fireValueEvent(path, parameters[0]);
 	        System.out.println("ok");
 	    } else
 	    if (cmd.equals("register")) {
@@ -181,7 +181,7 @@ public class ClusterCmd extends AbstractCmd {
                     System.out.println((local ? "Local: " : "Remote: ") + name + "=" + value);
                 }
 	        };
-            api.registerListener(path, c );
+            api.registerValueListener(path, c );
 	    } else
 	    if (cmd.equals("listen")) {
             ValueListener c = new ValueListener() {
@@ -190,13 +190,13 @@ public class ClusterCmd extends AbstractCmd {
                     System.out.println((local ? "Local: " : "Remote: ") + name + "=" + value);
                 }
             };
-	        api.registerListener(path, c );
+	        api.registerValueListener(path, c );
 	        System.out.println("Press Ctrl+C to exit");
 	        try {
     	        while (true)
     	            Thread.sleep(1000);
 	        } catch (InterruptedException e) {}
-	        api.unregisterListener( c );
+	        api.unregisterValueListener( c );
 	    } else
         if (cmd.equals("master")) {
             System.out.println( RegistryUtil.master(path, timeout) );

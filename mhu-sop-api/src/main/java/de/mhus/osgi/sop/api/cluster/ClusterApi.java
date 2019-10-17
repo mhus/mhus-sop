@@ -43,22 +43,26 @@ public interface ClusterApi {
         return isMaster(getServiceName() + "/" + name);
     }
     
-    void registerListener(String name, ValueListener consumer );
+    void registerValueListener(String name, ValueListener consumer );
     
     default void registerServiceListener(String name, ValueListener consumer ) {
-        registerListener(getServiceName() + "/" + name, consumer);
+        registerValueListener(getServiceName() + "/" + name, consumer);
     }
     
-    void fireEvent(String name, String value);
+    void fireValueEvent(String name, String value);
     
-    default void fireServiceEvent(String name, String value) {
-        fireEvent(getServiceName() + "/" + name, value);
+    default void fireServiceValueEvent(String name, String value) {
+        fireValueEvent(getServiceName() + "/" + name, value);
     }
 
-    void unregisterListener(ValueListener consumer);
+    void unregisterValueListener(ValueListener consumer);
     
     default String getServiceName() {
         return M.l(ServerIdent.class).getService();
     }
 
+    void registerLockListener(LockListener consumer );
+    
+    void unregisterLockListener(LockListener consumer);
+    
 }
