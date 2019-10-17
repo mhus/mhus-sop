@@ -23,16 +23,16 @@ import de.mhus.osgi.sop.api.cluster.ValueListener;
 import de.mhus.osgi.sop.api.registry.RegistryUtil;
 
 @Component(immediate=true)
-public class RegistryClusterApiImpl extends MLog implements ClusterApi {
+public class ClusterApiImpl extends MLog implements ClusterApi {
 
     private static CfgString CFG_PATH = new CfgString(ClusterApi.class, "registryPath", "cluster");
     public static CfgLong CFG_LOCK_TIMEOUT = new CfgLong(ClusterApi.class, "lockTimeout", MPeriod.HOUR_IN_MILLISECOUNDS);
     public static CfgLong CFG_LOCK_SLEEP = new CfgLong(ClusterApi.class, "lockSleep", 1000);
-    public static CfgBoolean CFG_LOCK_VALIDATE = new CfgBoolean(ClusterApi.class, "lockValidate", true); // XXX set to false
+    public static CfgBoolean CFG_LOCK_VALIDATE = new CfgBoolean(ClusterApi.class, "lockValidate", false); // XXX set to false
 
     HashMap<String,ValueEventHandler> valueListeners = new HashMap<>();
     LockEventHandler lockListeners = new LockEventHandler();
-    private static RegistryClusterApiImpl instance;
+    private static ClusterApiImpl instance;
 
     @Activate
     public void doActivate(ComponentContext ctx) {
@@ -44,7 +44,7 @@ public class RegistryClusterApiImpl extends MLog implements ClusterApi {
         instance = null;
     }
     
-    public static RegistryClusterApiImpl instance() {
+    public static ClusterApiImpl instance() {
         return instance;
     }
 

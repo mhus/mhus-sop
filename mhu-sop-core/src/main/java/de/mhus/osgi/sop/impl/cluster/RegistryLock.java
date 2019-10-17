@@ -34,13 +34,13 @@ public class RegistryLock extends MLog implements LockWithExtend {
     public Lock lock() {
         synchronized (this) {
             while (localLock != null) {
-                MThread.sleep(RegistryClusterApiImpl.CFG_LOCK_SLEEP.value());
+                MThread.sleep(ClusterApiImpl.CFG_LOCK_SLEEP.value());
             }
             // get local lock
             localLock = Thread.currentThread();
             // get remote lock
             while (true) {
-                lock = RegistryUtil.master(name, RegistryClusterApiImpl.CFG_LOCK_TIMEOUT.value());
+                lock = RegistryUtil.master(name, ClusterApiImpl.CFG_LOCK_TIMEOUT.value());
                 if ( lock != null) {
                     lockTime = System.currentTimeMillis();
                     if (!validateLock()) {
@@ -51,7 +51,7 @@ public class RegistryLock extends MLog implements LockWithExtend {
                     }
                     return this;
                 }
-                MThread.sleep(RegistryClusterApiImpl.CFG_LOCK_SLEEP.value());
+                MThread.sleep(ClusterApiImpl.CFG_LOCK_SLEEP.value());
             }
         }
     }
@@ -69,7 +69,7 @@ public class RegistryLock extends MLog implements LockWithExtend {
                         localLock = Thread.currentThread();
                 } else {
                     // get remote lock
-                    lock = RegistryUtil.master(name, RegistryClusterApiImpl.CFG_LOCK_TIMEOUT.value());
+                    lock = RegistryUtil.master(name, ClusterApiImpl.CFG_LOCK_TIMEOUT.value());
                     if (lock != null) {
                         lockTime = System.currentTimeMillis();
                         if (!validateLock()) {
@@ -82,13 +82,13 @@ public class RegistryLock extends MLog implements LockWithExtend {
                     }
                 }
                 if (System.currentTimeMillis() - start >= timeout ) return false;
-                MThread.sleep(RegistryClusterApiImpl.CFG_LOCK_SLEEP.value());
+                MThread.sleep(ClusterApiImpl.CFG_LOCK_SLEEP.value());
             }
         }
     }
 
     public boolean validateLock() {
-        if(!RegistryClusterApiImpl.CFG_LOCK_VALIDATE.value()) return true;
+        if(!ClusterApiImpl.CFG_LOCK_VALIDATE.value()) return true;
         MProperties properties = new MProperties();
         properties.setString("name", getName());
         try {
@@ -170,7 +170,7 @@ public class RegistryLock extends MLog implements LockWithExtend {
     public boolean refresh() {
         synchronized (this) {
             if (lock == null) return false;
-            lock = RegistryUtil.masterRefresh(name, RegistryClusterApiImpl.CFG_LOCK_TIMEOUT.value());
+            lock = RegistryUtil.masterRefresh(name, ClusterApiImpl.CFG_LOCK_TIMEOUT.value());
             if (lock == null) {
                 lockTime = 0;
                 return false;

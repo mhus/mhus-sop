@@ -7,7 +7,7 @@ import de.mhus.lib.core.concurrent.Lock;
 
 public interface ClusterApi {
 
-    public static final CfgBoolean CFG_ENABLED = new CfgBoolean(ClusterApi.class, "enabled", true); // XXX set to false
+    public static final CfgBoolean CFG_ENABLED = new CfgBoolean(ClusterApi.class, "enabled", false);
     
     /**
      * Get the lock object for a named resource.
