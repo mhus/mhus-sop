@@ -1,9 +1,9 @@
 package de.mhus.osgi.sop.api.cluster;
 
 import de.mhus.lib.core.M;
+import de.mhus.lib.core.base.service.ServerIdent;
 import de.mhus.lib.core.cfg.CfgBoolean;
 import de.mhus.lib.core.concurrent.Lock;
-import de.mhus.lib.core.service.ServerIdent;
 
 public interface ClusterApi {
 
