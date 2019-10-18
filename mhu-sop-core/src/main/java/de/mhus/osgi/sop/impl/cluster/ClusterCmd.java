@@ -16,6 +16,7 @@
 package de.mhus.osgi.sop.impl.cluster;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
@@ -23,6 +24,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 import de.mhus.lib.core.M;
+import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.MThread;
 import de.mhus.lib.core.MTimerTask;
@@ -33,11 +35,15 @@ import de.mhus.lib.core.lang.Value;
 import de.mhus.lib.core.schedule.CronJob;
 import de.mhus.lib.core.schedule.SchedulerJob;
 import de.mhus.lib.core.strategy.DefaultTaskContext;
+import de.mhus.lib.core.strategy.OperationResult;
+import de.mhus.lib.errors.NotFoundException;
 import de.mhus.lib.errors.WrongStateException;
 import de.mhus.osgi.api.karaf.AbstractCmd;
 import de.mhus.osgi.sop.api.cluster.ClusterApi;
 import de.mhus.osgi.sop.api.cluster.TimerTaskClusterInterceptor;
 import de.mhus.osgi.sop.api.cluster.ValueListener;
+import de.mhus.osgi.sop.api.operation.OperationsSelector;
+import de.mhus.osgi.sop.api.operation.SelectorProvider;
 import de.mhus.osgi.sop.api.registry.RegistryUtil;
 
 @Command(scope = "sop", name = "cluster", description = "Cluster commands")
@@ -48,6 +54,7 @@ public class ClusterCmd extends AbstractCmd {
 	        + " lock <path>\n"
 	        + " servicelock <path>\n"
 	        + " master <path>\n"
+	        + " lockvalidate <name>\n"
 	        + "", multiValued=false)
 	String cmd;
 
@@ -68,6 +75,27 @@ public class ClusterCmd extends AbstractCmd {
 	public Object execute2() throws Exception {
 	    ClusterApi api = M.l(ClusterApi.class);
 		
+	    if (!ClusterApi.CFG_ENABLED.value())
+	        System.out.println("*** ClusterApi is not enabled !");
+	    
+	    if (cmd.equals("lockvalidate")) {
+	        MProperties properties = new MProperties();
+	        properties.setString("name", path);
+	        try {
+	            
+	            OperationsSelector selector = new OperationsSelector();
+	            selector.setFilter(RegisterLockOperation.class.getCanonicalName());
+	            selector.addSelector(SelectorProvider.NOT_LOCAL_SELECTOR);
+	            List<OperationResult> results = selector.doExecuteAll(properties);
+	            
+	            for (OperationResult res : results)
+	                if (res.isSuccessful() && res.getReturnCode() == 1) {
+	                    log().w("Lock given",path, res.getResult());
+	                }
+	        } catch (NotFoundException e) {
+	            e.printStackTrace();
+	        }
+	    } else
 	    if (cmd.equals("testscheduler")) {
 	        if (path == null) path = "test";
 	        String def = "* * * * *";
