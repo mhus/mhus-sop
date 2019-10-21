@@ -72,16 +72,10 @@ public class RegistryMutex implements RegistryPathControl {
 	}
 
     private void fireLock(LockListener.EVENT event, RegistryValue value, boolean local) {
-        MThread.asynchron(new Runnable() {
-            
-            @Override
-            public void run() {
-                String name = value.getPath();
-                name = name.substring(14, name.length() - RegistryUtil.MASTER_VARNAME.length());
-                ClusterApiImpl.instance().fireLockEventLocal(event, name, local);
-            }
-        });
-    
+        // this event is not asynchrony to have it synchrony to the end of the lock - fire before the lock is released
+        String name = value.getPath();
+        name = name.substring(14, name.length() - RegistryUtil.MASTER_VARNAME.length());
+        ClusterApiImpl.instance().fireLockEventLocal(event, name, local);
     }
     
     @Override

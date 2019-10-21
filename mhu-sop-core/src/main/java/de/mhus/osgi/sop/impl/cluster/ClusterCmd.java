@@ -89,8 +89,8 @@ public class ClusterCmd extends AbstractCmd {
 	            List<OperationResult> results = selector.doExecuteAll(properties);
 	            
 	            for (OperationResult res : results)
-	                if (res.isSuccessful() && res.getReturnCode() == 1) {
-	                    log().w("Lock given",path, res.getResult());
+	                if (res.isSuccessful()) {
+	                    System.out.println("Instance " + res.getReturnCode() + " " + res.getResult());
 	                }
 	        } catch (NotFoundException e) {
 	            e.printStackTrace();
