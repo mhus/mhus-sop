@@ -29,6 +29,7 @@ import de.mhus.lib.basics.consts.GenerateConst;
 import de.mhus.lib.basics.consts.Identifier.TYPE;
 import de.mhus.lib.core.M;
 import de.mhus.lib.errors.MException;
+import de.mhus.osgi.sop.api.aaa.AaaUtil;
 import de.mhus.osgi.sop.api.foundation.FoundationApi;
 import de.mhus.osgi.sop.api.foundation.FoundationRelated;
 
@@ -43,6 +44,8 @@ public class SopJournal extends DbMetadata implements FoundationRelated {
 	@DbPersistent(ro=true)
 	@DbIndex({"u1","2"})
 	private long order;
+	@DbPersistent(ro=true)
+	private String createdBy;
 	@DbPersistent(size=10,ro=true)
 	@DbIndex({"u1"})
 	private String queue;
@@ -59,6 +62,7 @@ public class SopJournal extends DbMetadata implements FoundationRelated {
 		this.event = event;
 		this.order = order;
 		this.data = new HashMap<>();
+        createdBy = AaaUtil.currentAccount().getName();
 		if (data != null)
 			for (int i = 0; i < data.length-1; i+=2)
 				this.data.put(data[i], data[i+1]);
@@ -99,5 +103,9 @@ public class SopJournal extends DbMetadata implements FoundationRelated {
 	public DbMetadata findParentObject() throws MException {
 		return M.l(FoundationApi.class).getFoundation(getFoundation());
 	}
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
 
 }
