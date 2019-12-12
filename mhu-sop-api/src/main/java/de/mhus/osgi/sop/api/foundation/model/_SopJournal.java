@@ -16,6 +16,7 @@ public class _SopJournal extends ConstBase {
   public static final Identifier METHOD_CREATE = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.foundation.model.SopJournal.class,"create");
   public static final Identifier METHOD_DELETE = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.foundation.model.SopJournal.class,"delete");
   public static final Identifier METHOD_FIND_PARENT_OBJECT = new Identifier(Identifier.TYPE.ACTION, de.mhus.osgi.sop.api.foundation.model.SopJournal.class,"findParentObject");
+  public static final Identifier METHOD_GET_CREATED_BY = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.foundation.model.SopJournal.class,"getCreatedBy");
   public static final Identifier METHOD_GET_CREATION_DATE = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.foundation.model.SopJournal.class,"getCreationDate");
   public static final Identifier METHOD_GET_DATA = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.foundation.model.SopJournal.class,"getData");
   public static final Identifier METHOD_GET_DB_HANDLER = new Identifier(Identifier.TYPE.GETTER, de.mhus.osgi.sop.api.foundation.model.SopJournal.class,"getDbHandler");
@@ -37,6 +38,7 @@ public class _SopJournal extends ConstBase {
   public static final Identifier PROJECT_DESCRIPTION = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.api.foundation.model.SopJournal.class,"A set of tools to improve OSGi frameworks and karaf");
   public static final Identifier PROJECT_GROUP = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.api.foundation.model.SopJournal.class,"de.mhus.osgi");
   public static final Identifier PROJECT_VERSION = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.api.foundation.model.SopJournal.class,"1.6.3-SNAPSHOT");
+  public static final Identifier _CREATED_BY = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.foundation.model.SopJournal.class,"createdBy");
   public static final Identifier _CREATION_DATE = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.foundation.model.SopJournal.class,"creationDate");
   public static final Identifier _DATA = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.foundation.model.SopJournal.class,"data");
   public static final Identifier _EVENT = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.foundation.model.SopJournal.class,"event");
