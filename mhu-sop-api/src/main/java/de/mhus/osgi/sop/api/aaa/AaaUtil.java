@@ -39,6 +39,7 @@ public class AaaUtil {
 		try {
 			for (String line : acl) {
 				if (line == null) continue;
+				if (line.startsWith(" ") || line.startsWith("=")) continue;
 				line = line.trim();
 				if (line.length() == 0 || line.startsWith(AccessApi.ACCESS_COMMENT)) continue;
 				if (line.startsWith(AccessApi.ACCESS_NOT)) {
@@ -69,6 +70,7 @@ public class AaaUtil {
 		try {
 			for (String line : acl) {
 				if (line == null) continue;
+                if (line.startsWith(" ") || line.startsWith("=")) continue;
 				line = line.trim();
 				if (line.length() == 0 || line.startsWith(AccessApi.ACCESS_COMMENT)) continue;
 				if (line.startsWith(AccessApi.ACCESS_NOT)) {
@@ -109,7 +111,10 @@ public class AaaUtil {
 
 		try {
 			for (String line : acl) {
-				if (line == null || line.length() == 0 || line.startsWith(AccessApi.ACCESS_COMMENT)) continue;
+			    if (line == null) continue;
+			    if (line.startsWith(" ") || line.startsWith("=")) continue;
+			    line = line.trim();
+				if (line.length() == 0 || line.startsWith(AccessApi.ACCESS_COMMENT)) continue;
 				int p = line.indexOf(AccessApi.ACCESS_IS);
 				String rule = line;
 				String ace = Ace.RIGHTS_NONE;
@@ -148,7 +153,10 @@ public class AaaUtil {
 
 		try {
 			for (String line : acl) {
-				if (line == null || line.length() == 0 || line.startsWith(AccessApi.ACCESS_COMMENT)) continue;
+                if (line == null) continue;
+                if (line.startsWith(" ") || line.startsWith("=")) continue;
+                line = line.trim();
+                if (line.length() == 0 || line.startsWith(AccessApi.ACCESS_COMMENT)) continue;
 				int p = line.indexOf(AccessApi.ACCESS_IS);
 				String rule = line;
 				String ace = Ace.RIGHTS_NONE;
