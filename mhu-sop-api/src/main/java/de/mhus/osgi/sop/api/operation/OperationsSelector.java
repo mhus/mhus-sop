@@ -16,6 +16,7 @@
 package de.mhus.osgi.sop.api.operation;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -126,4 +127,17 @@ public class OperationsSelector {
         return doExecuteAll(properties, executeOptions);
     }
 
+    public String getFilter() {
+        return filter;
+    }
+    
+    public VersionRange getVersion() {
+        return version;
+    }
+    
+    public Collection<String> getProvidedTags() {
+        if (providedTags == null) return null;
+        return Collections.unmodifiableCollection(providedTags);
+    }
+    
 }
