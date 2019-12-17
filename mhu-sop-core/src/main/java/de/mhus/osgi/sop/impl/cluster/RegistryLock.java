@@ -25,6 +25,7 @@ public class RegistryLock extends MLog implements LockWithExtend {
     protected long lockTime = 0;
     private RegistryValue lock;
     private Thread localLock = null;
+    private long cnt = 0;
 
     public RegistryLock(String name) {
         this.name = name;
@@ -49,6 +50,7 @@ public class RegistryLock extends MLog implements LockWithExtend {
                         lockTime = 0;
                         throw new WrongStateException("already locked",name); // should not happen
                     }
+                    cnt++;
                     return this;
                 }
                 MThread.sleep(ClusterApiImpl.CFG_LOCK_SLEEP.value());
@@ -78,6 +80,7 @@ public class RegistryLock extends MLog implements LockWithExtend {
                             lockTime = 0;
                             throw new WrongStateException("already locked",name); // should not happen
                         }
+                        cnt++;
                         return true;
                     }
                 }
@@ -182,5 +185,10 @@ public class RegistryLock extends MLog implements LockWithExtend {
     @Override
     public String toString() {
         return MSystem.toString(this, name, isMyLock(), isLocked());
+    }
+
+    @Override
+    public long getCnt() {
+        return cnt;
     }
 }
