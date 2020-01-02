@@ -144,6 +144,7 @@ public class RegistryLock extends MLog implements LockWithExtend {
             RegistryUtil.masterRemove(name);
             lock = null;
             localLock = null;
+            stacktrace = null;
             lockTime = 0;
     }
 
