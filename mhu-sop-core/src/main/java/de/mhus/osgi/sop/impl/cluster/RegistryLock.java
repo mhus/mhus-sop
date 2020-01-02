@@ -26,6 +26,7 @@ public class RegistryLock extends MLog implements LockWithExtend {
     private RegistryValue lock;
     private Thread localLock = null;
     private long cnt = 0;
+    private String stacktrace;
 
     public RegistryLock(String name) {
         this.name = name;
@@ -44,6 +45,7 @@ public class RegistryLock extends MLog implements LockWithExtend {
                 lock = RegistryUtil.master(name, ClusterApiImpl.CFG_LOCK_TIMEOUT.value());
                 if ( lock != null) {
                     lockTime = System.currentTimeMillis();
+                    stacktrace = MCast.toString("RegistryLock " + Thread.currentThread().getId(), Thread.currentThread().getStackTrace());
                     if (!validateLock()) {
                         localLock = null;
                         lock = null;
@@ -74,6 +76,7 @@ public class RegistryLock extends MLog implements LockWithExtend {
                     lock = RegistryUtil.master(name, ClusterApiImpl.CFG_LOCK_TIMEOUT.value());
                     if (lock != null) {
                         lockTime = System.currentTimeMillis();
+                        stacktrace = MCast.toString("RegistryLock " + Thread.currentThread().getId(), Thread.currentThread().getStackTrace());
                         if (!validateLock()) {
                             localLock = null;
                             lock = null;
@@ -132,6 +135,7 @@ public class RegistryLock extends MLog implements LockWithExtend {
             }
             localLock = null;
             lockTime = 0;
+            stacktrace = null;
             return ret;
     }
 
@@ -190,5 +194,10 @@ public class RegistryLock extends MLog implements LockWithExtend {
     @Override
     public long getCnt() {
         return cnt;
+    }
+
+    @Override
+    public String getStartStackTrace() {
+        return stacktrace;
     }
 }
