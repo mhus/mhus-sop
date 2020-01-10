@@ -17,30 +17,36 @@ package de.mhus.osgi.sop.jms.operation;
 
 import org.osgi.service.component.annotations.Component;
 import de.mhus.lib.core.MLog;
+import de.mhus.lib.core.cfg.CfgBoolean;
 import de.mhus.osgi.sop.api.registry.RegistryProvider;
 import de.mhus.osgi.sop.api.registry.RegistryValue;
 
 @Component(immediate=true)
 public class JmsRegistryProvider extends MLog implements RegistryProvider {
 
+	public static CfgBoolean CFG_ENABLED = new CfgBoolean(JmsRegistryProvider.class, "enabled", true);
 	
 	@Override
 	public boolean publish(RegistryValue entry) {
+	    if (!CFG_ENABLED.value()) return false;
 		return JmsApiImpl.instance.registryPublish(entry);
 	}
 
 	@Override
 	public boolean remove(String path) {
+        if (!CFG_ENABLED.value()) return false;
 		return JmsApiImpl.instance.registryRemove(path);
 	}
 
 	@Override
 	public boolean publishAll() {
+        if (!CFG_ENABLED.value()) return false;
 		return JmsApiImpl.instance.sendLocalRegistry();
 	}
 
 	@Override
 	public boolean requestAll() {
+        if (!CFG_ENABLED.value()) return false;
 		return JmsApiImpl.instance.requestRegistry();		
 	}
 
