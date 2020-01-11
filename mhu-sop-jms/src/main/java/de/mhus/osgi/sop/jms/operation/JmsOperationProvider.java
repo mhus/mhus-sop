@@ -94,6 +94,7 @@ public class JmsOperationProvider extends MLog implements OperationsProvider {
 	@Override
 	public void collectOperations(List<OperationDescriptor> list, String filter, VersionRange version,
 			Collection<String> providedTags) {
+        if (!JmsRegistryProvider.CFG_ENABLED.value()) return;
 		synchronized (JmsApiImpl.instance.register) {
 			HashMap<String, JmsOperationDescriptor> register = JmsApiImpl.instance.register;
 			for (JmsOperationDescriptor desc : register.values())
@@ -282,6 +283,7 @@ public class JmsOperationProvider extends MLog implements OperationsProvider {
 
 	@Override
 	public OperationDescriptor getOperation(OperationAddress addr) throws NotFoundException {
+        if (!JmsRegistryProvider.CFG_ENABLED.value()) return null;
 		String connection = JmsApiImpl.instance.getDefaultConnectionName(); //TODO
 		String queue = addr.getPart(0);
 		String path = addr.getPath();
@@ -297,8 +299,8 @@ public class JmsOperationProvider extends MLog implements OperationsProvider {
 
 	@Override
 	public void synchronize() {
-		// TODO time configurable
-		if (MPeriod.isTimeOut(JmsApiImpl.instance.lastRegistryRequest,MPeriod.MINUTE_IN_MILLISECOUNDS * 3)) {
+	    if (!JmsRegistryProvider.CFG_ENABLED.value()) return;
+		if (MPeriod.isTimeOut(JmsApiImpl.instance.lastRegistryRequest,JmsRegistryProvider.CFG_SYNCHRONIZE_WAIT.value())) {
 			long now = System.currentTimeMillis();
 			JmsApiImpl.instance.requestOperationRegistry();
 			MThread.sleep(30000);

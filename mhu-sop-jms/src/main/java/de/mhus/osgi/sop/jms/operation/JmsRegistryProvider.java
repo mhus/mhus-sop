@@ -17,14 +17,17 @@ package de.mhus.osgi.sop.jms.operation;
 
 import org.osgi.service.component.annotations.Component;
 import de.mhus.lib.core.MLog;
+import de.mhus.lib.core.MPeriod;
 import de.mhus.lib.core.cfg.CfgBoolean;
+import de.mhus.lib.core.cfg.CfgLong;
 import de.mhus.osgi.sop.api.registry.RegistryProvider;
 import de.mhus.osgi.sop.api.registry.RegistryValue;
 
 @Component(immediate=true)
 public class JmsRegistryProvider extends MLog implements RegistryProvider {
 
-	public static CfgBoolean CFG_ENABLED = new CfgBoolean(JmsRegistryProvider.class, "enabled", true);
+	public static final CfgBoolean CFG_ENABLED = new CfgBoolean(JmsRegistryProvider.class, "enabled", true);
+    public static final CfgLong CFG_SYNCHRONIZE_WAIT = new CfgLong(JmsRegistryProvider.class,"synchronizeWait", MPeriod.MINUTE_IN_MILLISECOUNDS * 3);
 	
 	@Override
 	public boolean publish(RegistryValue entry) {
