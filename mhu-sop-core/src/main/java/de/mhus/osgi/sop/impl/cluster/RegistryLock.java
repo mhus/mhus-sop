@@ -64,13 +64,13 @@ public class RegistryLock extends MLog implements LockWithExtend {
     @Override
     public boolean lock(long timeout) {
         synchronized (this) {
-            if (isMyLocalLock()) return true;
 
             long start = System.currentTimeMillis();
             while (true) {
                 if (localLock == null) {
                     // get local lock
                     localLock = Thread.currentThread();
+                    continue; // to avoid timeout before remote lock is allocated
                 } else {
                     // get remote lock
                     remoteLock = RegistryUtil.master(name, ClusterApiImpl.CFG_LOCK_TIMEOUT.value());
@@ -87,7 +87,12 @@ public class RegistryLock extends MLog implements LockWithExtend {
                         return true;
                     }
                 }
-                if (System.currentTimeMillis() - start >= timeout ) return false;
+                if (System.currentTimeMillis() - start >= timeout ) {
+                    localLock = null;
+                    remoteLock = null;
+                    lockTime = 0;
+                    return false;
+                }
                 MThread.sleep(ClusterApiImpl.CFG_LOCK_SLEEP.value());
             }
         }
@@ -141,7 +146,8 @@ public class RegistryLock extends MLog implements LockWithExtend {
 
     @Override
     public void unlockHard() {
-            RegistryUtil.masterRemove(name);
+            if (remoteLock != null)
+                M.l(RegistryApi.class).removeParameter(remoteLock.getPath());
             remoteLock = null;
             stacktrace = null;
             lockTime = 0;
@@ -156,6 +162,14 @@ public class RegistryLock extends MLog implements LockWithExtend {
         return remoteLock != null || localLock == Thread.currentThread();
     }
 
+    public boolean isRemoteLocked() {
+        return remoteLock != null;
+    }
+    
+    public boolean isLocalLocked() {
+        return localLock != null;
+    }
+    
     @Override
     public boolean isLocked() {
         if (remoteLock != null || localLock != null) return true;
@@ -169,8 +183,8 @@ public class RegistryLock extends MLog implements LockWithExtend {
 
     @Override
     public String getOwner() {
-        return  (remoteLock == null ? "" : remoteLock.toString() + "\n") + 
-                (localLock == null ? "" : MCast.toString(localLock.toString(),localLock.getStackTrace()));
+        return  (remoteLock == null ? "" : remoteLock.toString()) + "::" +
+                (localLock == null ? "" : localLock.getName() + " " + localLock.getId());
     }
 
     @Override
