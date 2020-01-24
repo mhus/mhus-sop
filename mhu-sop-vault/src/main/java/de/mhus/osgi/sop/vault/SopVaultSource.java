@@ -28,6 +28,7 @@ import de.mhus.lib.core.vault.MutableVaultSource;
 import de.mhus.lib.core.vault.VaultEntry;
 import de.mhus.lib.core.vault.VaultSource;
 import de.mhus.lib.errors.MException;
+import de.mhus.lib.errors.NotFoundException;
 import de.mhus.lib.xdb.XdbService;
 import de.mhus.osgi.sop.api.SopApi;
 
@@ -93,6 +94,17 @@ public class SopVaultSource extends MLog implements MutableVaultSource {
 		SopVaultEntry clone = db.inject(new SopVaultEntry(entry));
 		clone.save();
 	}
+
+    @Override
+    public void updateEntry(VaultEntry entry) throws MException {
+        XdbService db = M.l(SopApi.class).getManager();
+        SopVaultEntry current = db.getObject(SopVaultEntry.class, entry.getId());
+        if (current == null) throw new NotFoundException("entry not found",entry.getId());
+        current.type = entry.getType();
+        current.name = entry.getName();
+        current.description = entry.getDescription();
+        current.save();
+    }
 
 	@Override
 	public void removeEntry(UUID id) throws MException {
