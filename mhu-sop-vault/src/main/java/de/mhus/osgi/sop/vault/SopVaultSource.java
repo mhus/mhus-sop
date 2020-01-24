@@ -21,6 +21,7 @@ import java.util.UUID;
 
 import org.osgi.service.component.annotations.Component;
 
+import de.mhus.lib.adb.query.Db;
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.vault.MutableVaultSource;
@@ -49,10 +50,10 @@ public class SopVaultSource extends MLog implements MutableVaultSource {
     public VaultEntry getEntry(String name) {
         XdbService db = M.l(SopApi.class).getManager();
         try {
-            SopVaultEntry entry = db.getObjectByQualification(Db.q) (SopVaultEntry.class, id);
+            SopVaultEntry entry = db.getObjectByQualification(Db.query(SopVaultEntry.class).eq("name", name));
             return entry;
         } catch (MException e) {
-            log().d(id,e);
+            log().d(name,e);
             return null;
         }
     }
