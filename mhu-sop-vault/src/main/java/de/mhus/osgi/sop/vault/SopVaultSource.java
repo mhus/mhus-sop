@@ -45,6 +45,18 @@ public class SopVaultSource extends MLog implements MutableVaultSource {
 		}
 	}
 
+    @Override
+    public VaultEntry getEntry(String name) {
+        XdbService db = M.l(SopApi.class).getManager();
+        try {
+            SopVaultEntry entry = db.getObjectByQualification(Db.q) (SopVaultEntry.class, id);
+            return entry;
+        } catch (MException e) {
+            log().d(id,e);
+            return null;
+        }
+    }
+    
 	@Override
 	public Iterable<UUID> getEntryIds() {
 		XdbService db = M.l(SopApi.class).getManager();

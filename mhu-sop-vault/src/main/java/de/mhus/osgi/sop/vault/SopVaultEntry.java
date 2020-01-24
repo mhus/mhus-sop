@@ -25,6 +25,8 @@ import de.mhus.lib.errors.MException;
 
 public class SopVaultEntry extends DbMetadata implements VaultEntry {
 
+    @DbPersistent
+    protected String name;
 	@DbPersistent
 	protected String type;
 	@DbPersistent(type=TYPE.BLOB)
@@ -37,6 +39,7 @@ public class SopVaultEntry extends DbMetadata implements VaultEntry {
 	@SuppressWarnings("deprecation")
     public SopVaultEntry(VaultEntry clone) {
 		AdbUtil.setId(this, clone.getId());
+		name = clone.getName();
 		type = clone.getType();
 		description = clone.getDescription();
 		value = clone.getValue();
@@ -61,5 +64,10 @@ public class SopVaultEntry extends DbMetadata implements VaultEntry {
 	public SecureString getValue() {
 		return value;
 	}
+
+    @Override
+    public String getName() {
+        return name;
+    }
 
 }
