@@ -21,7 +21,7 @@
 	<parent>
 		<groupId>de.mhus.osgi</groupId>
 		<artifactId>mhus-sop</artifactId>
-		<version>1.6.3-SNAPSHOT</version>
+		<version>6.3.0</version>
 	</parent>
   <artifactId>mhu-sop-vaadin-theme</artifactId>
     <packaging>bundle</packaging>
