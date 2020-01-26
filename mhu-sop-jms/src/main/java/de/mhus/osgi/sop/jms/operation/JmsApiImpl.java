@@ -1,16 +1,14 @@
 /**
  * Copyright 2018 Mike Hummel
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * <p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * <p>http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
+ * <p>Unless required by applicable law or agreed to in writing, software distributed under the
+ * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
 package de.mhus.osgi.sop.jms.operation;
@@ -49,217 +47,227 @@ import de.mhus.osgi.sop.api.registry.RegistryApi;
 import de.mhus.osgi.sop.api.registry.RegistryManager;
 import de.mhus.osgi.sop.api.registry.RegistryValue;
 
-@Component(immediate=true)
+@Component(immediate = true)
 public class JmsApiImpl extends MLog implements JmsApi {
 
-	public static CfgString connectionName = new CfgString(JmsApi.class, "connection", "sop");
-	protected static JmsApiImpl instance;
+    public static CfgString connectionName = new CfgString(JmsApi.class, "connection", "sop");
+    protected static JmsApiImpl instance;
 
-	private ClientJms registerClient;
-	HashMap<String, JmsOperationDescriptor> register = new HashMap<>();
-	long lastRegistryRequest;
+    private ClientJms registerClient;
+    HashMap<String, JmsOperationDescriptor> register = new HashMap<>();
+    long lastRegistryRequest;
 
-	@Override
-	public String getDefaultConnectionName() {
-		return connectionName.value();
-	}
+    @Override
+    public String getDefaultConnectionName() {
+        return connectionName.value();
+    }
 
-	@Override
-	public void sendLocalOperations() {
-		try {
-			checkClient();
-			MapMessage msg = registerClient.createMapMessage();
-			msg.setStringProperty("type", "operations");
-			msg.setStringProperty("connection", M.l(JmsApi.class).getDefaultConnectionName());
-			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.CFG_QUEUE_NAME.value());
-			
-			int cnt = 0;
-			
-			for ( OperationDescriptor desc : M.l(OperationApi.class).findOperations("*", null, null)) {
-				if (!JmsOperationProvider.PROVIDER_NAME.equals(desc.getProvider())) {
-					msg.setString("operation" + cnt, desc.getPath());
-					msg.setString("version" + cnt, desc.getVersionString());
-					String tags = MString.join(desc.getTags().iterator(), ";");
-					if (tags.length() > 0) tags = tags + ";";
-					tags = tags + OperationDescriptor.TAG_REMOTE + "=jms;"+OperationDescriptor.TAG_HOST+"=" + MSystem.getHostname() + ";"+OperationDescriptor.TAG_IDENT+"=" + M.l(ServerIdent.class).toString();
-					msg.setString("tags" + cnt, tags );
-					msg.setString("acl" + cnt, desc.getAcl() );
-					msg.setString("title" + cnt, desc.getTitle());
-					msg.setString("uuid" + cnt, desc.getUuid().toString());
-					for (String key : desc.getParameterKeys()) {
-						msg.setString("param" + cnt + "." + key, desc.getParameter(key) );
-					}
-					DefRoot form = desc.getForm();
-					if (form != null) {
-						Document doc = ModelUtil.toXml(form);
-						msg.setString("form" + cnt, MXml.toString(doc.getDocumentElement(), false));
-					}
-					cnt++;
-				}
-			}
-			
-			registerClient.sendJms(msg);
-		} catch (Throwable t) {
-			log().w(t);
-		}
-	}
+    @Override
+    public void sendLocalOperations() {
+        try {
+            checkClient();
+            MapMessage msg = registerClient.createMapMessage();
+            msg.setStringProperty("type", "operations");
+            msg.setStringProperty("connection", M.l(JmsApi.class).getDefaultConnectionName());
+            msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.CFG_QUEUE_NAME.value());
 
-	@Override
-	public void requestOperationRegistry() {
-		try {
-			checkClient();
-			MapMessage msg = registerClient.createMapMessage();
-			msg.setStringProperty("type", "request");
-			msg.setStringProperty("connection", M.l(JmsApi.class).getDefaultConnectionName());
-			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.CFG_QUEUE_NAME.value());
-			registerClient.sendJmsOneWay(msg);
-		} catch (Throwable t) {
-			log().w(t);
-		}
-	}
+            int cnt = 0;
 
-	private void checkClient() {
-		if (registerClient.getJmsDestination().getConnection() == null) {
-			JmsConnection con = JmsUtil.getConnection( getDefaultConnectionName() );
-			if (con != null)
-				registerClient.getJmsDestination().setConnection(con);
-		}
-	}
+            for (OperationDescriptor desc :
+                    M.l(OperationApi.class).findOperations("*", null, null)) {
+                if (!JmsOperationProvider.PROVIDER_NAME.equals(desc.getProvider())) {
+                    msg.setString("operation" + cnt, desc.getPath());
+                    msg.setString("version" + cnt, desc.getVersionString());
+                    String tags = MString.join(desc.getTags().iterator(), ";");
+                    if (tags.length() > 0) tags = tags + ";";
+                    tags =
+                            tags
+                                    + OperationDescriptor.TAG_REMOTE
+                                    + "=jms;"
+                                    + OperationDescriptor.TAG_HOST
+                                    + "="
+                                    + MSystem.getHostname()
+                                    + ";"
+                                    + OperationDescriptor.TAG_IDENT
+                                    + "="
+                                    + M.l(ServerIdent.class).toString();
+                    msg.setString("tags" + cnt, tags);
+                    msg.setString("acl" + cnt, desc.getAcl());
+                    msg.setString("title" + cnt, desc.getTitle());
+                    msg.setString("uuid" + cnt, desc.getUuid().toString());
+                    for (String key : desc.getParameterKeys()) {
+                        msg.setString("param" + cnt + "." + key, desc.getParameter(key));
+                    }
+                    DefRoot form = desc.getForm();
+                    if (form != null) {
+                        Document doc = ModelUtil.toXml(form);
+                        msg.setString("form" + cnt, MXml.toString(doc.getDocumentElement(), false));
+                    }
+                    cnt++;
+                }
+            }
 
-	@Activate
-	public void doActivate(ComponentContext ctx) {
-		instance = this;
-		registerClient = new ClientJms(new JmsDestination(JmsApi.REGISTRY_TOPIC, true));
-		
-	}
+            registerClient.sendJms(msg);
+        } catch (Throwable t) {
+            log().w(t);
+        }
+    }
 
-	@Deactivate
-	public void doDeactivate(ComponentContext ctx) {
-		instance = null;
-		
-		if (registerClient != null)
-			registerClient.close();
-		registerClient = null;
-		register.clear();
-		
-	}
+    @Override
+    public void requestOperationRegistry() {
+        try {
+            checkClient();
+            MapMessage msg = registerClient.createMapMessage();
+            msg.setStringProperty("type", "request");
+            msg.setStringProperty("connection", M.l(JmsApi.class).getDefaultConnectionName());
+            msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.CFG_QUEUE_NAME.value());
+            registerClient.sendJmsOneWay(msg);
+        } catch (Throwable t) {
+            log().w(t);
+        }
+    }
 
-	public static class JmsOperationDescriptor extends OperationDescriptor {
+    private void checkClient() {
+        if (registerClient.getJmsDestination().getConnection() == null) {
+            JmsConnection con = JmsUtil.getConnection(getDefaultConnectionName());
+            if (con != null) registerClient.getJmsDestination().setConnection(con);
+        }
+    }
 
-		private long lastUpdated;
+    @Activate
+    public void doActivate(ComponentContext ctx) {
+        instance = this;
+        registerClient = new ClientJms(new JmsDestination(JmsApi.REGISTRY_TOPIC, true));
+    }
 
-		public JmsOperationDescriptor(UUID uuid, OperationAddress address, OperationDescription description,
-				Collection<String> tags, String acl) {
-			super(uuid, address, description, tags, acl);
-		}
+    @Deactivate
+    public void doDeactivate(ComponentContext ctx) {
+        instance = null;
 
-		public long getLastUpdated() {
-			return lastUpdated;
-		}
+        if (registerClient != null) registerClient.close();
+        registerClient = null;
+        register.clear();
+    }
 
-		public void setLastUpdated() {
-			lastUpdated = System.currentTimeMillis();
-		}
-		
-	}
+    public static class JmsOperationDescriptor extends OperationDescriptor {
 
-	public boolean registryPublish(RegistryValue entry) {
-		try {
-			checkClient();
+        private long lastUpdated;
 
-			MapMessage msg = registerClient.createMapMessage();
-			msg.setStringProperty("type", "registrypublish");
-			msg.setStringProperty("connection", M.l(JmsApi.class).getDefaultConnectionName());
-			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.CFG_QUEUE_NAME.value());
-			msg.setStringProperty("ident", M.l(ServerIdent.class).getIdent());
-			msg.setStringProperty("scope", "single");
-			
-			msg.setString("path0", entry.getPath());
-			msg.setString("value0", entry.getValue());
-			msg.setLong("timeout0", entry.getTimeout());
-			msg.setBoolean("readOnly0", entry.isReadOnly());
-			msg.setBoolean("persistent0", entry.isPersistent());
-			registerClient.sendJms(msg);
-			return true;
-		} catch (Throwable t) {
-			log().w(t);
-		}
-		return false;
-	}
+        public JmsOperationDescriptor(
+                UUID uuid,
+                OperationAddress address,
+                OperationDescription description,
+                Collection<String> tags,
+                String acl) {
+            super(uuid, address, description, tags, acl);
+        }
 
-	public boolean registryRemove(String path) {
-		try {
-			checkClient();
+        public long getLastUpdated() {
+            return lastUpdated;
+        }
 
-			MapMessage msg = registerClient.createMapMessage();
-			msg.setStringProperty("type", "registryremove");
-			msg.setStringProperty("connection", M.l(JmsApi.class).getDefaultConnectionName());
-			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.CFG_QUEUE_NAME.value());
-			msg.setStringProperty("ident", M.l(ServerIdent.class).getIdent());
-			
-			msg.setString("path0", path);
-			
-			registerClient.sendJms(msg);
-			return true;
-		} catch (Throwable t) {
-			log().w(t);
-		}
-		return false;
-	}
+        public void setLastUpdated() {
+            lastUpdated = System.currentTimeMillis();
+        }
+    }
 
-	public boolean sendLocalRegistry() {
-		try {
-			checkClient();
+    public boolean registryPublish(RegistryValue entry) {
+        try {
+            checkClient();
 
-			String ident = M.l(ServerIdent.class).getIdent();
-			MapMessage msg = registerClient.createMapMessage();
-			msg.setStringProperty("type", "registrypublish");
-			msg.setStringProperty("connection", M.l(JmsApi.class).getDefaultConnectionName());
-			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.CFG_QUEUE_NAME.value());
-			msg.setStringProperty("ident", ident);
-			msg.setStringProperty("scope", "full");
+            MapMessage msg = registerClient.createMapMessage();
+            msg.setStringProperty("type", "registrypublish");
+            msg.setStringProperty("connection", M.l(JmsApi.class).getDefaultConnectionName());
+            msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.CFG_QUEUE_NAME.value());
+            msg.setStringProperty("ident", M.l(ServerIdent.class).getIdent());
+            msg.setStringProperty("scope", "single");
 
-			RegistryManager api = M.l(RegistryManager.class);
-			if (api == null) {
-				log().d("sendLocalRegistry: API not found");
-				return false;
-			}
-			int cnt = 0;
-			for (RegistryValue entry : api.getAll()) {
-				if (entry.getSource().equals(ident) && !entry.getPath().startsWith(RegistryApi.PATH_LOCAL)) {
-					msg.setString("path" + cnt, entry.getPath());
-					msg.setString("value" + cnt, entry.getValue());
-					msg.setLong("timeout" + cnt, entry.getTimeout());
-					msg.setBoolean("readOnly" + cnt, entry.isReadOnly());
-					msg.setBoolean("persistent" + cnt, entry.isPersistent());
-					cnt++;
-				}
-			}
-			registerClient.sendJms(msg);
-			return true;
-		} catch (Throwable t) {
-			log().w(t);
-		}
-		return false;
-	}
+            msg.setString("path0", entry.getPath());
+            msg.setString("value0", entry.getValue());
+            msg.setLong("timeout0", entry.getTimeout());
+            msg.setBoolean("readOnly0", entry.isReadOnly());
+            msg.setBoolean("persistent0", entry.isPersistent());
+            registerClient.sendJms(msg);
+            return true;
+        } catch (Throwable t) {
+            log().w(t);
+        }
+        return false;
+    }
 
-	public boolean requestRegistry() {
-		try {
-			checkClient();
-			MapMessage msg = registerClient.createMapMessage();
-			msg.setStringProperty("type", "registryrequest");
-			msg.setStringProperty("connection", M.l(JmsApi.class).getDefaultConnectionName());
-			msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.CFG_QUEUE_NAME.value());
-			registerClient.sendJmsOneWay(msg);
-			return true;
-		} catch (Throwable t) {
-			log().w(t);
-		}
-		return false;
-	}
-	
-	public boolean isConnected() {
-	    return registerClient != null && registerClient.getSession() != null;
-	}
+    public boolean registryRemove(String path) {
+        try {
+            checkClient();
 
+            MapMessage msg = registerClient.createMapMessage();
+            msg.setStringProperty("type", "registryremove");
+            msg.setStringProperty("connection", M.l(JmsApi.class).getDefaultConnectionName());
+            msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.CFG_QUEUE_NAME.value());
+            msg.setStringProperty("ident", M.l(ServerIdent.class).getIdent());
+
+            msg.setString("path0", path);
+
+            registerClient.sendJms(msg);
+            return true;
+        } catch (Throwable t) {
+            log().w(t);
+        }
+        return false;
+    }
+
+    public boolean sendLocalRegistry() {
+        try {
+            checkClient();
+
+            String ident = M.l(ServerIdent.class).getIdent();
+            MapMessage msg = registerClient.createMapMessage();
+            msg.setStringProperty("type", "registrypublish");
+            msg.setStringProperty("connection", M.l(JmsApi.class).getDefaultConnectionName());
+            msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.CFG_QUEUE_NAME.value());
+            msg.setStringProperty("ident", ident);
+            msg.setStringProperty("scope", "full");
+
+            RegistryManager api = M.l(RegistryManager.class);
+            if (api == null) {
+                log().d("sendLocalRegistry: API not found");
+                return false;
+            }
+            int cnt = 0;
+            for (RegistryValue entry : api.getAll()) {
+                if (entry.getSource().equals(ident)
+                        && !entry.getPath().startsWith(RegistryApi.PATH_LOCAL)) {
+                    msg.setString("path" + cnt, entry.getPath());
+                    msg.setString("value" + cnt, entry.getValue());
+                    msg.setLong("timeout" + cnt, entry.getTimeout());
+                    msg.setBoolean("readOnly" + cnt, entry.isReadOnly());
+                    msg.setBoolean("persistent" + cnt, entry.isPersistent());
+                    cnt++;
+                }
+            }
+            registerClient.sendJms(msg);
+            return true;
+        } catch (Throwable t) {
+            log().w(t);
+        }
+        return false;
+    }
+
+    public boolean requestRegistry() {
+        try {
+            checkClient();
+            MapMessage msg = registerClient.createMapMessage();
+            msg.setStringProperty("type", "registryrequest");
+            msg.setStringProperty("connection", M.l(JmsApi.class).getDefaultConnectionName());
+            msg.setStringProperty("queue", Jms2LocalOperationExecuteChannel.CFG_QUEUE_NAME.value());
+            registerClient.sendJmsOneWay(msg);
+            return true;
+        } catch (Throwable t) {
+            log().w(t);
+        }
+        return false;
+    }
+
+    public boolean isConnected() {
+        return registerClient != null && registerClient.getSession() != null;
+    }
 }

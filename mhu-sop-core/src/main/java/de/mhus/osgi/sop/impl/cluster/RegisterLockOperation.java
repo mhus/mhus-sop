@@ -17,7 +17,7 @@ import de.mhus.lib.core.util.Version;
 import de.mhus.lib.form.definition.FmText;
 import de.mhus.osgi.sop.api.cluster.ClusterApi;
 
-@Component(service=Operation.class, property="tags=acl=*")
+@Component(service = Operation.class, property = "tags=acl=*")
 public class RegisterLockOperation extends AbstractOperation {
 
     @SuppressWarnings("unchecked")
@@ -27,16 +27,19 @@ public class RegisterLockOperation extends AbstractOperation {
         Lock lock = M.l(ClusterApi.class).getLock(name);
         Successful ret = new Successful(this, "ok", "name", name);
         if (lock.isLocked())
-            ((HashMap<Object, Object>)ret.getResult()).put("owner",lock.getOwner());
+            ((HashMap<Object, Object>) ret.getResult()).put("owner", lock.getOwner());
         ret.setReturnCode(lock.isLocked() ? 1 : 0);
         return ret;
     }
 
     @Override
     protected OperationDescription createDescription() {
-        return new OperationDescription(getUuid(),this.getClass(), this, Version.V_1_0_0, "Is register lock, returns 0 for no 1 for yes", new DefRoot(
-                new FmText("name","Name","Name of the lock to check")
-                ));
+        return new OperationDescription(
+                getUuid(),
+                this.getClass(),
+                this,
+                Version.V_1_0_0,
+                "Is register lock, returns 0 for no 1 for yes",
+                new DefRoot(new FmText("name", "Name", "Name of the lock to check")));
     }
-
 }

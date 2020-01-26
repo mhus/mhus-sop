@@ -1,16 +1,14 @@
 /**
  * Copyright 2018 Mike Hummel
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * <p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * <p>http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
+ * <p>Unless required by applicable law or agreed to in writing, software distributed under the
+ * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
 package de.mhus.osgi.sop.api;
@@ -22,155 +20,171 @@ import de.mhus.osgi.api.jms.JmsUtil;
 
 public class Sop {
 
-	public static final String PARAMETERS = "parameter.";
+    public static final String PARAMETERS = "parameter.";
 
-	public static final String DEFAULT_GROUP = "default";
+    public static final String DEFAULT_GROUP = "default";
 
-	public static final String PARAM_OPERATION_PATH = "path";
-	public static final String OPERATION_LIST = "_list";
-	public static final String OPERATION_INFO = "_get";
-	public static final String PARAM_OPERATION_ID = "id";
+    public static final String PARAM_OPERATION_PATH = "path";
+    public static final String OPERATION_LIST = "_list";
+    public static final String OPERATION_INFO = "_get";
+    public static final String PARAM_OPERATION_ID = "id";
 
-	public static final String PARAM_AAA_TICKET = "_sop_aaa_ticket";
-	public static final String PARAM_LOCALE = "_sop_locale";
+    public static final String PARAM_AAA_TICKET = "_sop_aaa_ticket";
+    public static final String PARAM_LOCALE = "_sop_locale";
 
-	// public static final long MAX_MSG_BYTES = 1024 * 1024 * 100; // 100 MB
+    // public static final long MAX_MSG_BYTES = 1024 * 1024 * 100; // 100 MB
 
-	public static final String PARAM_SUCCESSFUL = "successful";
+    public static final String PARAM_SUCCESSFUL = "successful";
 
-	public static final String PARAM_MSG = "msg";
+    public static final String PARAM_MSG = "msg";
 
-	public static final String PARAM_RC = "rc";
+    public static final String PARAM_RC = "rc";
 
-	public static final String PARAM_OPERATION_VERSION = "version";
+    public static final String PARAM_OPERATION_VERSION = "version";
 
-	public static final String PARAM_ERROR = "_error";
-	
-/* use M.l() instead
+    public static final String PARAM_ERROR = "_error";
 
-	private static HashMap<String, Container> apiCache = new HashMap<>();
+    /* use M.l() instead
 
-	public synchronized static <T extends SApi> T getApi(Class<? extends T> ifc) {
-		return getApi(ifc, true);
-	}
-	
-	@SuppressWarnings("unchecked")
-	public synchronized static <T extends SApi> T getApi(Class<? extends T> ifc, boolean throwException) {
-		Container cached = apiCache.get(ifc.getCanonicalName());
-		if (cached != null) {
-			if (cached.bundle.getState() != Bundle.ACTIVE || cached.modified != cached.bundle.getLastModified()) {
-				apiCache.remove(cached.ifc.getCanonicalName());
-				cached = null;
-			}
-		}
-		
-		if (cached == null) {
-			BundleContext context = FrameworkUtil.getBundle(Sop.class).getBundleContext();
-			ServiceReference<? extends T> ref = context.getServiceReference(ifc);
-			if (ref == null) {
-				if (throwException)
-					throw new NotFoundException("api reference not found",ifc);
-				else
-					return null;
-			}
-			T obj = context.getService(ref);
-			if (obj == null) {
-				if (throwException)
-					throw new NotFoundException("api service not found",ifc);
-				else
-					return null;
-			}
-			cached = new Container();
-			cached.bundle = ref.getBundle();
-			cached.api = obj;
-			cached.ifc = ifc;
-			cached.modified = cached.bundle.getLastModified();
-			apiCache.put(ifc.getCanonicalName(), cached);
-		}
-		return (T) cached.api;
-	}
-	
-	private static class Container {
+    	private static HashMap<String, Container> apiCache = new HashMap<>();
 
-		public long modified;
-		public Class<? extends SApi> ifc;
-		public SApi api;
-		public Bundle bundle;
-		
-	}
-*/	
-	public static String decodePassword(String password) {
-		if (password == null) return null;
-		if (password.length() < 2 || !password.startsWith("`")) return password;
-		if (password.charAt(1) == 'A') {
-			StringBuilder out = new StringBuilder();
-			for (int i = 2; i < password.length(); i++) {
-				char c = password.charAt(i);
-				switch (c) {
-				case '0': c = '9'; break;
-				case '1': c = '0'; break;
-				case '2': c = '1'; break;
-				case '3': c = '2'; break;
-				case '4': c = '3'; break;
-				case '5': c = '4'; break;
-				case '6': c = '5'; break;
-				case '7': c = '6'; break;
-				case '8': c = '7'; break;
-				case '9': c = '8'; break;
-				}
-				out.append(c);
-			}
-			return out.toString();
-		}
-		return null;
-	}
+    	public synchronized static <T extends SApi> T getApi(Class<? extends T> ifc) {
+    		return getApi(ifc, true);
+    	}
 
-	public static String asEncodePassword(String alreadyEncoded) {
-		return "`A" +alreadyEncoded;
-	}
+    	@SuppressWarnings("unchecked")
+    	public synchronized static <T extends SApi> T getApi(Class<? extends T> ifc, boolean throwException) {
+    		Container cached = apiCache.get(ifc.getCanonicalName());
+    		if (cached != null) {
+    			if (cached.bundle.getState() != Bundle.ACTIVE || cached.modified != cached.bundle.getLastModified()) {
+    				apiCache.remove(cached.ifc.getCanonicalName());
+    				cached = null;
+    			}
+    		}
 
-	public static int getPageFromSearch(String search) {
-		if (MString.isEmpty(search) || !search.startsWith("page:"))
-			return 0;
-		search = search.substring(5);
-		if (search.indexOf(',') >= 0)
-			return MCast.toint(MString.beforeIndex(search, ','), 0);
-		return MCast.toint(search, 0);
-	}
+    		if (cached == null) {
+    			BundleContext context = FrameworkUtil.getBundle(Sop.class).getBundleContext();
+    			ServiceReference<? extends T> ref = context.getServiceReference(ifc);
+    			if (ref == null) {
+    				if (throwException)
+    					throw new NotFoundException("api reference not found",ifc);
+    				else
+    					return null;
+    			}
+    			T obj = context.getService(ref);
+    			if (obj == null) {
+    				if (throwException)
+    					throw new NotFoundException("api service not found",ifc);
+    				else
+    					return null;
+    			}
+    			cached = new Container();
+    			cached.bundle = ref.getBundle();
+    			cached.api = obj;
+    			cached.ifc = ifc;
+    			cached.modified = cached.bundle.getLastModified();
+    			apiCache.put(ifc.getCanonicalName(), cached);
+    		}
+    		return (T) cached.api;
+    	}
 
-	public static String getFilterFromSearch(String search) {
-		if (MString.isEmpty(search))
-			return null;
-		if (search.startsWith("page:")) {
-			if (search.indexOf(',') >= 0)
-				return MString.afterIndex(search, ',');
-			return null;
-		}
-		return search;
-	}
+    	private static class Container {
 
-	public static JmsConnection getDefaultJmsConnection() {
-		return JmsUtil.getConnection(getDefaultJmsConnectionName());
-	}
+    		public long modified;
+    		public Class<? extends SApi> ifc;
+    		public SApi api;
+    		public Bundle bundle;
 
-	public static String getDefaultJmsConnectionName() {
-		return "mhus"; //TODO configurable
-	}
+    	}
+    */
+    public static String decodePassword(String password) {
+        if (password == null) return null;
+        if (password.length() < 2 || !password.startsWith("`")) return password;
+        if (password.charAt(1) == 'A') {
+            StringBuilder out = new StringBuilder();
+            for (int i = 2; i < password.length(); i++) {
+                char c = password.charAt(i);
+                switch (c) {
+                    case '0':
+                        c = '9';
+                        break;
+                    case '1':
+                        c = '0';
+                        break;
+                    case '2':
+                        c = '1';
+                        break;
+                    case '3':
+                        c = '2';
+                        break;
+                    case '4':
+                        c = '3';
+                        break;
+                    case '5':
+                        c = '4';
+                        break;
+                    case '6':
+                        c = '5';
+                        break;
+                    case '7':
+                        c = '6';
+                        break;
+                    case '8':
+                        c = '7';
+                        break;
+                    case '9':
+                        c = '8';
+                        break;
+                }
+                out.append(c);
+            }
+            return out.toString();
+        }
+        return null;
+    }
 
-/* use MApi.waitFor() instead
+    public static String asEncodePassword(String alreadyEncoded) {
+        return "`A" + alreadyEncoded;
+    }
 
-	public static <T extends Object> T waitForApi(Class<? extends T> ifc, long timeout) {
-		long start = System.currentTimeMillis();
-		while (true) {
-			try {
-				T api = M.l(ifc);
-				if (api != null) // should not happen
-					return api;
-			} catch (Throwable t) {}
-			if (System.currentTimeMillis() - start > timeout)
-				throw new TimeoutRuntimeException("timeout getting API",ifc);
-			MThread.sleep(500);
-		}
-	}
-*/
+    public static int getPageFromSearch(String search) {
+        if (MString.isEmpty(search) || !search.startsWith("page:")) return 0;
+        search = search.substring(5);
+        if (search.indexOf(',') >= 0) return MCast.toint(MString.beforeIndex(search, ','), 0);
+        return MCast.toint(search, 0);
+    }
+
+    public static String getFilterFromSearch(String search) {
+        if (MString.isEmpty(search)) return null;
+        if (search.startsWith("page:")) {
+            if (search.indexOf(',') >= 0) return MString.afterIndex(search, ',');
+            return null;
+        }
+        return search;
+    }
+
+    public static JmsConnection getDefaultJmsConnection() {
+        return JmsUtil.getConnection(getDefaultJmsConnectionName());
+    }
+
+    public static String getDefaultJmsConnectionName() {
+        return "mhus"; // TODO configurable
+    }
+
+    /* use MApi.waitFor() instead
+
+    	public static <T extends Object> T waitForApi(Class<? extends T> ifc, long timeout) {
+    		long start = System.currentTimeMillis();
+    		while (true) {
+    			try {
+    				T api = M.l(ifc);
+    				if (api != null) // should not happen
+    					return api;
+    			} catch (Throwable t) {}
+    			if (System.currentTimeMillis() - start > timeout)
+    				throw new TimeoutRuntimeException("timeout getting API",ifc);
+    			MThread.sleep(500);
+    		}
+    	}
+    */
 }

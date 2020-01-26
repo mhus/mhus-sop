@@ -2,7 +2,6 @@ package de.mhus.osgi.sop.api.rest;
 
 import org.codehaus.jackson.node.ObjectNode;
 
-import de.mhus.osgi.sop.api.rest.JsonResult;
 
 public class SuccessfulJsonResult extends JsonResult {
 
@@ -12,8 +11,7 @@ public class SuccessfulJsonResult extends JsonResult {
         data = createObjectNode();
         data.put("successful", true);
         data.put("rc", 0);
-        if (msg != null)
-            data.put("msg", msg);
+        if (msg != null) data.put("msg", msg);
     }
 
     public ObjectNode getData() {

@@ -1,16 +1,14 @@
 /**
  * Copyright 2018 Mike Hummel
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * <p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * <p>http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
+ * <p>Unless required by applicable law or agreed to in writing, software distributed under the
+ * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
 package de.mhus.osgi.sop.impl.aaa.util;
@@ -30,61 +28,78 @@ import de.mhus.osgi.sop.api.util.SopUtil;
 
 public class AuthFromFile extends MLog implements AuthorizationSource, ModifyAuthorizationApi {
 
-	@Override
-	public Boolean hasResourceAccess(Account account, String aclName) {
-		File file = SopUtil.getFile( "aaa/groupmapping/" + MFile.normalize(aclName.trim()).toLowerCase() + ".txt" );
-		if (!file.exists()) {
-			log().w("file not found",file);
-			return null;
-		}
-		try {
-			List<String> acl = MFile.readLines(file, true);
-			return AaaUtil.hasAccess(account, acl);
-		} catch (IOException e) {
-			log().w("read error", file);
-			return null;
-		}
-	}
+    @Override
+    public Boolean hasResourceAccess(Account account, String aclName) {
+        File file =
+                SopUtil.getFile(
+                        "aaa/groupmapping/"
+                                + MFile.normalize(aclName.trim()).toLowerCase()
+                                + ".txt");
+        if (!file.exists()) {
+            log().w("file not found", file);
+            return null;
+        }
+        try {
+            List<String> acl = MFile.readLines(file, true);
+            return AaaUtil.hasAccess(account, acl);
+        } catch (IOException e) {
+            log().w("read error", file);
+            return null;
+        }
+    }
 
-	@Override
-	public String getResourceAccessAcl(Account account, String aclName) {
-		File file = SopUtil.getFile( "aaa/groupmapping/" + MFile.normalize(aclName.trim()).toLowerCase() + ".txt" );
-		if (!file.exists()) {
-			log().w("file not found",file);
-			return null;
-		}
-		String acl = MFile.readFile(file);
-		return acl;
-	}
+    @Override
+    public String getResourceAccessAcl(Account account, String aclName) {
+        File file =
+                SopUtil.getFile(
+                        "aaa/groupmapping/"
+                                + MFile.normalize(aclName.trim()).toLowerCase()
+                                + ".txt");
+        if (!file.exists()) {
+            log().w("file not found", file);
+            return null;
+        }
+        String acl = MFile.readFile(file);
+        return acl;
+    }
 
-	@Override
-	public void createAuthorization(String aclName, String acl) throws MException {
-		File file = SopUtil.getFile( "aaa/groupmapping/" + MFile.normalize(aclName.trim()).toLowerCase() + ".txt" );
-		if (!file.getParentFile().exists())
-			file.getParentFile().mkdirs();
-		
-		MFile.writeFile(file, acl);
-		
-	}
+    @Override
+    public void createAuthorization(String aclName, String acl) throws MException {
+        File file =
+                SopUtil.getFile(
+                        "aaa/groupmapping/"
+                                + MFile.normalize(aclName.trim()).toLowerCase()
+                                + ".txt");
+        if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
 
-	@Override
-	public void deleteAuthorization(String aclName) throws MException {
-		File file = SopUtil.getFile( "aaa/groupmapping/" + MFile.normalize(aclName.trim()).toLowerCase() + ".txt" );
-		if (!file.exists()) throw new MException("authorization not found", aclName);
-		
-		file.delete();
-	}
+        MFile.writeFile(file, acl);
+    }
 
-	@Override
-	public ModifyAuthorizationApi getModifyApi() {
-		return this;
-	}
+    @Override
+    public void deleteAuthorization(String aclName) throws MException {
+        File file =
+                SopUtil.getFile(
+                        "aaa/groupmapping/"
+                                + MFile.normalize(aclName.trim()).toLowerCase()
+                                + ".txt");
+        if (!file.exists()) throw new MException("authorization not found", aclName);
 
-	@Override
-	public String getAuthorizationAcl(String aclName) throws MException {
-		File file = SopUtil.getFile( "aaa/groupmapping/" + MFile.normalize(aclName.trim()).toLowerCase() + ".txt" );
-		if (!file.exists()) throw new MException("authorization not found", aclName);
-		return MFile.readFile(file);
-	}
+        file.delete();
+    }
 
+    @Override
+    public ModifyAuthorizationApi getModifyApi() {
+        return this;
+    }
+
+    @Override
+    public String getAuthorizationAcl(String aclName) throws MException {
+        File file =
+                SopUtil.getFile(
+                        "aaa/groupmapping/"
+                                + MFile.normalize(aclName.trim()).toLowerCase()
+                                + ".txt");
+        if (!file.exists()) throw new MException("authorization not found", aclName);
+        return MFile.readFile(file);
+    }
 }

@@ -6,14 +6,15 @@ import de.mhus.lib.core.cfg.CfgLong;
 
 public class RegistryUtil {
 
-    public static final CfgLong CFG_WAIT_FOR_OTHERS = new CfgLong(RegistryApi.class, "waitForOthers", 200);
+    public static final CfgLong CFG_WAIT_FOR_OTHERS =
+            new CfgLong(RegistryApi.class, "waitForOthers", 200);
     public static final String MUTEX_PATH = RegistryApi.PATH_SYSTEM + "/mutex/";
     public static final String MASTER_VARNAME = "@master";
     public static final String VALUE_VARNAME = "@value";
 
     /**
      * Negotiate with other notes which one is the master of the resource.
-     * 
+     *
      * @param path
      * @return true if my instance is the master.
      */
@@ -27,7 +28,7 @@ public class RegistryUtil {
         RegistryValue param = rapi.getParameter(p);
         return param;
     }
-    
+
     public static RegistryValue master(String path, long timeout) {
         timeout = Math.max(60000, timeout);
         RegistryApi rapi = M.l(RegistryApi.class);
@@ -51,8 +52,7 @@ public class RegistryUtil {
             rapi.setParameter(p, "", timeout, false, false, false);
             MThread.sleep(CFG_WAIT_FOR_OTHERS.value());
             param = rapi.getParameter(p);
-        } else
-        if (param.getTTL() < timeout / 2) {
+        } else if (param.getTTL() < timeout / 2) {
             rapi.setParameter(p, "", timeout, false, false, false);
             param = rapi.getParameter(p);
         }
@@ -63,15 +63,15 @@ public class RegistryUtil {
         RegistryApi rapi = M.l(RegistryApi.class);
         String p = MUTEX_PATH + path + MASTER_VARNAME;
         RegistryValue param = rapi.getParameter(p);
-        if (param != null && !param.getSource().equals(rapi.getServerIdent()))
-            return null;
+        if (param != null && !param.getSource().equals(rapi.getServerIdent())) return null;
         rapi.setParameter(p, param.getValue(), timeout, false, false, false);
         param = rapi.getParameter(p);
         return param;
     }
 
     public static boolean masterRemove(String name) {
-        return M.l(RegistryApi.class).removeParameter(RegistryUtil.MUTEX_PATH + name + RegistryUtil.MASTER_VARNAME);
+        return M.l(RegistryApi.class)
+                .removeParameter(RegistryUtil.MUTEX_PATH + name + RegistryUtil.MASTER_VARNAME);
     }
 
     public static void setValue(String path, String value) {
@@ -79,5 +79,4 @@ public class RegistryUtil {
         String p = MUTEX_PATH + path + VALUE_VARNAME;
         rapi.setParameter(p, value, 1000, false, false, false);
     }
-
 }

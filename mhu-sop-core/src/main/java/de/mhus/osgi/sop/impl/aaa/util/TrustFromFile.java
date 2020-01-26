@@ -1,16 +1,14 @@
 /**
  * Copyright 2018 Mike Hummel
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * <p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * <p>http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
+ * <p>Unless required by applicable law or agreed to in writing, software distributed under the
+ * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
 package de.mhus.osgi.sop.impl.aaa.util;
@@ -40,139 +38,148 @@ import de.mhus.osgi.sop.api.aaa.TrustSource;
 import de.mhus.osgi.sop.api.util.SopUtil;
 
 public class TrustFromFile extends MLog implements TrustSource, ModifyTrustApi {
-	
-	@Override
-	public Trust findTrust(String trust) {
-		File file = SopUtil.getFile( "aaa/trust/" + MFile.normalize(trust.trim()).toLowerCase() + ".xml" );
-		if (!file.exists() || !file.isFile()) return null;
-		
-		try {
-			return new TrustFile(file, trust);
-		} catch (ParserConfigurationException | SAXException | IOException e) {
-			log().w(trust, e);
-			return null;
-		}
-	}
-/*
-<trust>
-  <password plain="123" />
-  <information name="Default" />
-  <attributes>
-    <attribute name="privatekey" value=""/>
-  </attributes> 
-</trust>
- */
-	@Override
-	public void createTrust(String trust, String password, IReadProperties properties) throws MException {
 
-		File file = SopUtil.getFile( "aaa/trust/" + MFile.normalize(trust.trim()).toLowerCase() + ".xml" );
-		if (!file.getParentFile().exists())
-			file.getParentFile().mkdirs();
-		if (file.exists()) throw new MException("Trust already exists",trust);
-		
-		try {
-			Document doc = MXml.createDocument();
-			Element rootE = doc.createElement("user");
-			doc.appendChild(rootE);
-			rootE.setAttribute("created", MDate.toIsoDateTime(System.currentTimeMillis()));
-			Element passE = doc.createElement("password");
-			rootE.appendChild(passE);
-			passE.setAttribute("plain", MPassword.encode(password));
-			Element infoE = doc.createElement("information");
-			rootE.appendChild(infoE);
-			infoE.setAttribute("name", properties.getString(AccessApi.DISPLAY_NAME, trust));
-			Element attrE = doc.createElement("attributes");
-			rootE.appendChild(attrE);
-			
-			for (Entry<String, Object> entry : properties.entrySet()) {
-				Element aE = doc.createElement("attribute");
-				attrE.appendChild(aE);
-				aE.setAttribute("name", entry.getKey());
-				aE.setAttribute("value", String.valueOf(entry.getValue()));
-			}
-						
-			FileWriter os = new FileWriter(file);
-			MXml.saveXml(rootE, os, true);
-			os.close();
-			
-		} catch (Exception e) {
-			throw new MException(e);
-		}		
-	}
+    @Override
+    public Trust findTrust(String trust) {
+        File file =
+                SopUtil.getFile(
+                        "aaa/trust/" + MFile.normalize(trust.trim()).toLowerCase() + ".xml");
+        if (!file.exists() || !file.isFile()) return null;
 
-	@Override
-	public void deleteTrust(String trust) throws MException {
-		File file = SopUtil.getFile( "aaa/trust/" + MFile.normalize(trust.trim()).toLowerCase() + ".xml" );
-		if (!file.exists()) throw new MException("Trust not found",trust);
-		
-		file.delete();
-	}
+        try {
+            return new TrustFile(file, trust);
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            log().w(trust, e);
+            return null;
+        }
+    }
+    /*
+    <trust>
+      <password plain="123" />
+      <information name="Default" />
+      <attributes>
+        <attribute name="privatekey" value=""/>
+      </attributes>
+    </trust>
+     */
+    @Override
+    public void createTrust(String trust, String password, IReadProperties properties)
+            throws MException {
 
-	@Override
-	public void changePassword(String trust, String newPassword) throws MException {
-		File file = SopUtil.getFile( "aaa/trust/" + MFile.normalize(trust.trim()).toLowerCase() + ".xml" );
-		if (!file.exists()) throw new MException("Trust not found",trust);
+        File file =
+                SopUtil.getFile(
+                        "aaa/trust/" + MFile.normalize(trust.trim()).toLowerCase() + ".xml");
+        if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
+        if (file.exists()) throw new MException("Trust already exists", trust);
 
-		try {
-			Document doc = MXml.loadXml(file);
-			
-			Element rootE = doc.getDocumentElement();
-			rootE.setAttribute("modified", MDate.toIsoDateTime(System.currentTimeMillis()));
-			Element passE = MXml.getElementByPath(rootE, "password");
-			passE.setAttribute("plain", MPassword.encode(newPassword));
+        try {
+            Document doc = MXml.createDocument();
+            Element rootE = doc.createElement("user");
+            doc.appendChild(rootE);
+            rootE.setAttribute("created", MDate.toIsoDateTime(System.currentTimeMillis()));
+            Element passE = doc.createElement("password");
+            rootE.appendChild(passE);
+            passE.setAttribute("plain", MPassword.encode(password));
+            Element infoE = doc.createElement("information");
+            rootE.appendChild(infoE);
+            infoE.setAttribute("name", properties.getString(AccessApi.DISPLAY_NAME, trust));
+            Element attrE = doc.createElement("attributes");
+            rootE.appendChild(attrE);
 
-			FileWriter os = new FileWriter(file);
-			MXml.saveXml(rootE, os, true);
-			os.close();
+            for (Entry<String, Object> entry : properties.entrySet()) {
+                Element aE = doc.createElement("attribute");
+                attrE.appendChild(aE);
+                aE.setAttribute("name", entry.getKey());
+                aE.setAttribute("value", String.valueOf(entry.getValue()));
+            }
 
-		} catch (Exception e) {
-			throw new MException(e);
-		}
-	}
+            FileWriter os = new FileWriter(file);
+            MXml.saveXml(rootE, os, true);
+            os.close();
 
-	@Override
-	public void changeTrust(String trust, IReadProperties properties) throws MException {
-		File file = SopUtil.getFile( "aaa/trust/" + MFile.normalize(trust.trim()).toLowerCase() + ".xml" );
-		if (!file.exists()) throw new MException("Trust not found",trust);
+        } catch (Exception e) {
+            throw new MException(e);
+        }
+    }
 
-		try {
-			Document doc = MXml.loadXml(file);
-			
-			Element rootE = doc.getDocumentElement();
-			rootE.setAttribute("modified", MDate.toIsoDateTime(System.currentTimeMillis()));
-			
-			Element infoE = MXml.getElementByPath(rootE, "information");
-			rootE.appendChild(infoE);
-			infoE.setAttribute("name", properties.getString(AccessApi.DISPLAY_NAME, trust));
+    @Override
+    public void deleteTrust(String trust) throws MException {
+        File file =
+                SopUtil.getFile(
+                        "aaa/trust/" + MFile.normalize(trust.trim()).toLowerCase() + ".xml");
+        if (!file.exists()) throw new MException("Trust not found", trust);
 
-			Element attrE = MXml.getElementByPath(rootE, "attributes");
-			// remove all
-			while (attrE.hasChildNodes())
-				attrE.removeChild(attrE.getFirstChild());
-			// set new
-			for (Entry<String, Object> entry : properties.entrySet()) {
-				Element aE = doc.createElement("attribute");
-				attrE.appendChild(aE);
-				aE.setAttribute("name", entry.getKey());
-				aE.setAttribute("value", String.valueOf(entry.getValue()));
-			}
+        file.delete();
+    }
 
-			FileWriter os = new FileWriter(file);
-			MXml.saveXml(rootE, os, true);
-			os.close();
+    @Override
+    public void changePassword(String trust, String newPassword) throws MException {
+        File file =
+                SopUtil.getFile(
+                        "aaa/trust/" + MFile.normalize(trust.trim()).toLowerCase() + ".xml");
+        if (!file.exists()) throw new MException("Trust not found", trust);
 
-		} catch (Exception e) {
-			throw new MException(e);
-		}
-	}
-	
-	@Override
-	public Trust getTrust(String trust) {
-		return findTrust(trust);
-	}
-	@Override
-	public ModifyTrustApi getModifyApi() {
-		return this;
-	}
+        try {
+            Document doc = MXml.loadXml(file);
 
+            Element rootE = doc.getDocumentElement();
+            rootE.setAttribute("modified", MDate.toIsoDateTime(System.currentTimeMillis()));
+            Element passE = MXml.getElementByPath(rootE, "password");
+            passE.setAttribute("plain", MPassword.encode(newPassword));
+
+            FileWriter os = new FileWriter(file);
+            MXml.saveXml(rootE, os, true);
+            os.close();
+
+        } catch (Exception e) {
+            throw new MException(e);
+        }
+    }
+
+    @Override
+    public void changeTrust(String trust, IReadProperties properties) throws MException {
+        File file =
+                SopUtil.getFile(
+                        "aaa/trust/" + MFile.normalize(trust.trim()).toLowerCase() + ".xml");
+        if (!file.exists()) throw new MException("Trust not found", trust);
+
+        try {
+            Document doc = MXml.loadXml(file);
+
+            Element rootE = doc.getDocumentElement();
+            rootE.setAttribute("modified", MDate.toIsoDateTime(System.currentTimeMillis()));
+
+            Element infoE = MXml.getElementByPath(rootE, "information");
+            rootE.appendChild(infoE);
+            infoE.setAttribute("name", properties.getString(AccessApi.DISPLAY_NAME, trust));
+
+            Element attrE = MXml.getElementByPath(rootE, "attributes");
+            // remove all
+            while (attrE.hasChildNodes()) attrE.removeChild(attrE.getFirstChild());
+            // set new
+            for (Entry<String, Object> entry : properties.entrySet()) {
+                Element aE = doc.createElement("attribute");
+                attrE.appendChild(aE);
+                aE.setAttribute("name", entry.getKey());
+                aE.setAttribute("value", String.valueOf(entry.getValue()));
+            }
+
+            FileWriter os = new FileWriter(file);
+            MXml.saveXml(rootE, os, true);
+            os.close();
+
+        } catch (Exception e) {
+            throw new MException(e);
+        }
+    }
+
+    @Override
+    public Trust getTrust(String trust) {
+        return findTrust(trust);
+    }
+
+    @Override
+    public ModifyTrustApi getModifyApi() {
+        return this;
+    }
 }

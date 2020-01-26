@@ -1,16 +1,14 @@
 /**
  * Copyright 2018 Mike Hummel
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * <p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * <p>http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
+ * <p>Unless required by applicable law or agreed to in writing, software distributed under the
+ * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
 package de.mhus.osgi.sop.jms.operation;
@@ -70,300 +68,326 @@ import de.mhus.osgi.sop.api.jms.TicketAccessInterceptor;
 import de.mhus.osgi.sop.api.operation.OperationApi;
 import de.mhus.osgi.sop.api.operation.OperationDescriptor;
 
-@Component(service=JmsDataChannel.class,immediate=true)
+@Component(service = JmsDataChannel.class, immediate = true)
 public class Jms2LocalOperationExecuteChannel extends AbstractJmsDataChannel {
 
-	public static CfgString CFG_QUEUE_NAME = new CfgString(Jms2LocalOperationExecuteChannel.class, "queue", "sop.operation." + M.l(ServerIdent.class));
-	private static CfgBoolean CFG_IS_ACCESS_CONTROL = new CfgBoolean(Jms2LocalOperationExecuteChannel.class, "accessControl", true);
-	private String ident = M.l(ServerIdent.class).getIdent();
+    public static CfgString CFG_QUEUE_NAME =
+            new CfgString(
+                    Jms2LocalOperationExecuteChannel.class,
+                    "queue",
+                    "sop.operation." + M.l(ServerIdent.class));
+    private static CfgBoolean CFG_IS_ACCESS_CONTROL =
+            new CfgBoolean(Jms2LocalOperationExecuteChannel.class, "accessControl", true);
+    private String ident = M.l(ServerIdent.class).getIdent();
 
-	static Jms2LocalOperationExecuteChannel instance;
-	private JmsApi jmsApi;
-	
-	@Activate
-	public void doActivate(ComponentContext ctx) {
-		instance = this;
-	}	
-	
-	@Deactivate
-	public void doDeactivate(ComponentContext ctx) {
-		instance = null;
-	}
+    static Jms2LocalOperationExecuteChannel instance;
+    private JmsApi jmsApi;
 
-	@Override
+    @Activate
+    public void doActivate(ComponentContext ctx) {
+        instance = this;
+    }
+
+    @Deactivate
+    public void doDeactivate(ComponentContext ctx) {
+        instance = null;
+    }
+
+    @Override
     protected JmsChannel createChannel() throws JMSException {
-	    
+
         name = getServiceName();
-        ServerJms out = new ServerJms(new JmsDestination(getQueueName(), false)) {
-            
-            @Override
-            public void receivedOneWay(Message msg) throws JMSException {
-                Jms2LocalOperationExecuteChannel.this.received(msg);
+        ServerJms out =
+                new ServerJms(new JmsDestination(getQueueName(), false)) {
+
+                    @Override
+                    public void receivedOneWay(Message msg) throws JMSException {
+                        Jms2LocalOperationExecuteChannel.this.received(msg);
+                    }
+
+                    @Override
+                    public Message received(Message msg) throws JMSException {
+                        return Jms2LocalOperationExecuteChannel.this.received(msg);
+                    }
+                };
+
+        if (out != null && CFG_IS_ACCESS_CONTROL.value())
+            ((ServerJms) out).setInterceptorIn(new TicketAccessInterceptor());
+        return out;
+    }
+
+    protected String getQueueName() {
+        return CFG_QUEUE_NAME.value();
+    }
+
+    @Reference
+    public void setJmsApi(JmsApi api) {
+        this.jmsApi = api;
+    }
+
+    protected String getJmsConnectionName() {
+        return jmsApi.getDefaultConnectionName();
+        // return "sop";
+    }
+
+    protected OperationResult doExecute(String path, VersionRange version, IProperties properties)
+            throws NotFoundException {
+
+        log().d("execute operation", path, properties);
+
+        OperationApi api = M.l(OperationApi.class);
+        OperationResult res =
+                api.doExecute(
+                        path,
+                        version,
+                        null,
+                        properties,
+                        OperationApi.LOCAL_ONLY,
+                        OperationApi.RAW_RESULT);
+
+        log().d("operation result", path, res, res == null ? "" : res.getResult());
+        return res;
+    }
+
+    protected List<String> getPublicOperations() {
+        LinkedList<String> out = new LinkedList<String>();
+        OperationApi admin = M.l(OperationApi.class);
+        for (OperationDescriptor desc : admin.findOperations("*", null, null)) {
+            if (!JmsOperationProvider.PROVIDER_NAME.equals(desc.getProvider())) {
+                try {
+                    out.add(desc.getPath() + ":" + desc.getVersionString());
+                } catch (Throwable t) {
+                    log().d(desc, t);
+                }
             }
-            
-            @Override
-            public Message received(Message msg) throws JMSException {
-                return Jms2LocalOperationExecuteChannel.this.received(msg);
+        }
+
+        return out;
+    }
+
+    protected OperationDescriptor getOperationDescription(String path, VersionRange version)
+            throws NotFoundException {
+        OperationApi admin = M.l(OperationApi.class);
+        OperationDescriptor desc = admin.findOperation(path, version, null);
+        if (desc == null) return null;
+        return desc;
+    }
+
+    @Override
+    public String getConnectionName() {
+        connectionName = jmsApi.getDefaultConnectionName();
+        return connectionName;
+    }
+
+    /** Receive operation calls and return the answer */
+    @SuppressWarnings("rawtypes")
+    protected Message received(Message msg) throws JMSException {
+
+        String path = msg.getStringProperty(Sop.PARAM_OPERATION_PATH);
+        if (path == null) return null;
+        String version = msg.getStringProperty(Sop.PARAM_OPERATION_VERSION);
+        IProperties properties = null;
+        if (msg instanceof MapMessage) {
+            properties = MJms.getMapProperties((MapMessage) msg);
+        } else if (msg instanceof ObjectMessage) {
+            Serializable obj = ((ObjectMessage) msg).getObject();
+            if (obj == null) {
+
+            } else if (obj instanceof MProperties) {
+                properties = (MProperties) obj;
+            } else if (obj instanceof Map) {
+                properties = new MProperties((Map) obj);
             }
-        };
-	    
-		if (out != null && CFG_IS_ACCESS_CONTROL.value())
-			((ServerJms)out).setInterceptorIn(new TicketAccessInterceptor());
-		return out;
-	}
-	
-	protected String getQueueName() {
-		return  CFG_QUEUE_NAME.value();
-	}
+        }
 
-	@Reference
-	public void setJmsApi(JmsApi api) {
-		this.jmsApi = api;
-	}
-	
-	protected String getJmsConnectionName() {
-		return jmsApi.getDefaultConnectionName();
-		//return "sop";
-	}
+        if (properties == null) properties = new MProperties(); // empty
 
-	protected OperationResult doExecute(String path, VersionRange version, IProperties properties) throws NotFoundException {
+        OperationResult res = null;
+        if (path.equals(Sop.OPERATION_LIST)) {
+            String list = MString.join(getPublicOperations().iterator(), ",");
+            res = new Successful(Sop.OPERATION_LIST, "list", OperationResult.OK, "list", list);
+        } else if (path.equals(Sop.OPERATION_INFO)) {
+            String id = properties.getString(Sop.PARAM_OPERATION_ID, null);
+            if (id == null)
+                res = new NotSuccessful(Sop.OPERATION_INFO, "not found", OperationResult.NOT_FOUND);
+            else {
+                try {
+                    OperationDescriptor des =
+                            getOperationDescription(
+                                    id, version == null ? null : new VersionRange(version));
+                    res =
+                            new Successful(
+                                    Sop.OPERATION_INFO,
+                                    "list",
+                                    OperationResult.OK,
+                                    "group",
+                                    des.getAddress().getGroup(),
+                                    "id",
+                                    des.getAddress().getName(),
+                                    "form",
+                                    des.getForm() == null ? "" : des.getForm().toString(),
+                                    "title",
+                                    des.getTitle());
+                } catch (NotFoundException nfe) {
+                    res =
+                            new NotSuccessful(
+                                    Sop.OPERATION_INFO, "not found", OperationResult.NOT_FOUND);
+                }
+            }
+        } else
+            try {
+                res =
+                        doExecute(
+                                path,
+                                version == null ? null : new VersionRange(version),
+                                properties);
+            } catch (NotFoundException nfe) {
+                res = new NotSuccessful(path, "not found", OperationResult.NOT_FOUND);
+            }
+        Message ret = null;
+        boolean consumed = false;
 
-		log().d("execute operation",path,properties);
-		
-		OperationApi api = M.l(OperationApi.class);
-		OperationResult res = api.doExecute(path, version, null, properties, OperationApi.LOCAL_ONLY, OperationApi.RAW_RESULT );
-		
-		log().d("operation result",path,res, res == null ? "" : res.getResult());
-		return res;
-	}
+        // check if map message is possible and create a result message if possible
+        if (res != null && res.getResult() != null && res.getResult() instanceof Map) {
+            // Map Message is allowed if all values are primitives. If not use object Message
+            consumed = true;
+            ret = getServer().createMapMessage();
+            ret.setStringProperty("_encoding", "map");
 
-	protected List<String> getPublicOperations() {
-		LinkedList<String> out = new LinkedList<String>();
-		OperationApi admin = M.l(OperationApi.class);
-		for (OperationDescriptor desc :  admin.findOperations("*", null, null)) {
-			if (!JmsOperationProvider.PROVIDER_NAME.equals(desc.getProvider())) {
-				try {
-					out.add(desc.getPath() + ":" + desc.getVersionString());
-				} catch (Throwable t) {
-					log().d(desc,t);
-				}
-			}
-		}
-			
-		return out;
-	}
+            Map<?, ?> map = (Map<?, ?>) res.getResult();
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                Object value = entry.getValue();
+                if (MJms.isMapProperty(value))
+                    MJms.setMapProperty(
+                            String.valueOf(entry.getKey()), entry.getValue(), (MapMessage) ret);
+                else {
+                    consumed = false;
+                    ret = null;
+                    break;
+                }
+            }
+        }
 
-	protected OperationDescriptor getOperationDescription(String path, VersionRange version) throws NotFoundException {
-		OperationApi admin = M.l(OperationApi.class);
-		OperationDescriptor desc = admin.findOperation(path, version, null);
-		if (desc == null) return null;
-		return desc;
-	}
-
-	@Override
-	public String getConnectionName() {
-		connectionName = jmsApi.getDefaultConnectionName();
-		return connectionName;
-	}
-
-	/**
-	 * Receive operation calls and return the answer
-	 */
-	    @SuppressWarnings("rawtypes")
-	    protected Message received(Message msg) throws JMSException {
-	        
-	        String path = msg.getStringProperty(Sop.PARAM_OPERATION_PATH);
-	        if (path == null) return null;
-	        String version = msg.getStringProperty(Sop.PARAM_OPERATION_VERSION);
-	        IProperties properties = null;
-	        if (msg instanceof MapMessage) {
-	            properties = MJms.getMapProperties((MapMessage)msg);
-	        } else
-	        if (msg instanceof ObjectMessage) {
-	            Serializable obj = ((ObjectMessage)msg).getObject();
-	            if (obj == null) {
-	                
-	            } else
-	            if (obj instanceof MProperties) {
-	                properties = (MProperties)obj;
-	            } else
-	            if (obj instanceof Map) {
-	                properties = new MProperties( (Map)obj );
-	            }
-	        }
-	        
-	        if (properties == null)
-	            properties = new MProperties(); // empty
-	        
-	        OperationResult res = null;
-	        if (path.equals(Sop.OPERATION_LIST)) {
-	            String list = MString.join(getPublicOperations().iterator(), ",");
-	            res = new Successful(Sop.OPERATION_LIST, "list",OperationResult.OK,"list",list);
-	        } else
-	        if (path.equals(Sop.OPERATION_INFO)) {
-	            String id = properties.getString(Sop.PARAM_OPERATION_ID, null);
-	            if (id == null) 
-	                res = new NotSuccessful(Sop.OPERATION_INFO, "not found", OperationResult.NOT_FOUND);
-	            else {
-	                try {
-	                    OperationDescriptor des = getOperationDescription(id, version == null ? null : new VersionRange(version));
-	                    res = new Successful(Sop.OPERATION_INFO, "list",OperationResult.OK,
-	                            "group",des.getAddress().getGroup(),
-	                            "id",des.getAddress().getName(),
-	                            "form",des.getForm() == null ? "" : des.getForm().toString(),
-	                            "title",des.getTitle()
-	                            );
-	                } catch (NotFoundException nfe) {
-	                    res = new NotSuccessful(Sop.OPERATION_INFO, "not found", OperationResult.NOT_FOUND);
-	                }
-	            }
-	        } else
-	            try {
-	                res = doExecute(path, version == null ? null : new VersionRange(version), properties);
-	            } catch (NotFoundException nfe) {
-	                res = new NotSuccessful(path, "not found", OperationResult.NOT_FOUND);
-	            }
-	        Message ret = null;
-	        boolean consumed = false;
-	        
-	        // check if map message is possible and create a result message if possible
-	        if (res != null && res.getResult() != null && res.getResult() instanceof Map) {
-	            // Map Message is allowed if all values are primitives. If not use object Message
-	            consumed = true;
-	            ret = getServer().createMapMessage();
-	            ret.setStringProperty("_encoding", "map");
-	            
-	            Map<?,?> map = (Map<?,?>)res.getResult();
-	            for (Map.Entry<?,?> entry : map.entrySet()) {
-	                Object value = entry.getValue();
-	                if (MJms.isMapProperty(value))
-                        MJms.setMapProperty(String.valueOf(entry.getKey()), entry.getValue(), (MapMessage)ret );
-	                else {
-	                    consumed = false;
-	                    ret = null;
-	                    break;
-	                }
-	            }
-	        }
-	        
-	        // create result message and fill with result data from operation
-	        if (consumed) {
-	            // already done
-	        } else
-            if (res != null && res.getResult() != null) {
-                if (res.getResult() instanceof SerializedValue) {
-                    ret = getServer().createObjectMessage();
-                    ret.setStringProperty("_encoding", "serialized");
-                    ((ObjectMessage)ret).setObject( ((SerializedValue)res.getResult()).getValue() );
-                } else
-                if (res.getResult() instanceof MapValue) {
-                    ret = getServer().createMapMessage();
-                    ret.setStringProperty("_encoding", "mapvalue");
-                    MJms.setMapProperties((Map<?, ?>)((MapValue)res.getResult()).getValue(), (MapMessage)ret);
-                } else
-                if (res.getResult() instanceof InputStream) {
-                    ret = getServer().createBytesMessage();
-                    ret.setStringProperty("_encoding", "stream");
-                    try (InputStream is = (InputStream)res.getResult()) {
+        // create result message and fill with result data from operation
+        if (consumed) {
+            // already done
+        } else if (res != null && res.getResult() != null) {
+            if (res.getResult() instanceof SerializedValue) {
+                ret = getServer().createObjectMessage();
+                ret.setStringProperty("_encoding", "serialized");
+                ((ObjectMessage) ret).setObject(((SerializedValue) res.getResult()).getValue());
+            } else if (res.getResult() instanceof MapValue) {
+                ret = getServer().createMapMessage();
+                ret.setStringProperty("_encoding", "mapvalue");
+                MJms.setMapProperties(
+                        (Map<?, ?>) ((MapValue) res.getResult()).getValue(), (MapMessage) ret);
+            } else if (res.getResult() instanceof InputStream) {
+                ret = getServer().createBytesMessage();
+                ret.setStringProperty("_encoding", "stream");
+                try (InputStream is = (InputStream) res.getResult()) {
+                    byte[] buffer = new byte[1024 * 10];
+                    while (true) {
+                        int size = is.read(buffer);
+                        if (size == -1) break;
+                        if (size == 0) MThread.sleep(200);
+                        else {
+                            ((BytesMessage) ret).writeBytes(buffer, 0, size);
+                        }
+                    }
+                } catch (IOException e) {
+                    throw new JMSException(e.toString());
+                }
+            } else if (res.getResult() instanceof File) {
+                ret = getServer().createBytesMessage();
+                ret.setStringProperty("_encoding", "file");
+                ret.setStringProperty("_file", ((File) res.getResult()).getName());
+                try {
+                    File f = (File) res.getResult();
+                    try (FileInputStream is = new FileInputStream(f)) {
                         byte[] buffer = new byte[1024 * 10];
                         while (true) {
                             int size = is.read(buffer);
                             if (size == -1) break;
-                            if (size == 0)
-                                MThread.sleep(200);
+                            if (size == 0) MThread.sleep(200);
                             else {
-                                ((BytesMessage)ret).writeBytes(buffer, 0, size);
+                                ((BytesMessage) ret).writeBytes(buffer, 0, size);
                             }
                         }
-                    } catch (IOException e) {
-                        throw new JMSException(e.toString());
                     }
-                } else
-                if (res.getResult() instanceof File) {
-                    ret = getServer().createBytesMessage();
-                    ret.setStringProperty("_encoding", "file");
-                    ret.setStringProperty("_file", ((File)res.getResult()).getName() );
-                    try {
-                        File f = (File)res.getResult();
-                        try (FileInputStream is = new FileInputStream(f)) {
-                            byte[] buffer = new byte[1024 * 10];
-                            while (true) {
-                                int size = is.read(buffer);
-                                if (size == -1) break;
-                                if (size == 0)
-                                    MThread.sleep(200);
-                                else {
-                                    ((BytesMessage)ret).writeBytes(buffer, 0, size);
-                                }
-                            }
-                        }
-                    } catch (IOException e) {
-                        throw new JMSException(e.toString());
-                    }
-                } else
-                if (res.getResult() instanceof byte[]) {
-                    ret = getServer().createBytesMessage();
-                    ret.setStringProperty("_encoding", "byte[]");
-                    ((BytesMessage)ret).writeBytes((byte[])res.getResult());
-                } else
-                if (res.getResult() instanceof Serializable ) {
-                    ret = getServer().createObjectMessage();
-                    ret.setStringProperty("_encoding", "serialized");
-                    ((ObjectMessage)ret).setObject((Serializable) res.getResult());
-                } else {
-                    ret = getServer().createMapMessage();
-                    ret.setStringProperty("_encoding", "pojo");
-                    try {
-                        IProperties prop = MPojo.pojoToProperties(res.getResult(), new PojoModelFactory() {
-                            
-                            @Override
-                            public PojoModel createPojoModel(Class<?> pojoClass) {
-                                PojoModel model = new PojoParser().parse(pojoClass,"_",null).filter(new DefaultFilter(true, false, false, false, true) ).getModel();
-                                return model;
-                            }
-                        } );
-                        MJms.setMapProperties(prop, (MapMessage)ret);
-                    } catch (IOException e) {
-                        log().w(path,res,e);
-                        ret.setStringProperty("_error", e.getMessage());
-                    }
+                } catch (IOException e) {
+                    throw new JMSException(e.toString());
                 }
+            } else if (res.getResult() instanceof byte[]) {
+                ret = getServer().createBytesMessage();
+                ret.setStringProperty("_encoding", "byte[]");
+                ((BytesMessage) ret).writeBytes((byte[]) res.getResult());
+            } else if (res.getResult() instanceof Serializable) {
+                ret = getServer().createObjectMessage();
+                ret.setStringProperty("_encoding", "serialized");
+                ((ObjectMessage) ret).setObject((Serializable) res.getResult());
             } else {
-                ret = getServer().createTextMessage(null);
-                ret.setStringProperty("_encoding", "empty");
+                ret = getServer().createMapMessage();
+                ret.setStringProperty("_encoding", "pojo");
+                try {
+                    IProperties prop =
+                            MPojo.pojoToProperties(
+                                    res.getResult(),
+                                    new PojoModelFactory() {
+
+                                        @Override
+                                        public PojoModel createPojoModel(Class<?> pojoClass) {
+                                            PojoModel model =
+                                                    new PojoParser()
+                                                            .parse(pojoClass, "_", null)
+                                                            .filter(
+                                                                    new DefaultFilter(
+                                                                            true, false, false,
+                                                                            false, true))
+                                                            .getModel();
+                                            return model;
+                                        }
+                                    });
+                    MJms.setMapProperties(prop, (MapMessage) ret);
+                } catch (IOException e) {
+                    log().w(path, res, e);
+                    ret.setStringProperty("_error", e.getMessage());
+                }
             }
+        } else {
+            ret = getServer().createTextMessage(null);
+            ret.setStringProperty("_encoding", "empty");
+        }
 
-	        // fill metadata of result message
-	        if (res == null) {
-	            ret.setLongProperty("rc", OperationResult.INTERNAL_ERROR);
-	            ret.setStringProperty("msg", "null");
-	            ret.setBooleanProperty("successful", false);
-	        } else {
-	            ret.setLongProperty("rc", res.getReturnCode());
-	            ret.setStringProperty("msg", res.getMsg());
-	            ret.setBooleanProperty("successful", res.isSuccessful());
-	            OperationDescription next = res.getNextOperation();
-	            if (next != null) {
-	                ret.setStringProperty("next.path", next.getPath());
-	                MProperties prop = new MProperties(next.getParameters());
-	                MJms.setProperties("next.p.", prop, ret);
-	            }
-	        }
-	        ret.setStringProperty("path", path);
-	        ret.setStringProperty("source", ident);
-            ret.setStringProperty("host", MSystem.getHostname());
-            ret.setStringProperty("reply_source", msg.getStringProperty("source"));
-            ret.setStringProperty("reply_host", msg.getStringProperty("host"));
+        // fill metadata of result message
+        if (res == null) {
+            ret.setLongProperty("rc", OperationResult.INTERNAL_ERROR);
+            ret.setStringProperty("msg", "null");
+            ret.setBooleanProperty("successful", false);
+        } else {
+            ret.setLongProperty("rc", res.getReturnCode());
+            ret.setStringProperty("msg", res.getMsg());
+            ret.setBooleanProperty("successful", res.isSuccessful());
+            OperationDescription next = res.getNextOperation();
+            if (next != null) {
+                ret.setStringProperty("next.path", next.getPath());
+                MProperties prop = new MProperties(next.getParameters());
+                MJms.setProperties("next.p.", prop, ret);
+            }
+        }
+        ret.setStringProperty("path", path);
+        ret.setStringProperty("source", ident);
+        ret.setStringProperty("host", MSystem.getHostname());
+        ret.setStringProperty("reply_source", msg.getStringProperty("source"));
+        ret.setStringProperty("reply_host", msg.getStringProperty("host"));
 
-	        return ret;
-	    }
-	    
-	    protected String getServiceName() {
-	        return getClass().getCanonicalName();
-	    }
+        return ret;
+    }
 
-	    protected ServerJms getServer() {
-	        return (ServerJms) getChannel();
-	    };
+    protected String getServiceName() {
+        return getClass().getCanonicalName();
+    }
 
+    protected ServerJms getServer() {
+        return (ServerJms) getChannel();
+    };
 }

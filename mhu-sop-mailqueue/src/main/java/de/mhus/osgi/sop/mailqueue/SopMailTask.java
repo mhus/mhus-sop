@@ -1,16 +1,14 @@
 /**
  * Copyright 2018 Mike Hummel
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * <p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * <p>http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
+ * <p>Unless required by applicable law or agreed to in writing, software distributed under the
+ * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
 package de.mhus.osgi.sop.mailqueue;
@@ -31,123 +29,120 @@ import de.mhus.osgi.sop.api.mailqueue.MailQueueOperation;
 @GenerateConst
 public class SopMailTask extends DbMetadata {
 
-	@DbPersistent
-	private String source;
-	@DbPersistent
-	private String from;
-	@DbPersistent
-	private String to;
-	@DbPersistent
-	private String cc;
-	@DbPersistent
-	private String bcc;
-	@DbPersistent
-	private String subject;
-	@DbPersistent
-	private MailQueueOperation.STATUS status = MailQueueOperation.STATUS.NEW;
-	@DbPersistent
-	private Date lastSendAttempt;
-	@DbPersistent
-	private Date nextSendAttempt = new Date();
-	@DbPersistent (type=DbType.TYPE.STRING, size=700)
-	private String lastError;
-	@DbPersistent
-	private int sendAttempts = 0;
-	@DbPersistent
-	private MProperties properties;
+    @DbPersistent private String source;
+    @DbPersistent private String from;
+    @DbPersistent private String to;
+    @DbPersistent private String cc;
+    @DbPersistent private String bcc;
+    @DbPersistent private String subject;
+    @DbPersistent private MailQueueOperation.STATUS status = MailQueueOperation.STATUS.NEW;
+    @DbPersistent private Date lastSendAttempt;
+    @DbPersistent private Date nextSendAttempt = new Date();
 
-	public SopMailTask() {}
-	
-	public SopMailTask(MailMessage mail) {
-		this(mail.getSource(), mail.getFrom(), mail.getTo(), mail.getCc(), mail.getBcc(), mail.getSubject());
-	}
-	
-	public SopMailTask(String source, String from, String to, String cc, String bcc, String subject) {
-		this.source = source;
-		this.from = from;
-		this.to = to;
-		this.cc = cc;
-		this.bcc = bcc;
-		this.subject = M.trunc(subject, 200);
-		this.properties = new MProperties();
-	}
+    @DbPersistent(type = DbType.TYPE.STRING, size = 700)
+    private String lastError;
 
-	@Override
-	public DbMetadata findParentObject() throws MException {
-		return null;
-	}
+    @DbPersistent private int sendAttempts = 0;
+    @DbPersistent private MProperties properties;
 
-	public MailQueueOperation.STATUS getStatus() {
-		return status;
-	}
+    public SopMailTask() {}
 
-	public void setStatus(MailQueueOperation.STATUS status) {
-		this.status = status;
-	}
+    public SopMailTask(MailMessage mail) {
+        this(
+                mail.getSource(),
+                mail.getFrom(),
+                mail.getTo(),
+                mail.getCc(),
+                mail.getBcc(),
+                mail.getSubject());
+    }
 
-	public Date getLastSendAttempt() {
-		return lastSendAttempt;
-	}
+    public SopMailTask(
+            String source, String from, String to, String cc, String bcc, String subject) {
+        this.source = source;
+        this.from = from;
+        this.to = to;
+        this.cc = cc;
+        this.bcc = bcc;
+        this.subject = M.trunc(subject, 200);
+        this.properties = new MProperties();
+    }
 
-	public void setLastSendAttempt(Date lastSendAttempt) {
-		this.lastSendAttempt = lastSendAttempt;
-	}
+    @Override
+    public DbMetadata findParentObject() throws MException {
+        return null;
+    }
 
-	public Date getNextSendAttempt() {
-		return nextSendAttempt;
-	}
+    public MailQueueOperation.STATUS getStatus() {
+        return status;
+    }
 
-	public void setNextSendAttempt(Date nextSendAttempt) {
-		this.nextSendAttempt = nextSendAttempt;
-	}
+    public void setStatus(MailQueueOperation.STATUS status) {
+        this.status = status;
+    }
 
-	public String getLastError() {
-		return lastError;
-	}
+    public Date getLastSendAttempt() {
+        return lastSendAttempt;
+    }
 
-	public void setLastError(String lastError) {
-		this.lastError = M.trunc(lastError, 700);
-	}
+    public void setLastSendAttempt(Date lastSendAttempt) {
+        this.lastSendAttempt = lastSendAttempt;
+    }
 
-	public String getFrom() {
-		return from;
-	}
+    public Date getNextSendAttempt() {
+        return nextSendAttempt;
+    }
 
-	public String getTo() {
-		return to;
-	}
+    public void setNextSendAttempt(Date nextSendAttempt) {
+        this.nextSendAttempt = nextSendAttempt;
+    }
 
-	public String getCc() {
-		return cc;
-	}
+    public String getLastError() {
+        return lastError;
+    }
 
-	public String getBcc() {
-		return bcc;
-	}
+    public void setLastError(String lastError) {
+        this.lastError = M.trunc(lastError, 700);
+    }
 
-	public String getSubject() {
-		return subject;
-	}
+    public String getFrom() {
+        return from;
+    }
 
-	public int getSendAttempts() {
-		return sendAttempts;
-	}
+    public String getTo() {
+        return to;
+    }
 
-	public void setSendAttempts(int sendAttempts) {
-		this.sendAttempts = sendAttempts;
-	}
+    public String getCc() {
+        return cc;
+    }
 
-	public String getSource() {
-		return source;
-	}
+    public String getBcc() {
+        return bcc;
+    }
 
-	@Override
-	public String toString() {
-		return MSystem.toString(this, getId(), source, to, subject);
-	}
+    public String getSubject() {
+        return subject;
+    }
 
-	public MProperties getProperties() {
-		return properties;
-	}
-	
+    public int getSendAttempts() {
+        return sendAttempts;
+    }
+
+    public void setSendAttempts(int sendAttempts) {
+        this.sendAttempts = sendAttempts;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    @Override
+    public String toString() {
+        return MSystem.toString(this, getId(), source, to, subject);
+    }
+
+    public MProperties getProperties() {
+        return properties;
+    }
 }

@@ -23,5 +23,4 @@ public abstract class SchedulerClusterServiceAdapter extends SchedulerServiceAda
     protected void setStack(boolean service) {
         this.service = service;
     }
-
 }

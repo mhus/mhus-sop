@@ -1,16 +1,14 @@
 /**
  * Copyright 2018 Mike Hummel
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * <p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * <p>http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
+ * <p>Unless required by applicable law or agreed to in writing, software distributed under the
+ * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
 package de.mhus.osgi.sop.impl.operation;
@@ -52,249 +50,274 @@ import de.mhus.osgi.sop.api.operation.OperationUtil;
 import de.mhus.osgi.sop.api.operation.OperationsProvider;
 import de.mhus.osgi.sop.api.util.SopUtil;
 
-@Component(immediate=true,service=OperationsProvider.class,property="provider=local")
+@Component(immediate = true, service = OperationsProvider.class, property = "provider=local")
 public class LocalOperationsProvider extends MLog implements OperationsProvider {
 
-	static final String PROVIDER_NAME = "local";
+    static final String PROVIDER_NAME = "local";
 
-	private BundleContext context;
-	private ServiceTracker<Operation,Operation> nodeTracker;
-	private HashMap<UUID, LocalOperationDescriptor> register = new HashMap<>();
-	public static LocalOperationsProvider instance;
+    private BundleContext context;
+    private ServiceTracker<Operation, Operation> nodeTracker;
+    private HashMap<UUID, LocalOperationDescriptor> register = new HashMap<>();
+    public static LocalOperationsProvider instance;
 
-	@Activate
-	public void doActivate(ComponentContext ctx) {
-		context = ctx.getBundleContext();
-		nodeTracker = new ServiceTracker<>(context, Operation.class, new MyServiceTrackerCustomizer() );
-		nodeTracker.open(true);
-		instance = this;
-	}
+    @Activate
+    public void doActivate(ComponentContext ctx) {
+        context = ctx.getBundleContext();
+        nodeTracker =
+                new ServiceTracker<>(context, Operation.class, new MyServiceTrackerCustomizer());
+        nodeTracker.open(true);
+        instance = this;
+    }
 
-	@Deactivate
-	public void doDeactivate(ComponentContext ctx) {
-		instance  = null;
-		context = null;
-	}
+    @Deactivate
+    public void doDeactivate(ComponentContext ctx) {
+        instance = null;
+        context = null;
+    }
 
-	@Reference(cardinality=ReferenceCardinality.OPTIONAL)
-	public void getAccessApi(AccessApi api) {}
-	
-	private class MyServiceTrackerCustomizer implements ServiceTrackerCustomizer<Operation,Operation> {
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL)
+    public void getAccessApi(AccessApi api) {}
 
-		@Override
-		public Operation addingService(
-				ServiceReference<Operation> reference) {
+    private class MyServiceTrackerCustomizer
+            implements ServiceTrackerCustomizer<Operation, Operation> {
 
-			Operation service = context.getService(reference);
-			if (service != null) {
-				OperationDescription desc = service.getDescription();
-				if (desc != null && desc.getPath() != null) {
-					log().i("register",desc);
-					synchronized (register) {
-						LocalOperationDescriptor descriptor = createDescriptor(reference, service);
-						if (register.put(desc.getUuid(), descriptor ) != null)
-							log().w("Operation already defined",desc.getPath());
-					}
-				} else {
-					log().w("no description found, not registered",reference.getProperty("objectClass"));
-				}
-			}
-			return service;
-		}
+        @Override
+        public Operation addingService(ServiceReference<Operation> reference) {
 
-		private LocalOperationDescriptor createDescriptor(ServiceReference<Operation> reference, Operation service) {
-			TreeSet<String> tags = new TreeSet<>();
-			Object tagsStr = reference.getProperty("tags");
-			if (tagsStr instanceof String[]) {
-				for (String item : (String[])tagsStr)
-					tags.add(item);
-			} else
-			if (tagsStr instanceof String) {
-				for (String item : ((String)tagsStr).split(";"))
-					tags.add(item);
-			}
-			service.getDescription().getForm();
-			OperationDescription desc = service.getDescription();
-			
-			Object tagsStr2 = desc.getParameters() == null ? null : desc.getParameters().get(OperationDescription.TAGS);
-			if (tagsStr2 != null)
-				for (String item : String.valueOf(tagsStr2).split(";"))
-					tags.add(item);
-			
-			tags.add(OperationDescriptor.TAG_IDENT + "=" + SopUtil.getServerIdent());
-			tags.add(OperationDescriptor.TAG_HOST + "=localhost");
+            Operation service = context.getService(reference);
+            if (service != null) {
+                OperationDescription desc = service.getDescription();
+                if (desc != null && desc.getPath() != null) {
+                    log().i("register", desc);
+                    synchronized (register) {
+                        LocalOperationDescriptor descriptor = createDescriptor(reference, service);
+                        if (register.put(desc.getUuid(), descriptor) != null)
+                            log().w("Operation already defined", desc.getPath());
+                    }
+                } else {
+                    log().w(
+                                    "no description found, not registered",
+                                    reference.getProperty("objectClass"));
+                }
+            }
+            return service;
+        }
+
+        private LocalOperationDescriptor createDescriptor(
+                ServiceReference<Operation> reference, Operation service) {
+            TreeSet<String> tags = new TreeSet<>();
+            Object tagsStr = reference.getProperty("tags");
+            if (tagsStr instanceof String[]) {
+                for (String item : (String[]) tagsStr) tags.add(item);
+            } else if (tagsStr instanceof String) {
+                for (String item : ((String) tagsStr).split(";")) tags.add(item);
+            }
+            service.getDescription().getForm();
+            OperationDescription desc = service.getDescription();
+
+            Object tagsStr2 =
+                    desc.getParameters() == null
+                            ? null
+                            : desc.getParameters().get(OperationDescription.TAGS);
+            if (tagsStr2 != null)
+                for (String item : String.valueOf(tagsStr2).split(";")) tags.add(item);
+
+            tags.add(OperationDescriptor.TAG_IDENT + "=" + SopUtil.getServerIdent());
+            tags.add(OperationDescriptor.TAG_HOST + "=localhost");
             tags.add(OperationDescription.TAG_TECH + "=" + OperationDescription.TECH_JAVA);
-			
-			String acl = OperationUtil.getOption(tags, OperationDescriptor.TAG_DEFAULT_ACL, "");
-			try {
-				AccessApi aaa = M.l(AccessApi.class);
-				if (aaa != null)
-					acl = aaa.getResourceAccessAcl(aaa.getCurrentAccount(), "local.operation", desc.getPath(), "execute", acl);
-				else
-					log().w("AccessApi not found",desc,acl);
-			} catch (Throwable t) {
-				log().e(t);
-			}
-			return new LocalOperationDescriptor(service.getUuid(), OperationAddress.create(PROVIDER_NAME,desc), desc,tags, acl, service);
-		}
 
-		@Override
-		public void modifiedService(
-				ServiceReference<Operation> reference,
-				Operation service) {
+            String acl = OperationUtil.getOption(tags, OperationDescriptor.TAG_DEFAULT_ACL, "");
+            try {
+                AccessApi aaa = M.l(AccessApi.class);
+                if (aaa != null)
+                    acl =
+                            aaa.getResourceAccessAcl(
+                                    aaa.getCurrentAccount(),
+                                    "local.operation",
+                                    desc.getPath(),
+                                    "execute",
+                                    acl);
+                else log().w("AccessApi not found", desc, acl);
+            } catch (Throwable t) {
+                log().e(t);
+            }
+            return new LocalOperationDescriptor(
+                    service.getUuid(),
+                    OperationAddress.create(PROVIDER_NAME, desc),
+                    desc,
+                    tags,
+                    acl,
+                    service);
+        }
 
-			if (service != null) {
-				OperationDescription desc = service.getDescription();
-				if (desc != null && desc.getPath() != null) {
-					log().i("modified",desc);
-					synchronized (register) {
-						LocalOperationDescriptor descriptor = createDescriptor(reference, service);
-						register.put(desc.getUuid(), descriptor);
-					}
-				}
-			}
-			
-		}
+        @Override
+        public void modifiedService(ServiceReference<Operation> reference, Operation service) {
 
-		@Override
-		public void removedService(
-				ServiceReference<Operation> reference,
-				Operation service) {
-			
-			if (service != null) {
-				OperationDescription desc = service.getDescription();
-				if (desc != null && desc.getPath() != null) {
-					log().i("unregister",desc);
-					synchronized (register) {
-						register.remove(desc.getUuid());
-					}
-				}
-			}			
-		}
-		
-	}
+            if (service != null) {
+                OperationDescription desc = service.getDescription();
+                if (desc != null && desc.getPath() != null) {
+                    log().i("modified", desc);
+                    synchronized (register) {
+                        LocalOperationDescriptor descriptor = createDescriptor(reference, service);
+                        register.put(desc.getUuid(), descriptor);
+                    }
+                }
+            }
+        }
 
-	@Override
-	public void collectOperations(List<OperationDescriptor> list, String filter, VersionRange version, Collection<String> providedTags) {
-		synchronized (register) {
-			for (OperationDescriptor desc : register.values()) {
-				if (OperationUtil.matches(desc, filter, version, providedTags))
-					list.add(desc);
-			}
-		}
-	}
+        @Override
+        public void removedService(ServiceReference<Operation> reference, Operation service) {
 
-	@Override
-	public OperationResult doExecute(String filter, VersionRange version, Collection<String> providedTags, IProperties properties, String ... executeOptions)
-			throws NotFoundException {
-		OperationDescriptor d = null;
-		synchronized (register) {
-			for (OperationDescriptor desc : register.values()) {
-				if (OperationUtil.matches(desc, filter, version, providedTags)) {
-						d = desc;
-						break;
-				}
-			}
-		}
-		if (d == null) throw new NotFoundException("operation not found",filter,version,providedTags);
-		return doExecute(d, properties);
-	}
+            if (service != null) {
+                OperationDescription desc = service.getDescription();
+                if (desc != null && desc.getPath() != null) {
+                    log().i("unregister", desc);
+                    synchronized (register) {
+                        register.remove(desc.getUuid());
+                    }
+                }
+            }
+        }
+    }
 
-	@Override
-	public OperationResult doExecute(OperationDescriptor desc, IProperties properties, String ... executeOptions) throws NotFoundException {
-		Operation operation = null;
-		if (desc instanceof LocalOperationDescriptor) {
-			operation = ((LocalOperationDescriptor)desc).operation;
-		}
-		if (operation == null) {
-			if (!PROVIDER_NAME.equals(desc.getProvider()))
-				throw new NotFoundException("description is from another provider",desc);
-			synchronized (register) {
-				LocalOperationDescriptor local = findOperation(desc);
-				if (local != null)
-					operation = local.operation;
-			}
-		}
-		if (operation == null)
-			throw new NotFoundException("operation not found", desc);
-		
-		AccessApi aaa = M.l(AccessApi.class);
-		if (aaa != null) {
-			try {
-				String acl = OperationUtil.getOption(desc.getTags(), OperationDescriptor.TAG_DEFAULT_ACL, "");
-				if (!aaa.hasResourceAccess(aaa.getCurrentAccount(), "local.operation", desc.getPath(), "execute", acl))
-					throw new AccessDeniedException("access denied",desc.getPath());
-			} catch (AccessDeniedException e) {
-				throw e;
-			} catch (Throwable t) {
-				throw new AccessDeniedException("internal error", t);
-			}
-		} else
-			throw new AccessDeniedException("Access api not found");
-		
-		DefaultTaskContext taskContext = new DefaultTaskContext(getClass());
-		taskContext.setParameters(properties);
-		try {
-			OperationResult res = operation.doExecute(taskContext);
-			return res;
-		} catch (OperationException e) {
-			log().w(desc,properties,e);
-			return new NotSuccessful(operation,e.getMessage(), e.getCaption(), e.getReturnCode());
-		} catch (Exception e) {
-			log().w(desc,properties,e);
-			return new NotSuccessful(operation,e.toString(), OperationResult.INTERNAL_ERROR);
-		}
-	}
+    @Override
+    public void collectOperations(
+            List<OperationDescriptor> list,
+            String filter,
+            VersionRange version,
+            Collection<String> providedTags) {
+        synchronized (register) {
+            for (OperationDescriptor desc : register.values()) {
+                if (OperationUtil.matches(desc, filter, version, providedTags)) list.add(desc);
+            }
+        }
+    }
 
-	private LocalOperationDescriptor findOperation(OperationDescriptor desc) {
-		if (MValidator.isUUID(desc.getPath()))
-			return register.get(UUID.fromString(desc.getPath()));
-		
-		for (LocalOperationDescriptor value : register.values())
-			if (desc.getPath().equals(value.getPath()) && desc.getVersionString().equals(value.getVersionString())) {
-				return value;
-			}
-		return null;
-	}
-	private LocalOperationDescriptor findOperation(OperationAddress desc) {
-		for (LocalOperationDescriptor value : register.values())
-			if (value.operation.getUuid().toString().equals(desc.getPath()) || desc.getPath().equals(value.getPath()) && desc.getVersionString().equals(value.getVersionString())) {
-				return value;
-			}
-		return null;
-	}
+    @Override
+    public OperationResult doExecute(
+            String filter,
+            VersionRange version,
+            Collection<String> providedTags,
+            IProperties properties,
+            String... executeOptions)
+            throws NotFoundException {
+        OperationDescriptor d = null;
+        synchronized (register) {
+            for (OperationDescriptor desc : register.values()) {
+                if (OperationUtil.matches(desc, filter, version, providedTags)) {
+                    d = desc;
+                    break;
+                }
+            }
+        }
+        if (d == null)
+            throw new NotFoundException("operation not found", filter, version, providedTags);
+        return doExecute(d, properties);
+    }
 
-	private class LocalOperationDescriptor extends OperationDescriptor {
+    @Override
+    public OperationResult doExecute(
+            OperationDescriptor desc, IProperties properties, String... executeOptions)
+            throws NotFoundException {
+        Operation operation = null;
+        if (desc instanceof LocalOperationDescriptor) {
+            operation = ((LocalOperationDescriptor) desc).operation;
+        }
+        if (operation == null) {
+            if (!PROVIDER_NAME.equals(desc.getProvider()))
+                throw new NotFoundException("description is from another provider", desc);
+            synchronized (register) {
+                LocalOperationDescriptor local = findOperation(desc);
+                if (local != null) operation = local.operation;
+            }
+        }
+        if (operation == null) throw new NotFoundException("operation not found", desc);
 
-		private Operation operation;
+        AccessApi aaa = M.l(AccessApi.class);
+        if (aaa != null) {
+            try {
+                String acl =
+                        OperationUtil.getOption(
+                                desc.getTags(), OperationDescriptor.TAG_DEFAULT_ACL, "");
+                if (!aaa.hasResourceAccess(
+                        aaa.getCurrentAccount(), "local.operation", desc.getPath(), "execute", acl))
+                    throw new AccessDeniedException("access denied", desc.getPath());
+            } catch (AccessDeniedException e) {
+                throw e;
+            } catch (Throwable t) {
+                throw new AccessDeniedException("internal error", t);
+            }
+        } else throw new AccessDeniedException("Access api not found");
 
-		public LocalOperationDescriptor(UUID uuid, OperationAddress address, OperationDescription description,
-				Collection<String> tags, String acl, Operation operation) {
-			super(uuid, address, description, tags, acl);
-			this.operation = operation;
-		}
-		
-		@Override
-		@SuppressWarnings("unchecked")
-		public <T> T adaptTo(Class<T> ifc) {
-			if (ifc == Operation.class) return (T) operation;
-			return super.adaptTo(ifc);
-		}
-		
-	}
+        DefaultTaskContext taskContext = new DefaultTaskContext(getClass());
+        taskContext.setParameters(properties);
+        try {
+            OperationResult res = operation.doExecute(taskContext);
+            return res;
+        } catch (OperationException e) {
+            log().w(desc, properties, e);
+            return new NotSuccessful(operation, e.getMessage(), e.getCaption(), e.getReturnCode());
+        } catch (Exception e) {
+            log().w(desc, properties, e);
+            return new NotSuccessful(operation, e.toString(), OperationResult.INTERNAL_ERROR);
+        }
+    }
 
-	@Override
-	public OperationDescriptor getOperation(OperationAddress addr) throws NotFoundException {
-		synchronized (register) {
-			LocalOperationDescriptor ret = findOperation(addr);
-			if (ret == null) throw new NotFoundException("operation not found", addr);
-			return ret;
-		}
-	}
+    private LocalOperationDescriptor findOperation(OperationDescriptor desc) {
+        if (MValidator.isUUID(desc.getPath())) return register.get(UUID.fromString(desc.getPath()));
 
-	@Override
-	public void synchronize() {
-		// already up to date
-	}
-	
+        for (LocalOperationDescriptor value : register.values())
+            if (desc.getPath().equals(value.getPath())
+                    && desc.getVersionString().equals(value.getVersionString())) {
+                return value;
+            }
+        return null;
+    }
+
+    private LocalOperationDescriptor findOperation(OperationAddress desc) {
+        for (LocalOperationDescriptor value : register.values())
+            if (value.operation.getUuid().toString().equals(desc.getPath())
+                    || desc.getPath().equals(value.getPath())
+                            && desc.getVersionString().equals(value.getVersionString())) {
+                return value;
+            }
+        return null;
+    }
+
+    private class LocalOperationDescriptor extends OperationDescriptor {
+
+        private Operation operation;
+
+        public LocalOperationDescriptor(
+                UUID uuid,
+                OperationAddress address,
+                OperationDescription description,
+                Collection<String> tags,
+                String acl,
+                Operation operation) {
+            super(uuid, address, description, tags, acl);
+            this.operation = operation;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public <T> T adaptTo(Class<T> ifc) {
+            if (ifc == Operation.class) return (T) operation;
+            return super.adaptTo(ifc);
+        }
+    }
+
+    @Override
+    public OperationDescriptor getOperation(OperationAddress addr) throws NotFoundException {
+        synchronized (register) {
+            LocalOperationDescriptor ret = findOperation(addr);
+            if (ret == null) throw new NotFoundException("operation not found", addr);
+            return ret;
+        }
+    }
+
+    @Override
+    public void synchronize() {
+        // already up to date
+    }
 }

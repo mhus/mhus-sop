@@ -22,15 +22,17 @@ import de.mhus.osgi.sop.api.cluster.LockListener;
 import de.mhus.osgi.sop.api.cluster.ValueListener;
 import de.mhus.osgi.sop.api.registry.RegistryUtil;
 
-@Component(immediate=true)
+@Component(immediate = true)
 public class ClusterApiImpl extends MLog implements ClusterApi {
 
     private static CfgString CFG_PATH = new CfgString(ClusterApi.class, "registryPath", "cluster");
-    public static CfgLong CFG_LOCK_TIMEOUT = new CfgLong(ClusterApi.class, "lockTimeout", MPeriod.HOUR_IN_MILLISECOUNDS);
+    public static CfgLong CFG_LOCK_TIMEOUT =
+            new CfgLong(ClusterApi.class, "lockTimeout", MPeriod.HOUR_IN_MILLISECOUNDS);
     public static CfgLong CFG_LOCK_SLEEP = new CfgLong(ClusterApi.class, "lockSleep", 200);
-    public static CfgBoolean CFG_LOCK_VALIDATE = new CfgBoolean(ClusterApi.class, "lockValidate", false);
+    public static CfgBoolean CFG_LOCK_VALIDATE =
+            new CfgBoolean(ClusterApi.class, "lockValidate", false);
 
-    HashMap<String,ValueEventHandler> valueListeners = new HashMap<>();
+    HashMap<String, ValueEventHandler> valueListeners = new HashMap<>();
     LockEventHandler lockListeners = new LockEventHandler();
     private static ClusterApiImpl instance;
 
@@ -43,14 +45,19 @@ public class ClusterApiImpl extends MLog implements ClusterApi {
     public void doDeactivate(ComponentContext ctx) {
         instance = null;
     }
-    
+
     public static ClusterApiImpl instance() {
         return instance;
     }
 
     @Override
     public Lock getLock(String name) {
-        return M.l(LockManager.class).getLock(CFG_PATH.value() + "/" + name, n -> {return new RegistryLock(n);});
+        return M.l(LockManager.class)
+                .getLock(
+                        CFG_PATH.value() + "/" + name,
+                        n -> {
+                            return new RegistryLock(n);
+                        });
     }
 
     @Override
@@ -68,7 +75,7 @@ public class ClusterApiImpl extends MLog implements ClusterApi {
         }
         return ret;
     }
-    
+
     @Override
     public void registerValueListener(String name, ValueListener consumer) {
         synchronized (valueListeners) {
@@ -82,7 +89,7 @@ public class ClusterApiImpl extends MLog implements ClusterApi {
         String p = MFile.normalizePath(CFG_PATH.value() + "/" + name);
         RegistryUtil.setValue(p, value);
     }
-    
+
     public void fireValueEventLocal(String name, String value, boolean local) {
         ValueEventHandler handler = null;
         synchronized (valueListeners) {
@@ -100,21 +107,21 @@ public class ClusterApiImpl extends MLog implements ClusterApi {
         }
         handler.fire(event, name, local);
     }
-    
+
     static class ValueEventHandler extends MEventHandler<ValueListener> {
         @Override
-        public void onFire(ValueListener listener, Object event, Object ... values) {
-            listener.event((String)event, (String)values[0], (Boolean)values[1]);
+        public void onFire(ValueListener listener, Object event, Object... values) {
+            listener.event((String) event, (String) values[0], (Boolean) values[1]);
         }
     }
 
     static class LockEventHandler extends MEventHandler<LockListener> {
         @Override
-        public void onFire(LockListener listener, Object event, Object ... values) {
-            listener.event((LockListener.EVENT)event, (String)values[0], (Boolean)values[1]);
+        public void onFire(LockListener listener, Object event, Object... values) {
+            listener.event((LockListener.EVENT) event, (String) values[0], (Boolean) values[1]);
         }
     }
-    
+
     @Override
     public void unregisterValueListener(ValueListener consumer) {
         synchronized (valueListeners) {
@@ -133,5 +140,4 @@ public class ClusterApiImpl extends MLog implements ClusterApi {
     public void unregisterLockListener(LockListener consumer) {
         lockListeners.unregister(consumer);
     }
-
 }

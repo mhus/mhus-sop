@@ -1,16 +1,14 @@
 /**
  * Copyright 2018 Mike Hummel
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * <p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * <p>http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
+ * <p>Unless required by applicable law or agreed to in writing, software distributed under the
+ * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
 package de.mhus.osgi.sop.api.action;
@@ -32,9 +30,9 @@ public abstract class ActionSchedulerServiceAdapter extends SchedulerServiceAdap
 
     public ActionSchedulerServiceAdapter() {
         desc = getClass().getAnnotation(ActionDescription.class);
-        if (desc == null)
-            log().w("action description not set",getClass().getCanonicalName());
+        if (desc == null) log().w("action description not set", getClass().getCanonicalName());
     }
+
     @Override
     public String getInterval() {
         String ret = super.getInterval();
@@ -55,60 +53,54 @@ public abstract class ActionSchedulerServiceAdapter extends SchedulerServiceAdap
             XdbService db = api.getManager();
             if (db == null) return;
             // create query
-            AQuery<SopActionTask> query = Db.query(SopActionTask.class).eq(_SopActionTask._QUEUE, queueName);
+            AQuery<SopActionTask> query =
+                    Db.query(SopActionTask.class).eq(_SopActionTask._QUEUE, queueName);
             int limit = getRoundLimit();
             int processed = 0;
             boolean isStarted = false; // marker if a action is processed and doBegin() was called
-            
+
             // iterate actions
             try (DbCollection<SopActionTask> res = db.getByQualification(query)) {
-                for ( SopActionTask action : res) {
+                for (SopActionTask action : res) {
                     long timeToWait = getTimeToWait();
-                    if (timeToWait <= 0 || MPeriod.isTimeOut(action.getModifyDate().getTime(), timeToWait)) {
-                        log().d("execute",action);
+                    if (timeToWait <= 0
+                            || MPeriod.isTimeOut(action.getModifyDate().getTime(), timeToWait)) {
+                        log().d("execute", action);
                         if (!isStarted) {
                             doBegin();
                             isStarted = true;
                         }
                         try {
-                            if (doExecute(action))
-                                action.delete();
-                            else
-                                action.save(); // set new modify date
+                            if (doExecute(action)) action.delete();
+                            else action.save(); // set new modify date
                         } catch (Throwable t) {
-                            log().e("delete action because of an error",action,t);
+                            log().e("delete action because of an error", action, t);
                             action.delete();
                         }
-                        
+
                         processed++;
                         if (limit > 0 && processed >= limit) break;
-                        
                     }
                 }
             }
-            
-            if (isStarted)
-                doEnd();
-            
+
+            if (isStarted) doEnd();
+
         } catch (Throwable t) {
             log().e(t);
         }
-        
     }
 
-    /**
-     * Called before the first action will be executed
-     */
+    /** Called before the first action will be executed */
     protected abstract void doBegin();
-    
-    /**
-     * Called after the last action for this block was executed
-     */
+
+    /** Called after the last action for this block was executed */
     protected abstract void doEnd();
-    
+
     /**
-     * Overwrite to process the action. If the method throws an exception the action task will be deleted.
-     * 
+     * Overwrite to process the action. If the method throws an exception the action task will be
+     * deleted.
+     *
      * @param action The action to process
      * @return true if the action was processed and the task can be deleted.
      */
@@ -118,13 +110,16 @@ public abstract class ActionSchedulerServiceAdapter extends SchedulerServiceAdap
         if (desc == null) return 0;
         return desc.timeToWait();
     }
+
     protected int getRoundLimit() {
         if (desc == null) return 0;
         return desc.limit();
     }
 
     /**
-     * Overwrite this if you need to disable the action processing depending on other then the timer resources.
+     * Overwrite this if you need to disable the action processing depending on other then the timer
+     * resources.
+     *
      * @return true if action processing is enabled (default)
      */
     protected boolean isEnabled() {
@@ -135,5 +130,4 @@ public abstract class ActionSchedulerServiceAdapter extends SchedulerServiceAdap
         if (desc == null) return null;
         return desc.queue();
     }
-
 }

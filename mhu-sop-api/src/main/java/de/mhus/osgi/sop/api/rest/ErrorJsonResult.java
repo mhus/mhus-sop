@@ -2,7 +2,6 @@ package de.mhus.osgi.sop.api.rest;
 
 import org.codehaus.jackson.node.ObjectNode;
 
-import de.mhus.osgi.sop.api.rest.JsonResult;
 
 public class ErrorJsonResult extends JsonResult {
 
@@ -10,8 +9,6 @@ public class ErrorJsonResult extends JsonResult {
         ObjectNode out = createObjectNode();
         out.put("successful", false);
         out.put("rc", rc);
-        if (msg != null)
-            out.put("msg", msg);
+        if (msg != null) out.put("msg", msg);
     }
-
 }

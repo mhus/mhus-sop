@@ -1,16 +1,14 @@
 /**
  * Copyright 2018 Mike Hummel
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * <p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * <p>http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
+ * <p>Unless required by applicable law or agreed to in writing, software distributed under the
+ * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
 package de.mhus.osgi.sop.impl.aaa.util;
@@ -46,11 +44,13 @@ public class AccountFromLdap extends MLog implements AccountSource {
 
     public static final SearchControls SEARCH_CONTROLS_ALL = MLdap.getSimpleSearchControls();
     public static final SearchControls SEARCH_CONTROLS_EMPTY = MLdap.getSimpleSearchControls();
+
     static {
         SEARCH_CONTROLS_EMPTY.setReturningAttributes(new String[0]);
     }
+
     public static final Date STARTED_DATE = new Date();
-    
+
     private String url;
     private String principal;
     private String password;
@@ -69,8 +69,7 @@ public class AccountFromLdap extends MLog implements AccountSource {
 
         LdapAccount ret = new LdapAccount(account);
         if (!ret.reloadAccount()) return null;
-        
-        
+
         return ret;
     }
 
@@ -116,9 +115,11 @@ public class AccountFromLdap extends MLog implements AccountSource {
     }
 
     public void setUserAttributeMapping(String mapping) {
-        userAttributeMapping = MProperties.explodeToMProperties(MUri.explodeArray(mapping, ';'), '=', ':', 0, Integer.MAX_VALUE);
+        userAttributeMapping =
+                MProperties.explodeToMProperties(
+                        MUri.explodeArray(mapping, ';'), '=', ':', 0, Integer.MAX_VALUE);
     }
-    
+
     public String getUserAttributesDisplayName() {
         return userAttributesDisplayName;
     }
@@ -199,7 +200,7 @@ public class AccountFromLdap extends MLog implements AccountSource {
             } catch (javax.naming.AuthenticationException e) {
                 return false;
             } catch (Throwable t) {
-                log().e(account,t);
+                log().e(account, t);
             }
             return false;
         }
@@ -232,18 +233,19 @@ public class AccountFromLdap extends MLog implements AccountSource {
         @Override
         public boolean reloadAccount() {
             try {
-                
+
                 MProperties repl = new MProperties();
                 repl.setString("account", account);
-                
+
                 valid = true;
                 DirContext ctx = MLdap.getConnection(url, principal, MPassword.decode(password));
-                
+
                 // user parameters
-                NamingEnumeration<SearchResult> res = ctx.search( 
-                        StringCompiler.compile(userSearchName).execute(repl),
-                        StringCompiler.compile(userSearchFilter).execute(repl),
-                        SEARCH_CONTROLS_ALL);
+                NamingEnumeration<SearchResult> res =
+                        ctx.search(
+                                StringCompiler.compile(userSearchName).execute(repl),
+                                StringCompiler.compile(userSearchFilter).execute(repl),
+                                SEARCH_CONTROLS_ALL);
                 Map<String, Object> first = MLdap.getFirst(res);
                 if (first == null) {
                     valid = false;
@@ -251,7 +253,7 @@ public class AccountFromLdap extends MLog implements AccountSource {
                 }
                 fqdn = String.valueOf(first.get(MLdap.KEY_FQDN));
                 repl.setString("fqdn", fqdn);
-                
+
                 params = new MProperties();
                 if (userAttributeMapping != null) {
                     for (Entry<String, Object> mapping : userAttributeMapping.entrySet()) {
@@ -260,27 +262,37 @@ public class AccountFromLdap extends MLog implements AccountSource {
                 } else {
                     params.putAll(first);
                 }
-                
-                displayName = userAttributesDisplayName == null ? account : StringCompiler.compile(userAttributesDisplayName).execute(first);
+
+                displayName =
+                        userAttributesDisplayName == null
+                                ? account
+                                : StringCompiler.compile(userAttributesDisplayName).execute(first);
                 displayName = displayName.trim();
-                
-                active = userAttributesActive == null ? true : MCast.toboolean(first.get(userAttributesActive), false);
-                
-                uuid = userAttributesUuid == null ? MCrypt.toUuidHash(UUID_PREFIX + fqdn) : UUID.fromString(String.valueOf(first.get(userAttributesUuid)));
+
+                active =
+                        userAttributesActive == null
+                                ? true
+                                : MCast.toboolean(first.get(userAttributesActive), false);
+
+                uuid =
+                        userAttributesUuid == null
+                                ? MCrypt.toUuidHash(UUID_PREFIX + fqdn)
+                                : UUID.fromString(String.valueOf(first.get(userAttributesUuid)));
 
                 // groups
-                res = ctx.search( 
-                        StringCompiler.compile(groupsSearchName).execute(repl),
-                        StringCompiler.compile(groupsSearchFilter).execute(repl),
-                        SEARCH_CONTROLS_EMPTY);
-                
+                res =
+                        ctx.search(
+                                StringCompiler.compile(groupsSearchName).execute(repl),
+                                StringCompiler.compile(groupsSearchFilter).execute(repl),
+                                SEARCH_CONTROLS_EMPTY);
+
                 List<String> groupsList = MLdap.getNames(res);
                 groupsList.replaceAll(o -> MString.afterIndex(o, '=').toUpperCase());
                 groups = new HashSet<>();
                 groups.addAll(groupsList);
-                
+
                 res.close();
-                
+
                 ctx.close();
                 return true;
             } catch (Throwable t) {
@@ -308,6 +320,5 @@ public class AccountFromLdap extends MLog implements AccountSource {
         public boolean isActive() {
             return active;
         }
-        
     }
 }

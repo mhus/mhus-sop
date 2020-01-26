@@ -1,16 +1,14 @@
 /**
  * Copyright 2018 Mike Hummel
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * <p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * <p>http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
+ * <p>Unless required by applicable law or agreed to in writing, software distributed under the
+ * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
 package de.mhus.osgi.sop.api.rest;
@@ -32,77 +30,77 @@ import de.mhus.osgi.sop.api.aaa.AccessApi;
 
 public class JsonResult implements RestResult {
 
-	// private static Log log = Log.getLog(JsonResult.class);
-	private static int nextId = 0;
-	private org.codehaus.jackson.JsonNode json;
-	private long id;
-	private static ObjectMapper m = new ObjectMapper();
-	
-	public JsonResult() {
-		id = newId();
-	}
-	
-	@Override
-	public void write(PrintWriter writer) throws Exception {
-		
-    	// log.d("result",id,json);
-    	if (json == null) {
-    		createObjectNode();
-    	}
-    	if (json.isObject()) {
-    		((ObjectNode)json).put("_timestamp", System.currentTimeMillis());
-    		((ObjectNode)json).put("_sequence", id);
+    // private static Log log = Log.getLog(JsonResult.class);
+    private static int nextId = 0;
+    private org.codehaus.jackson.JsonNode json;
+    private long id;
+    private static ObjectMapper m = new ObjectMapper();
 
-    		AaaContext user = M.l(AccessApi.class).getCurrentOrGuest();
-    		((ObjectNode)json).put("_user", user.getAccountId());
-    		if (user.isAdminMode())
-        		((ObjectNode)json).put("_admin", true);
-    			 
-    		LevelMapper lm = MApi.get().getLogFactory().getLevelMapper();
-    		if (lm != null && lm instanceof TrailLevelMapper && ((TrailLevelMapper)lm).isLocalTrail() )
-    			((ObjectNode)json).put("_trail",((TrailLevelMapper)lm).getTrailId());
-    	}
-    	
-		m.writeValue(writer,json);
+    public JsonResult() {
+        id = newId();
+    }
 
-	}
+    @Override
+    public void write(PrintWriter writer) throws Exception {
 
-	@Override
-	public String getContentType() {
-		return "application/json";
-	}
+        // log.d("result",id,json);
+        if (json == null) {
+            createObjectNode();
+        }
+        if (json.isObject()) {
+            ((ObjectNode) json).put("_timestamp", System.currentTimeMillis());
+            ((ObjectNode) json).put("_sequence", id);
 
-	private static synchronized long newId() {
-		return nextId ++;
-	}
+            AaaContext user = M.l(AccessApi.class).getCurrentOrGuest();
+            ((ObjectNode) json).put("_user", user.getAccountId());
+            if (user.isAdminMode()) ((ObjectNode) json).put("_admin", true);
 
-	public JsonNode getJson() {
-		return json;
-	}
+            LevelMapper lm = MApi.get().getLogFactory().getLevelMapper();
+            if (lm != null
+                    && lm instanceof TrailLevelMapper
+                    && ((TrailLevelMapper) lm).isLocalTrail())
+                ((ObjectNode) json).put("_trail", ((TrailLevelMapper) lm).getTrailId());
+        }
 
-	public void setJson(ObjectNode json) {
-		this.json = json;
-	}
+        m.writeValue(writer, json);
+    }
 
-	public ObjectNode createObjectNode() {
-    	json = m.createObjectNode();
-    	return (ObjectNode)json;
-	}
-	
-	@Override
-	public String toString() {
-		StringWriter w = new StringWriter();
-		PrintWriter p = new PrintWriter(w);
-		try {
-			write(p);
-		} catch (Exception e) {
-		}
-		p.flush();
-		return w.toString();
-	}
+    @Override
+    public String getContentType() {
+        return "application/json";
+    }
 
-	public ArrayNode createArrayNode() {
-		json = m.createArrayNode();
-		return (ArrayNode)json;
-	}
+    private static synchronized long newId() {
+        return nextId++;
+    }
+
+    public JsonNode getJson() {
+        return json;
+    }
+
+    public void setJson(ObjectNode json) {
+        this.json = json;
+    }
+
+    public ObjectNode createObjectNode() {
+        json = m.createObjectNode();
+        return (ObjectNode) json;
+    }
+
+    @Override
+    public String toString() {
+        StringWriter w = new StringWriter();
+        PrintWriter p = new PrintWriter(w);
+        try {
+            write(p);
+        } catch (Exception e) {
+        }
+        p.flush();
+        return w.toString();
+    }
+
+    public ArrayNode createArrayNode() {
+        json = m.createArrayNode();
+        return (ArrayNode) json;
+    }
 }
