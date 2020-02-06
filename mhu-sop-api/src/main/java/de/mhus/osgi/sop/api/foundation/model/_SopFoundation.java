@@ -36,7 +36,7 @@ public class _SopFoundation extends ConstBase {
   public static final Identifier PROJECT_ARTIFACT = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.api.foundation.model.SopFoundation.class,"mhu-sop-api");
   public static final Identifier PROJECT_DESCRIPTION = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.api.foundation.model.SopFoundation.class,"A set of tools to improve OSGi frameworks and karaf");
   public static final Identifier PROJECT_GROUP = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.api.foundation.model.SopFoundation.class,"de.mhus.osgi");
-  public static final Identifier PROJECT_VERSION = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.api.foundation.model.SopFoundation.class,"6.3.0");
+  public static final Identifier PROJECT_VERSION = new Identifier(Identifier.TYPE.MAVEN, de.mhus.osgi.sop.api.foundation.model.SopFoundation.class,"6.3.1-SNAPSHOT");
   public static final Identifier _ACTIVE = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.foundation.model.SopFoundation.class,"active");
   public static final Identifier _CREATION_DATE = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.foundation.model.SopFoundation.class,"creationDate");
   public static final Identifier _GROUP = new Identifier(Identifier.TYPE.FIELD, de.mhus.osgi.sop.api.foundation.model.SopFoundation.class,"group");
