@@ -1,17 +1,19 @@
 package de.mhus.osgi.sop.api.cluster;
 
+import de.mhus.lib.core.M;
+import de.mhus.lib.core.base.service.LockManager;
 import de.mhus.lib.core.concurrent.Lock;
 
 public class ClusterApiDummy implements ClusterApi {
 
     @Override
     public Lock getLock(String name) {
-        return null;
+        return M.l(LockManager.class).getLock("cluster_" + name);
     }
 
     @Override
     public boolean isMaster(String name) {
-        return false;
+        return true;
     }
 
     @Override
@@ -41,7 +43,7 @@ public class ClusterApiDummy implements ClusterApi {
 
     @Override
     public boolean isReady() {
-        return false;
+        return true;
     }
 
 }
