@@ -1,10 +1,12 @@
 package de.mhus.osgi.sop.api.cluster;
 
+import de.mhus.lib.annotations.activator.DefaultImplementation;
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.base.service.ServerIdent;
 import de.mhus.lib.core.cfg.CfgBoolean;
 import de.mhus.lib.core.concurrent.Lock;
 
+@DefaultImplementation(ClusterApiDummy.class)
 public interface ClusterApi {
 
     public static final CfgBoolean CFG_ENABLED = new CfgBoolean(ClusterApi.class, "enabled", false);

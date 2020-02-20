@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 
 import de.mhus.lib.core.M;
@@ -22,8 +21,7 @@ import de.mhus.osgi.sop.api.cluster.LockListener;
 import de.mhus.osgi.sop.api.cluster.ValueListener;
 import de.mhus.osgi.sop.api.registry.RegistryUtil;
 
-@Component(immediate = true)
-public class ClusterApiImpl extends MLog implements ClusterApi {
+public class ClusterApiViaRegistry extends MLog implements ClusterApi {
 
     private static CfgString CFG_PATH = new CfgString(ClusterApi.class, "registryPath", "cluster");
     public static CfgLong CFG_LOCK_TIMEOUT =
@@ -34,7 +32,7 @@ public class ClusterApiImpl extends MLog implements ClusterApi {
 
     HashMap<String, ValueEventHandler> valueListeners = new HashMap<>();
     LockEventHandler lockListeners = new LockEventHandler();
-    private static ClusterApiImpl instance;
+    private static ClusterApiViaRegistry instance;
 
     @Activate
     public void doActivate(ComponentContext ctx) {
@@ -46,7 +44,7 @@ public class ClusterApiImpl extends MLog implements ClusterApi {
         instance = null;
     }
 
-    public static ClusterApiImpl instance() {
+    public static ClusterApiViaRegistry instance() {
         return instance;
     }
 

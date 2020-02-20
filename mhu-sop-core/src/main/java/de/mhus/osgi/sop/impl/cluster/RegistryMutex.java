@@ -79,8 +79,9 @@ public class RegistryMutex implements RegistryPathControl {
                         name =
                                 name.substring(
                                         14, name.length() - RegistryUtil.VALUE_VARNAME.length());
-                        ClusterApiImpl.instance()
-                                .fireValueEventLocal(name, value.getValue(), local);
+                        if (ClusterApiViaRegistry.instance() != null)
+                            ClusterApiViaRegistry.instance()
+                                    .fireValueEventLocal(name, value.getValue(), local);
                     }
                 });
     }
@@ -90,7 +91,8 @@ public class RegistryMutex implements RegistryPathControl {
         // the lock is released
         String name = value.getPath();
         name = name.substring(14, name.length() - RegistryUtil.MASTER_VARNAME.length());
-        ClusterApiImpl.instance().fireLockEventLocal(event, name, local);
+        if (ClusterApiViaRegistry.instance() != null)
+            ClusterApiViaRegistry.instance().fireLockEventLocal(event, name, local);
     }
 
     @Override
