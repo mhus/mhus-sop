@@ -22,4 +22,6 @@ public interface RegistryProvider {
     boolean publishAll();
 
     boolean requestAll();
+
+    boolean isReady();
 }

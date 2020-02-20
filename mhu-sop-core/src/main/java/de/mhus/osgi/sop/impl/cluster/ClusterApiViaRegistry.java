@@ -19,6 +19,7 @@ import de.mhus.lib.core.concurrent.Lock;
 import de.mhus.osgi.sop.api.cluster.ClusterApi;
 import de.mhus.osgi.sop.api.cluster.LockListener;
 import de.mhus.osgi.sop.api.cluster.ValueListener;
+import de.mhus.osgi.sop.api.registry.RegistryApi;
 import de.mhus.osgi.sop.api.registry.RegistryUtil;
 
 public class ClusterApiViaRegistry extends MLog implements ClusterApi {
@@ -137,5 +138,10 @@ public class ClusterApiViaRegistry extends MLog implements ClusterApi {
     @Override
     public void unregisterLockListener(LockListener consumer) {
         lockListeners.unregister(consumer);
+    }
+
+    @Override
+    public boolean isReady() {
+        return M.l(RegistryApi.class).isReady();
     }
 }

@@ -55,4 +55,17 @@ public class JmsRegistryProvider extends MLog implements RegistryProvider {
         if (!CFG_ENABLED.value()) return false;
         return JmsApiImpl.instance.requestRegistry();
     }
+
+    @Override
+    public boolean isReady() {
+        return 
+                JmsApiImpl.instance != null 
+                && 
+                JmsApiImpl.instance.isConnected() 
+                && 
+                JmsApiImpl.instance.register != null
+                &&
+                JmsApiImpl.instance.register.size() > 0 // should not be empty
+                ;
+    }
 }

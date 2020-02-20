@@ -91,4 +91,11 @@ public interface RegistryApi {
     void load();
 
     String getServerIdent();
+
+    /**
+     * Return true if the api is ready. The state can change multiple times while lifetime and depends on
+     * active services.
+     * @return true if ready.
+     */
+    boolean isReady();
 }

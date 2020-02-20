@@ -66,6 +66,7 @@ import de.mhus.osgi.sop.api.util.SopUtil;
 public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManager, CfgProvider {
 
     public static final int DEFAULT_PRIORITY = 100;
+    private boolean ready = false;
     private IConfig configProxy = new MyConfig();
     private TreeMap<String, RegistryValue> registry = new TreeMap<>();
     private TimerIfc timer;
@@ -115,10 +116,17 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
                     @Override
                     public void run() {
                         MThread.sleep(10000);
+                        while (MOsgi.getServices(RegistryProvider.class, null).size() == 0) {
+                            log().d("RegistryProvider not found");
+                            MThread.sleep(10000);
+                        }
                         while (!publishAll()) {
                             MThread.sleep(10000);
                         }
-                        requestAll();
+                        while (!requestAll()) {
+                            MThread.sleep(10000);
+                        }
+                        ready = true;
                     }
                 });
     }
@@ -528,6 +536,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 
     @Override
     public boolean publishAll() {
+        log().d("publishAll");
         boolean res = true;
         for (RegistryProvider provider : MOsgi.getServices(RegistryProvider.class, null)) {
             try {
@@ -541,6 +550,7 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
 
     @Override
     public boolean requestAll() {
+        log().d("requestAll");
         boolean res = true;
         for (RegistryProvider provider : MOsgi.getServices(RegistryProvider.class, null)) {
             try {
@@ -907,5 +917,17 @@ public class RegistryApiImpl extends MLog implements RegistryApi, RegistryManage
     @Override
     public String getServerIdent() {
         return SopUtil.getServerIdent();
+    }
+
+    @Override
+    public boolean isReady() {
+        if (!ready) return false;
+        boolean one = false;
+        for ( RegistryProvider provider : MOsgi.getServices(RegistryProvider.class, null)) {
+            if (!provider.isReady())
+                return false;
+            one = true;
+        }
+        return one;
     }
 }

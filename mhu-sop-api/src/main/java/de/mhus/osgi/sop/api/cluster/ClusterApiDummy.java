@@ -39,4 +39,9 @@ public class ClusterApiDummy implements ClusterApi {
         
     }
 
+    @Override
+    public boolean isReady() {
+        return false;
+    }
+
 }

@@ -69,4 +69,11 @@ public interface ClusterApi {
     void registerLockListener(LockListener consumer);
 
     void unregisterLockListener(LockListener consumer);
+
+    /**
+     * Return true if the cluster api is ready. The state can change multiple times while lifetime and depends on
+     * active services.
+     * @return true if ready.
+     */
+    boolean isReady();
 }
