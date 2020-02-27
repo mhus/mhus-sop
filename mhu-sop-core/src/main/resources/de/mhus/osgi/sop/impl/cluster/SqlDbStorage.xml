@@ -1,0 +1,5 @@
+<config>
+	<table name="$/prefix$_lock" primary_key="id">
+      <field name="id" type="string" size="300" />
+	</table>
+</config>

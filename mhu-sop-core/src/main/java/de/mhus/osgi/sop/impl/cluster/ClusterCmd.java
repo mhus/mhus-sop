@@ -39,7 +39,6 @@ import de.mhus.lib.errors.WrongStateException;
 import de.mhus.osgi.api.karaf.AbstractCmd;
 import de.mhus.osgi.sop.api.cluster.ClusterApi;
 import de.mhus.osgi.sop.api.cluster.TimerTaskClusterInterceptor;
-import de.mhus.osgi.sop.api.cluster.ValueListener;
 import de.mhus.osgi.sop.api.operation.OperationsSelector;
 import de.mhus.osgi.sop.api.operation.SelectorProvider;
 import de.mhus.osgi.sop.api.registry.RegistryUtil;
@@ -235,35 +234,35 @@ public class ClusterCmd extends AbstractCmd {
             }
             System.out.println("Finished!");
             System.out.println("With " + errors + " errors in " + locks + " locks");
-        } else if (cmd.equals("fire")) {
-            api.fireValueEvent(path, parameters[0]);
-            System.out.println("ok");
-        } else if (cmd.equals("register")) {
-            ValueListener c =
-                    new ValueListener() {
-                        @Override
-                        public void event(String name, String value, boolean local) {
-                            System.out.println(
-                                    (local ? "Local: " : "Remote: ") + name + "=" + value);
-                        }
-                    };
-            api.registerValueListener(path, c);
-        } else if (cmd.equals("listen")) {
-            ValueListener c =
-                    new ValueListener() {
-                        @Override
-                        public void event(String name, String value, boolean local) {
-                            System.out.println(
-                                    (local ? "Local: " : "Remote: ") + name + "=" + value);
-                        }
-                    };
-            api.registerValueListener(path, c);
-            System.out.println("Press Ctrl+C to exit");
-            try {
-                while (true) Thread.sleep(1000);
-            } catch (InterruptedException e) {
-            }
-            api.unregisterValueListener(c);
+//        } else if (cmd.equals("fire")) {
+//            api.fireValueEvent(path, parameters[0]);
+//            System.out.println("ok");
+//        } else if (cmd.equals("register")) {
+//            ValueListener c =
+//                    new ValueListener() {
+//                        @Override
+//                        public void event(String name, String value, boolean local) {
+//                            System.out.println(
+//                                    (local ? "Local: " : "Remote: ") + name + "=" + value);
+//                        }
+//                    };
+//            api.registerValueListener(path, c);
+//        } else if (cmd.equals("listen")) {
+//            ValueListener c =
+//                    new ValueListener() {
+//                        @Override
+//                        public void event(String name, String value, boolean local) {
+//                            System.out.println(
+//                                    (local ? "Local: " : "Remote: ") + name + "=" + value);
+//                        }
+//                    };
+//            api.registerValueListener(path, c);
+//            System.out.println("Press Ctrl+C to exit");
+//            try {
+//                while (true) Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//            }
+//            api.unregisterValueListener(c);
         } else if (cmd.equals("master")) {
             System.out.println(RegistryUtil.master(path, timeout));
         } else if (cmd.equals("servicelock")) {

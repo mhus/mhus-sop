@@ -12,36 +12,6 @@ public class ClusterApiDummy implements ClusterApi {
     }
 
     @Override
-    public boolean isMaster(String name) {
-        return true;
-    }
-
-    @Override
-    public void registerValueListener(String name, ValueListener consumer) {
-        
-    }
-
-    @Override
-    public void fireValueEvent(String name, String value) {
-        
-    }
-
-    @Override
-    public void unregisterValueListener(ValueListener consumer) {
-        
-    }
-
-    @Override
-    public void registerLockListener(LockListener consumer) {
-        
-    }
-
-    @Override
-    public void unregisterLockListener(LockListener consumer) {
-        
-    }
-
-    @Override
     public boolean isReady() {
         return true;
     }

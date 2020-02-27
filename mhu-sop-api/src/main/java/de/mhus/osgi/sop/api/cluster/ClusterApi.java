@@ -35,7 +35,7 @@ public interface ClusterApi {
      * @param name
      * @return true if I'm the master
      */
-    boolean isMaster(String name);
+//    boolean isMaster(String name);
 
     /**
      * Check if I'm the master of a named resource of the current service (hostname). The method
@@ -44,31 +44,31 @@ public interface ClusterApi {
      * @param name
      * @return true if I'm the master
      */
-    default boolean isServiceMaster(String name) {
-        return isMaster(getServiceName() + "/" + name);
-    }
+//    default boolean isServiceMaster(String name) {
+//        return isMaster(getServiceName() + "/" + name);
+//    }
 
-    void registerValueListener(String name, ValueListener consumer);
+//    void registerValueListener(String name, ValueListener consumer);
 
-    default void registerServiceListener(String name, ValueListener consumer) {
-        registerValueListener(getServiceName() + "/" + name, consumer);
-    }
+//    default void registerServiceListener(String name, ValueListener consumer) {
+//        registerValueListener(getServiceName() + "/" + name, consumer);
+//    }
 
-    void fireValueEvent(String name, String value);
+//    void fireValueEvent(String name, String value);
 
-    default void fireServiceValueEvent(String name, String value) {
-        fireValueEvent(getServiceName() + "/" + name, value);
-    }
+//    default void fireServiceValueEvent(String name, String value) {
+//        fireValueEvent(getServiceName() + "/" + name, value);
+//    }
 
-    void unregisterValueListener(ValueListener consumer);
+//    void unregisterValueListener(ValueListener consumer);
 
     default String getServiceName() {
         return M.l(ServerIdent.class).getService();
     }
 
-    void registerLockListener(LockListener consumer);
-
-    void unregisterLockListener(LockListener consumer);
+//    void registerLockListener(LockListener consumer);
+//
+//    void unregisterLockListener(LockListener consumer);
 
     /**
      * Return true if the cluster api is ready. The state can change multiple times while lifetime and depends on
@@ -76,4 +76,5 @@ public interface ClusterApi {
      * @return true if ready.
      */
     boolean isReady();
+
 }

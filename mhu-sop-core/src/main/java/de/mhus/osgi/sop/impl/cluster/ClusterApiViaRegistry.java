@@ -2,10 +2,6 @@ package de.mhus.osgi.sop.impl.cluster;
 
 import java.util.HashMap;
 
-import org.osgi.service.component.ComponentContext;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Deactivate;
-
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MEventHandler;
 import de.mhus.lib.core.MFile;
@@ -35,16 +31,20 @@ public class ClusterApiViaRegistry extends MLog implements ClusterApi {
     LockEventHandler lockListeners = new LockEventHandler();
     private static ClusterApiViaRegistry instance;
 
-    @Activate
-    public void doActivate(ComponentContext ctx) {
+    public ClusterApiViaRegistry() {
         instance = this;
     }
-
-    @Deactivate
-    public void doDeactivate(ComponentContext ctx) {
-        instance = null;
-    }
-
+    
+//    @Activate
+//    public void doActivate(ComponentContext ctx) {
+//        instance = this;
+//    }
+//
+//    @Deactivate
+//    public void doDeactivate(ComponentContext ctx) {
+//        instance = null;
+//    }
+//
     public static ClusterApiViaRegistry instance() {
         return instance;
     }
@@ -59,12 +59,11 @@ public class ClusterApiViaRegistry extends MLog implements ClusterApi {
                         });
     }
 
-    @Override
-    public boolean isMaster(String name) {
-        String p = MFile.normalizePath(CFG_PATH.value() + "/" + name);
-        boolean master = RegistryUtil.master(p);
-        return master;
-    }
+//    public boolean isMaster(String name) {
+//        String p = MFile.normalizePath(CFG_PATH.value() + "/" + name);
+//        boolean master = RegistryUtil.master(p);
+//        return master;
+//    }
 
     private ValueEventHandler getEventHandler(String name) {
         ValueEventHandler ret = valueListeners.get(name);
@@ -75,7 +74,6 @@ public class ClusterApiViaRegistry extends MLog implements ClusterApi {
         return ret;
     }
 
-    @Override
     public void registerValueListener(String name, ValueListener consumer) {
         synchronized (valueListeners) {
             ValueEventHandler handler = getEventHandler(name);
@@ -83,7 +81,6 @@ public class ClusterApiViaRegistry extends MLog implements ClusterApi {
         }
     }
 
-    @Override
     public void fireValueEvent(String name, String value) {
         String p = MFile.normalizePath(CFG_PATH.value() + "/" + name);
         RegistryUtil.setValue(p, value);
@@ -121,7 +118,6 @@ public class ClusterApiViaRegistry extends MLog implements ClusterApi {
         }
     }
 
-    @Override
     public void unregisterValueListener(ValueListener consumer) {
         synchronized (valueListeners) {
             for (ValueEventHandler handler : valueListeners.values()) {
@@ -130,12 +126,10 @@ public class ClusterApiViaRegistry extends MLog implements ClusterApi {
         }
     }
 
-    @Override
     public void registerLockListener(LockListener consumer) {
         lockListeners.registerWeak(consumer);
     }
 
-    @Override
     public void unregisterLockListener(LockListener consumer) {
         lockListeners.unregister(consumer);
     }
