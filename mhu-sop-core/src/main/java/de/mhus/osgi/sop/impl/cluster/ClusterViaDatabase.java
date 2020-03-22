@@ -24,7 +24,7 @@ import de.mhus.lib.sql.DbResult;
 import de.mhus.lib.sql.DbStatement;
 import de.mhus.lib.sql.DefaultDbPool;
 import de.mhus.lib.sql.Dialect;
-import de.mhus.osgi.api.services.MOsgi;
+import de.mhus.osgi.api.util.DataSourceUtil;
 import de.mhus.osgi.sop.api.cluster.ClusterApi;
 
 public class ClusterViaDatabase extends MLog implements ClusterApi {
@@ -53,7 +53,13 @@ public class ClusterViaDatabase extends MLog implements ClusterApi {
     public Lock getLock(String name) {
         init();
         synchronized (cache) {
-            return cache.getOrCreate(name, (k) -> new DbLock(k));
+            // return cache.getOrCreate(name, (k) -> new DbLock(k));
+            Lock res = cache.get(name);
+            if (res == null) {
+                res = new DbLock(name);
+                cache.put(key, res);
+            }
+            return res;
         }
     }
 
@@ -70,7 +76,7 @@ public class ClusterViaDatabase extends MLog implements ClusterApi {
         if (ds != null) return; // TODO timeout
         while (true) {
             try {
-                ds = MOsgi.getDataSource(dsName);
+                ds = new DataSourceUtil().getDataSource(dsName);
                 if (ds == null) {
                     log().w("Datasource not found",dsName);
                 } else {
